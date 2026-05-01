@@ -74,99 +74,6 @@
             }
         }
 
-        .hamburger-menu {
-            position: absolute;
-            margin-left: 7px;
-            top: 20px;
-            left: 13px;
-            z-index: 1000;
-        }
-
-        .menu-toggle {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 30px;
-            height: 25px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .menu-toggle span {
-            width: 30px;
-            height: 3px;
-            background: white;
-            border-radius: 10px;
-            transition: all 0.3s linear;
-        }
-
-        .menu-toggle.open span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .menu-toggle.open span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-toggle.open span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        .menu-items {
-            position: absolute;
-            top: 25px;
-            left: -250px;
-            background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
-            width: 250px;
-            height: 90vh;
-            padding-top: 20px;
-            transition: all 0.3s ease-in-out;
-            opacity: 0;
-        }
-
-        .menu-items.show {
-            left: 0;
-            opacity: 1;
-        }
-
-        .menu-items a {
-            display: block;
-            padding: 10px 20px;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.2s;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
-
-        .menu-items.show a {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .menu-items a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-title {
-            text-align: center;
-            color: white;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .menu-footer {
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-size: 12px;
-        }
-
         h1.Title {
             font-family: 'Arial', sans-serif;
             font-size: 2.5rem;
@@ -417,31 +324,11 @@
     </style>
 </head>
 <body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
-
-    <div class="hamburger-menu">
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div class="menu-items" id="menu-items">
-            <div class="menu-title">BIPH Music</div>
-            <a href="https://biphmusic.github.io/">Home</a>
-            <a href="https://biphmusic.github.io/dailysightsinging/">Daily Sight Singing</a>
-            <a href="https://biphmusic.github.io/wordwall/">Word Wall</a>
-            <a href="https://biphmusic.github.io/flashcards/">Flash Cards</a>
-            <a href="https://biphmusic.github.io/dice/">Dice Simulator</a>
-            <a href="https://biphmusic.github.io/chords/">Chord Quality</a>
-            <a href="https://biphmusic.github.io/progressions/">Chord Progressions</a>
-            <a href="https://biphmusic.github.io/piano/">Web Piano</a>
-            <a href="https://biphmusic.github.io/units/">AP Units</a>
-            <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            <div class="menu-footer">© Garrison Tubbs 2024</div>
-        </div>
-    </div>
 
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Vocabulary Quiz</h1>
@@ -1007,22 +894,6 @@
                 console.error('Failed to copy table: ', err);
             });
         }
-
-        function toggleMenu() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const menuItems = document.querySelector('.menu-items');
-            menuToggle.classList.toggle('open');
-            menuItems.classList.toggle('show');
-        }
-
-        document.addEventListener('click', (event) => {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const menuItems = document.querySelector('.menu-items');
-            if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-                menuToggle.classList.remove('open');
-                menuItems.classList.remove('show');
-            }
-        });
 
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
