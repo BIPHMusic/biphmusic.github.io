@@ -14,7 +14,6 @@
         body {
             background-color: rgb(45, 70, 119);
             font-family: 'Andika', sans-serif;
-            /* font-family: 'Helvetica Neue', Arial, sans-serif; */
             color: #ffffff;
             margin: 0;
             padding: 20px;
@@ -23,10 +22,8 @@
 
         .background {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
             opacity: 0.8;
             z-index: -2;
@@ -34,10 +31,8 @@
 
         .overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
                         radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
             mix-blend-mode: overlay;
@@ -47,10 +42,8 @@
         }
         .overlay2 {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
                         radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
             mix-blend-mode: overlay;
@@ -59,169 +52,75 @@
             animation: pulse 2s infinite alternate;
         }
         @keyframes pulse {
-            0% {
-                opacity: 0.3;
-                transform: scale(1); 
-            }
-            100% {
-                opacity: 0.7;
-                transform: scale(1.1);
-            }
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(1.1); }
         }
 
         .logocontainer {
-    position: relative;
-    min-height: 10vh;
-    padding-bottom: 50px;
-}
-
-.logo {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 25vh;
-    height: auto;
-    z-index: 10; 
-}
-
-.Subtitle {
-            font-family: 'Zapfino', sans-serif;
-            color: white;
-            margin-top: -0.7em;
-            font-size: 40px;
-            margin-bottom: 35px; /* Add some space below the subtitle */
+            position: relative;
+            min-height: 10vh;
+            padding-bottom: 50px;
         }
-
-.hamburger-menu {
+        .logo {
             position: absolute;
-            margin-left: 7px;
-            top: 20px;
-            left: 13px;
-            z-index: 1000;
+            right: 0;
+            bottom: 0;
+            width: 25vh;
+            height: auto;
+            z-index: 10; 
         }
 
-        .menu-toggle {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 30px;
-            height: 25px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 20;
-            z-index: 1001;
-        }
-
-        .menu-toggle span {
-            width: 30px;
-            height: 3px;
-            background: white;
-            border-radius: 10px;
-            transition: all 0.3s linear;
-        }
-
-        .menu-toggle.open span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .menu-toggle.open span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-toggle.open span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        .menu-items {
-            position: absolute;
-            top: 25px;
-            left: -250px;
-            background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
-            width: 250px;
-            height: 90vh;
-            padding-top: 20px;
-            transition: all 0.3s ease-in-out;
-            opacity: 0;
-        }
-
-        .menu-items.show {
-            left: 0;
-            opacity: 1;
-        }
-
-        .menu-items a {
-            display: block;
-            padding: 15px 20px;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.2s;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
-
-        .menu-items.show a {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .menu-items a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-items a:nth-child(1) { transition-delay: 0.1s; }
-.menu-items a:nth-child(2) { transition-delay: 0.2s; }
-.menu-items a:nth-child(3) { transition-delay: 0.3s; }
-.menu-items a:nth-child(4) { transition-delay: 0.4s; }
-.menu-items a:nth-child(5) { transition-delay: 0.5s; }
-.menu-items a:nth-child(6) { transition-delay: 0.6s; }
-.menu-items a:nth-child(7) { transition-delay: 0.7s; }
-.menu-items a:nth-child(8) { transition-delay: 0.8s; }
-.menu-items a:nth-child(9) { transition-delay: 0.9s; }
-.menu-items a:nth-child(10) { transition-delay: 1.0s; }
-
-        .menu-title {
+                h1.Title {
+            font-family: 'Arial', sans-serif;
+            font-size: 2.5rem;
             text-align: center;
-            color: white;
-            font-size: 18px;
             margin-bottom: 10px;
         }
 
-        .menu-footer {
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
+        h1.Subtitle {
+            font-family: 'Zapfino', sans-serif;
+            font-size: 40px;
             text-align: center;
-            color: white;
-            font-size: 12px;
+            margin-bottom: 20px;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
-            text-align: center;
-            margin-bottom: 40px;
-            letter-spacing: 2px;
-        }
-       
-/* Add CSS here */
 
-.content {
-            padding-top: 120px; /* Adjust based on your header height */
-            height: 100vh;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
+#unitSelector {
+    display: block;
+    margin: 0 auto 25px;
+    padding: 8px 12px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    width: auto;
+    min-width: 180px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%278%27 viewBox=%270 0 12 8%27 fill=%27white%27><polygon points=%276,8 0,0 12,0%27/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+}
+
+#unitSelector:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+#unitSelector option {
+    cursor: pointer;
+}
+
         #glossary {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
         }
+
         .term-card {
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
@@ -232,26 +131,77 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            height: 100px; /* Set a fixed height */
-            margin-bottom: 10px; /* Add consistent margin between cards */
+            height: 130px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0);
         }
 
         .term-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 50px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 5px 50px rgba(255, 255, 255, 0.05);
         }
+
         .term {
             font-family: sans-serif;
             font-size: 1.1em;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             color: #fbe179;
+            transition: filter 0.6s ease;
+            position: relative;
         }
+
         .definition {
             font-size: 1.1em;
             line-height: 1.4;
             flex-grow: 1;
-            transition: opacity 0.3s ease-in-out;
         }
+
+        /* Hidden Mode - Strong Blur */
+        .hidden-mode .term {
+            filter: blur(50px);
+        }
+
+        /* Reveal Button */
+        .term-card .reveal-btn {
+            display: none;
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .hidden-mode .term-card:hover .reveal-btn {
+            display: block;
+            opacity: 0.7;
+        }
+
+        .reveal-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 19px;
+            color: rgba(255, 255, 255, 0.65);
+            cursor: pointer;
+            z-index: 20;
+        }
+        .close-btn:hover { color: white; }
+
+        /* Classic Poof Animation */
         .poof {
             position: absolute;
             top: 50%;
@@ -262,7 +212,7 @@
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             opacity: 0;
-            animation: poofAnimation 0.4s ease-out; /* Animation duration reduced to 0.3s */
+            pointer-events: none;
         }
         .poof::before,
         .poof::after {
@@ -283,27 +233,19 @@
             top: 30px;
             left: 50px;
         }
+
         @keyframes poofAnimation {
             0% {
                 transform: translate(-50%, -50%) scale(0);
-                opacity: 0.5;
+                opacity: 0.6;
             }
             100% {
-                transform: translate(-50%, -50%) scale(3);
+                transform: translate(-50%, -50%) scale(3.2);
                 opacity: 0;
             }
         }
-        .slide {
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-        }
 
-        #unitSelector {
-            display: block;
-            margin: 0 auto 20px; /* Reduced bottom margin */
-            padding: 5px; /* Reduced padding */
-            font-size: 16px;
-        }
-
+        /* Buttons */
         .hidden-mode-toggle {
             position: absolute;
             top: 50px;
@@ -315,68 +257,6 @@
             width: 60px;
             height: 50px;
         }
-
-        .hidden-mode-toggle img {
-            width: 100%;
-            height: 100%;
-        }
-
-        .term-card .reveal-btn {
-            display: none;
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            top: 40%;
-            transform: translateX(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            width: 60px;  /* Increased from 20px */
-            height: 60px; /* Increased from 20px */
-            z-index: 10;  /* Ensure it's above other elements */
-        }
-
-        .term-card .reveal-btn img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .term-card .close-btn {
-            display: none;
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: none;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            color: rgba(255, 255, 255, 0.56);
-            z-index: 11; /* Ensure it's above the reveal button */
-            padding: 10px; /* Increased padding for larger clickable area */
-            transition: color 0.3s; /* Transition for hover effect */
-        }
-
-        .term-card .close-btn:hover {
-            color: rgba(255, 255, 255, 1); /* Change color on hover */
-        }
-
-        .hidden-mode .term-card .reveal-btn,
-        .hidden-mode .term-card .close-btn {
-            display: block;
-        }
-
-        .hidden-mode .term-card .definition {
-            display: none;
-        }
-
-        /* Ensure the reveal button stays within the card */
-        .term-card {
-            position: relative;
-            overflow: hidden;
-            padding-bottom: 60px; /* Reduced padding to remove extra space */
-        }
-
         .shuffle-button {
             position: absolute;
             top: 95px;
@@ -389,49 +269,25 @@
             width: 60px;
             height: 50px;
         }
-
-        .shuffle-button img {
+        .hidden-mode-toggle img, .shuffle-button img {
             width: 100%;
             height: 100%;
         }
     </style>
 </head>
 <body>
+    <iframe src="../menu.html" style="border: none; width: 100%; height: 120px; position: absolute; top: 0; left: 0; z-index: 1000; pointer-events: auto;" title="Navigation Menu"></iframe>
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
 
-    <div class="hamburger-menu">
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div class="menu-items" id="menu-items">
-            <div class="menu-title">BIPH Music</div>
-            <a href="https://biphmusic.github.io/">Home</a>
-            <a href="https://biphmusic.github.io/units/">AP Units</a>
-            <a href="https://biphmusic.github.io/flashcards/">Flash Cards</a>
-            <a href="https://biphmusic.github.io/dice/">Dice Simulator</a>
-            <a href="https://biphmusic.github.io/piano/">Web Piano</a>
-            <a href="https://biphmusic.github.io/wordwall/">Word Wall</a>
-            <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            
-            <div class="menu-footer">© Garrison Tubbs 2024</div>
-        </div>
-    </div>
 
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Word Wall</h1>
 
     <select id="unitSelector" onchange="filterTerms()" style="margin-top: -20px;">
-        <option value="Cumulative">Cumulative</option>
         <option value="Unit1">Unit 1</option>
-        <option value="Unit2">Unit 2</option>
-        <option value="Unit3">Unit 3</option>
-        <option value="Unit4">Unit 4</option>
-        <option value="Unit5">Unit 5</option>
-        <option value="jan16">Jan 16 Test</option>
+        <!-- Add more units as needed -->
     </select>
 
     <button class="hidden-mode-toggle" onclick="toggleHiddenMode()">
@@ -447,38 +303,29 @@
     <div class="logocontainer">        
         <img src="BASIS logo/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
-    
 
-
-    <script src="../terms.js"></script> <!-- Reference to the terms.js file -->
+    <script src="../terms.js"></script>
     <script>
-
-
         let hiddenMode = false;
-        let removedCardsStandard = []; // Track removed cards in standard mode
-        let removedCardsHidden = []; // Track removed cards in hidden mode
+        let currentOrder = [];
 
         function createTermCard(term) {
             const card = document.createElement('div');
             card.className = 'term-card';
+            card.dataset.term = term.Term;
+
             card.innerHTML = `
                 <div class="term">${term.Term}</div>
                 <div class="definition">${term.Definition}</div>
-                <button class="reveal-btn" onclick="revealDefinition(this)">
+                <button class="reveal-btn" onclick="revealTerm(this)">
                     <img src="icons/magnifying-glass.png" alt="Reveal">
                 </button>
                 <button class="close-btn" onclick="removeCard(this.parentElement)">✕</button>
             `;
 
-            // Add click event to the card to remove it if not in hidden mode
-            card.addEventListener('click', (event) => {
-                if (!event.target.classList.contains('close-btn')) {
-                    if (!hiddenMode) {
-                        removeCard(card); // Trigger removeCard if not in hidden mode
-                    } else {
-                        revealDefinition(card.querySelector('.reveal-btn'));
-                    }
-                }
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.reveal-btn') || e.target.closest('.close-btn')) return;
+                if (!hiddenMode) removeCard(card);
             });
 
             return card;
@@ -486,186 +333,117 @@
 
         function toggleHiddenMode() {
             hiddenMode = !hiddenMode;
-            const hiddenModeIcon = document.getElementById('hiddenModeIcon');
-            hiddenModeIcon.src = hiddenMode ? "icons/hidden-on.png" : "icons/hidden-off.png";
+            const icon = document.getElementById('hiddenModeIcon');
+            icon.src = hiddenMode ? "icons/hidden-on.png" : "icons/hidden-off.png";
             document.body.classList.toggle('hidden-mode', hiddenMode);
             
-            // Reapply the current filter to update card appearances
-            filterTerms(); 
-            const removedCards = hiddenMode ? removedCardsStandard : removedCardsHidden;
-            removedCards.forEach(card => card.card.remove()); // Ensure removed cards stay removed
+            setTimeout(() => {
+        renderCurrentCards();
+    }, 500);
         }
 
-        function revealDefinition(button) {
+        function renderCurrentCards() {
+            const glossary = document.getElementById('glossary');
+            glossary.innerHTML = '';
+
+            if (currentOrder.length === 0) {
+                theglossary.forEach(t => glossary.appendChild(createTermCard(t)));
+                currentOrder = theglossary.map(t => t.Term);
+            } else {
+                currentOrder.forEach(name => {
+                    const term = theglossary.find(t => t.Term === name);
+                    if (term) glossary.appendChild(createTermCard(term));
+                });
+            }
+        }
+
+        function filterTerms() {
+            const glossary = document.getElementById('glossary');
+            glossary.innerHTML = '';
+
+            theglossary.forEach(term => glossary.appendChild(createTermCard(term)));
+            currentOrder = theglossary.map(t => t.Term);
+        }
+
+        function revealTerm(button) {
             const card = button.closest('.term-card');
-            const definition = card.querySelector('.definition');
+            const termEl = card.querySelector('.term');
             
-            definition.style.display = 'block';
+            termEl.style.filter = 'blur(0px)';
             button.style.display = 'none';
 
-            // Fade in
             setTimeout(() => {
-                definition.style.opacity = '1';
-            }, 10);
-
-            if (hiddenMode) {
-                setTimeout(() => {
-                    // Fade out
-                    definition.style.opacity = '0';
-                    setTimeout(() => {
-                        definition.style.display = 'none';
-                        button.style.display = 'block';
-                    }, 300); // Match this with the transition duration
-                }, 2000);
-            }
+                if (hiddenMode && card.isConnected) {
+                    termEl.style.filter = 'blur(50px)';
+                    button.style.display = 'block';
+                }
+            }, 2000);
         }
 
         function removeCard(card) {
             const poof = document.createElement('div');
             poof.className = 'poof';
+            poof.style.animation = 'poofAnimation 0.45s ease-out forwards';
             card.appendChild(poof);
 
-            // Start fading out the card immediately
+            card.style.transition = 'opacity 0.35s ease';
             card.style.opacity = '0';
 
-            // Add card to the appropriate removed list based on the current mode
-            if (hiddenMode) {
-                removedCardsHidden.push({ term: card.querySelector('.term').textContent, card }); // Store term and card
-            } else {
-                removedCardsStandard.push({ term: card.querySelector('.term').textContent, card }); // Store term and card
-            }
-
-            poof.addEventListener('animationend', () => {
+            setTimeout(() => {
                 card.remove();
-                rearrangeCards();
-            });
-        }
-
-        function rearrangeCards() {
-            const glossary = document.getElementById('glossary');
-            const cards = Array.from(glossary.children);
-            const cardPositions = cards.map(card => card.getBoundingClientRect());
-
-            cards.forEach((card, index) => {
-                const startRect = cardPositions[index];
-                card.style.position = 'absolute';
-                card.style.left = `${startRect.left}px`;
-                card.style.top = `${startRect.top}px`;
-                card.style.width = `${startRect.width}px`;
-                card.style.height = `${startRect.height}px`;
-            });
-
-            glossary.innerHTML = '';
-            cards.forEach(card => {
-                if (card.style.opacity !== '0') {
-                    glossary.appendChild(card);
-                }
-            });
-
-            requestAnimationFrame(() => {
-                cards.forEach(card => {
-                    card.classList.add('slide');
-                    card.style.position = '';
-                    card.style.left = '';
-                    card.style.top = '';
-                    card.style.width = '';
-                    card.style.height = '';
-                });
-            });
-        }
-
-        function filterTerms() {
-    const selectedUnit = document.getElementById('unitSelector').value;
-    let filteredTerms;
-
-    if (selectedUnit === 'Cumulative') {
-        filteredTerms = theglossary; // Reference to the entire glossary
-    } else if (selectedUnit === 'jan16') {
-        const unitTerms = jan16; 
-        filteredTerms = theglossary.filter(term => unitTerms.includes(term.Term)); 
-    } else {
-        const unitTerms = eval(selectedUnit.toLowerCase()); // Get terms for other units
-        filteredTerms = theglossary.filter(term => unitTerms.includes(term.Term)); // Filter the glossary
-    }
-
-    const glossary = document.getElementById('glossary');
-    glossary.innerHTML = '';
-
-            // Combine removed cards based on the current mode
-            const removedCards = hiddenMode ? removedCardsStandard : removedCardsHidden;
-
-            filteredTerms.forEach(term => {
-                // Only create cards that are not in the removed list
-                if (!removedCards.some(card => card.term === term.Term)) {
-                    const card = createTermCard(term);
-                    glossary.appendChild(card);
-                }
-            });
+                currentOrder = currentOrder.filter(t => t !== card.dataset.term);
+            }, 400);
         }
 
         function shuffleCards() {
             const glossary = document.getElementById('glossary');
-            const cards = Array.from(glossary.children);
-            const shuffledCards = cards.sort(() => Math.random() - 0.5); // Randomize the order
+            let cards = Array.from(glossary.children);
 
-            // Clear the glossary and append shuffled cards
+            // Fisher-Yates shuffle
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+
             glossary.innerHTML = '';
-            shuffledCards.forEach(card => {
-                glossary.appendChild(card);
-            });
+            cards.forEach(card => glossary.appendChild(card));
 
-            // Animate the cards to new positions and adjust opacity
-            const positions = shuffledCards.map(card => {
+            // Improved shuffle animation (similar to old version)
+            const positions = cards.map(card => {
                 const rect = card.getBoundingClientRect();
-                const newLeft = glossary.clientWidth / 2 - rect.left - rect.width / 2;
-                const newTop = glossary.clientHeight / 2 - rect.top - rect.height / 2;
                 return {
-                    left: newLeft,
-                    top: newTop
+                    left: glossary.clientWidth / 2 - rect.left - rect.width / 2,
+                    top: glossary.clientHeight / 2 - rect.top - rect.height / 2
                 };
             });
 
-            shuffledCards.forEach((card, index) => {
-                card.style.transition = 'transform 0.3s ease, opacity 0.3s ease'; // Quick animation for both transform and opacityx
-                card.style.transform = `translate(${positions[index].left}px, ${positions[index].top}px)`;
-                card.style.opacity = '0.1'; // Drop opacity
+            cards.forEach((card, i) => {
+                card.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+                card.style.transform = `translate(${positions[i].left}px, ${positions[i].top}px)`;
+                card.style.opacity = '0.15';
             });
 
-            // Reset positions and opacity after animation
             setTimeout(() => {
-                shuffledCards.forEach(card => {
-                    card.style.transition = ''; // Reset transition
-                    card.style.transform = ''; // Reset position
-                    card.style.opacity = '1'; // Return opacity
+                cards.forEach(card => {
+                    card.style.transition = '';
+                    card.style.transform = '';
+                    card.style.opacity = '1';
                 });
-            }, 300); // Match this with the animation duration
+            }, 400);
+
+            currentOrder = cards.map(card => card.dataset.term);
         }
 
+
+
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             const unitSelector = document.getElementById('unitSelector');
-            unitSelector.value = unitSelector.options[unitSelector.options.length - 1].value; // Set default to last option
+            unitSelector.value = unitSelector.options[unitSelector.options.length - 1].value;
             filterTerms();
-            document.querySelector('.hidden-mode-toggle').style.display = 'block';
         });
 
-        // Hamburger menu functionality
-        const menuToggle = document.querySelector('.menu-toggle');
-        const menuItems = document.querySelector('.menu-items');
-        
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('open');
-            menuItems.classList.toggle('show');
-        });
-        
-        // Close the menu when clicking outside
-        document.addEventListener('click', (event) => {
-            // Check if the click was outside the menu and the toggle button
-            if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-                menuToggle.classList.remove('open');
-                menuItems.classList.remove('show');
-            }
-        });
+
     </script>
-
 </body>
 </html>
