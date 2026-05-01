@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sheet Music Composer</title>
-    <link rel="icon" href="/icons/BGicon.png">
+    <link rel="icon" href="../icons/BGicon.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <style>
         @font-face {
@@ -70,110 +70,6 @@
                 opacity: 0.7;
                 transform: scale(1.1);
             }
-        }
-
-        .hamburger-menu {
-            position: absolute;
-            top: 20px;
-            left: 13px;
-            z-index: 1000;
-        }
-
-        .menu-toggle {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 30px;
-            height: 25px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .menu-toggle span {
-            width: 30px;
-            height: 3px;
-            background: white;
-            border-radius: 10px;
-            transition: all 0.3s linear;
-        }
-
-        .menu-toggle.open span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .menu-toggle.open span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-toggle.open span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        .menu-items {
-            position: absolute;
-            top: 25px;
-            left: -250px;
-            background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
-            width: 250px;
-            height: 90vh;
-            padding-top: 20px;
-            transition: all 0.3s ease-in-out;
-            opacity: 0;
-        }
-
-        .menu-items.show {
-            left: 0;
-            opacity: 1;
-        }
-
-        .menu-items a {
-            display: block;
-            padding: 10px 20px;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.2s;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
-
-        .menu-items.show a {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .menu-items a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-items a:nth-child(1) { transition-delay: 0.1s; }
-        .menu-items a:nth-child(2) { transition-delay: 0.2s; }
-        .menu-items a:nth-child(3) { transition-delay: 0.3s; }
-        .menu-items a:nth-child(4) { transition-delay: 0.4s; }
-        .menu-items a:nth-child(5) { transition-delay: 0.5s; }
-        .menu-items a:nth-child(6) { transition-delay: 0.6s; }
-        .menu-items a:nth-child(7) { transition-delay: 0.7s; }
-        .menu-items a:nth-child(8) { transition-delay: 0.8s; }
-        .menu-items a:nth-child(9) { transition-delay: 0.9s; }
-        .menu-items a:nth-child(10) { transition-delay: 1.0s; }
-        .menu-items a:nth-child(11) { transition-delay: 1.1s; }
-
-        .menu-title {
-            text-align: center;
-            color: white;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .menu-footer {
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-size: 12px;
         }
 
         .container {
@@ -258,7 +154,7 @@
             position: fixed;
             top: 60px;
             left: 20px;
-            z-index: 1000;
+            z-index: 10;
         }
 
         .note-size-controls button {
@@ -310,31 +206,11 @@
     </style>
 </head>
 <body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script> 
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
-
-    <div class="hamburger-menu">
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div class="menu-items" id="menu-items">
-            <div class="menu-title">BIPH Music</div>
-            <a href="https://biphmusic.github.io/">Home</a>
-            <a href="https://biphmusic.github.io/dailysightsinging/">Daily Sight Singing</a>
-            <a href="https://biphmusic.github.io/wordwall/">Word Wall</a>
-            <a href="https://biphmusic.github.io/flashcards/">Flash Cards</a>
-            <a href="https://biphmusic.github.io/dice/">Dice Simulator</a>
-            <a href="https://biphmusic.github.io/chords/">Chord Quality</a>
-            <a href="https://biphmusic.github.io/progressions/">Chord Progressions</a>
-            <a href="https://biphmusic.github.io/piano/">Web Piano</a>
-            <a href="https://biphmusic.github.io/units/">AP Units</a>
-            <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            <div class="menu-footer">© Garrison Tubbs 2024</div>
-        </div>
-    </div>
 
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Notation</h1>
@@ -390,7 +266,7 @@
     </div>
 
     <div class="logocontainer">
-        <img src="BASIS logo/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
 
     <script>
@@ -408,44 +284,39 @@
         let undoStack = [];
         let redoStack = [];
 
-// Load the background sheet music and adjust canvas size
-fabric.Image.fromURL('images/example1.png', function(img) {
-    const imageWidth = img.width; // Width of the image (1081px in this case)
-    const canvasWidth = canvas.width; // Width of the canvas
 
-    // Calculate the zoom level to fit the image width to the canvas width
+fabric.Image.fromURL('images/example1.png', function(img) {
+    const imageWidth = img.width; 
+    const canvasWidth = canvas.width; 
+    
     let zoomLevel = canvasWidth / imageWidth;
 
-    // Apply constraints to the zoom level
     const minZoom = 0.68;
     const maxZoom = 1;
     zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoomLevel));
 
-    img.scaleToWidth(canvas.width); // Scale the image to fit the canvas width
+    img.scaleToWidth(canvas.width); 
     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
         scaleX: zoomLevel,
         scaleY: zoomLevel
     });
 
-    // Set the canvas zoom to ensure the full image is visible
     canvas.setZoom(zoomLevel);
 
     backgroundImageLoaded = true;
 });
 
-// Ensure canvas adjusts on window resize
+
 window.addEventListener('resize', () => {
     canvas.setWidth(window.innerWidth);
 
     if (backgroundImageLoaded) {
         const backgroundImage = canvas.backgroundImage;
-        const imageWidth = backgroundImage.width; // Original width of the image
-        const canvasWidth = canvas.width; // Current width of the canvas
+        const imageWidth = backgroundImage.width; 
+        const canvasWidth = canvas.width; 
 
-        // Recalculate the zoom level
         let zoomLevel = canvasWidth / imageWidth;
 
-        // Apply constraints to the zoom level
         const minZoom = 0.68;
         const maxZoom = 1;
         zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoomLevel));
@@ -453,13 +324,11 @@ window.addEventListener('resize', () => {
         backgroundImage.scaleX = zoomLevel;
         backgroundImage.scaleY = zoomLevel;
 
-        // Apply the new zoom level
         canvas.setZoom(zoomLevel);
         canvas.renderAll();
     }
 });
 
-        // Zoom functionality
         canvas.on('mouse:wheel', function(opt) {
             let delta = opt.e.deltaY;
             let zoom = canvas.getZoom();
@@ -477,7 +346,6 @@ window.addEventListener('resize', () => {
             opt.e.stopPropagation();
         });
 
-        // Create compound path for note head (outer oval with inner transparent oval)
         function createNoteHead(angle = 30) {
             const outerOval = new fabric.Ellipse({
                 rx: 12 * noteScaleFactor,
@@ -506,7 +374,7 @@ window.addEventListener('resize', () => {
 
         function createNote(type) {
     if (type === 'whole' || type === 'half') {
-        // Load the SVG for the whole note or half note
+        
         fabric.loadSVGFromString(`
             <svg height="800px" width="800px">
                 <path class="s0" d="m257.8 227.6c-78.2 19.6-115.1 77.2-82.9 126.5 31 47.3 114.2 68.5 186.2 49.2 71.2-19 108.8-71.6 83.7-119.3-26-49.6-109.8-75.8-187-56.4zm93.6 159.3c-36.2 9.6-84.3-12.6-107.9-50.6-24.4-39.4-13.3-80.2 25.3-89.9 38.4-9.7 87.7 15.4 109.6 54.9 21.3 38.2 9 76-27 85.6z"/>
@@ -516,24 +384,24 @@ window.addEventListener('resize', () => {
             svgGroup.set({
                 left: 100,
                 top: 100,
-                scaleX: noteScaleFactor * 0.063, // Slightly increased scale for whole and half notes
-                scaleY: noteScaleFactor * 0.058, // Slightly increased scale for whole and half notes
+                scaleX: noteScaleFactor * 0.063, 
+                scaleY: noteScaleFactor * 0.058, 
                 originX: 'center',
                 originY: 'center',
-                angle: -0 // Rotate 5 degrees to the left
+                angle: -0 
             });
 
             if (type === 'half') {
-                // Add a vertical stem for the half note
+                
                 const stem = new fabric.Rect({
-                    left: 100.7 * noteScaleFactor, // Adjust position relative to the note head
-                    top: 54 * noteScaleFactor,  // Adjust position relative to the note head
+                    left: 100.7 * noteScaleFactor, 
+                    top: 54 * noteScaleFactor,  
                     width: 2 * noteScaleFactor,
                     height: 40 * noteScaleFactor,
                     fill: 'black'
                 });
 
-                // Load the new SVG for the half note head
+                
                 fabric.loadSVGFromString(`
                     <svg height="800px" width="800px">
                         <path id="Layer copy" class="s0" d="m347.5 222.4c79.9 10.4 123.3 63.3 97 115.9-25.2 50.6-105.4 81.3-179.2 70.6-72.9-10.6-116.3-58.5-97-108.7 20.1-52.3 100.2-88.1 179.2-77.8zm-74.5 169c37.1 5.4 82.3-22.2 101.3-62.8 19.7-41.9 3.9-81.1-35.6-86.3-39.3-5.2-85.3 25.5-102.5 67.3-16.6 40.4 0 76.5 36.8 81.8z"/>
@@ -544,14 +412,14 @@ window.addEventListener('resize', () => {
                     halfNoteSVGGroup.set({
                         left: 100,
                         top: 100,
-                        scaleX: noteScaleFactor * 0.063, // Slightly increased scale for whole and half notes
-                        scaleY: noteScaleFactor * 0.058, // Slightly increased scale for whole and half notes
+                        scaleX: noteScaleFactor * 0.063, 
+                        scaleY: noteScaleFactor * 0.058, 
                         originX: 'center',
                         originY: 'center',
                         angle: -0
                     });
 
-                    // Combine the SVG note head and the stem into a group
+                    
                     const halfNoteGroup = new fabric.Group([halfNoteSVGGroup, stem], {
                         left: 100,
                         top: 100,
@@ -567,14 +435,13 @@ window.addEventListener('resize', () => {
                     canvas.renderAll();
                 });
             } else {
-                // For whole notes, just add the SVG note head
                 canvas.add(svgGroup);
                 canvas.setActiveObject(svgGroup);
                 saveState();
                 canvas.renderAll();
             }
         });
-        return; // Exit early since the SVG is handled asynchronously
+        return; 
     } else if (type === 'quarter') {
         const quarterNoteHead = new fabric.Ellipse({
             angle: -20,
@@ -600,17 +467,17 @@ window.addEventListener('resize', () => {
     }
 }
 
- // Note size adjustment
+ 
  const noteSizeDisplay = document.getElementById('noteSize');
 
 function adjustNoteSize(delta) {
     noteScaleFactor += delta;
-    noteScaleFactor = Math.max(0.5, Math.min(2, noteScaleFactor)); // Clamp between 0.5x and 2x
+    noteScaleFactor = Math.max(0.5, Math.min(2, noteScaleFactor)); 
     noteSizeDisplay.textContent = `${noteScaleFactor.toFixed(1)}x`;
 
-    // Update existing notes
+    
     canvas.forEachObject(obj => {
-        if (obj.type === 'group') { // Assuming notes are grouped objects
+        if (obj.type === 'group') { 
             obj.scaleX = noteScaleFactor;
             obj.scaleY = noteScaleFactor;
         }
@@ -646,14 +513,14 @@ function adjustNoteSize(delta) {
 
         function exportImage() {
             const originalZoom = canvas.getZoom();
-            canvas.setZoom(1); // Reset zoom to original framing
+            canvas.setZoom(1); 
 
             const dataURL = canvas.toDataURL({
                 format: 'png',
                 quality: 1
             });
 
-            canvas.setZoom(originalZoom); // Restore zoom level
+            canvas.setZoom(originalZoom); 
 
             const link = document.createElement('a');
             link.download = 'sheet-music-composition.png';
@@ -663,7 +530,7 @@ function adjustNoteSize(delta) {
             document.body.removeChild(link);
         }
 
-        // Pencil tool functionality
+        
         const pencilSettings = document.getElementById('pencilSettings');
         const lineThicknessInput = document.getElementById('lineThickness');
         const lineColorInput = document.getElementById('lineColor');
@@ -680,13 +547,11 @@ function adjustNoteSize(delta) {
             }
         }
 
-        // Add path tracking
         canvas.on('path:created', function(e) {
             drawingPaths.push(e.path);
             saveState();
         });
 
-        // Undo/Redo functionality
         function saveState() {
             undoStack.push(JSON.stringify(canvas.toJSON()));
             redoStack = [];
@@ -725,26 +590,26 @@ function adjustNoteSize(delta) {
         cornerStyle: 'circle',
         originX: 'center',
         originY: 'center',
-        hasControls: true, // Ensure controls are enabled
-        editable: true,    // Ensure the text is editable
+        hasControls: true, 
+        editable: true,   
     });
 
     canvas.add(text);
     canvas.setActiveObject(text);
-    text.enterEditing(); // Enter editing mode immediately
-    text.selectAll();    // Select all text for quick replacement
+    text.enterEditing(); 
+    text.selectAll();   
 
-    // Ensure proper rendering and focus
+    
     canvas.renderAll();
     text.on('editing:entered', () => {
-        canvas.selection = false; // Disable global selection while editing
+        canvas.selection = false; 
     });
     text.on('editing:exited', () => {
-        canvas.selection = true; // Re-enable global selection after editing
-        saveState();             // Save state after editing is done
+        canvas.selection = true;
+        saveState();           
     });
 
-    saveState(); // Save state when adding the text object
+    saveState();
 }
 
         function disableDrawingModes() {
@@ -756,7 +621,6 @@ function adjustNoteSize(delta) {
             }
         }
 
-        // Modify toolbar button event handlers
         const originalAddNote = addNote;
         addNote = function(type) {
             disableDrawingModes();
@@ -770,7 +634,7 @@ function adjustNoteSize(delta) {
         };
 
 
-        // Pan functionality
+
         let isDragging = false;
         let lastPosX;
         let lastPosY;
@@ -810,12 +674,11 @@ function adjustNoteSize(delta) {
         window.addEventListener('keydown', function(e) {
     const activeObject = canvas.getActiveObject();
 
-    // Check if an IText object is currently in editing mode
+    
     if (activeObject && activeObject.isEditing) {
-        return; // Allow the IText object to handle its own key events
+        return; 
     }
 
-    // Handle global shortcuts only when no text is being edited
     if (e.key === 'Escape' && isDrawingMode) {
         togglePencilTool();
         e.preventDefault();
@@ -837,7 +700,7 @@ function adjustNoteSize(delta) {
         pasteSelection();
         e.preventDefault();
     } else if (canvas.getActiveObject()) {
-        const moveDistance = e.altKey ? 10 : 1; // Faster movement with option key
+        const moveDistance = e.altKey ? 10 : 1; 
 
         switch (e.key) {
             case 'ArrowUp':
@@ -852,49 +715,48 @@ function adjustNoteSize(delta) {
             case 'ArrowRight':
                 activeObject.left += moveDistance;
                 break;
-            case 'x': // Rotate the object 180 degrees
+            case 'x': 
             case 'X':
                 if (activeObject.angle === 0) {
-                    activeObject.top += 50; // Move down 50px
+                    activeObject.top += 50; 
                 } else if (activeObject.angle === 180) {
-                    activeObject.top -= 50; // Move up 50px
+                    activeObject.top -= 50; 
                 }
-                activeObject.angle += 180; // Rotate by 180 degrees
+                activeObject.angle += 180;
                 if (activeObject.angle >= 360) {
-                    activeObject.angle = 0; // Reset to 0 degrees if it reaches 360
+                    activeObject.angle = 0; 
                 }
                 break;
         }
-        activeObject.setCoords(); // Update the object's coordinates
+        activeObject.setCoords(); 
         saveState();
         canvas.renderAll();
-        e.preventDefault(); // Prevent default arrow key behavior
+        e.preventDefault();
     }
 
-    // New hotkey functionality
     if (e.key === '1') {
-        addNote('quarter'); // Add quarter note
+        addNote('quarter'); 
         e.preventDefault();
     } else if (e.key === '2') {
-        addNote('half'); // Add half note
+        addNote('half'); 
         e.preventDefault();
     } else if (e.key === '4') {
-        addNote('whole'); // Add whole note
+        addNote('whole'); 
         e.preventDefault();
     } else if (e.key === 'p') {
-        togglePencilTool(); // Toggle pencil tool
+        togglePencilTool(); 
         e.preventDefault();
     } else if (e.key === 't') {
-        addText(); // Add text
+        addText(); 
         e.preventDefault();
     } else if ((e.key === 's' || e.key === 'S') && (e.metaKey || e.ctrlKey)) {
-        exportImage(); // Export/save image
+        exportImage(); 
         e.preventDefault();
     } else if ((e.key === '+' || e.key === '=') && (e.metaKey || e.ctrlKey)) {
-        adjustNoteSize(0.1); // Increase note size
+        adjustNoteSize(0.1); 
         e.preventDefault();
     } else if ((e.key === '-' && (e.metaKey || e.ctrlKey))) {
-        adjustNoteSize(-0.1); // Decrease note size
+        adjustNoteSize(-0.1); 
         e.preventDefault();
     }
 });
@@ -911,7 +773,7 @@ function adjustNoteSize(delta) {
             }
         });
 
-        // Copy/Paste functionality
+
         let copiedObjects = [];
 
         function copySelection() {
@@ -928,8 +790,8 @@ function adjustNoteSize(delta) {
                     clonedObj.set({
                         left: clonedObj.left + 10,
                         top: clonedObj.top + 10,
-                        selectable: true, // Ensure pasted objects are selectable
-                        evented: true // Ensure pasted objects respond to events
+                        selectable: true, 
+                        evented: true 
                     });
                     return clonedObj;
                 });
@@ -942,27 +804,10 @@ function adjustNoteSize(delta) {
             }
         }
 
-        // Fix disappearing objects issue
         canvas.on('object:modified', function() {
             canvas.renderAll();
         });
 
-        // Hamburger menu functionality
-        const menuToggle = document.querySelector('.menu-toggle');
-        const menuItems = document.querySelector('.menu-items');
-
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('open');
-            menuItems.classList.toggle('show');
-        });
-
-        // Close the menu when clicking outside
-        document.addEventListener('click', (event) => {
-            if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-                menuToggle.classList.remove('open');
-                menuItems.classList.remove('show');
-            }
-        });
     </script>
 </body>
 </html>
