@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AP Music Theory Student Portal</title>
+    <link rel="icon" href="../icons/BGIcon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond:wght@300&display=swap" rel="stylesheet">
+    <style>
+       @font-face {
+            font-family: 'Zapfino';
+            src: url('fonts/Zapfino.ttf') format('truetype');
+        }
+       
+       body {
+            background-color: rgb(45, 70, 119);
+            height: 100%;
+            font-family: 'Andika', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: rgb(255, 255, 255);
+        }
+
+        body, html {
+            margin-top: 2vh;
+            background-position-y: 15px;
+            background-size: 25vh;
+        }
+        
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
+            opacity: 0.8;
+            z-index: -2;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
+            mix-blend-mode: overlay;
+            opacity: 0.5;
+            z-index: -1;
+            animation: pulse 1.5s infinite alternate;
+        }
+        .overlay2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
+                        radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
+            mix-blend-mode: overlay;
+            opacity: 0.5;
+            z-index: -1;
+            animation: pulse 2s infinite alternate;
+        }
+        @keyframes pulse {
+            0% {
+                opacity: 0.3;
+                transform: scale(1); 
+            }
+            100% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        .logocontainer {
+    position: relative;
+    min-height: 10vh;
+    padding-bottom: 50px;
+}
+
+.logo {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 25vh;
+    height: auto;
+    z-index: 10; 
+}
+
+
+        .content {
+            text-align: center;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: calc(100vh - 60px); /* Ensure content doesn't push nav out of view */
+            overflow-y: auto; /* Allow scrolling if content is too tall */
+        }
+        h1 {
+            font-size: 10vw;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            font-family: 'Cinzel Decorative', cursive;
+            font-weight: 400;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        h2 {
+            font-size: 2vw;
+            font-weight: 300;
+            text-align: center;
+            margin-top: 0;
+            letter-spacing: 2px;
+        }
+        h3 {
+    font-family: 'Zapfino';
+    font-size: clamp(1.5rem, 5vw, 2.5rem); /* Min: 1rem, Preferred: 5vw, Max: 3rem */
+    font-weight: 300;
+    text-align: center;
+    margin-top: 0;
+    letter-spacing: 2px;
+}
+
+        .divider-image {
+    display: block; 
+    width: 60%;
+    max-width: 600px; 
+    object-fit: cover;
+    margin: 0 auto; 
+    margin-top: 20px; 
+    margin-bottom: -10px; 
+}
+        
+        @media (min-width: 800px) {
+            h1 {
+                font-size: 8vw;; /* Cap font size for large screens */
+            }
+            h2 {
+                font-size: 2vh; /* Cap font size for large screens */
+            }
+        }
+        @media (min-width: 1000px) {
+            h1 {
+                font-size: 7vw;; /* Cap font size for large screens */
+            }
+            h2 {
+                font-size: 2.5vh; /* Cap font size for large screens */
+            }
+        }
+        @media (min-width: 1200px) {
+            h1 {
+                font-size: 6vw;; /* Cap font size for large screens */
+            }
+            h2 {
+                font-size: 2.5vh; /* Cap font size for large screens */
+            }
+        }
+
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 60%;
+            margin: 0 auto;
+        }
+
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .link-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.5s ease, box-shadow 0.8s ease;
+        }
+
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 80px rgba(255, 255, 255, 0.3);
+        }
+
+        .link-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .link-content {
+            padding: 20px;
+        }
+
+        .link-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .link-description {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .link-url {
+            display: inline-block;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .link-url:hover {
+            color: #2980b9;
+        }
+
+        .toolbox-image {
+            width: 280px;          
+            height: 200px;
+            object-fit: contain;    
+            margin: 0 auto;        
+            display: block;
+            transition: filter 1s ease;
+
+        }
+
+        .link-card:hover .toolbox-image {
+            /* opacity: 0.6; */
+            filter: brightness(1.2);
+        }
+
+        .external-links {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+.external-links li {
+    margin-bottom: 50px;
+}
+
+.external-links li:last-child {
+    margin-bottom: 0;
+}
+
+.external-link-wrapper {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.external-link-wrapper:hover {
+    transform: scale(1.01);
+}
+
+.external-link-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+}
+
+.external-link-icon2 {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+    margin-left:-10px
+}
+
+.external-link-content {
+    flex-grow: 1;
+}
+
+.external-link-title {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.external-link-wrapper:hover .external-link-title {
+    color: #3498db;
+}
+
+.external-link-description {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-top: 5px;
+}
+    </style>
+</head>
+<body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script> 
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    <div class="content">
+        <h1>AP<br>Music<br>Theory<br>Student<br>Portal</h1>
+        <h2>Find Your Forte!</h2>
+    </div>
+    
+
+    <img src="images/MusicNotation.png" class="divider-image">
+
+    
+    <h1> ⠀⠀</h1>
+    <h3>Tools</h3>
+
+    
+
+
+<div class="container">
+
+        <div class="links-grid">
+            <a href="https://biphmusic.github.io/units"  style="text-decoration: none; color: inherit;">
+                <div class="link-card">
+                    <img src="images/music-notes-MA400.jpg" alt="Resource 1" class="link-image">
+                    <div class="link-content">
+                        <h2 class="link-title">AP Music Theory Units</h2>
+                        <p class="link-description">An overview of all units, their subtopics, as well as relevant vocabulary.</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="https://biphmusic.github.io/flashcards/"  style="text-decoration: none; color: inherit;">
+                <div class="link-card">
+                    <img src="images/BIPH-Music-Flashcards.png" alt="Resource 1" class="link-image">
+                    <div class="link-content">
+                        <h2 class="link-title">Flash Cards</h2>
+                        <p class="link-description">For memorizing vocabulary, harmony and everything in between.</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="https://biphmusic.github.io/dice/"  style="text-decoration: none; color: inherit;">
+                <div class="link-card">
+                    <img src="images/Musical-Dice.png?raw=true" alt="Resource 2" class="link-image">
+                    <div class="link-content">
+                        <h2 class="link-title">Dice Simulator</h2>
+                        <p class="link-description">Randomized notes, chords, keys, scale degrees, solfege, the choice is yours.</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="https://biphmusic.github.io/piano/" style="text-decoration: none; color: inherit;">
+                <div class="link-card">
+                    <img src="images/WebPiano.png" alt="Web Piano" class="link-image">
+                    <div class="link-content">
+                        <h2 class="link-title">Web Piano 1.0</h2>
+                        <p class="link-description">Use this online keyboard as a visual aid, to practice scales, or to just to play.</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="https://biphmusic.github.io/toolbox/" style="text-decoration: none; color: inherit;">
+                <div class="link-card">
+                    <img id="toolbox-img" 
+                        src="images/wired-gradient-2499-toolbox-firstframe.jpg" 
+                        data-gif="images/wired-gradient-2499-toolbox.gif"
+                        alt="Toolbox" 
+                        class="link-image toolbox-image">
+                    <div class="link-content">
+                        <h2 class="link-title">Toolbox</h2>
+                        <p class="link-description">Many utilities and tools for music theory students.</p>
+                    </div>
+                </div>
+            </a>
+
+    <h1> </h1>
+    <h3>External Links</h3>
+    <div class="external-links">
+        <ul>
+            <li>
+                <a href="https://www.musictheory.net/exercises" class="external-link-wrapper" >
+                    <img src="../icons/MusicTheoryNetIcon.png" alt="Site 1 Icon" class="external-link-icon">
+                    <div class="external-link-content">
+                        <span class="external-link-title">MusicTheory.net</span>
+                        <p class="external-link-description">Practice your music literacy and aural skills here.</p>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="https://teoria.com/en/exercises/" class="external-link-wrapper" >
+                    <img src="../icons/TeoriaComIcon.png" alt="Site 2 Icon" class="external-link-icon2">
+                    <div class="external-link-content">
+                        <span class="external-link-title">Teoria.com</span>
+                        <p class="external-link-description">Great practice for sight reading and harmonic / melodic dictation.</p>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="https://apclassroom.collegeboard.org/" class="external-link-wrapper" >
+                    <img src="../icons/APClassroomIcon.png" alt="Site 3 Icon" class="external-link-icon2">
+                    <div class="external-link-content">
+                        <span class="external-link-title">AP Classroom</span>
+                        <p class="external-link-description">The official website of Collegeboard.</p>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+    <div class="logocontainer">        
+        <img src="BASIS logo/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+    </div>
+
+    <script>
+     // Toolbox hover GIF effect
+    const toolboxImg = document.getElementById('toolbox-img');
+    
+    if (toolboxImg) {
+        const staticSrc = toolboxImg.src;
+        const gifSrc = toolboxImg.getAttribute('data-gif');
+
+        toolboxImg.addEventListener('mouseenter', function() {
+            this.src = gifSrc;
+        });
+
+        toolboxImg.addEventListener('mouseleave', function() {
+            this.src = staticSrc;
+        });
+    }
+    </script>
+</body>
+</html>
