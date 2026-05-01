@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Web Piano</title>
-    <link rel="icon" href="/icons/BGicon.png">
+    <link rel="icon" href="../icons/BGicon.png">
     <style>
         @font-face {
             font-family: 'Zapfino';
-            src: url('fonts/Zapfino.ttf') format('truetype');
+            src: url('../fonts/Zapfino.ttf') format('truetype');
         }
 
         body {
@@ -21,7 +21,11 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            overflow: hidden;
+            overflow: hidden; 
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         h1 {
@@ -72,7 +76,7 @@
         @keyframes pulse {
             0% {
                 opacity: 0.3;
-                transform: scale(1); 
+                transform: scale(1);
             }
             100% {
                 opacity: 0.7;
@@ -81,19 +85,18 @@
         }
 
         .logocontainer {
-    position: relative;
-    /* Ensure the container has a defined height */
-    height: 100vh; /* Adjust as needed */
-}
+            position: relative;
+            height: 100vh; /* Adjust as needed */
+        }
 
-.logo {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 25vh; /* Adjust for size */
-    height: auto; /* Maintain aspect ratio */
-    z-index: 10; /* Ensure it is above other content */
-}
+        .logo {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 25vh; /* Adjust for size */
+            height: auto; /* Maintain aspect ratio */
+            z-index: 10; /* Ensure it is above other content */
+        }
 
         .Subtitle {
             font-family: 'Zapfino', sans-serif;
@@ -116,118 +119,13 @@
             animation: subtlePulse 0.2s ease-out;
         }
 
-        .hamburger-menu {
-            position: absolute;
-            margin-left: 7px;
-            top: 20px;
-            left: 13px;
-            z-index: 1000;
-        }
-
-        .menu-toggle {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 30px;
-            height: 25px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 20;
-            z-index: 1001;
-        }
-
-        .menu-toggle span {
-            width: 30px;
-            height: 3px;
-            background: white;
-            border-radius: 10px;
-            transition: all 0.3s linear;
-        }
-
-        .menu-toggle.open span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .menu-toggle.open span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-toggle.open span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        .menu-items {
-            position: absolute;
-            top: 25px;
-            left: -250px;
-            background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
-            /* background: rgba(35, 47, 70, 0.951); */
-            width: 250px;
-            height: 90vh;
-            padding-top: 20px;
-            transition: all 0.3s ease-in-out;
-            opacity: 0;
-        }
-
-        .menu-items.show {
-            left: 0;
-            opacity: 1;
-        }
-
-        .menu-items a {
-            display: block;
-            padding: 15px 20px;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.2s;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
-
-        .menu-items.show a {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .menu-items a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-items a:nth-child(1) { transition-delay: 0.1s; }
-.menu-items a:nth-child(2) { transition-delay: 0.2s; }
-.menu-items a:nth-child(3) { transition-delay: 0.3s; }
-.menu-items a:nth-child(4) { transition-delay: 0.4s; }
-.menu-items a:nth-child(5) { transition-delay: 0.5s; }
-.menu-items a:nth-child(6) { transition-delay: 0.6s; }
-.menu-items a:nth-child(7) { transition-delay: 0.7s; }
-.menu-items a:nth-child(8) { transition-delay: 0.8s; }
-.menu-items a:nth-child(9) { transition-delay: 0.9s; }
-.menu-items a:nth-child(10) { transition-delay: 1.0s; }
-
-        .menu-title {
-            text-align: center;
-            color: white;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .menu-footer {
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-size: 12px;
-        }
-        
         .piano {
             display: flex;
             position: relative;
             margin-top: 50px;
             border: 3px solid black;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            touch-action: manipulation; /* Improves touch responsiveness */
         }
 
         .key {
@@ -255,38 +153,57 @@
         .black-key:active, .black-key.active {
             background-color: #333;
         }
+
+        /* Mobile specific styles for landscape orientation */
+        @media (orientation: portrait) and (max-width: 768px) {
+            body {
+                transform: rotate(90deg);
+                transform-origin: top left;
+                width: 100vh; 
+                height: 100vw; 
+                overflow-x: hidden; 
+                position: absolute;
+                top: 0; 
+                left: 100%; 
+                padding: 0; 
+            }
+            .piano {
+                transform: scale(0.85);
+                margin-top: 20px; 
+            }
+            h1, .Subtitle {
+                font-size: 2rem; 
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 768px) {
+            .piano {
+                transform: scale(0.85); 
+                margin-top: 20px;
+            }
+            h1, .Subtitle {
+                font-size: 2rem;
+            }
+        }
+
+        /* Prevent system zoom on touch */
+        html, body {
+            touch-action: manipulation;
+        }
     </style>
 </head>
 <body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
-
-    <div class="hamburger-menu">
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div class="menu-items" id="menu-items">
-            <div class="menu-title">BIPH Music</div>
-            <a href="https://biphmusic.github.io/">Home</a>
-            <a href="https://biphmusic.github.io/units/">AP Units</a>
-            <a href="https://biphmusic.github.io/flashcards/">Flash Cards</a>
-            <a href="https://biphmusic.github.io/dice/">Dice Simulator</a>
-            <a href="https://biphmusic.github.io/piano/">Web Piano</a>
-            <a href="https://biphmusic.github.io/wordwall/">Word Wall</a>
-            <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            
-            <div class="menu-footer">© Garrison Tubbs 2024</div>
-        </div>
-    </div>
 
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Web Piano</h1>
 
     <div class="container">
-        <img src="BASIS logo/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
 
     <div class="piano">
@@ -353,9 +270,14 @@
             'P': {note: 'D#', octave: 5},
             ';': {note: 'E', octave: 5},
             "'": {note: 'F', octave: 5},
+            "]": {note: 'F#', octave: 5},
+            "ENTER": {note: 'G', octave: 5},
         };
 
-        function playNote(note, octave) {
+        // This map stores information about currently active notes, including the oscillator and the key element
+        const activeNotes = new Map(); // Stores { identifier: { oscillator, gainNode, keyElement } }
+
+        function createAndPlayNote(note, octave, identifier, keyElement) {
             const frequency = noteFrequencies[note] * Math.pow(2, octave - 4);
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
@@ -364,78 +286,218 @@
             oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
 
             gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            // Notes will ring out for 1 second by default
             gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 1);
 
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
 
             oscillator.start();
-            oscillator.stop(audioContext.currentTime + 1);
+            oscillator.stop(audioContext.currentTime + 1); // Ensures resources are released after decay
+
+            activeNotes.set(identifier, { oscillator, gainNode, keyElement });
         }
 
-        function activateKey(note, octave) {
-            const key = document.querySelector(`[data-note="${note}"][data-octave="${octave}"]`);
-            if (key) {
-                key.classList.add('active');
-                playNote(note, octave);
+        function activateKeyVisual(keyElement) {
+            if (keyElement) {
+                keyElement.classList.add('active');
             }
         }
 
-        function deactivateKey(note, octave) {
-            const key = document.querySelector(`[data-note="${note}"][data-octave="${octave}"]`);
-            if (key) {
-                key.classList.remove('active');
+        function deactivateKeyVisual(keyElement) {
+            if (keyElement) {
+                keyElement.classList.remove('active');
             }
         }
 
-        document.querySelectorAll('.key, .black-key').forEach(key => {
-            key.addEventListener('mousedown', () => {
-                const note = key.getAttribute('data-note');
-                const octave = parseInt(key.getAttribute('data-octave'));
-                playNote(note, octave);
-                key.classList.add('active');
-            });
+        // --- Helper to get key element from coordinates ---
+        const pianoElement = document.querySelector('.piano');
+        let currentMouseKey = null; // To track the key under the mouse for glissando
+        let activeTouches = new Map(); // Stores { touchId: { currentKeyElement, currentNoteInfo } }
 
-            key.addEventListener('mouseup', () => {
-                key.classList.remove('active');
-            });
+        function getKeyElementFromCoords(x, y) {
+            const elements = document.elementsFromPoint(x, y);
+            for (let i = 0; i < elements.length; i++) {
+                if (elements[i].classList.contains('key') || elements[i].classList.contains('black-key')) {
+                    // Make sure the element is part of the piano and not some overlay
+                    if (pianoElement.contains(elements[i])) {
+                        return elements[i];
+                    }
+                }
+            }
+            return null;
+        }
 
-            key.addEventListener('mouseleave', () => {
-                key.classList.remove('active');
-            });
-        });
-
+        // --- Keyboard Events ---
         document.addEventListener('keydown', (event) => {
             const key = event.key.toUpperCase();
             if (keyMap[key] && !event.repeat) {
-                activateKey(keyMap[key].note, keyMap[key].octave);
+                const noteInfo = keyMap[key];
+                const identifier = 'keyboard-' + key;
+
+                if (!activeNotes.has(identifier)) {
+                    const keyElement = document.querySelector(`[data-note="${noteInfo.note}"][data-octave="${noteInfo.octave}"]`);
+                    activateKeyVisual(keyElement);
+                    createAndPlayNote(noteInfo.note, noteInfo.octave, identifier, keyElement);
+                }
             }
         });
 
         document.addEventListener('keyup', (event) => {
             const key = event.key.toUpperCase();
             if (keyMap[key]) {
-                deactivateKey(keyMap[key].note, keyMap[key].octave);
+                const identifier = 'keyboard-' + key;
+                const activeNote = activeNotes.get(identifier);
+                if (activeNote) {
+                    deactivateKeyVisual(activeNote.keyElement);
+                    activeNotes.delete(identifier);
+                }
             }
         });
 
-        // Hamburger menu functionality
-        const menuToggle = document.querySelector('.menu-toggle');
-    const menuItems = document.querySelector('.menu-items');
-    
-    menuToggle.addEventListener('click', () => {
-        menuToggle.classList.toggle('open');
-        menuItems.classList.toggle('show');
-    });
-    
-    // Close the menu when clicking outside
-    document.addEventListener('click', (event) => {
-        // Check if the click was outside the menu and the toggle button
-        if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-            menuToggle.classList.remove('open');
-            menuItems.classList.remove('show');
-        }
-    });
+        // --- Mouse Events (for glissando) ---
+        let isMouseDown = false;
+
+        pianoElement.addEventListener('mousedown', (event) => {
+            if (event.button === 0) { // Left click
+                isMouseDown = true;
+                const targetKey = getKeyElementFromCoords(event.clientX, event.clientY);
+                if (targetKey) {
+                    const note = targetKey.getAttribute('data-note');
+                    const octave = parseInt(targetKey.getAttribute('data-octave'));
+                    const identifier = 'mouse';
+
+                    if (!activeNotes.has(identifier)) { // Only play if no mouse note is currently active
+                        activateKeyVisual(targetKey);
+                        createAndPlayNote(note, octave, identifier, targetKey);
+                        currentMouseKey = targetKey; // Track the key that's currently "pressed" by the mouse
+                    }
+                }
+            }
+        });
+
+        pianoElement.addEventListener('mousemove', (event) => {
+            if (isMouseDown) {
+                const targetKey = getKeyElementFromCoords(event.clientX, event.clientY);
+
+                if (targetKey && targetKey !== currentMouseKey) {
+                    // New key is being hovered over
+                    const identifier = 'mouse';
+                    const activeNote = activeNotes.get(identifier);
+
+                    // Deactivate old key visual
+                    if (activeNote) {
+                        deactivateKeyVisual(activeNote.keyElement);
+                    }
+
+                    // Play new note
+                    const note = targetKey.getAttribute('data-note');
+                    const octave = parseInt(targetKey.getAttribute('data-octave'));
+                    createAndPlayNote(note, octave, identifier, targetKey); // Overwrites the old note in activeNotes map
+
+                    activateKeyVisual(targetKey);
+                    currentMouseKey = targetKey;
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', () => { // Listen on document for release outside piano
+            if (isMouseDown) {
+                isMouseDown = false;
+                const identifier = 'mouse';
+                const activeNote = activeNotes.get(identifier);
+                if (activeNote) {
+                    deactivateKeyVisual(activeNote.keyElement);
+                    activeNotes.delete(identifier);
+                }
+                currentMouseKey = null;
+            }
+        });
+
+        // --- Touch Events (Multitouch and Glissando) ---
+        pianoElement.addEventListener('touchstart', (event) => {
+            event.preventDefault(); // Prevent scrolling and zooming
+            const changedTouches = event.changedTouches;
+
+            for (let i = 0; i < changedTouches.length; i++) {
+                const touch = changedTouches[i];
+                const targetKey = getKeyElementFromCoords(touch.clientX, touch.clientY);
+
+                if (targetKey) {
+                    const note = targetKey.getAttribute('data-note');
+                    const octave = parseInt(targetKey.getAttribute('data-octave'));
+                    const touchIdentifier = 'touch-' + touch.identifier;
+
+                    activateKeyVisual(targetKey);
+                    createAndPlayNote(note, octave, touchIdentifier, targetKey);
+                    activeTouches.set(touch.identifier, { currentKeyElement: targetKey, noteInfo: { note, octave } });
+                }
+            }
+        }, { passive: false });
+
+        pianoElement.addEventListener('touchmove', (event) => {
+            event.preventDefault(); // Keep preventing default to avoid scrolling during glissando
+            const changedTouches = event.changedTouches;
+
+            for (let i = 0; i < changedTouches.length; i++) {
+                const touch = changedTouches[i];
+                const touchIdentifier = 'touch-' + touch.identifier;
+                const currentTouchData = activeTouches.get(touch.identifier);
+
+                if (currentTouchData) {
+                    const targetKey = getKeyElementFromCoords(touch.clientX, touch.clientY);
+
+                    if (targetKey && targetKey !== currentTouchData.currentKeyElement) {
+                        // New key is being slid over
+                        deactivateKeyVisual(currentTouchData.currentKeyElement); // Deactivate old visual
+
+                        const note = targetKey.getAttribute('data-note');
+                        const octave = parseInt(targetKey.getAttribute('data-octave'));
+
+                        // Only play new note if it's different to prevent rapid re-triggering of the same note
+                        if (currentTouchData.noteInfo.note !== note || currentTouchData.noteInfo.octave !== octave) {
+                             createAndPlayNote(note, octave, touchIdentifier, targetKey); // Overwrites the old note
+                        }
+                        activateKeyVisual(targetKey);
+                        activeTouches.set(touch.identifier, { currentKeyElement: targetKey, noteInfo: { note, octave } });
+                    }
+                }
+            }
+        }, { passive: false });
+
+        pianoElement.addEventListener('touchend', (event) => {
+            event.preventDefault();
+            const changedTouches = event.changedTouches;
+
+            for (let i = 0; i < changedTouches.length; i++) {
+                const touch = changedTouches[i];
+                const touchIdentifier = 'touch-' + touch.identifier;
+                const activeNote = activeNotes.get(touchIdentifier);
+
+                if (activeNote) {
+                    deactivateKeyVisual(activeNote.keyElement);
+                    activeNotes.delete(touchIdentifier); // Remove from active notes
+                }
+                activeTouches.delete(touch.identifier); // Remove from active touches tracking
+            }
+        });
+
+        pianoElement.addEventListener('touchcancel', (event) => {
+            event.preventDefault();
+            const changedTouches = event.changedTouches;
+
+            for (let i = 0; i < changedTouches.length; i++) {
+                const touch = changedTouches[i];
+                const touchIdentifier = 'touch-' + touch.identifier;
+                const activeNote = activeNotes.get(touchIdentifier);
+
+                if (activeNote) {
+                    deactivateKeyVisual(activeNote.keyElement);
+                    activeNotes.delete(touchIdentifier);
+                }
+                activeTouches.delete(touch.identifier);
+            }
+        });
     </script>
 </body>
 </html>
