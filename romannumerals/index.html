@@ -9,6 +9,8 @@
     <link href="styles.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script> 
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
@@ -16,29 +18,6 @@
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Roman Numerals</h1>
 
-
-    <div class="hamburger-menu">
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div class="menu-items" id="menu-items">
-            <div class="menu-title">BIPH Music</div>
-            <a href="https://biphmusic.github.io/">Home</a>
-            <a href="https://biphmusic.github.io/dailysightsinging/">Daily Sight Singing</a>
-            <a href="https://biphmusic.github.io/wordwall/">Word Wall</a>
-            <a href="https://biphmusic.github.io/flashcards/">Flash Cards</a>
-            <a href="https://biphmusic.github.io/dice/">Dice Simulator</a>
-            <a href="https://biphmusic.github.io/chords/">Chord Quality</a>
-            <a href="https://biphmusic.github.io/progressions/">Chord Progressions</a>
-            <a href="https://biphmusic.github.io/piano/">Web Piano</a>
-            <a href="https://biphmusic.github.io/units/">AP Units</a>
-            <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            
-            <div class="menu-footer">© Garrison Tubbs 2024</div>
-        </div>
-    </div>
 
     <div class="controls">
             <button class="sevenths-toggle" onclick="toggleSevenths()">Triads</button>
@@ -747,47 +726,6 @@ function flattenNote(note) {
     };
     return sharpToFlat[note] || note;
 }
-
-
-
-
-
-
-// Hamburger menu functionality
-const menuToggle = document.querySelector('.menu-toggle');
-const menuItems = document.querySelector('.menu-items');
-
-menuToggle.addEventListener('click', () => {
-    menuToggle.classList.toggle('open');
-    menuItems.classList.toggle('show');
-});
-
-document.addEventListener('click', (event) => {
-    const featureContainer = document.querySelector('.feature-menu-container');
-    const arrow = document.getElementById('arrow');
-    const featureList = document.getElementById('feature-list');
-
-    // Check if the click was outside the hamburger menu and the toggle button
-    if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-        menuToggle.classList.remove('open');
-        menuItems.classList.remove('show');
-    }
-
-    // Check if the click was outside the feature menu
-    if (!featureContainer.contains(event.target)) {
-        arrow.classList.remove('rotated');
-        featureContainer.classList.remove('menu-open');
-        featureList.classList.remove('show');
-    }
-});
-
-// Prevent closing the menu when clicking on checklist items
-const checklistItems = document.querySelectorAll('.feature-item input[type="checkbox"]');
-checklistItems.forEach(item => {
-    item.addEventListener('click', (event) => {
-        event.stopPropagation(); // Prevent the click from bubbling up to the document
-    });
-});
     </script>
 </body>
 </html>
