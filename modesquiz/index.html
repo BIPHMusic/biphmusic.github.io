@@ -3,80 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Mode Quiz</title>
+    <title>AP Units</title>
+    <link rel="icon" href="../icons/BGicon.png">
     <style>
+        @font-face {
+            font-family: 'Zapfino';
+            src: url('../fonts/Zapfino.ttf') format('truetype');
+        }
+         
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            background-color: rgb(45, 70, 119);
+            font-family: 'Andika', sans-serif;
+            color: #ffffff;
+            margin: 0;
             padding: 20px;
-            background-color: #f0f0f0;
+            line-height: 1.6;
         }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
+            opacity: 0.8;
+            z-index: -2;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
+            mix-blend-mode: overlay;
+            opacity: 0.5;
+            z-index: -1;
+            animation: pulse 1.5s infinite alternate;
+        }
+        .overlay2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
+                        radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
+            mix-blend-mode: overlay;
+            opacity: 0.5;
+            z-index: -1;
+            animation: pulse 2s infinite alternate;
+        }
+        @keyframes pulse {
+            0% {
+                opacity: 0.3;
+                transform: scale(1); 
+            }
+            100% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        .logocontainer {
+            min-height: 10vh;
+        }
+
+        .logo {
+            position:fixed;
+            right: 0;
+            bottom: 0;
+            margin-bottom: 5px;
+            width: 25vh;
+            height: auto;
+            z-index: 10; 
+        }
+
+        .Subtitle {
+            font-family: 'Zapfino', sans-serif;
+            color: white;
+            margin-top: -0.7em;
+            font-size: 40px;
+        }
+
         .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 1100px;
+            margin: 0 auto;
+            position:absolute;
+            margin-top: 75px;
+            width: 100%;
+            transform: translate(-50%, -50%); 
+            left: 50%;
+            text-align: center;
+            align-items: center;
         }
+
+        #login-section {
+            position:absolute;
+            margin-top: 75px;
+            width: 100%;
+            transform: translate(-50%, -50%); 
+            left: 50%;
+            text-align: center;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            margin-top: -120px;
+            text-align: center;
+        }
+        h3 {
+            margin-top: -40px;
+            font-size: 2rem;
+            font-weight: 300;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        /* Music Mode Quiz Styles */
         .hidden {
             display: none;
         }
-        button {
+
+        button2 {
             background-color: #4CAF50;
             color: white;
-            padding: 10px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             margin: 5px;
         }
-        button:disabled {
+
+        button:not(.menu-toggle) {
+            background-color: #4c87af;
+            color: white;
+            padding: 10px 20px;
+            border: 0.5px solid rgba(255, 255, 255, 0.442);
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:not(.menu-toggle):disabled {
             background-color: #cccccc;
             cursor: not-allowed;
         }
+
         input[type="text"], input[type="password"] {
             padding: 8px;
             margin: 5px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+
         .play-count {
-            color: #666;
+            color: #d2d2d2;
             font-size: 0.9em;
         }
+
         .error {
             color: red;
             margin: 10px 0;
         }
+
         .incorrect {
             color: red;
         }
+
         .results-table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
         }
+
         .results-table th, .results-table td {
-            border: 1px solid #ddd;
+            border: 1px solid #c8c8c886;
             padding: 8px;
             text-align: left;
         }
+
         .results-table th {
-            background-color: #f5f5f5;
+            background-color: #ffffff90;
         }
+
         .correct-mark {
-        color: #4CAF50;
-        font-weight: bold;
-    }
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
         .student-result {
             margin-bottom: 30px;
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+
+        #answer-input {
+            padding: 5px; 
+        }
     </style>
 </head>
 <body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    
+
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">Modes<br></h1>
+    <h3 class="Title">Ear Training</h3>
+
     <div class="container">
         <div id="login-section">
             <h2>Enter your name to begin the quiz</h2>
@@ -92,22 +242,21 @@
         </div>
 
         <div id="quiz-section" class="hidden">
-            <h2>Music Mode Quiz</h2>
             <div id="question-container">
                 <p>Question <span id="question-number">1</span>/20</p>
                 <button id="play-button" onclick="playAudio()">Play Audio</button>
                 <span class="play-count" id="play-count">Plays remaining: 2</span>
                 <br><br>
-                <input type="text" id="answer-input" list="modes" placeholder="Enter your answer">
-                <datalist id="modes">
-                    <option value="Ionian">
-                    <option value="Dorian">
-                    <option value="Phrygian">
-                    <option value="Lydian">
-                    <option value="Mixolydian">
-                    <option value="Aeolian">
-                    <option value="Locrian">
-                </datalist>
+                <select id="answer-input" placeholder="Select your answer">
+                    <option value="" disabled selected>Select your answer</option>
+                    <option value="Ionian">Ionian</option>
+                    <option value="Dorian">Dorian</option>
+                    <option value="Phrygian">Phrygian</option>
+                    <option value="Lydian">Lydian</option>
+                    <option value="Mixolydian">Mixolydian</option>
+                    <option value="Aeolian">Aeolian</option>
+                    <option value="Locrian">Locrian</option>
+                </select>
                 <button onclick="submitAnswer()">Submit Answer</button>
             </div>
         </div>
@@ -119,6 +268,10 @@
         </div>
     </div>
 
+    <div class="logocontainer">        
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+    </div>
+    
     <script>
         const approvedNames = ['ben', 'howard', 'terry', 'alice', 'vincent', 'tiger', 'chris', 'lucy', 'diego', 'hailey', 'eileen', 'angelina', 'serena', 'catherine', 'andrew', 'jennifer'];
         const TEACHER_PASSWORD = '18721958';
@@ -156,7 +309,6 @@
                 answers: shuffled.slice(0, 20).map(file => file.replace(/[0-9].mp3$/, ''))
             };
         }
-
 
         function hashCode(str) {
             let hash = 0;
@@ -295,138 +447,137 @@
         }
 
         function checkAnswers() {
-        const fileInput = document.getElementById('json-input');
-        const resultsContainer = document.getElementById('results-container');
-        resultsContainer.innerHTML = '';
+            const fileInput = document.getElementById('json-input');
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.innerHTML = '';
 
-        if (fileInput.files.length === 0) {
-            alert('Please select at least one JSON file to check.');
-            return;
-        }
+            if (fileInput.files.length === 0) {
+                alert('Please select at least one JSON file to check.');
+                return;
+            }
 
-        const studentOrder = [
-            'Ben', 'Howard', 'Terry', 'Alice', 'Vincent', 'Tiger', 
-            'Chris', 'Lucy', 'Diego', 'Hailey', 'Eileen', 'Angelina', 
-            'Serena', 'Catherine', 'Andrew', 'Jennifer'
-        ];
+            const studentOrder = [
+                'Ben', 'Howard', 'Terry', 'Alice', 'Vincent', 'Tiger', 
+                'Chris', 'Lucy', 'Diego', 'Hailey', 'Eileen', 'Angelina', 
+                'Serena', 'Catherine', 'Andrew', 'Jennifer'
+            ];
 
-        const files = Array.from(fileInput.files);
-        const results = [];
+            const files = Array.from(fileInput.files);
+            const results = [];
 
-        let filesProcessed = 0;
-        
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const decodedData = atob(e.target.result);
-                    const submission = JSON.parse(decodedData);
-                    results.push(submission);
-                    
-                    filesProcessed++;
-                    if (filesProcessed === files.length) {
-                        displaySortedResults(results);
+            let filesProcessed = 0;
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const decodedData = atob(e.target.result);
+                        const submission = JSON.parse(decodedData);
+                        results.push(submission);
+                        
+                        filesProcessed++;
+                        if (filesProcessed === files.length) {
+                            displaySortedResults(results);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                        alert(`Error parsing file: ${file.name}`);
+                        filesProcessed++;
                     }
-                } catch (error) {
-                    console.error('Error parsing JSON:', error);
-                    alert(`Error parsing file: ${file.name}`);
-                    filesProcessed++;
-                }
-            };
-            reader.readAsText(file);
-        });
+                };
+                reader.readAsText(file);
+            });
 
-        function displaySortedResults(results) {
-    // Sort results according to studentOrder
-    results.sort((a, b) => {
-        const indexA = studentOrder.indexOf(a.student);
-        const indexB = studentOrder.indexOf(b.student);
-        return indexA - indexB;
-    });
+            function displaySortedResults(results) {
+                // Sort results according to studentOrder
+                results.sort((a, b) => {
+                    const indexA = studentOrder.indexOf(a.student);
+                    const indexB = studentOrder.indexOf(b.student);
+                    return indexA - indexB;
+                });
 
-    // Clear existing results
-    resultsContainer.innerHTML = '';
+                // Clear existing results
+                resultsContainer.innerHTML = '';
 
-    // Display individual results
-    results.forEach(submission => {
-        const correctAnswers = submission.questionSet.answers;
-        let score = 0;
+                // Display individual results
+                results.forEach(submission => {
+                    const correctAnswers = submission.questionSet.answers;
+                    let score = 0;
 
-        const resultDiv = document.createElement('div');
-        resultDiv.className = 'student-result';
-        resultDiv.innerHTML = `
-            <h3>${submission.student}</h3>
-            <p>Date: ${submission.date}</p>
-            <table class="results-table">
-                <tr>
-                    <th>#</th>
-                    <th>Student Answer</th>
-                    <th>Correct Answer</th>
-                </tr>
-                ${submission.answers.map((answer, index) => {
-                    const isCorrect = answer.toLowerCase() === correctAnswers[index].toLowerCase();
-                    if (isCorrect) score++;
-                    return `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td class="${isCorrect ? '' : 'incorrect'}">${answer} ${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
-                            <td>${correctAnswers[index]}</td>
-                        </tr>
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'student-result';
+                    resultDiv.innerHTML = `
+                        <h4>${submission.student}</h4>
+                        <p>Date: ${submission.date}</p>
+                        <table class="results-table">
+                            <tr>
+                                <th>#</th>
+                                <th>Student Answer</th>
+                                <th>Correct Answer</th>
+                            </tr>
+                            ${submission.answers.map((answer, index) => {
+                                const isCorrect = answer.toLowerCase() === correctAnswers[index].toLowerCase();
+                                if (isCorrect) score++;
+                                return `
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td class="${isCorrect ? '' : 'incorrect'}">${answer} ${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
+                                        <td>${correctAnswers[index]}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </table>
+                        <p>Score: ${score}/20 (${(score/20*100).toFixed(1)}%)</p>
                     `;
-                }).join('')}
-            </table>
-            <p>Score: ${score}/20 (${(score/20*100).toFixed(1)}%)</p>
-        `;
-        resultsContainer.appendChild(resultDiv);
-    });
+                    resultsContainer.appendChild(resultDiv);
+                });
 
-    // Create summary spreadsheet
-    const summaryDiv = document.createElement('div');
-    summaryDiv.className = 'summary-table';
-    summaryDiv.style.marginTop = '2rem';
-    summaryDiv.style.overflowX = 'auto';
+                // Create summary spreadsheet
+                const summaryDiv = document.createElement('div');
+                summaryDiv.className = 'summary-table';
+                summaryDiv.style.marginTop = '2rem';
+                summaryDiv.style.overflowX = 'auto';
 
-    // Create a lookup object for quick access to scores
-    const scoreMap = new Map(results.map(r => {
-        const score = r.answers.reduce((acc, ans, idx) => 
-            acc + (ans.toLowerCase() === r.questionSet.answers[idx].toLowerCase() ? 1 : 0), 0);
-        return [r.student, (score/20*100).toFixed(1)];
-    }));
+                // Create a lookup object for quick access to scores
+                const scoreMap = new Map(results.map(r => {
+                    const score = r.answers.reduce((acc, ans, idx) => 
+                        acc + (ans.toLowerCase() === r.questionSet.answers[idx].toLowerCase() ? 1 : 0), 0);
+                    return [r.student, (score/20*100).toFixed(1)];
+                }));
 
-    const table = document.createElement('table');
-    table.style.borderCollapse = 'collapse';
-    table.style.width = '100%';
-    table.style.minWidth = 'max-content';
+                const table = document.createElement('table');
+                table.style.borderCollapse = 'collapse';
+                table.style.width = '100%';
+                table.style.minWidth = 'max-content';
 
-    // Names row
-    const nameRow = document.createElement('tr');
-    studentOrder.forEach(student => {
-        const th = document.createElement('th');
-        th.style.border = '1px solid #ccc';
-        th.style.padding = '8px';
-        th.textContent = student;
-        nameRow.appendChild(th);
-    });
+                // Names row
+                const nameRow = document.createElement('tr');
+                studentOrder.forEach(student => {
+                    const th = document.createElement('th');
+                    th.style.border = '1px solid #ccc';
+                    th.style.padding = '8px';
+                    th.textContent = student;
+                    nameRow.appendChild(th);
+                });
 
-    // Scores row
-    const scoreRow = document.createElement('tr');
-    studentOrder.forEach(student => {
-        const td = document.createElement('td');
-        td.style.border = '1px solid #ccc';
-        td.style.padding = '8px';
-        td.style.textAlign = 'center';
-        const score = scoreMap.get(student);
-        td.textContent = score ? `${score}%` : 'N/A';
-        scoreRow.appendChild(td);
-    });
+                // Scores row
+                const scoreRow = document.createElement('tr');
+                studentOrder.forEach(student => {
+                    const td = document.createElement('td');
+                    td.style.border = '1px solid #ccc';
+                    td.style.padding = '8px';
+                    td.style.textAlign = 'center';
+                    const score = scoreMap.get(student);
+                    td.textContent = score ? `${score}%` : 'N/A';
+                    scoreRow.appendChild(td);
+                });
 
-    table.appendChild(nameRow);
-    table.appendChild(scoreRow);
-    summaryDiv.appendChild(table);
-    resultsContainer.appendChild(summaryDiv);
-}
+                table.appendChild(nameRow);
+                table.appendChild(scoreRow);
+                summaryDiv.appendChild(table);
+                resultsContainer.appendChild(summaryDiv);
+            }
         }
-
 
         // Add keyboard shortcuts
         document.addEventListener('keydown', function(e) {
@@ -485,7 +636,7 @@
 
         // Focus the name input when the page loads
         window.addEventListener('load', function() {
-            document.getElementById('name-input').focus();
+            // document.getElementById('name-input').focus();
         });
 
         // Prevent form submission on enter
@@ -521,7 +672,6 @@
                 e.target.value = match;
             }
         });
-
     </script>
 </body>
 </html>
