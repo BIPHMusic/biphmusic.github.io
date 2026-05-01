@@ -42,7 +42,7 @@
         .hamburger-menu {
             position: absolute;
             top: 20px;
-            left: 13px;
+            left: 20px;
             z-index: 1000;
         }
 
@@ -73,7 +73,10 @@
             position: absolute;
             top: 25px;
             left: -250px;
-            background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            box-shadow: 0 14px 16px rgba(20, 20, 20, 0.81);
+            background: linear-gradient(180deg, rgba(56, 81, 132, 1), rgba(13, 19, 30, 1));
             width: 250px;
             height: 90vh;
             padding-top: 20px;
