@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ear Training</title>
-    <link rel="icon" href="/icons/BGicon.png">
+    <link rel="icon" href="../icons/BGicon.png">
     <style>
 @font-face {
             font-family: 'Zapfino';
-            src: url('fonts/Zapfino.ttf') format('truetype');
+            src: url('../fonts/Zapfino.ttf') format('truetype');
         }
         
         body {
@@ -90,107 +90,6 @@
             font-size: 40px;
         }
 
-        .hamburger-menu {
-            position: absolute;
-            margin-left: 7px;
-            top: 20px;
-            left: 13px;
-            z-index: 1000;
-        }
-
-        .menu-toggle {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 30px;
-            height: 25px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 20;
-            z-index: 1001;
-        }
-
-        .menu-toggle span {
-            width: 30px;
-            height: 3px;
-            background: white;
-            border-radius: 10px;
-            transition: all 0.3s linear;
-        }
-
-        .menu-toggle.open span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .menu-toggle.open span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-toggle.open span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        .menu-items {
-            position: absolute;
-            top: 25px;
-            left: -250px;
-            background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
-            width: 250px;
-            height: 90vh;
-            padding-top: 20px;
-            transition: all 0.3s ease-in-out;
-            opacity: 0;
-        }
-
-        .menu-items.show {
-            left: 0;
-            opacity: 1;
-        }
-
-        .menu-items a {
-            display: block;
-            padding: 10px 20px;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.2s;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
-
-        .menu-items a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-items a:nth-child(1) { transition-delay: 0.1s; }
-.menu-items a:nth-child(2) { transition-delay: 0.2s; }
-.menu-items a:nth-child(3) { transition-delay: 0.3s; }
-.menu-items a:nth-child(4) { transition-delay: 0.4s; }
-.menu-items a:nth-child(5) { transition-delay: 0.5s; }
-.menu-items a:nth-child(6) { transition-delay: 0.6s; }
-.menu-items a:nth-child(7) { transition-delay: 0.7s; }
-.menu-items a:nth-child(8) { transition-delay: 0.8s; }
-.menu-items a:nth-child(9) { transition-delay: 0.9s; }
-.menu-items a:nth-child(10) { transition-delay: 1.0s; }
-.menu-items a:nth-child(11) { transition-delay: 1.1s; }
-
-        .menu-title {
-            text-align: center;
-            color: white;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .menu-footer {
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-size: 12px;
-        }
-
         .container {
             max-width: 1100px;
             margin: 0 auto;
@@ -238,24 +137,27 @@
             display: none;
         }
 
-        button2 {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 5px;
-        }
+button:not(.menu-toggle) {
+    background-color: #4c87af;
+    color: white;
+    padding: 10px 20px;
+    border: 0.5px solid rgba(255, 255, 255, 0.442);
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+}
 
-        button {
-            background-color: #4c87af;
-            color: white;
-            padding: 10px 20px;
-            border: 0.5px solid rgba(255, 255, 255, 0.442);
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 5px;
-        }
+button:not(.menu-toggle):disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Optional: Make quiz buttons look consistent */
+#quiz-section button {
+    background-color: #4c87af;
+    padding: 10px 20px;
+    margin: 8px 5px;
+}
 
         button:disabled {
             background-color: #cccccc;
@@ -396,38 +298,17 @@
     </style>
 </head>
 <body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script> 
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
-
-    <div class="hamburger-menu">
-        <button2 class="menu-toggle" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button2>
-        <div class="menu-items" id="menu-items">
-            <div class="menu-title">BIPH Music</div>
-            <a href="https://biphmusic.github.io/">Home</a>
-            <a href="https://biphmusic.github.io/dailysightsinging/">Daily Sight Singing</a>
-            <a href="https://biphmusic.github.io/wordwall/">Word Wall</a>
-            <a href="https://biphmusic.github.io/flashcards/">Flash Cards</a>
-            <a href="https://biphmusic.github.io/dice/">Dice Simulator</a>
-            <a href="https://biphmusic.github.io/chords/">Chord Quality</a>
-            <a href="https://biphmusic.github.io/progressions/">Chord Progressions</a>
-            <a href="https://biphmusic.github.io/piano/">Web Piano</a>
-            <a href="https://biphmusic.github.io/units/">AP Units</a>
-            <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            
-            <div class="menu-footer">© Garrison Tubbs 2024</div>
-        </div>
-    </div>
 
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Ear Training<br></h1>
 
     <div class="logocontainer">        
-        <img src="BASIS logo/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
 
     <div class="container">
@@ -466,11 +347,9 @@
             </div>
         </div>
 
-    
-    
     <script>
         const approvedNames = ['ben', 'howard', 'terry', 'alice', 'vincent', 'tiger', 'chris', 'lucy', 'diego', 'hailey', 'eileen', 'angelina', 'serena', 'catherine', 'andrew', 'jennifer'];
-const TEACHER_PASSWORD = '18721958';
+        const TEACHER_PASSWORD = atob("MTg3MjE5NTg="); //RVW
 
 const audioFiles = {
     intervals: [
@@ -505,10 +384,6 @@ const audioFiles = {
         { file: 'Major7-2.mp3', answer: 'Major 7th' },
         { file: 'Major7-3.mp3', answer: 'Major 7th' },
         { file: 'Major7-4.mp3', answer: 'Major 7th' },
-        { file: 'Major7-5.mp3', answer: 'Major 7th' },
-        { file: 'Major7-6.mp3', answer: 'Major 7th' },
-        { file: 'Major7-7.mp3', answer: 'Major 7th' },
-        { file: 'Major7-8.mp3', answer: 'Major 7th' },
         { file: 'Minor2-1.mp3', answer: 'Minor 2nd' },
         { file: 'Minor2-2.mp3', answer: 'Minor 2nd' },
         { file: 'Minor2-3.mp3', answer: 'Minor 2nd' },
@@ -1328,25 +1203,6 @@ const observer = new MutationObserver(function(mutations) {
             attributeFilter: ['class']
         });
 
-
-
-    // Hamburger menu functionality
-    const menuToggle = document.querySelector('.menu-toggle');
-    const menuItems = document.querySelector('.menu-items');
-    
-    menuToggle.addEventListener('click', () => {
-        menuToggle.classList.toggle('open');
-        menuItems.classList.toggle('show');
-    });
-    
-    // Close the menu when clicking outside
-    document.addEventListener('click', (event) => {
-        // Check if the click was outside the menu and the toggle button
-        if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-            menuToggle.classList.remove('open');
-            menuItems.classList.remove('show');
-        }
-    });
     </script>
 </body>
 </html>
