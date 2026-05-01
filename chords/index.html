@@ -6,187 +6,61 @@
 <title>Building Chords</title>
 <style>
 body {
-            background-color: rgb(45, 70, 119);
-            font-family: 'Andika', sans-serif;
-            /* font-family: 'Helvetica Neue', Arial, sans-serif; */
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-            justify-content: center;
-            align-items: center; 
-            text-align: center; 
-        }
+    background-color: rgb(45, 70, 119);
+    font-family: 'Andika', sans-serif;
+    color: #ffffff;
+    margin: 0;
+    padding: 15px;
+    line-height: 1.5;
+    text-align: center; 
+}
 
+.background, .overlay, .overlay2 {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -2;
+}
 
 .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
-            opacity: 0.8;
-            z-index: -2;
+    background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
+    opacity: 0.8;
+}
+
+.overlay {
+    background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+    animation: pulse 1.5s infinite alternate;
+}
+
+.overlay2 {
+    background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
+                radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+    animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0.7; transform: scale(1.1); }
+}
+
+        h1.Title {
+            font-family: 'Arial', sans-serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 10px;
         }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
-                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 1.5s infinite alternate;
+        h1.Subtitle {
+            font-family: 'Zapfino', sans-serif;
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 20px;
         }
-
-        .overlay2 {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
-                        radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 2s infinite alternate;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 0.3;
-                transform: scale(1); 
-            }
-            100% {
-                opacity: 0.7;
-                transform: scale(1.1);
-            }
-        }
-
-.Title {
-    font-size: 2.5rem;
-    font-weight: 300;
-    text-align: center;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    letter-spacing: 2px;
-    color: white;
-}
-
-.Subtitle {
-    font-family: 'Zapfino', sans-serif;
-    color: white;
-    margin-top: -10px;
-    margin-bottom: 40px;
-    font-size: 40px;
-}
-
-.hamburger-menu {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
-}
-
-.menu-toggle {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    width: 30px;
-    height: 25px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    z-index: 1001;
-}
-
-.menu-toggle span {
-    width: 30px;
-    height: 3px;
-    background: white;
-    border-radius: 10px;
-    transition: all 0.3s linear;
-}
-
-.menu-toggle.open span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.menu-toggle.open span:nth-child(2) {
-    opacity: 0;
-}
-
-.menu-toggle.open span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
-}
-
-.menu-items {
-    position: fixed;
-    top: 60px;
-    left: -250px;
-    background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
-    width: 250px;
-    height: calc(100vh - 60px);
-    padding-top: 20px;
-    transition: all 0.3s ease-in-out;
-    opacity: 0;
-}
-
-.menu-items.show {
-    left: 0;
-    opacity: 1;
-}
-
-.menu-items a {
-    display: block;
-    padding: 15px 20px;
-    color: white;
-    text-decoration: none;
-    transition: background-color 0.2s;
-    opacity: 0;
-    transform: translateX(-20px);
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-}
-
-.menu-items.show a {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.menu-items a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.menu-items a:nth-child(1) { transition-delay: 0.1s; }
-.menu-items a:nth-child(2) { transition-delay: 0.2s; }
-.menu-items a:nth-child(3) { transition-delay: 0.3s; }
-.menu-items a:nth-child(4) { transition-delay: 0.4s; }
-.menu-items a:nth-child(5) { transition-delay: 0.5s; }
-.menu-items a:nth-child(6) { transition-delay: 0.6s; }
-.menu-items a:nth-child(7) { transition-delay: 0.7s; }
-
-.menu-title {
-    text-align: center;
-    color: white;
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-.menu-footer {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-    color: white;
-    font-size: 12px;
-}
 
 .wrapper {
     position: absolute; 
@@ -196,45 +70,41 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center; 
-    padding-top: 10px;
-    padding-bottom: 35px;
-    width: 600px;
-    background-color: rgba(255, 255, 255, 0.8);
+    padding: 15px 20px 25px;
+    width: 480px;                    /* Reduced width */
+    background-color: rgba(255, 255, 255, 0.85);
     border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.12);
 }
 
 .chord-name {
-    font-size: 24px;
+    font-size: 21px;                 /* Slightly smaller */
     font-weight: bold;
-    margin-bottom: 20px;
-    height: 30px;
-    color: rgba(25, 50, 100, 0.741);
+    margin-bottom: 15px;
+    height: 28px;
+    color: rgba(25, 50, 100, 0.8);
 }
 
 .container {
     display: flex;
     justify-content: center;
-    gap: 30px;
-    max-width: 800px;
+    gap: 20px;                       /* Reduced gap */
     width: 100%;
-    transition: all 0.5s ease;
 }
 
 .block-wrapper {
-    
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 .block {
-    width: 100px;
-    height: 100px;
+    width: 85px;                     /* Reduced from 100px */
+    height: 85px;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    margin: 20px 0;
+    margin: 12px 0;
 }
 
 .face {
@@ -247,70 +117,63 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
+    font-size: 21px;                 /* Smaller text inside blocks */
     font-weight: bold;
     backface-visibility: hidden;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
 }
 
-.front { transform: rotateX(0deg) translateZ(50px); }
-.back { transform: rotateX(180deg) translateZ(50px); }
-.right { transform: rotateY(90deg) translateZ(50px); }
-.left { transform: rotateY(-90deg) translateZ(50px); }
-.top { transform: rotateX(90deg) translateZ(50px); }
-.bottom { transform: rotateX(-90deg) translateZ(50px); }
+/* Face rotations */
+.front { transform: rotateX(0deg) translateZ(42px); }
+.back  { transform: rotateX(180deg) translateZ(42px); }
+.right { transform: rotateY(90deg) translateZ(42px); }
+.left  { transform: rotateY(-90deg) translateZ(42px); }
+.top   { transform: rotateX(90deg) translateZ(42px); }
+.bottom{ transform: rotateX(-90deg) translateZ(42px); }
 
-.controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-button {
+/* Buttons */
+.buttons {
     background-color: #67798a;
     border: none;
     color: white;
-    padding: 10px 15px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 5px 0;
+    padding: 8px 12px;
+    font-size: 15px;
+    margin: 4px 0;
     cursor: pointer;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
 }
 
-button:hover:not(:disabled) {
+.buttons:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-button:disabled {
+.buttons:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
     box-shadow: none;
 }
 
+/* Tabs */
 .tabs {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
-    background-color: #ddd;
+    margin-bottom: 15px;
     border-radius: 25px;
-    padding: 5px;
+    padding: 4px;
 }
 
 .tab {
-    padding: 10px 20px;
+    padding: 8px 18px;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s;
     transition: all 0.3s ease;
     border-radius: 12px;
-    background-color: transparent;
+    background-color: #eceaea;
     color: #333;
+    font-size: 15px;
 }
 
 .tab.active {
@@ -320,56 +183,60 @@ button:disabled {
 
 .logocontainer {
     position: fixed;
-    right: 20px;
-    bottom: 20px;
+    right: 15px;
+    bottom: 15px;
     z-index: 10;
 }
 
 .logo {
-    width: 25vh;
+    width: 20vh;
     height: auto;
 }
 
-@media (max-width: 600px) {
-    .container {
-        flex-wrap: wrap;
-    }
-}
-
 .example-section {
-    position: absolute; /* Add this */
-    top: 78%;
+    position: absolute;
+    top: 82%;                    /* Adjusted position */
     left: 50%;
     transform: translate(-50%, -50%);
-    margin-top: 20px;
     text-align: center;
     color: white;
     width: 100%;
 }
 
 .example-text {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .note-display {
-    font-size: 36px;
+    font-size: 32px;             /* Slightly smaller */
     font-weight: bold;
-    letter-spacing: 15px;
+    letter-spacing: 12px;
 }
 
 .note-display .accidental {
-    font-size: 18px;
+    font-size: 16px;
     vertical-align: super;
-    margin-left: -15px;
-    margin-right: -20px;
+    margin-left: -12px;
+    margin-right: -16px;
 }
 
 .invalid-combination {
-    margin-top: 10px;
-    font-size: 24px;
-    color: rgba(255, 255, 255, 0.536);
+    margin-top: 8px;
+    font-size: 22px;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+@media (max-width: 600px) {
+    .container {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .wrapper {
+        width: 95%;
+        padding: 12px 15px 20px;
+    }
 }
 </style>
 </head>
@@ -379,33 +246,13 @@ button:disabled {
     <div class="overlay"></div>
     <div class="overlay2"></div>
 
-    <div class="hamburger-menu">
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div class="menu-items" id="menu-items">
-            <div class="menu-title">BIPH Music</div>
-            <a href="https://biphmusic.github.io/">Home</a>
-            <a href="https://biphmusic.github.io/APUnits/">AP Units</a>
-            <a href="https://biphmusic.github.io/FlashCards/">Flash Cards</a>
-            <a href="https://biphmusic.github.io/MusicTheoryDice/">Dice Simulator</a>
-            <a href="https://biphmusic.github.io/WebPiano/">Web Piano</a>
-            <a href="https://biphmusic.github.io/WordWall/">Word Wall</a>
-            <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            
-            <div class="menu-footer">© Garrison Tubbs 2024</div>
-        </div>
-    </div>
-
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Building Chords</h1>
 
     <div class="wrapper">
         <div class="tabs">
-            <button class="tab active" onclick="switchMode('triad')">Triads</button>
-            <button class="tab" onclick="switchMode('seventh')">Seventh Chords</button>
+            <button class="tab buttons active" onclick="switchMode('triad')">Triads</button>
+            <button class="tab buttons" onclick="switchMode('seventh')">Seventh Chords</button>
         </div>
         <div class="chord-name" id="chordName"></div>
         <div class="container" id="chordContainer"></div>
@@ -419,8 +266,11 @@ button:disabled {
     </div>
 
     <div class="logocontainer">        
-        <img src="BASIS logo/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
+
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
 
 <script>
     const triadValues = [
@@ -434,6 +284,7 @@ button:disabled {
         ['P5', 'd5'],
         ['M7', 'd7', 'm7']
     ];
+
     let currentMode = 'triad';
     let currentIndex = [0, 0, 0, 0];
     let rotations = [0, 0, 0, 0];
@@ -441,7 +292,7 @@ button:disabled {
     function createBlockHTML(blockIndex) {
         return `
             <div class="block-wrapper">
-                <button onclick="changeValue(${blockIndex}, -1)" id="up${blockIndex}">▲</button>
+                <button class="buttons" onclick="changeValue(${blockIndex}, -1)" id="up${blockIndex}">▲</button>
                 <div class="block" id="block${blockIndex}">
                     <div class="face front"></div>
                     <div class="face back"></div>
@@ -450,12 +301,10 @@ button:disabled {
                     <div class="face top"></div>
                     <div class="face bottom"></div>
                 </div>
-                <button onclick="changeValue(${blockIndex}, 1)" id="down${blockIndex}">▼</button>
+                <button class="buttons" onclick="changeValue(${blockIndex}, 1)" id="down${blockIndex}">▼</button>
             </div>
         `;
     }
-
-    
 
     function switchMode(mode) {
         currentMode = mode;
@@ -478,13 +327,11 @@ button:disabled {
         document.querySelector(`.tab[onclick="switchMode('${mode}')"]`).classList.add('active');
     }
 
-    // Initialize the page
     window.onload = function() {
         switchMode('triad');
     };
 
-
-function updateBlockFaces(blockIndex) {
+    function updateBlockFaces(blockIndex) {
         const block = document.getElementById(`block${blockIndex}`);
         const values = currentMode === 'triad' ? triadValues[blockIndex] : seventhValues[blockIndex];
         const faces = block.querySelectorAll('.face');
@@ -494,10 +341,9 @@ function updateBlockFaces(blockIndex) {
     }
 
     function changeValue(blockIndex, direction) {
-        if (blockIndex === 0) return; // First block doesn't change
+        if (blockIndex === 0) return;
 
         const values = currentMode === 'triad' ? triadValues : seventhValues;
-        const maxIndex = values[blockIndex].length - 1;
         const newIndex = (currentIndex[blockIndex] + direction + values[blockIndex].length) % values[blockIndex].length;
 
         currentIndex[blockIndex] = newIndex;
@@ -519,21 +365,21 @@ function updateBlockFaces(blockIndex) {
             } else {
                 const currentValue = values[i][currentIndex[i]];
                 if (currentMode === 'triad') {
-                    if (i === 1) { // 3rd
+                    if (i === 1) {
                         upButton.disabled = currentValue === 'M3';
                         downButton.disabled = currentValue === 'm3';
-                    } else if (i === 2) { // 5th
+                    } else if (i === 2) {
                         upButton.disabled = currentValue === 'd5';
                         downButton.disabled = currentValue === 'A5';
                     }
-                } else { // seventh chords
-                    if (i === 1) { // 3rd
+                } else {
+                    if (i === 1) {
                         upButton.disabled = currentValue === 'M3';
                         downButton.disabled = currentValue === 'm3';
-                    } else if (i === 2) { // 5th
+                    } else if (i === 2) {
                         upButton.disabled = currentValue === 'P5';
                         downButton.disabled = currentValue === 'd5';
-                    } else if (i === 3) { // 7th
+                    } else if (i === 3) {
                         upButton.disabled = currentValue === 'M7';
                         downButton.disabled = currentValue === 'm7';
                     }
@@ -543,90 +389,71 @@ function updateBlockFaces(blockIndex) {
     }
 
     function updateChordName() {
-    const values = currentMode === 'triad' ? triadValues : seventhValues;
-    const chordValues = values.map((v, i) => v[currentIndex[i]]);
+        const values = currentMode === 'triad' ? triadValues : seventhValues;
+        const chordValues = values.map((v, i) => v[currentIndex[i]]);
 
-    let chordName = '';
-    let rootNote = 'C';
-    let thirdNote = 'E';
-    let fifthNote = 'G';
-    let seventhNote = '';
-    let isValidCombination = true;
+        let chordName = '';
+        let rootNote = 'C';
+        let thirdNote = 'E';
+        let fifthNote = 'G';
+        let seventhNote = '';
+        let isValidCombination = true;
 
-    if (currentMode === 'triad') {
-        if (chordValues.join(',') === '1,M3,P5') {
-            chordName = 'Major Triad';
-        } else if (chordValues.join(',') === '1,m3,P5') {
-            chordName = 'Minor Triad';
-            thirdNote = 'E<span class="accidental">♭</span>';
-        } else if (chordValues.join(',') === '1,m3,A5') {
-            chordName = 'Diminished Triad';
-            thirdNote = 'E<span class="accidental">♭</span>';
-            fifthNote = 'G<span class="accidental">♭</span>';
-        } else if (chordValues.join(',') === '1,M3,d5') {
-            chordName = 'Augmented Triad';
-            fifthNote = 'G<span class="accidental">♯</span>';
+        if (currentMode === 'triad') {
+            if (chordValues.join(',') === '1,M3,P5') chordName = 'Major Triad';
+            else if (chordValues.join(',') === '1,m3,P5') {
+                chordName = 'Minor Triad';
+                thirdNote = 'E<span class="accidental">♭</span>';
+            }
+            else if (chordValues.join(',') === '1,m3,A5') {
+                chordName = 'Diminished Triad';
+                thirdNote = 'E<span class="accidental">♭</span>';
+                fifthNote = 'G<span class="accidental">♭</span>';
+            }
+            else if (chordValues.join(',') === '1,M3,d5') {
+                chordName = 'Augmented Triad';
+                fifthNote = 'G<span class="accidental">♯</span>';
+            }
+            else isValidCombination = false;
         } else {
-            isValidCombination = false;
+            seventhNote = 'B';
+            if (chordValues.join(',') === '1,M3,P5,M7') chordName = 'Major 7';
+            else if (chordValues.join(',') === '1,M3,P5,d7') {
+                chordName = 'Dominant 7';
+                seventhNote = 'B<span class="accidental">♭</span>';
+            }
+            else if (chordValues.join(',') === '1,m3,P5,d7') {
+                chordName = 'Minor 7';
+                thirdNote = 'E<span class="accidental">♭</span>';
+                seventhNote = 'B<span class="accidental">♭</span>';
+            }
+            else if (chordValues.join(',') === '1,m3,d5,d7') {
+                chordName = 'Half-Diminished 7';
+                thirdNote = 'E<span class="accidental">♭</span>';
+                fifthNote = 'G<span class="accidental">♭</span>';
+                seventhNote = 'B<span class="accidental">♭</span>';
+            }
+            else if (chordValues.join(',') === '1,m3,d5,m7') {
+                chordName = 'Diminished 7';
+                thirdNote = 'E<span class="accidental">♭</span>';
+                fifthNote = 'G<span class="accidental">♭</span>';
+                seventhNote = 'B<span class="accidental">♭</span><span class="accidental"> ♭</span>';
+            }
+            else isValidCombination = false;
         }
-    } else {
-        seventhNote = 'B';
-        if (chordValues.join(',') === '1,M3,P5,M7') {
-            chordName = 'Major 7';
-        } else if (chordValues.join(',') === '1,M3,P5,d7') {
-            chordName = 'Dominant 7';
-            seventhNote = 'B<span class="accidental">♭</span>';
-        } else if (chordValues.join(',') === '1,m3,P5,d7') {
-            chordName = 'Minor 7';
-            thirdNote = 'E<span class="accidental">♭</span>';
-            seventhNote = 'B<span class="accidental">♭</span>';
-        } else if (chordValues.join(',') === '1,m3,d5,d7') {
-            chordName = 'Half-Diminished 7';
-            thirdNote = 'E<span class="accidental">♭</span>';
-            fifthNote = 'G<span class="accidental">♭</span>';
-            seventhNote = 'B<span class="accidental">♭</span>';
-        } else if (chordValues.join(',') === '1,m3,d5,m7') {
-            chordName = 'Diminished 7';
-            thirdNote = 'E<span class="accidental">♭</span>';
-            fifthNote = 'G<span class="accidental">♭</span>';
-            seventhNote = 'B<span class="accidental">♭</span><span class="accidental"> ♭</span>';
+
+        document.getElementById('chordName').textContent = chordName;
+
+        const exampleContent = document.getElementById('exampleContent');
+        if (isValidCombination) {
+            exampleContent.innerHTML = `
+                <div class="example-text">For example:</div>
+                <div class="note-display" id="noteDisplay">${rootNote} ${thirdNote} ${fifthNote}${currentMode === 'seventh' ? ' ' + seventhNote : ''}</div>
+            `;
         } else {
-            isValidCombination = false;
+            exampleContent.innerHTML = `<div class="invalid-combination">(Invalid combination)</div>`;
         }
     }
-
-    document.getElementById('chordName').textContent = chordName;
-
-    const exampleContent = document.getElementById('exampleContent');
-    if (isValidCombination) {
-        exampleContent.innerHTML = `
-            <div class="example-text">For example:</div>
-            <div class="note-display" id="noteDisplay">${rootNote} ${thirdNote} ${fifthNote}${currentMode === 'seventh' ? ' ' + seventhNote : ''}</div>
-        `;
-    } else {
-        exampleContent.innerHTML = `
-            <div class="invalid-combination">(Invalid combination)</div>
-        `;
-    }
-}
-
-    // Hamburger menu functionality
-    const menuToggle = document.querySelector('.menu-toggle');
-    const menuItems = document.querySelector('.menu-items');
-    
-    function toggleMenu() {
-        menuToggle.classList.toggle('open');
-        menuItems.classList.toggle('show');
-    }
-    
-    // Close the menu when clicking outside
-    document.addEventListener('click', (event) => {
-        // Check if the click was outside the menu and the toggle button
-        if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-            menuToggle.classList.remove('open');
-            menuItems.classList.remove('show');
-        }
-    });
 </script>
 </body>
 </html>
