@@ -271,11 +271,11 @@
 
     <div class="logincontainer">
         <div id="login-section" class="login-section">
-            <h2>Enter your name to begin</h2>
-            <input type="text" id="name-input" placeholder="Your name" autofocus>
-            <button onclick="checkName()">Begin</button>
-            <div id="error-message" class="error"></div>
-        </div>
+    <h2>Enter your name to begin</h2>
+    <input type="text" id="name-input" placeholder="Your name" autofocus autocomplete="off">
+    <button type="button" onclick="checkName()">Begin</button>
+    <div id="error-message" class="error"></div>
+</div>
 
         <div id="quiz-section" class="quiz-section hidden">
             <div class="quiz-container" id="quiz-container"></div>
@@ -293,6 +293,13 @@
     <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
+document.getElementById('name-input').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        checkName();
+    }
+});
+
         let currentStudent = '';
         let currentQuestion = 0;
         let studentAnswers = [];
@@ -301,35 +308,173 @@
         let isQuestionDisplayed = false; // Tracks if a question is currently displayed
 
         const questionSets = {
-            '2025-03-27': { start: 81, end: 90 },
-            '2025-03-28': { start: 91, end: 100 },
-            '2025-03-31': { start: 101, end: 110 },
-            '2025-04-01': { start: 111, end: 120 },
-            '2025-04-02': { start: 121, end: 130 },
-            '2025-04-03': { start: 131, end: 140 },
-            '2025-04-07': { start: 141, end: 150 },
-            '2025-04-08': { start: 151, end: 160 },
-            '2025-04-09': { start: 161, end: 170 },
-            '2025-04-10': { start: 171, end: 180 },
-            '2025-04-11': { start: 181, end: 190 },
-            '2025-04-14': { start: 191, end: 200 },
-            '2025-04-15': { start: 201, end: 210 },
-            '2025-04-16': { start: 211, end: 220 },
-            '2025-04-17': { start: 221, end: 230 },
-            '2025-04-18': { start: 231, end: 240 },
-            '2025-04-21': { start: 241, end: 250 },
-            '2025-04-22': { start: 251, end: 260 },
-            '2025-04-23': { start: 261, end: 270 },
-            '2025-04-24': { start: 271, end: 280 },
-            '2025-04-25': { start: 281, end: 290 },
-            '2025-04-28': { start: 291, end: 300 },
-            '2025-04-29': { start: 301, end: 310 },
-            '2025-04-30': { start: 311, end: 320 },
-            '2025-05-05': { start: 321, end: 330 },
-            '2025-05-06': { start: 331, end: 340 },
-            '2025-05-07': { start: 341, end: 350 },
-            '2025-05-08': { start: 351, end: 360 },
-            '2025-05-09': { start: 361, end: 370 }
+            '2026-08-17': { start: 1, end: 5 }, 
+            '2026-08-18': { start: 6, end: 10 }, 
+            '2026-08-19': { start: 11, end: 15 }, 
+            '2026-08-20': { start: 16, end: 20 }, 
+            '2026-08-21': { start: 21, end: 25 }, 
+            '2026-08-24': { start: 26, end: 30 }, 
+            '2026-08-25': { start: 31, end: 35 }, 
+            '2026-08-26': { start: 36, end: 40 }, 
+            '2026-08-27': { start: 41, end: 45 }, 
+            '2026-08-28': { start: 46, end: 50 }, 
+            '2026-08-31': { start: 51, end: 55 }, 
+            '2026-09-01': { start: 56, end: 60 }, 
+            '2026-09-02': { start: 61, end: 65 }, 
+            '2026-09-03': { start: 66, end: 70 }, 
+            '2026-09-04': { start: 71, end: 75 }, 
+            '2026-09-07': { start: 76, end: 80 }, 
+            '2026-09-08': { start: 81, end: 85 }, 
+            '2026-09-09': { start: 86, end: 90 }, 
+            '2026-09-10': { start: 91, end: 95 }, 
+            '2026-09-11': { start: 96, end: 100 }, 
+            '2026-09-14': { start: 101, end: 105 }, 
+            '2026-09-15': { start: 106, end: 110 }, 
+            '2026-09-16': { start: 111, end: 115 }, 
+            '2026-09-17': { start: 116, end: 120 }, 
+            '2026-09-18': { start: 121, end: 125 }, 
+            '2026-09-21': { start: 126, end: 130 }, 
+            '2026-09-22': { start: 131, end: 135 }, 
+            '2026-09-23': { start: 136, end: 140 }, 
+            '2026-09-24': { start: 141, end: 145 }, 
+            '2026-09-28': { start: 146, end: 150 }, 
+            '2026-09-29': { start: 151, end: 155 }, 
+            '2026-09-30': { start: 156, end: 160 }, 
+            '2026-10-08': { start: 161, end: 165 }, 
+            '2026-10-09': { start: 166, end: 170 }, 
+            '2026-10-12': { start: 171, end: 175 }, 
+            '2026-10-13': { start: 176, end: 180 }, 
+            '2026-10-14': { start: 181, end: 185 }, 
+            '2026-10-15': { start: 186, end: 190 }, 
+            '2026-10-16': { start: 191, end: 195 }, 
+            '2026-10-19': { start: 196, end: 200 }, 
+            '2026-10-20': { start: 201, end: 205 }, 
+            '2026-10-21': { start: 206, end: 210 }, 
+            '2026-10-22': { start: 211, end: 215 }, 
+            '2026-10-23': { start: 216, end: 220 }, 
+            '2026-10-26': { start: 221, end: 225 }, 
+            '2026-10-27': { start: 226, end: 230 }, 
+            '2026-10-28': { start: 231, end: 235 }, 
+            '2026-10-29': { start: 236, end: 240 }, 
+            '2026-10-30': { start: 241, end: 245 }, 
+            '2026-11-03': { start: 246, end: 250 }, 
+            '2026-11-04': { start: 251, end: 255 }, 
+            '2026-11-05': { start: 256, end: 260 }, 
+            '2026-11-06': { start: 261, end: 265 }, 
+            '2026-11-09': { start: 266, end: 270 }, 
+            '2026-11-10': { start: 271, end: 275 }, 
+            '2026-11-11': { start: 276, end: 280 }, 
+            '2026-11-12': { start: 281, end: 285 }, 
+            '2026-11-13': { start: 286, end: 290 }, 
+            '2026-11-16': { start: 291, end: 295 }, 
+            '2026-11-17': { start: 296, end: 300 }, 
+            '2026-11-18': { start: 301, end: 305 }, 
+            '2026-11-19': { start: 306, end: 310 }, 
+            '2026-11-18': { start: 311, end: 315 }, 
+            '2026-11-23': { start: 316, end: 320 }, 
+            '2026-11-24': { start: 321, end: 325 }, 
+            '2026-11-25': { start: 326, end: 330 }, 
+            '2026-11-30': { start: 331, end: 335 }, 
+            '2026-12-01': { start: 336, end: 340 }, 
+            '2026-12-02': { start: 341, end: 345 }, 
+            '2026-12-03': { start: 346, end: 350 }, 
+            '2026-12-04': { start: 351, end: 355 }, 
+            '2026-12-07': { start: 356, end: 360 }, 
+            '2026-12-08': { start: 361, end: 365 }, 
+            '2026-12-09': { start: 366, end: 370 }, 
+            '2026-12-10': { start: 371, end: 375 }, 
+            '2026-12-11': { start: 376, end: 380 }, 
+            '2026-12-14': { start: 381, end: 385 }, 
+            '2026-12-15': { start: 386, end: 390 }, 
+            '2026-12-16': { start: 391, end: 395 }, 
+            '2026-12-17': { start: 396, end: 400 }, 
+            '2026-12-18': { start: 401, end: 405 }, 
+            '2027-01-04': { start: 406, end: 410 }, 
+            '2027-01-05': { start: 411, end: 415 }, 
+            '2027-01-06': { start: 416, end: 420 }, 
+            '2027-01-07': { start: 421, end: 425 }, 
+            '2027-01-08': { start: 426, end: 430 }, 
+            '2027-01-11': { start: 431, end: 435 }, 
+            '2027-01-12': { start: 436, end: 440 }, 
+            '2027-01-13': { start: 441, end: 445 }, 
+            '2027-01-14': { start: 446, end: 450 }, 
+            '2027-01-15': { start: 451, end: 455 }, 
+            '2027-01-18': { start: 456, end: 460 }, 
+            '2027-01-19': { start: 461, end: 465 }, 
+            '2027-01-20': { start: 466, end: 470 }, 
+            '2027-01-21': { start: 471, end: 475 }, 
+            '2027-01-22': { start: 476, end: 480 }, 
+            '2027-01-25': { start: 481, end: 485 }, 
+            '2027-01-26': { start: 486, end: 490 }, 
+            '2027-01-27': { start: 491, end: 495 }, 
+            '2027-01-28': { start: 496, end: 500 }, 
+            '2027-01-29': { start: 501, end: 505 }, 
+            '2027-02-15': { start: 506, end: 510 }, 
+            '2027-02-16': { start: 511, end: 515 }, 
+            '2027-02-17': { start: 516, end: 520 }, 
+            '2027-02-18': { start: 521, end: 525 }, 
+            '2027-02-19': { start: 526, end: 530 }, 
+            '2027-02-22': { start: 531, end: 535 }, 
+            '2027-02-23': { start: 536, end: 540 }, 
+            '2027-02-24': { start: 541, end: 545 }, 
+            '2027-02-25': { start: 546, end: 550 }, 
+            '2027-02-26': { start: 551, end: 555 }, 
+            '2027-03-01': { start: 556, end: 560 }, 
+            '2027-03-02': { start: 561, end: 565 }, 
+            '2027-03-03': { start: 566, end: 570 }, 
+            '2027-03-04': { start: 571, end: 575 }, 
+            '2027-03-05': { start: 576, end: 580 }, 
+            '2027-03-08': { start: 581, end: 585 }, 
+            '2027-03-09': { start: 586, end: 590 }, 
+            '2027-03-10': { start: 591, end: 595 }, 
+            '2027-03-11': { start: 596, end: 600 }, 
+            '2027-03-15': { start: 601, end: 605 }, 
+            '2027-03-16': { start: 606, end: 610 }, 
+            '2027-03-17': { start: 611, end: 615 }, 
+            '2027-03-18': { start: 616, end: 620 }, 
+            '2027-03-19': { start: 621, end: 625 }, 
+            '2027-03-22': { start: 626, end: 630 }, 
+            '2027-03-23': { start: 631, end: 635 }, 
+            '2027-03-24': { start: 636, end: 640 }, 
+            '2027-03-25': { start: 641, end: 645 }, 
+            '2027-03-26': { start: 646, end: 650 }, 
+            '2027-03-29': { start: 651, end: 655 }, 
+            '2027-03-30': { start: 656, end: 660 }, 
+            '2027-03-31': { start: 661, end: 665 }, 
+            '2027-04-01': { start: 666, end: 670 }, 
+            '2027-04-02': { start: 671, end: 675 }, 
+            '2027-04-07': { start: 676, end: 680 }, 
+            '2027-04-08': { start: 681, end: 685 }, 
+            '2027-04-09': { start: 686, end: 690 }, 
+            '2027-04-12': { start: 691, end: 695 }, 
+            '2027-04-13': { start: 696, end: 700 }, 
+            '2027-04-14': { start: 701, end: 705 }, 
+            '2027-04-15': { start: 706, end: 710 }, 
+            '2027-04-16': { start: 711, end: 715 }, 
+            '2027-04-19': { start: 716, end: 720 }, 
+            '2027-04-20': { start: 721, end: 725 }, 
+            '2027-04-21': { start: 726, end: 730 }, 
+            '2027-04-22': { start: 731, end: 735 }, 
+            '2027-04-23': { start: 736, end: 740 }, 
+            '2027-04-26': { start: 741, end: 745 }, 
+            '2027-04-27': { start: 746, end: 750 }, 
+            '2027-04-28': { start: 751, end: 755 }, 
+            '2027-04-29': { start: 756, end: 760 }, 
+            '2027-05-03': { start: 761, end: 765 }, 
+            '2027-05-04': { start: 766, end: 770 }, 
+            '2027-05-05': { start: 771, end: 775 }, 
+            '2027-05-06': { start: 776, end: 780 }, 
+            '2027-05-07': { start: 781, end: 785 }, 
+            '2027-05-10': { start: 786, end: 790 }, 
+            '2027-05-11': { start: 791, end: 795 }, 
+            '2027-05-12': { start: 796, end: 800 }, 
+            '2027-05-13': { start: 801, end: 805 }, 
+            '2027-05-14': { start: 806, end: 810 }, 
+            '2027-05-17': { start: 811, end: 815 }, 
+            '2027-05-18': { start: 816, end: 820 }, 
+            '2027-05-19': { start: 821, end: 825 }, 
+            '2027-05-20': { start: 826, end: 830 }, 
+            '2027-05-21': { start: 831, end: 835 }, 
         };
 
         // Move date calculation to the top
@@ -339,7 +484,35 @@
         const day = String(systemDate.getDate()).padStart(2, '0');
         const today = `${year}-${month}-${day}`;
 
-        const currentSet = questionSets[today] || { start: 81, end: 90 };
+        const sortedQuestionDates = Object.keys(questionSets).sort();
+
+function getCurrentSet() {
+    if (questionSets[today]) {
+        return { set: questionSets[today], found: true };
+    }
+
+    let mostRecentDate = null;
+    for (const date of sortedQuestionDates) {
+        if (date <= today) {
+            mostRecentDate = date;
+        } else {
+            break;
+        }
+    }
+
+    if (mostRecentDate) {
+        return { set: questionSets[mostRecentDate], found: true };
+    }
+
+    const nextDate = sortedQuestionDates[0];
+    const nextDateObj = new Date(nextDate + 'T00:00:00');
+    const diffMs = nextDateObj - systemDate;
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    return { set: null, found: false, nextDate, daysUntil: diffDays };
+}
+
+const currentSetResult = getCurrentSet();
 
         function findAnswer(originalQuestion) {
             const scrambledKey = originalQuestion * 3 + 7;
@@ -403,9 +576,24 @@
                 const hasProgress = loadStudentProgress(currentStudent);
         
                 document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('quiz-section').classList.remove('hidden');
-        
-                if (hasProgress && currentQuestion >= totalQuestions) {
+document.getElementById('quiz-section').classList.remove('hidden');
+
+if (!currentSetResult.found) {
+    const quizContainer = document.getElementById('quiz-container');
+    quizContainer.innerHTML = `
+        <div class="confirmation-container">
+            <span class="confirmation-symbol">⏳</span>
+            <div class="confirmation-text">
+                No questions available yet.<br>
+                Next set unlocks in <strong>${currentSetResult.daysUntil} day${currentSetResult.daysUntil !== 1 ? 's' : ''}</strong><br>
+                (${currentSetResult.nextDate})
+            </div>
+        </div>
+    `;
+    return;
+}
+
+if (hasProgress && currentQuestion >= totalQuestions) {
                     showResults();
                 } else {
                     if (!hasProgress) {
