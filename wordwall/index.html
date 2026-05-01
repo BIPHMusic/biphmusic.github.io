@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Wall</title>
-    <link rel="icon" href="icons/BGicon.png">
+    <link rel="icon" href="../icons/BGicon.png">
     <style>
         @font-face {
             font-family: 'Zapfino';
-            src: url('fonts/Zapfino.ttf') format('truetype');
+            src: url('../fonts/Zapfino.ttf') format('truetype');
         }
         
         body {
@@ -290,17 +290,17 @@
     </select>
 
     <button class="hidden-mode-toggle" onclick="toggleHiddenMode()">
-        <img src="icons/hidden-off.png" alt="Toggle Hidden Mode" id="hiddenModeIcon">
+        <img src="../icons/hidden-off.png" alt="Toggle Hidden Mode" id="hiddenModeIcon">
     </button>
 
     <button class="shuffle-button" onclick="shuffleCards()">
-        <img src="icons/shuffle.png" alt="Shuffle">
+        <img src="../icons/shuffle.png" alt="Shuffle">
     </button>
 
     <div id="glossary"></div>
 
     <div class="logocontainer">        
-        <img src="BASIS logo/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
 
     <div id="shared-menu"></div>
@@ -320,7 +320,7 @@
                 <div class="term">${term.Term}</div>
                 <div class="definition">${term.Definition}</div>
                 <button class="reveal-btn" onclick="revealTerm(this)">
-                    <img src="icons/magnifying-glass.png" alt="Reveal">
+                    <img src="../icons/magnifying-glass.png" alt="Reveal">
                 </button>
                 <button class="close-btn" onclick="removeCard(this.parentElement)">✕</button>
             `;
@@ -336,7 +336,7 @@
         function toggleHiddenMode() {
             hiddenMode = !hiddenMode;
             const icon = document.getElementById('hiddenModeIcon');
-            icon.src = hiddenMode ? "icons/hidden-on.png" : "icons/hidden-off.png";
+            icon.src = hiddenMode ? "../icons/hidden-on.png" : "../icons/hidden-off.png";
             document.body.classList.toggle('hidden-mode', hiddenMode);
             
             setTimeout(() => {
