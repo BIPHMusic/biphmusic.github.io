@@ -8,6 +8,7 @@
                 <div class="menu-title">BIPH Music</div>
                 <a href="https://biphmusic.github.io/">Home</a>
                 <a href="https://biphmusic.github.io/dailysightsinging/">Daily Sight Singing</a>
+                <a href="https://biphmusic.github.io/eartraining/">Ear Training</a>
                 <a href="https://biphmusic.github.io/wordwall/">Word Wall</a>
                 <a href="https://biphmusic.github.io/flashcards/">Flash Cards</a>
                 <a href="https://biphmusic.github.io/dice/">Dice Simulator</a>
@@ -137,27 +138,24 @@
     document.head.appendChild(style);
 
     // Track which menu is currently visible
-    let activeMenu = null; // 'student' | 'teacher' | null
+    let activeMenu = null;
 
     function renderMenu(type) {
         container.innerHTML = type === 'teacher' ? teacherMenuHTML : studentMenuHTML;
     }
 
     function toggleMenu(type) {
-        // If this menu is already active and visible, close it
         if (activeMenu === type) {
             closeMenu();
             return;
         }
 
-        // Otherwise, render and open the requested menu
         renderMenu(type);
         setupMenuInteractions(type);
         
         const menuItems = document.getElementById(`${type}-menu`);
         const menuToggle = document.getElementById('menu-toggle');
         
-        // Force reflow to ensure transition works
         void menuItems.offsetWidth;
         menuToggle.classList.add('open');
         menuItems.classList.add('show');
@@ -176,22 +174,30 @@
     function setupMenuInteractions(type) {
         const menuToggle = document.getElementById('menu-toggle');
         const menuItems = document.getElementById(`${type}-menu`);
-        
         if (!menuToggle || !menuItems) return;
 
-        // Close on outside click
+        // Prevent menu from closing when clicking links (especially useful for student menu)
+        menuItems.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') {
+                // Allow default link behavior (open in new tab or navigate)
+                // Do NOT close the menu
+                return;
+            }
+        });
+
+        // Close only on outside clicks
         const outsideClickHandler = (e) => {
             if (!menuToggle.contains(e.target) && !menuItems.contains(e.target)) {
                 closeMenu();
                 document.removeEventListener('click', outsideClickHandler);
             }
         };
-        // Defer adding listener so current click doesn't immediately close
+
         setTimeout(() => {
             document.addEventListener('click', outsideClickHandler);
         }, 0);
 
-        // Close on Escape key
+        // Escape key still closes
         const escapeHandler = (e) => {
             if (e.key === 'Escape') {
                 closeMenu();
@@ -201,20 +207,18 @@
         document.addEventListener('keydown', escapeHandler);
     }
 
-    // Main toggle click handler
+    // Main toggle handler
     container.addEventListener('click', function(e) {
-        // Only respond to clicks on the toggle button
         if (!e.target.closest('.menu-toggle')) return;
         
         e.preventDefault();
         e.stopPropagation();
         
-        const isAltClick = e.altKey || e.metaKey; // metaKey for Cmd on Mac
+        const isAltClick = e.altKey || e.metaKey;
         const requestedType = isAltClick ? 'teacher' : 'student';
         
         toggleMenu(requestedType);
     });
 
-    // Initialize with student menu rendered but closed (optional)
     renderMenu('student');
 })();
