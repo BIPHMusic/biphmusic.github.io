@@ -5,90 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ear Training</title>
     <link rel="icon" href="../icons/BGicon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <style>
-@font-face {
-            font-family: 'Zapfino';
-            src: url('../fonts/Zapfino.ttf') format('truetype');
-        }
-        
-        body {
-            background-color: rgb(45, 70, 119);
-            font-family: 'Andika', sans-serif;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
-            opacity: 0.8;
-            z-index: -2;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
-                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 1.5s infinite alternate;
-        }
-        .overlay2 {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
-                        radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 2s infinite alternate;
-        }
-        @keyframes pulse {
-            0% {
-                opacity: 0.3;
-                transform: scale(1); 
-            }
-            100% {
-                opacity: 0.7;
-                transform: scale(1.1);
-            }
-        }
-
-        .logocontainer {
-            min-height: 10vh;
-        }
-
-        .logo {
-            position: fixed;
-            right: 0px;
-            bottom: 0;
-            margin-bottom: 5px;
-            width: 25vh;
-            height: auto;
-            z-index: 10; 
-        }
-
-        .Subtitle {
-            font-family: 'Zapfino', sans-serif;
-            color: white;
-            margin-top: -0.7em;
-            font-size: 40px;
-        }
+        /* SHARED STYLES */
+        /* Loaded from common-styles.css - Do not duplicate/edit: */
+        /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
 
         .container {
             max-width: 1100px;
@@ -111,17 +33,9 @@
             text-align: center;
             align-items: center;
         }
-        
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
-            text-align: center;
-            margin-bottom: 40px;
-            letter-spacing: 2px;
-        }
 
         h2 {
-            margin-top: -120px;
+            margin-top: -180px;
             text-align: center;
         }
         h3 {
@@ -137,27 +51,26 @@
             display: none;
         }
 
-button:not(.menu-toggle) {
-    background-color: #4c87af;
-    color: white;
-    padding: 10px 20px;
-    border: 0.5px solid rgba(255, 255, 255, 0.442);
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 5px;
-}
+        button:not(.menu-toggle) {
+            background-color: #4c87af;
+            color: white;
+            padding: 10px 20px;
+            border: 0.5px solid rgba(255, 255, 255, 0.442);
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
 
-button:not(.menu-toggle):disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
+        button:not(.menu-toggle):disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
 
-/* Optional: Make quiz buttons look consistent */
-#quiz-section button {
-    background-color: #4c87af;
-    padding: 10px 20px;
-    margin: 8px 5px;
-}
+        #quiz-section button {
+            background-color: #4c87af;
+            padding: 10px 20px;
+            margin: 8px 5px;
+        }
 
         button:disabled {
             background-color: #cccccc;
@@ -191,48 +104,48 @@ button:not(.menu-toggle):disabled {
         }
 
         .teacher-section {
-    position: fixed;
-    top: 115px;
-    left: 50%;
-    transform: translateX(-52%);
-    width: 100%;
-    height: calc(100vh - 250px);
-    overflow-y: auto;
-    scroll-behavior: smooth;
-    align-items: center;
-}
+            position: fixed;
+            top: 115px;
+            left: 50%;
+            transform: translateX(-52%);
+            width: 100%;
+            height: calc(100vh - 250px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            align-items: center;
+        }
 
-#results-container {
-    position: relative;  
-    width: 95%;
-    margin: 0 auto;    
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        #results-container {
+            position: relative;  
+            width: 95%;
+            margin: 0 auto;    
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-.student-result {
-    position: relative;
-    text-align: center;
-    width: 100%;       
-    padding: 20px;
-    margin-top: -10px;
-    margin-bottom: 50px;
-    align-items: center; 
-}
+        .student-result {
+            position: relative;
+            text-align: center;
+            width: 100%;       
+            padding: 20px;
+            margin-top: -10px;
+            margin-bottom: 50px;
+            align-items: center; 
+        }
 
-.results-table {
-    width: 420px;
-    border-collapse: collapse;
-    margin: 0 auto 20px auto;  /* This centers the table horizontally */
-    background-color: rgba(255, 255, 255, 0.05);
-}
+        .results-table {
+            width: 420px;
+            border-collapse: collapse;
+            margin: 0 auto 20px auto;  
+            background-color: rgba(255, 255, 255, 0.05);
+        }
 
-.student-result:last-child {
-    margin-bottom: 0;
-}
-        
-.correct-mark {
+        .student-result:last-child {
+            margin-bottom: 0;
+        }
+                
+        .correct-mark {
             color: #4CAF50;
             font-weight: bold;
         }
@@ -257,22 +170,22 @@ button:not(.menu-toggle):disabled {
         }
 
         .summary-table {
-    margin-top: 2rem;
-    overflow-x: auto; /* Enable horizontal scrolling if needed */
-}
+            margin-top: 2rem;
+            overflow-x: auto; 
+        }
 
-.summary-table table {
-    border-collapse: collapse;
-    width: 80%;
-    min-width: max-content;
-}
+        .summary-table table {
+            border-collapse: collapse;
+            width: 80%;
+            min-width: max-content;
+        }
 
-.summary-table th,
-.summary-table td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: center;
-}
+        .summary-table th,
+        .summary-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
 
         .section-header {
             margin-top: 20px;
@@ -294,7 +207,6 @@ button:not(.menu-toggle):disabled {
         .copy-button:hover {
             background-color: #3a6da8;
         }
-
     </style>
 </head>
 <body>
