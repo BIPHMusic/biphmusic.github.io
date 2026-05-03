@@ -5,115 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Wall</title>
     <link rel="icon" href="../icons/BGicon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <style>
-        @font-face {
-            font-family: 'Zapfino';
-            src: url('../fonts/Zapfino.ttf') format('truetype');
-        }
-        
-        body {
-            background-color: rgb(45, 70, 119);
-            font-family: 'Andika', sans-serif;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+        /* SHARED STYLES */
+        /* Loaded from common-styles.css - Do not duplicate/edit: */
+        /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
+
+        #unitSelector {
+            display: block;
+            margin: 0 auto 25px;
+            padding: 8px 12px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            width: auto;
+            min-width: 180px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%278%27 viewBox=%270 0 12 8%27 fill=%27white%27><polygon points=%276,8 0,0 12,0%27/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
         }
 
-        .background {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
-            opacity: 0.8;
-            z-index: -2;
+        #unitSelector:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.6);
         }
 
-        .overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
-                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 1.5s infinite alternate;
+        #unitSelector option {
+            cursor: pointer;
         }
-        .overlay2 {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
-                        radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 2s infinite alternate;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.7; transform: scale(1.1); }
-        }
-
-        .logocontainer {
-            position: relative;
-            min-height: 10vh;
-            padding-bottom: 50px;
-        }
-        .logo {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            width: 25vh;
-            height: auto;
-            z-index: 10; 
-        }
-
-                h1.Title {
-            font-family: 'Arial', sans-serif;
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        h1.Subtitle {
-            font-family: 'Zapfino', sans-serif;
-            font-size: 40px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-
-#unitSelector {
-    display: block;
-    margin: 0 auto 25px;
-    padding: 8px 12px;
-    font-size: 16px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 8px;
-    cursor: pointer;
-    width: auto;
-    min-width: 180px;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%278%27 viewBox=%270 0 12 8%27 fill=%27white%27><polygon points=%276,8 0,0 12,0%27/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 32px;
-}
-
-#unitSelector:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.6);
-}
-
-#unitSelector option {
-    cursor: pointer;
-}
 
         #glossary {
             display: grid;
@@ -156,12 +83,10 @@
             flex-grow: 1;
         }
 
-        /* Hidden Mode - Strong Blur */
         .hidden-mode .term {
             filter: blur(50px);
         }
 
-        /* Reveal Button */
         .term-card .reveal-btn {
             display: none;
             position: absolute;
@@ -201,7 +126,6 @@
         }
         .close-btn:hover { color: white; }
 
-        /* Classic Poof Animation */
         .poof {
             position: absolute;
             top: 50%;
@@ -245,7 +169,6 @@
             }
         }
 
-        /* Buttons */
         .hidden-mode-toggle {
             position: absolute;
             top: 50px;
