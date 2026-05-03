@@ -5,89 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Review</title>
     <link rel="icon" href="../icons/BGicon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <style>
-        @font-face {
-            font-family: 'Zapfino';
-            src: url('../fonts/Zapfino.ttf') format('truetype');
-        }
-
-        body {
-            background-color: rgb(45, 70, 119);
-            font-family: 'Arial', sans-serif;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            user-select: none;
-        }
-
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
-            opacity: 0.8;
-            z-index: -2;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
-                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 1.5s infinite alternate;
-        }
-
-        .overlay2 {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
-                        radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 2s infinite alternate;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0.7;
-                transform: scale(1.1);
-            }
-        }
-
-        h1.Title {
-            font-family: 'Arial', sans-serif;
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        h1.Subtitle {
-            font-family: 'Zapfino', sans-serif;
-            font-size: 40px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
+        /* SHARED STYLES */
+        /* Loaded from common-styles.css - Do not duplicate/edit: */
+        /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
         .container {
             text-align: left;
             width: 90%;
@@ -101,9 +24,9 @@
         }
 
         .login-section {
-    text-align: center;
-    margin-bottom: 20px; 
-}
+            text-align: center;
+            margin-bottom: 20px; 
+        }
 
         .quiz-container {
             margin-top: 40px;
@@ -301,20 +224,6 @@
             outline: 2px solid rgba(255, 0, 0, 0.589);
         }
 
-        .logocontainer {
-    min-height: 10vh;
-    padding-bottom: 50px;
-}
-
-.logo {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    width: 25vh;
-    height: auto;
-    z-index: 10; 
-}
-
         .action-button.export {
             display: inline-flex;
             align-items: center;
@@ -339,63 +248,63 @@
         }
 
         .hidden {
-    display: none;
-}
+            display: none;
+        }
 
-.auth-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 40px;
-    padding: 20px;
-    margin-top: 20px;
-    width: fit-content;
-    max-width: 300px;
-    margin-left: auto;
-    margin-right: auto;
-}
+        .auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 40px;
+            padding: 20px;
+            margin-top: 20px;
+            width: fit-content;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-.auth-check {
-    color: #16a34a; /* Green color */
-    font-size: 1.5rem;
-    margin-right: 10px;
-    opacity: 0;
-    transform: scale(0);
-    animation: checkFadeIn 0.5s ease-out forwards;
-    animation-delay: 0.2s;
-}
+        .auth-check {
+            color: #16a34a; /* Green color */
+            font-size: 1.5rem;
+            margin-right: 10px;
+            opacity: 0;
+            transform: scale(0);
+            animation: checkFadeIn 0.5s ease-out forwards;
+            animation-delay: 0.2s;
+        }
 
-.auth-text {
-    font-size: 1rem;
-    color: white;
-    opacity: 0;
-    animation: textFadeIn 0.5s ease-out forwards;
-    animation-delay: 0.4s;
-}
+        .auth-text {
+            font-size: 1rem;
+            color: white;
+            opacity: 0;
+            animation: textFadeIn 0.5s ease-out forwards;
+            animation-delay: 0.4s;
+        }
 
-@keyframes checkFadeIn {
-    0% {
-        opacity: 0;
-        transform: scale(0);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
+        @keyframes checkFadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
 
-@keyframes textFadeIn {
-    0% {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        @keyframes textFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
