@@ -4,87 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AP Units</title>
-    <link rel="icon" href="../icons/BGicon.png">
+        <link rel="icon" href="../icons/BGicon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <style>
-        @font-face {
-            font-family: 'Zapfino';
-            src: url('../fonts/Zapfino.ttf') format('truetype');
-        }
-        
-        body {
-            background-color: rgb(45, 70, 119);
-            font-family: 'Andika', sans-serif;
-            /* font-family: 'Helvetica Neue', Arial, sans-serif; */
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-        }
-
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
-            opacity: 0.8;
-            z-index: -2;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
-                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 1.5s infinite alternate;
-        }
-        .overlay2 {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
-                        radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 2s infinite alternate;
-        }
-        @keyframes pulse {
-            0% {
-                opacity: 0.3;
-                transform: scale(1); 
-            }
-            100% {
-                opacity: 0.7;
-                transform: scale(1.1);
-            }
-        }
+        /* SHARED STYLES */
+        /* Loaded from common-styles.css - Do not duplicate/edit: */
+        /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
 
         .logocontainer {
-    position: relative;
-    min-height: 10vh; /* Ensures the container covers the viewport height */
-    padding-bottom: 50px; /* Space for the logo */
-}
+            position: relative;
+            min-height: 10vh; /* Ensures the container covers the viewport height */
+            padding-bottom: 50px; /* Space for the logo */
+        }
 
-.logo {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 25vh;
-    height: auto;
-    z-index: 10; 
-}
+        .logo {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 25vh;
+            height: auto;
+            z-index: 10; 
+        }
 
-.Subtitle {
+        .Subtitle {
             font-family: 'Zapfino', sans-serif;
             color: white;
             margin-top: -0.7em;
@@ -92,109 +35,103 @@
         }
 
         .container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-h1 {
-    font-size: 2.5rem;
-    font-weight: 300;
-    text-align: center;
-    margin-bottom: 40px;
-    letter-spacing: 2px;
-}
-.unit {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-    padding: 20px;
-    background-color: #1e1e1e4a;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    overflow: hidden;
-}
-.unit:hover {
-    box-shadow: 0 5px 80px rgba(255, 255, 255, 0.1);
-}
-.unit-info {
-    flex-grow: 1;
-    width: 100%;
-}
-.unit-info h2 {
-    font-size: 1.5rem;
-    font-weight: 400;
-    margin: 0 0 10px 0;
-}
-.unit-info p {
-    font-size: 1rem;
-    margin: 0;
-    opacity: 0.7;
-}
-.btn-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    width: 100%;
-    max-width: 250px;
-    flex-direction: column;
-}
-.btn0, .btn, .btn2 {
-    background-color: #b4b4b4;
-    color: #121212;
-    border: none;
-    padding: 10px 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    -webkit-tap-highlight-color: transparent;
-}
-.btn {
-    background-color: #ffffff;
-}
-.btn2 {
-    background-color: #8aa5d7;
-    width: 100%;
-}
-.btn0:hover, .btn:hover, .btn2:hover {
-    background-color: #f8f9d0;
-    transform: scale(1.05);
-}
-.btn0:active, .btn:active, .btn2:active {
-    background-color: #f8f9d0;
-    transform: scale(0.95);
-}
-.vocab, .topics {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease-out, opacity 0.5s ease-out, transform 0.5s ease-out;
-    opacity: 0;
-    transform: translateY(-20px);
-    background-color: #f9f9f900;
-    width: 100%;
-}
-.vocab.show, .topics.show {
-    max-height: 2000px;
-    opacity: 1;
-    transform: translateY(0);
-    padding: 10px 0;
-}
-.topics ul {
-    margin: 0;
-    padding-left: 20px;
-}
-.vocab-list ul {
-    column-width: 150px;
-    column-gap: 20px;
-    list-style-position: inside;
-    padding-left: 0;
-}
-.vocab-list li {
-    break-inside: avoid;
-    margin-bottom: 5px;
-}
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #1e1e1e4a;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .unit:hover {
+            box-shadow: 0 5px 80px rgba(255, 255, 255, 0.1);
+        }
+        .unit-info {
+            flex-grow: 1;
+            width: 100%;
+        }
+        .unit-info h2 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin: 0 0 10px 0;
+        }
+        .unit-info p {
+            font-size: 1rem;
+            margin: 0;
+            opacity: 0.7;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            width: 100%;
+            max-width: 250px;
+            flex-direction: column;
+        }
+        .btn0, .btn, .btn2 {
+            background-color: #b4b4b4;
+            color: #121212;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn {
+            background-color: #ffffff;
+        }
+        .btn2 {
+            background-color: #8aa5d7;
+            width: 100%;
+        }
+        .btn0:hover, .btn:hover, .btn2:hover {
+            background-color: #f8f9d0;
+            transform: scale(1.05);
+        }
+        .btn0:active, .btn:active, .btn2:active {
+            background-color: #f8f9d0;
+            transform: scale(0.95);
+        }
+        .vocab, .topics {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out, transform 0.5s ease-out;
+            opacity: 0;
+            transform: translateY(-20px);
+            background-color: #f9f9f900;
+            width: 100%;
+        }
+        .vocab.show, .topics.show {
+            max-height: 2000px;
+            opacity: 1;
+            transform: translateY(0);
+            padding: 10px 0;
+        }
+        .topics ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .vocab-list ul {
+            column-width: 150px;
+            column-gap: 20px;
+            list-style-position: inside;
+            padding-left: 0;
+        }
+        .vocab-list li {
+            break-inside: avoid;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
