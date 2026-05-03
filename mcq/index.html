@@ -3,57 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="icon" href="../icons/BGicon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <title>MCQ Questions - April 8</title>
     <style>
+        /* SHARED STYLES */
+        /* Loaded from common-styles.css - Do not duplicate/edit: */
+        /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
 
         body {
-            background-color: rgb(45, 70, 119);
-            font-family: 'Arial', sans-serif;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
             display: flex;
             flex-direction: column;
             align-items: center;
             user-select: none;
-        }
-
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgb(45, 70, 119), rgb(9, 32, 79));
-            opacity: 0.8;
-            z-index: -2;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
-                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 1.5s infinite alternate;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.7; transform: scale(1.1); }
-        }
-
-        h1 {
-            font-family: 'Arial', sans-serif;
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 20px;
         }
 
         .quiz-container {
@@ -63,6 +26,7 @@
         }
 
         .question {
+            text-align: left;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             padding: 20px;
@@ -74,6 +38,7 @@
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: left;
         }
 
         .media-container {
@@ -90,6 +55,12 @@
             border-style: solid;
             border-width: 15px;
             border-radius: 15px;
+        }
+
+        img.logo {
+            border: none;
+            border-radius: 0;
+            z-index: -2;
         }
 
         audio {
@@ -276,6 +247,10 @@
                 <div class="option">D. Submediant</div>
             </div>
         </div>
+    </div>
+
+        <div class="logocontainer">        
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
 </body>
 </html>
