@@ -7,6 +7,7 @@
     <link rel="icon" href="icons/bg-icon.png">
     <link rel="stylesheet" href="common-styles.css">
     <link rel="preload" href="fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <script src="apstudents.js"></script>
     <style>
         /* SHARED STYLES */
         /* Loaded from common-styles.css - Do not duplicate/edit: */
@@ -62,31 +63,6 @@
             font-size: 18px;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-        }
-
-        .grid-item {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .grid-item:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .grid-item img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-        }
-
         .zapfino {
             font-family: 'Zapfino', sans-serif; 
             font-size: 1.5em; 
@@ -95,78 +71,263 @@
         .greeting-text {
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.7);
         }
+
+        /* LOGIN OVERLAY */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease;
+        }
+
+        .login-box {
+            background: rgba(255,255,255,0.95);
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 380px;
+            color: #34405d;
+        }
+
+        .login-box h1.Title {
+            margin: 0 0 8px 0;
+            font-size: 2.4em;
+        }
+
+        .login-box .Subtitle {
+            margin-bottom: 25px;
+            color: #444;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 14px;
+            margin: 15px 0;
+            font-size: 1.1em;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1em;
+            background: #3b6cac;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .login-box button:hover {
+            background: #3680ce;
+        }
+
+        .error {
+            color: #c00;
+            margin-top: 10px;
+            min-height: 1.2em;
+        }
+
+        /* Daily Exercises Button */
+        #daily-btn {
+            font-size: 1.5em;
+            padding: 18px 40px;
+            background: #2c568e;
+            color: white;
+            border: 2px solid #3b6cac;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #daily-btn:hover {
+            background: #3b6cac;
+            border-color: #3680ce;
+        }
+
+        /* Fade-in animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+            box-shadow: 0 0 0 30px white inset !important;
+            transition: background-color 5000s ease-in-out 0s !important;
+        }
     </style>
 </head>
 <body>
-    <div id="shared-menu"></div>
-    <script src="menu.js"></script>
-    <div class="background"></div>
-    <div class="overlay"></div>
-    <div class="overlay2"></div>
-
-    <div class="banner">
-        <img src="images/manuscript.png" alt="Manuscript Background" class="manuscript-background">
-        <div class="banner-text" id="banner-text"></div>
-    </div>
-
-    <div class="container">
-        <div class="countdown" id="upcoming-dates"></div>
-        <p><h2>Our review activities for today:</h2></p>
-        <div class="grid">
-            <div class="grid-item" onclick="window.open('https://biphmusic.github.io/dailysightsinging/', '_blank')">
-                <img src="images/sightsinging.png" alt="Sight Singing">
-                Sight Singing
-            </div>
-            <div class="grid-item" onclick="window.open('https://biphmusic.github.io/eartraining/', '_blank')">
-                <img src="images/eartraining.png" alt="Ear Training">
-                Ear Training
-            </div>
-            <div class="grid-item" onclick="window.open('https://biphmusic.github.io/vocabreview/', '_blank')">
-                <img src="images/vocabreview.png" alt="Vocabulary">
-                Vocabulary
-            </div>
-            <div class="grid-item" onclick="window.open('https://apclassroom.collegeboard.org/', '_blank')">
-                <img src="images/apclassroom.png" alt="AP Classroom Questions">
-                AP Classroom Questions
-            </div>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h1 class="Title">BIPH</h1>
+            <h1 class="Subtitle">AP Music Theory</h1>
+            <h2>Enter your name to begin</h2>
+            
+            <input 
+                type="text" 
+                id="name-input" 
+                placeholder="Your name" 
+                autofocus
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+            >
+            
+            <button onclick="handleLogin()">Begin</button>
+            <div id="error-message" class="error"></div>
         </div>
     </div>
 
-        <div class="logocontainer">        
-        <img src="icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+    <!-- MAIN CONTENT -->
+    <div id="main-content" style="display: none;">
+        <div id="shared-menu"></div>
+        <script src="menu.js"></script>
+        <script src="mymenu.js"></script>
+
+        <div class="background"></div>
+        <div class="overlay"></div>
+        <div class="overlay2"></div>
+
+        <div class="banner fade-in" id="banner-section">
+            <img src="images/manuscript.png" alt="Manuscript Background" class="manuscript-background">
+            <div class="banner-text" id="banner-text"></div>
+        </div>
+
+        <div class="container" id="container-section">
+            <div class="countdown" id="upcoming-dates">
+                <h2 class="fade-in" id="dates-title">Dates of Importance</h2>
+                <p class="fade-in" id="mock-exam"><strong>Mock Exam</strong>: February 18th, 2027</p>
+                <p class="fade-in" id="ap-exam"><strong>AP Exam</strong>: May 5–23, 2027 <span style="opacity: 0.6; font-size: 0.85em;">(date TBD)</span></p>
+            </div>
+            
+            <div style="margin: 30px 0;">
+                <button id="daily-btn" class="fade-in" onclick="startDailyExercises()">
+                    Start Daily Exercises
+                </button>
+            </div>
+        </div>
+
+        <div class="logocontainer fade-in" id="logo-section">        
+            <img src="icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+        </div>
     </div>
 
     <script>
-        // Hamburger menu functionality
-        const menuToggle = document.querySelector('.menu-toggle');
-        const menuItems = document.querySelector('.menu-items');
+        // Name utilities
+        function normalizeName(name) {
+            return name.trim().toLowerCase();
+        }
 
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('open');
-            menuItems.classList.toggle('show');
-        });
+        function findStudent(inputName) {
+            const lowerInput = normalizeName(inputName);
+            return apStudents.find(student => 
+                normalizeName(student.name) === lowerInput || 
+                normalizeName(student.altName) === lowerInput
+            );
+        }
 
-        // Close the menu when clicking outside
-        document.addEventListener('click', (event) => {
-            if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-                menuToggle.classList.remove('open');
-                menuItems.classList.remove('show');
+        function capitalizeName(name) {
+            return name.trim().split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+        }
+
+        function getStoredName() {
+            const name = localStorage.getItem('biph_student_name');
+            const timestamp = localStorage.getItem('biph_name_timestamp');
+            if (!name || !timestamp) return null;
+            if (Date.now() - parseInt(timestamp) > 60 * 60 * 1000) {
+                localStorage.removeItem('biph_student_name');
+                localStorage.removeItem('biph_name_timestamp');
+                return null;
             }
+            return name;
+        }
+
+        function storeName(name) {
+            localStorage.setItem('biph_student_name', name);
+            localStorage.setItem('biph_name_timestamp', Date.now().toString());
+        }
+
+        // Login Handler
+        function handleLogin() {
+            const input = document.getElementById('name-input');
+            const error = document.getElementById('error-message');
+            const rawName = input.value.trim();
+
+            if (!rawName) {
+                error.textContent = "Please enter your name";
+                return;
+            }
+
+            const student = findStudent(rawName);
+            if (!student) {
+                error.textContent = "Name not recognized. Please use your approved name.";
+                input.value = "";
+                return;
+            }
+
+            const displayName = capitalizeName(student.name);
+            storeName(displayName);
+            showMainContent(displayName);
+        }
+
+        // Enter key support
+        document.getElementById('name-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleLogin();
         });
 
-        // Banner text based on time of day
-        function getGreeting() {
+        function showMainContent(displayName) {
+            const loginScreen = document.getElementById('login-screen');
+            loginScreen.style.opacity = '0';
+
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+
+                const banner = document.getElementById('banner-section');
+                const logo = document.getElementById('logo-section');
+                const datesTitle = document.getElementById('dates-title');
+                const mockExam = document.getElementById('mock-exam');
+                const apExam = document.getElementById('ap-exam');
+                const dailyBtn = document.getElementById('daily-btn');
+
+                setTimeout(() => { banner.classList.add('visible'); logo.classList.add('visible'); }, 100);
+                setTimeout(() => datesTitle.classList.add('visible'), 600);
+                setTimeout(() => mockExam.classList.add('visible'), 900);
+                setTimeout(() => apExam.classList.add('visible'), 1200);
+                setTimeout(() => dailyBtn.classList.add('visible'), 1600);
+
+                document.getElementById('banner-text').innerHTML = getGreeting(displayName);
+
+                if (typeof initMyMenu === 'function') initMyMenu(false);
+            }, 600);
+        }
+
+        function getGreeting(displayName = "") {
             const now = new Date();
             const hours = now.getHours();
-            let greeting;
-
-            if (hours < 12) {
-                greeting = "Good morning";
-            } else if (hours < 18) {
-                greeting = "Good afternoon";
-            } else {
-                greeting = "Good evening";
-            }
+            let greeting = hours < 12 ? "Good morning" : hours < 18 ? "Good afternoon" : "Good evening";
 
             const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -175,36 +336,35 @@
             const month = months[now.getMonth()];
             const day = now.getDate();
 
-            return `<style> 
-                        .zapfino { font-family: 'Zapfino', sans-serif; font-size: 1.5em; } 
-                        .greeting-text { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); }
-                    </style>
-                    <div style="position: relative;">
-                        <div style="position: relative; z-index: 0;">
-                            <span class="zapfino">${greeting}!</span> <br>
-                            <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>
-                        </div>
-                    </div>`;
+            return `<span class="zapfino">${greeting}, ${displayName}!</span><br>
+                    <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
         }
 
-        // Countdown to mock exam and AP exam
-        function getCountdownText() {
-            const now = new Date();
-            const mockExamDate = new Date(now.getFullYear(), 1, 19); // February 19th
-            const apExamDate = new Date(now.getFullYear(), 4, 12); // May 12th
+        function startDailyExercises() {
+            const urls = [
+                "https://biphmusic.github.io/dailysightsinging/",
+                "https://biphmusic.github.io/dailymcqs/",
+                "https://biphmusic.github.io/eartraining/",
+                "https://biphmusic.github.io/vocabreview/"
+            ];
 
-            const mockDaysLeft = Math.ceil((mockExamDate - now) / (1000 * 60 * 60 * 24));
-            const apDaysLeft = Math.ceil((apExamDate - now) / (1000 * 60 * 60 * 24));
-
-            return `<h2>Dates of Importance</h2>
-                    <p><strong>Mock Exam</strong>: February 19th <span style="opacity: 0.5; font-size: 0.8em;">(in ${mockDaysLeft} days)</span></p>
-                    <p><strong>AP Exam</strong>: May 12th <span style="opacity: 0.5; font-size: 0.8em;">(in ${apDaysLeft} days)</span></p>
-                    <br><br>`; // Added extra line breaks for more space
+            window.location.href = urls[0];
+            for (let i = 1; i < urls.length; i++) {
+                window.open(urls[i], '_blank');
+            }
         }
 
-        // Update banner text and countdown
-        document.getElementById('banner-text').innerHTML = getGreeting();
-        document.getElementById('upcoming-dates').innerHTML = getCountdownText();
+        // Auto-login
+        window.onload = () => {
+            const stored = getStoredName();
+            if (stored) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                showMainContent(stored);
+            } else {
+                if (typeof initMyMenu === 'function') initMyMenu(true);
+            }
+        };
     </script>
 </body>
 </html>
