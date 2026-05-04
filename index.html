@@ -276,13 +276,13 @@
             const rawName = input.value.trim();
 
             if (!rawName) {
-                error.textContent = "Please enter your name";
+                error.textContent = "Please enter your first name";
                 return;
             }
 
             const student = findStudent(rawName);
             if (!student) {
-                error.textContent = "Name not recognized. Please use your approved name.";
+                error.innerHTML = "Name not recognized.<br>(First name only)";
                 input.value = "";
                 return;
             }
