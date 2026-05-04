@@ -7,9 +7,10 @@
             <div class="menu-items student-menu" id="student-menu">
                 <div class="menu-title">BIPH Music</div>
                 <a href="https://biphmusic.github.io/">Home</a>
-                <a href="https://biphmusic.github.io/dailysightsinging/">Daily Sight Singing</a>
-                <a href="https://biphmusic.github.io/dailymcqs/">Daily MCQs</a>
+                <a href="https://biphmusic.github.io/dailysightsinging/">Sight Singing</a>
+                <a href="https://biphmusic.github.io/dailymcqs/">MCQs</a>
                 <a href="https://biphmusic.github.io/eartraining/">Ear Training</a>
+                <a href="https://biphmusic.github.io/vocabreview/">Vocabulary</a>
                 <a href="https://biphmusic.github.io/wordwall/">Word Wall</a>
                 <a href="https://biphmusic.github.io/flashcards/">Flash Cards</a>
                 <a href="https://biphmusic.github.io/toolbox/">Toolbox</a>
