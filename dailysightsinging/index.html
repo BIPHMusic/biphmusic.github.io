@@ -7,9 +7,10 @@
     <link rel="icon" href="../icons/bg-icon.png">
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <script src="../apstudents.js"></script>
+    <script src="../mymenu.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
     <style>
-        
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -58,7 +59,7 @@
             margin-bottom: 5px;
         }
 
-        img {
+        #exerciseImage {
             width: 100%;
             height: auto;
             margin-bottom: 50px;
@@ -66,7 +67,7 @@
             transition: filter 0.5s ease;
         }
 
-        img.revealed { 
+        #exerciseImage.revealed { 
             filter: blur(0); 
         }
 
@@ -84,6 +85,15 @@
             width: 300px; 
             margin-top: 15px;
             margin-bottom: -10px;
+        }
+
+        #nameInputError {
+            color: #c00;
+            font-size: 14px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            min-height: 1.2em;
+            text-align: center;
         }
 
         #recordButton {
@@ -172,12 +182,6 @@
             padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-
-        #submitPassword:hover {
-            background-color: #45a049;
         }
 
         .modal-content {
@@ -188,6 +192,7 @@
             color: black;
         }
     </style>
+<base target="_blank">
 </head>
 <body>
     <div class="background"></div>
@@ -197,23 +202,26 @@
     <div class="container">
         <h1>Daily Sight Singing Practice</h1>
         <h2 id="dateSubtitle"></h2>
-        <input type="text" id="nameInput" placeholder="Enter your name (required)" required>
-        
+
+        <div id="signedOutSection">
+            <input type="text" id="nameInput" placeholder="Enter your name (required)" required>
+            <div id="nameInputError"></div>
+        </div>
+
         <div id="timeRestriction" class="time-restriction"></div>
-        
+
         <div class="image-container">
             <img id="exerciseImage" alt="Sight Singing Exercise" draggable="false">
         </div>
-        
-        <div id="countdown" style="display: none;"></div>
+
         <div id="recordingNotice" class="recording-notice">
             You may start recording at any time, but only may record once.
         </div>
-        
+
         <button id="recordButton" class="action-btn" disabled>
             <div id="recordIcon"></div>
         </button>
-        
+
         <canvas id="visualizer"></canvas>
         <audio id="audioPlayback" controls></audio>
         <button id="downloadButton" class="action-btn">Download Recording</button>
@@ -241,16 +249,55 @@
     <script src="../menu.js"></script>
 
     <script>
-        // Your JavaScript remains the same (no changes needed for functionality)
-        const allowedNames = [
-            "Ben Chen", "Howard Ding", "Terry He", "Alice Li", "Vincent Mu",
-            "Tiger Pan", "Chris Peng", "Lucy Sheng", "Diego Su", "Hailey Wang",
-            "Eileen Xu", "Angelina Yan", "Serena Zeng", "Catherine Zhang",
-            "Andrew Zhao", "Jennifer Zhou", "Ben", "Howard", "Terry", "Alice",
-            "Vincent", "Tiger", "Chris", "Lucy", "Diego", "Hailey", "Eileen",
-            "Angelina", "Serena", "Catherine", "Andrew", "Jennifer", "Mr. Tubbs"
-        ];
+        function normalizeName(name) {
+            return name.trim().toLowerCase();
+        }
 
+        function findStudent(inputName) {
+            const lowerInput = normalizeName(inputName);
+            return apStudents.find(student => 
+                normalizeName(student.name) === lowerInput || 
+                normalizeName(student.altName) === lowerInput
+            );
+        }
+
+        function capitalizeName(name) {
+            return name.trim().split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+        }
+
+        function getStoredName() {
+            const name = localStorage.getItem('biph_student_name');
+            const ts = localStorage.getItem('biph_name_timestamp');
+            if (name && ts && (Date.now() - parseInt(ts) < 60 * 60 * 1000)) {
+                return name;
+            }
+            return null;
+        }
+
+        function signInStudent(rawName) {
+            const errorDiv = document.getElementById('nameInputError');
+
+            if (!rawName) {
+                if (errorDiv) errorDiv.textContent = "Please enter your name";
+                return false;
+            }
+
+            const student = findStudent(rawName);
+            if (student) {
+                const displayName = capitalizeName(student.name);
+                localStorage.setItem('biph_student_name', displayName);
+                localStorage.setItem('biph_name_timestamp', Date.now().toString());
+                location.reload();
+                return true;
+            } else {
+                if (errorDiv) errorDiv.textContent = "Name not recognized. Please use your approved name.";
+                return false;
+            }
+        }
+
+        // ==================== CORE FUNCTIONALITY ====================
         let mediaRecorder;
         let audioChunks = [];
         let isRecording = false;
@@ -258,59 +305,79 @@
         let animationId;
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Example image logic
             const startDate = new Date('2024-11-04');
             const today = new Date();
-            const differenceInTime = today.getTime() - startDate.getTime();
-            let differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
-            
+            let differenceInDays = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
+
             const completeWeeks = Math.floor(differenceInDays / 7);
             differenceInDays -= (completeWeeks * 2);
-            
+
             const currentDay = today.getDay();
             if (currentDay === 0) differenceInDays -= 2;
             if (currentDay === 6) differenceInDays -= 1;
-            
-            const currentExample = (differenceInDays % 30) + 1;
 
-            const exerciseImage = document.getElementById('exerciseImage');
-            exerciseImage.src = `examples/${currentExample}.jpg`;
+            const currentExample = (differenceInDays % 30) + 1;
+            document.getElementById('exerciseImage').src = `examples/${currentExample}.jpg`;
 
             const dateSubtitle = document.getElementById('dateSubtitle');
             const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-            const todayFormatted = today.toLocaleDateString('en-US', options);
-            dateSubtitle.textContent = todayFormatted;
+            dateSubtitle.textContent = today.toLocaleDateString('en-US', options);
 
-            setInterval(checkNameAndTime, 1000);
+            // Check cached name
+            const storedName = getStoredName();
+            if (storedName) {
+                document.getElementById('signedOutSection').style.display = 'none';
+                checkTimeAndUnlock();
+            } else {
+                document.getElementById('signedOutSection').style.display = 'block';
+                setInterval(checkNameAndTime, 800);
+            }
 
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape') {
-                    const modal = document.getElementById('passwordModal');
-                    modal.style.display = 'none';
-                    document.getElementById('passwordInput').value = '';
-                    document.getElementById('nameInput').value = '';
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+        });
+
+        // Name input: Enter key submits
+        document.getElementById('nameInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const rawName = document.getElementById('nameInput').value.trim();
+                signInStudent(rawName);
+            }
+        });
+
+        // Also validate on blur (when user clicks away) — optional, but helpful
+        document.getElementById('nameInput').addEventListener('blur', () => {
+            const rawName = document.getElementById('nameInput').value.trim();
+            if (rawName) {
+                const student = findStudent(rawName);
+                const errorDiv = document.getElementById('nameInputError');
+                if (!student && errorDiv) {
+                    errorDiv.textContent = "Name not recognized.";
                 }
-            });
+            }
+        });
 
-            window.onclick = (event) => {
-                if (event.target === document.getElementById('passwordModal')) {
-                    document.getElementById('passwordModal').style.display = 'none';
-                    document.getElementById('passwordInput').value = '';
-                    document.getElementById('nameInput').value = '';
-                }
-            };
+        // Clear error when user starts typing again
+        document.getElementById('nameInput').addEventListener('input', () => {
+            const errorDiv = document.getElementById('nameInputError');
+            if (errorDiv) errorDiv.textContent = '';
         });
 
         function checkNameAndTime() {
             const name = document.getElementById('nameInput').value.trim();
-            const nameLower = name.toLowerCase();
-            
-            const isAllowed = allowedNames.some(allowedName => 
-                allowedName.toLowerCase() === nameLower
-            );
+            if (!name) return;
 
-            if (nameLower === "mr. tubbs" || nameLower === "mr tubbs") {
-                showPasswordModal();
-            } else if (isAllowed && checkTime()) {
+            const student = findStudent(name);
+            if (student && checkTime()) {
+                document.getElementById('exerciseImage').classList.add('revealed');
+                document.getElementById('recordButton').disabled = false;
+            }
+        }
+
+        function checkTimeAndUnlock() {
+            if (checkTime()) {
                 document.getElementById('exerciseImage').classList.add('revealed');
                 document.getElementById('recordButton').disabled = false;
             }
@@ -323,31 +390,7 @@
             return (hour === 10 && minutes >= 45 && minutes < 48);
         }
 
-        function showPasswordModal() {
-            document.getElementById('passwordModal').style.display = 'flex';
-            document.getElementById('passwordInput').focus();
-        }
-
-        document.getElementById('submitPassword').onclick = () => {
-            const password = document.getElementById('passwordInput').value;
-            if (password === "review") {
-                const exerciseImageSrc = document.getElementById('exerciseImage').src;
-                window.open(exerciseImageSrc, '_blank');
-                document.getElementById('recordButton').disabled = false;
-                document.getElementById('passwordModal').style.display = 'none';
-                document.getElementById('passwordInput').value = '';
-            } else {
-                alert("Incorrect password.");
-            }
-        };
-
-        document.getElementById('passwordInput').addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                document.getElementById('submitPassword').click();
-            }
-        });
-
-        // Recording functionality remains unchanged...
+        // ==================== RECORDING ====================
         document.getElementById('recordButton').addEventListener('click', async () => {
             if (!isRecording) {
                 try {
@@ -356,7 +399,7 @@
                     const source = audioContext.createMediaStreamSource(stream);
                     analyser = audioContext.createAnalyser();
                     source.connect(analyser);
-                    
+
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
 
@@ -391,18 +434,15 @@
         });
 
         document.getElementById('downloadButton').addEventListener('click', () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
             const url = URL.createObjectURL(audioBlob);
             const a = document.createElement('a');
             const today = new Date();
             const formattedDate = today.toISOString().split('T')[0];
-            const name = document.getElementById('nameInput').value.trim();
-            const capitalizedName = name.split(' ')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-            
+            const name = getStoredName() || document.getElementById('nameInput').value.trim() || "Student";
+
             a.href = url;
-            a.download = `${formattedDate} Sight Singing - ${capitalizedName}.mp3`;
+            a.download = `${formattedDate} Sight Singing - ${name}.wav`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -435,25 +475,37 @@
             draw();
         }
 
-        function updateCountdown() {
-            // ... (your existing countdown logic remains unchanged)
-            const now = new Date();
-            const targetTime = new Date(now);
-            targetTime.setHours(10, 45, 0);
-            
-            const endTime = new Date(now);
-            endTime.setHours(10, 48, 0);
-            
-            const peerReviewEnd = new Date(now);
-            peerReviewEnd.setHours(10, 50, 0);
+        // Password Modal
+        document.getElementById('submitPassword').onclick = () => {
+            if (document.getElementById('passwordInput').value === "review") {
+                window.open(document.getElementById('exerciseImage').src, '_blank');
+                document.getElementById('recordButton').disabled = false;
+                document.getElementById('passwordModal').style.display = 'none';
+            } else {
+                alert("Incorrect password.");
+            }
+        };
 
-            const nextDay = new Date(now);
-            nextDay.setDate(nextDay.getDate() + 1);
-            nextDay.setHours(10, 45, 0);
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('submitPassword').click();
+        });
+
+        function updateCountdown() {
+            const now = new Date();
+            const targetTime = new Date(now); targetTime.setHours(10, 45, 0);
+            const endTime = new Date(now); endTime.setHours(10, 48, 0);
+            const peerReviewEnd = new Date(now); peerReviewEnd.setHours(10, 50, 0);
+            const nextDay = new Date(now); nextDay.setDate(nextDay.getDate() + 1); nextDay.setHours(10, 45, 0);
 
             const timeRestriction = document.getElementById('timeRestriction');
             const exerciseImage = document.getElementById('exerciseImage');
-            
+            const storedName = getStoredName();
+
+            if (!storedName) {
+                timeRestriction.textContent = "";
+                return;
+            }
+
             if (now >= targetTime && now < endTime) {
                 const timeLeft = endTime - now;
                 const minutes = Math.floor(timeLeft / 60000);
@@ -478,9 +530,6 @@
                 exerciseImage.classList.remove('revealed');
             }
         }
-
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
     </script>
 </body>
 </html>
