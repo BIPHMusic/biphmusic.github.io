@@ -62,6 +62,7 @@ h1 {
 .logocontainer {
     min-height: 10vh;
     padding-bottom: 50px;
+    z-index: -1000000;
 }
 
 .logo {
