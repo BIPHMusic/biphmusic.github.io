@@ -49,7 +49,7 @@
     // Inject styles once
     const style = document.createElement('style');
     style.textContent = `
- .hamburger-menu {
+        .hamburger-menu {
             position: absolute;
             top: 20px;
             left: 20px;
@@ -137,29 +137,12 @@
     `;
     document.head.appendChild(style);
 
-    // Track which menu is currently visible
     let activeMenu = null;
+    let currentOutsideHandler = null;
+    let currentEscapeHandler = null;
 
     function renderMenu(type) {
         container.innerHTML = type === 'teacher' ? teacherMenuHTML : studentMenuHTML;
-    }
-
-    function toggleMenu(type) {
-        if (activeMenu === type) {
-            closeMenu();
-            return;
-        }
-
-        renderMenu(type);
-        setupMenuInteractions(type);
-        
-        const menuItems = document.getElementById(`${type}-menu`);
-        const menuToggle = document.getElementById('menu-toggle');
-        
-        void menuItems.offsetWidth;
-        menuToggle.classList.add('open');
-        menuItems.classList.add('show');
-        activeMenu = type;
     }
 
     function closeMenu() {
@@ -168,6 +151,17 @@
         
         if (menuToggle) menuToggle.classList.remove('open');
         if (openMenu) openMenu.classList.remove('show');
+
+        // Cleanup listeners
+        if (currentOutsideHandler) {
+            document.removeEventListener('click', currentOutsideHandler);
+            currentOutsideHandler = null;
+        }
+        if (currentEscapeHandler) {
+            document.removeEventListener('keydown', currentEscapeHandler);
+            currentEscapeHandler = null;
+        }
+        
         activeMenu = null;
     }
 
@@ -176,49 +170,67 @@
         const menuItems = document.getElementById(`${type}-menu`);
         if (!menuToggle || !menuItems) return;
 
-        // Prevent menu from closing when clicking links (especially useful for student menu)
+        // Prevent clicks inside the menu from closing it
         menuItems.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A') {
-                // Allow default link behavior (open in new tab or navigate)
-                // Do NOT close the menu
-                return;
-            }
+            e.stopPropagation();
         });
 
-        // Close only on outside clicks
-        const outsideClickHandler = (e) => {
+        // Outside click handler
+        currentOutsideHandler = (e) => {
             if (!menuToggle.contains(e.target) && !menuItems.contains(e.target)) {
                 closeMenu();
-                document.removeEventListener('click', outsideClickHandler);
+            }
+        };
+
+        // Escape key handler
+        currentEscapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                closeMenu();
             }
         };
 
         setTimeout(() => {
-            document.addEventListener('click', outsideClickHandler);
-        }, 0);
-
-        // Escape key still closes
-        const escapeHandler = (e) => {
-            if (e.key === 'Escape') {
-                closeMenu();
-                document.removeEventListener('keydown', escapeHandler);
-            }
-        };
-        document.addEventListener('keydown', escapeHandler);
+            document.addEventListener('click', currentOutsideHandler);
+            document.addEventListener('keydown', currentEscapeHandler);
+        }, 10);
     }
 
-    // Main toggle handler
+    function toggleMenu(requestedType) {
+        if (activeMenu === requestedType) {
+            // Special case: Command-click when teacher menu is already open → do nothing (stay open)
+            if (requestedType === 'teacher') {
+                return;
+            } else {
+                closeMenu();
+                return;
+            }
+        }
+
+        // Open or switch menu
+        renderMenu(requestedType);
+        setupMenuInteractions(requestedType);
+        
+        const menuItems = document.getElementById(`${requestedType}-menu`);
+        const menuToggle = document.getElementById('menu-toggle');
+        
+        void menuItems.offsetWidth; // force reflow for animation
+        menuToggle.classList.add('open');
+        menuItems.classList.add('show');
+        activeMenu = requestedType;
+    }
+
+    // Main toggle button handler
     container.addEventListener('click', function(e) {
         if (!e.target.closest('.menu-toggle')) return;
+
+        e.stopImmediatePropagation();
         
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const isAltClick = e.altKey || e.metaKey;
-        const requestedType = isAltClick ? 'teacher' : 'student';
+        const isTeacherRequest = e.altKey || e.metaKey;
+        const requestedType = isTeacherRequest ? 'teacher' : 'student';
         
         toggleMenu(requestedType);
     });
 
+    // Initial render
     renderMenu('student');
 })();
