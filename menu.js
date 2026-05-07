@@ -7,10 +7,10 @@
             <div class="menu-items student-menu" id="student-menu">
                 <div class="menu-title">BIPH Music</div>
                 <a href="https://biphmusic.github.io/">Home</a>
-                <a href="https://biphmusic.github.io/dailysightsinging/">Sight Singing</a>
-                <a href="https://biphmusic.github.io/dailyvocab/">Vocab</a>
-                <a href="https://biphmusic.github.io/dailymcqs/">MCQs</a>
-                <a href="https://biphmusic.github.io/eartraining/">Ear Training</a>
+                <a href="https://biphmusic.github.io/dailysightsinging/">     • Sight Singing</a>
+                <a href="https://biphmusic.github.io/dailyvocab/">     • Vocab</a>
+                <a href="https://biphmusic.github.io/dailymcqs/">     • MCQs</a>
+                <a href="https://biphmusic.github.io/eartraining/">     • Ear Training</a>
                 <a href="https://biphmusic.github.io/toolbox/">Toolbox</a>
                 <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
                 <div class="menu-footer">© Garrison Tubbs 2026</div>
@@ -84,7 +84,7 @@
             box-shadow: 0 14px 16px rgba(20, 20, 20, 0.81);
             background: linear-gradient(180deg, rgba(56, 81, 132, 1), rgba(13, 19, 30, 1));
             width: 250px;
-            height: 90vh;
+            height: 80vh;
             padding-top: 20px;
             transition: all 0.3s ease-in-out;
             opacity: 0;
@@ -96,8 +96,9 @@
         }
 
         .menu-items a {
+            text-align: left;
             display: block;
-            padding: 8px 20px;
+            padding: 10px 40px 10px 47px; /* top right bottom left */
             color: white;
             text-decoration: none;
             transition: background-color 0.2s;
