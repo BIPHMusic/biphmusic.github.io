@@ -340,19 +340,26 @@
                     <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
         }
 
-        function startDailyExercises() {
-            const urls = [
-                "https://biphmusic.github.io/dailysightsinging/",
-                "https://biphmusic.github.io/dailymcqs/",
-                "https://biphmusic.github.io/eartraining/",
-                "https://biphmusic.github.io/vocabreview/"
-            ];
+function startDailyExercises() {
+    const urls = [
+        "https://biphmusic.github.io/dailysightsinging/",
+        "https://biphmusic.github.io/dailymcqs/",
+        "https://biphmusic.github.io/eartraining/",
+        "https://biphmusic.github.io/dailyvocab/"
+    ];
 
-            window.location.href = urls[0];
-            for (let i = 1; i < urls.length; i++) {
-                window.open(urls[i], '_blank');
+    window.location.href = urls[0];
+
+    setTimeout(() => {
+        urls.slice(1).forEach(url => {
+            const win = window.open(url, '_blank', 'noopener,noreferrer');
+            if (win) {
+                win.blur();
+                setTimeout(() => window.focus(), 50);
             }
-        }
+        });
+    }, 150);
+}
 
         // Auto-login
         window.onload = () => {
