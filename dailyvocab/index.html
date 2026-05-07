@@ -352,6 +352,16 @@ transition: all 0.2s ease;
     0% { background: rgba(74, 222, 128, 0.4); }
     100% { background: transparent; }
 }
+
+.question-box:focus,
+.word-bank button:focus {
+    outline: none;
+}
+
+.question-box:focus-visible,
+.word-bank button:focus-visible {
+    outline: none;
+}
     </style>
 </head>
 <body>
@@ -560,17 +570,27 @@ function generateQuestionSet(student) {
     };
 }
 
-function isIpad() {
-    return /iPad/.test(navigator.platform) || 
-           (navigator.platform === 'iPhone' && 'ontouchend' in document) ||
-           navigator.userAgent.includes('iPad');
-}
+// function isIpad() {
+//     return /iPad/.test(navigator.platform) || 
+//            (navigator.platform === 'iPhone' && 'ontouchend' in document) ||
+//            navigator.userAgent.includes('iPad');
+// }
 
 function selectQuestion(index) {
     clearSelections();
     selectedQuestion = index;
-    const qBox = document.querySelectorAll('.question-box')[index];
-    if (qBox) qBox.classList.add('selected');
+    
+    const questions = document.querySelectorAll('.question-box');
+    const qBox = questions[index];
+    
+    if (qBox) {
+        qBox.classList.add('selected');
+        // Scroll smoothly into view
+        qBox.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
 }
 
 function selectWord(index) {
@@ -594,15 +614,14 @@ function makeMatch(qIndex, wIndex) {
     const letter = String.fromCharCode(65 + wIndex);
     input.value = letter;
 
-    // Update logic (same as typing)
     handleInput(input, qIndex);
 
-    // Focus behavior (except iPad)
-    if (!isIpad()) {
-        input.focus();
-    }
-
-    clearSelections();
+    // Keep question selected after match + scroll to it
+    const buttons = document.querySelectorAll('.word-bank button');
+    if (buttons[wIndex]) buttons[wIndex].classList.remove('selected');
+    selectedWord = null;
+    
+    selectQuestion(qIndex);   // This also ensures it scrolls into view
 }
 
 function clearAnswer(index) {
@@ -610,9 +629,10 @@ function clearAnswer(index) {
     if (input) {
         input.value = '';
         handleInput(input, index);
-        if (!isIpad()) input.focus();
     }
 }
+
+// ==================== INITIALIZE QUIZ ====================
 
 function initializeQuiz() {
     const quizQuestionsDiv = document.getElementById('quiz-questions');
@@ -630,6 +650,7 @@ function initializeQuiz() {
     studentQuestions.questions.forEach((question, index) => {
         const questionDiv = document.createElement('div');
         questionDiv.className = 'question-box';
+        questionDiv.tabIndex = -1;                    // Prevent default tab focus
         questionDiv.innerHTML = `
             <p><strong>${index + 1}. 
                 <input type="text" id="answer-${index}" class="answer-input" 
@@ -640,7 +661,6 @@ function initializeQuiz() {
 
         questionDiv.addEventListener('click', (e) => {
             if (e.target.tagName === 'INPUT') return;
-
             if (selectedWord !== null) {
                 makeMatch(index, selectedWord);
             } else {
@@ -656,6 +676,7 @@ function initializeQuiz() {
         const button = document.createElement('button');
         button.textContent = `${String.fromCharCode(65 + index)}. ${term}`;
         button.dataset.index = index;
+        button.tabIndex = -1;                         // Disable tab navigation
 
         button.addEventListener('click', () => {
             if (selectedQuestion !== null) {
@@ -669,13 +690,14 @@ function initializeQuiz() {
     });
 }
 
+// ==================== KEYBOARD SUPPORT ====================
+
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         clearSelections();
         return;
     }
 
-    // Delete / Backspace when question is selected
     if ((e.key === 'Delete' || e.key === 'Backspace') && selectedQuestion !== null) {
         e.preventDefault();
         clearAnswer(selectedQuestion);
@@ -685,7 +707,6 @@ document.addEventListener('keydown', (e) => {
     const questions = document.querySelectorAll('.question-box');
     const buttons = document.querySelectorAll('.word-bank button');
 
-    // Arrow navigation
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
 
@@ -693,7 +714,7 @@ document.addEventListener('keydown', (e) => {
             let newIndex = selectedQuestion + (e.key === 'ArrowDown' ? 1 : -1);
             if (newIndex < 0) newIndex = questions.length - 1;
             if (newIndex >= questions.length) newIndex = 0;
-            selectQuestion(newIndex);
+            selectQuestion(newIndex);        // This now scrolls into view
         } 
         else if (selectedWord !== null) {
             let newIndex = selectedWord + (e.key === 'ArrowDown' ? 1 : -1);
@@ -703,14 +724,11 @@ document.addEventListener('keydown', (e) => {
         }
     }
 
-    // Type letter when question selected
     if (selectedQuestion !== null && /^[a-zA-Z]$/.test(e.key)) {
         const input = document.getElementById(`answer-${selectedQuestion}`);
         if (input) {
             input.value = e.key.toUpperCase();
             handleInput(input, selectedQuestion);
-            if (!isIpad()) input.focus();
-            clearSelections();
         }
     }
 });
@@ -1137,13 +1155,10 @@ async function shareResultsAsPNG(resultData) {
         const canvas = await html2canvas(document.body, {
             scale: 2,
             useCORS: true,
-            scrollX: 0,
-            scrollY: 0,
-            width: document.body.scrollWidth,
-            height: document.body.scrollHeight,
             backgroundColor: 'rgb(45, 70, 119)'
         });
 
+        // Add logo back
         const logoImg = new Image();
         logoImg.crossOrigin = 'anonymous';
         logoImg.src = '../icons/Full Logo White on Transparent.png';
@@ -1153,8 +1168,7 @@ async function shareResultsAsPNG(resultData) {
                 const ctx = canvas.getContext('2d');
                 const logoWidth = canvas.width * 0.25;
                 const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
-                const padding = 100;
-                ctx.drawImage(logoImg, canvas.width - logoWidth - padding, canvas.height - logoHeight - padding, logoWidth, logoHeight);
+                ctx.drawImage(logoImg, canvas.width - logoWidth - 100, canvas.height - logoHeight - 100, logoWidth, logoHeight);
                 resolve();
             };
             logoImg.onerror = resolve;
@@ -1162,22 +1176,25 @@ async function shareResultsAsPNG(resultData) {
 
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 
+        // Restore UI
         tempHide.forEach(el => { if (el) el.style.display = ''; });
         if (copyPngBtn) copyPngBtn.style.visibility = 'visible';
 
-        const file = new File([blob], `Vocabulary_Results_${resultData.student || resultData.s}_${resultData.date || resultData.d}.png`, { type: 'image/png' });
+        const fileName = `Vocabulary_Results_${resultData.student || resultData.s}_${resultData.date || resultData.d}.png`;
+        const file = new File([blob], fileName, { type: 'image/png' });
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
                 files: [file],
                 title: `Vocabulary Results - ${resultData.student || resultData.s}`,
-                text: `Score: ${resultData.p || percentage || 'N/A'}%`
+                text: `Score: ${resultData.p || 'N/A'}%`
             });
         } else {
+            // Fallback download
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = file.name;
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1186,7 +1203,7 @@ async function shareResultsAsPNG(resultData) {
     } catch (err) {
         console.error('Share failed:', err);
         if (err.name !== 'AbortError') {
-            alert('Sharing failed. Please use the Copy/Download button.');
+            alert('Sharing failed. Please use the "Copy Results" button instead.');
         }
     }
 }
