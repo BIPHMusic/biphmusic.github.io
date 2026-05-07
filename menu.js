@@ -8,14 +8,10 @@
                 <div class="menu-title">BIPH Music</div>
                 <a href="https://biphmusic.github.io/">Home</a>
                 <a href="https://biphmusic.github.io/dailysightsinging/">Sight Singing</a>
+                <a href="https://biphmusic.github.io/dailyvocab/">Vocab</a>
                 <a href="https://biphmusic.github.io/dailymcqs/">MCQs</a>
                 <a href="https://biphmusic.github.io/eartraining/">Ear Training</a>
-                <a href="https://biphmusic.github.io/vocabreview/">Vocabulary</a>
-                <a href="https://biphmusic.github.io/wordwall/">Word Wall</a>
-                <a href="https://biphmusic.github.io/flashcards/">Flash Cards</a>
                 <a href="https://biphmusic.github.io/toolbox/">Toolbox</a>
-                <a href="https://biphmusic.github.io/piano/">Web Piano</a>
-                <a href="https://biphmusic.github.io/units/">AP Units</a>
                 <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
                 <div class="menu-footer">© Garrison Tubbs 2026</div>
             </div>
@@ -101,7 +97,7 @@
 
         .menu-items a {
             display: block;
-            padding: 10px 20px;
+            padding: 8px 20px;
             color: white;
             text-decoration: none;
             transition: background-color 0.2s;
