@@ -309,6 +309,49 @@
                 transform: translateY(0);
             }
         }
+
+        .question-box {
+transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.question-box:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.question-box.selected {
+    background: rgba(255, 215, 0, 0.25);
+    border: 2px solid #ffd700;
+    transform: scale(1.02);
+}
+
+.word-bank button {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.word-bank button:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.word-bank button.selected {
+    background: rgba(255, 215, 0, 0.3) !important;
+    border: 2px solid #ffd700;
+}
+
+.word-bank button.used {
+    opacity: 0.4;
+}
+
+.flash {
+    animation: flash 0.6s ease;
+}
+
+@keyframes flash {
+    0% { background: rgba(74, 222, 128, 0.4); }
+    100% { background: transparent; }
+}
     </style>
 </head>
 <body>
@@ -395,6 +438,9 @@ let currentStudent = '';
 let questionBank = {};
 let answers = [];
 let usedTerms = {};
+
+let selectedQuestion = null;
+let selectedWord = null;     
 
 // Auto-login if already signed in via menu
 function autoLoginIfPossible() {
@@ -514,6 +560,60 @@ function generateQuestionSet(student) {
     };
 }
 
+function isIpad() {
+    return /iPad/.test(navigator.platform) || 
+           (navigator.platform === 'iPhone' && 'ontouchend' in document) ||
+           navigator.userAgent.includes('iPad');
+}
+
+function selectQuestion(index) {
+    clearSelections();
+    selectedQuestion = index;
+    const qBox = document.querySelectorAll('.question-box')[index];
+    if (qBox) qBox.classList.add('selected');
+}
+
+function selectWord(index) {
+    clearSelections();
+    selectedWord = index;
+    const buttons = document.querySelectorAll('.word-bank button');
+    if (buttons[index]) buttons[index].classList.add('selected');
+}
+
+function clearSelections() {
+    document.querySelectorAll('.question-box').forEach(q => q.classList.remove('selected'));
+    document.querySelectorAll('.word-bank button').forEach(b => b.classList.remove('selected'));
+    selectedQuestion = null;
+    selectedWord = null;
+}
+
+function makeMatch(qIndex, wIndex) {
+    const input = document.getElementById(`answer-${qIndex}`);
+    if (!input) return;
+
+    const letter = String.fromCharCode(65 + wIndex);
+    input.value = letter;
+
+    // Update logic (same as typing)
+    handleInput(input, qIndex);
+
+    // Focus behavior (except iPad)
+    if (!isIpad()) {
+        input.focus();
+    }
+
+    clearSelections();
+}
+
+function clearAnswer(index) {
+    const input = document.getElementById(`answer-${index}`);
+    if (input) {
+        input.value = '';
+        handleInput(input, index);
+        if (!isIpad()) input.focus();
+    }
+}
+
 function initializeQuiz() {
     const quizQuestionsDiv = document.getElementById('quiz-questions');
     const wordBankDiv = document.getElementById('word-bank');
@@ -521,25 +621,106 @@ function initializeQuiz() {
     wordBankDiv.innerHTML = '';
     answers = [];
     usedTerms = {};
+    selectedQuestion = null;
+    selectedWord = null;
+
     const studentQuestions = questionBank[currentStudent];
 
+    // Questions
     studentQuestions.questions.forEach((question, index) => {
         const questionDiv = document.createElement('div');
         questionDiv.className = 'question-box';
         questionDiv.innerHTML = `
-            <p><strong>${index + 1}. <input type="text" id="answer-${index}" class="answer-input" oninput="handleInput(this, '${index}')" autocomplete="off"></strong> ${question.Definition}</p>
+            <p><strong>${index + 1}. 
+                <input type="text" id="answer-${index}" class="answer-input" 
+                       oninput="handleInput(this, '${index}')" 
+                       autocomplete="off" maxlength="1">
+            </strong> ${question.Definition}</p>
         `;
+
+        questionDiv.addEventListener('click', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+
+            if (selectedWord !== null) {
+                makeMatch(index, selectedWord);
+            } else {
+                selectQuestion(index);
+            }
+        });
+
         quizQuestionsDiv.appendChild(questionDiv);
     });
 
+    // Word Bank
     studentQuestions.terms.forEach((term, index) => {
         const button = document.createElement('button');
         button.textContent = `${String.fromCharCode(65 + index)}. ${term}`;
-        button.dataset.term = term;
-        button.style.color = 'white';
+        button.dataset.index = index;
+
+        button.addEventListener('click', () => {
+            if (selectedQuestion !== null) {
+                makeMatch(selectedQuestion, index);
+            } else {
+                selectWord(index);
+            }
+        });
+
         wordBankDiv.appendChild(button);
     });
 }
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        clearSelections();
+        return;
+    }
+
+    // Delete / Backspace when question is selected
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedQuestion !== null) {
+        e.preventDefault();
+        clearAnswer(selectedQuestion);
+        return;
+    }
+
+    const questions = document.querySelectorAll('.question-box');
+    const buttons = document.querySelectorAll('.word-bank button');
+
+    // Arrow navigation
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+
+        if (selectedQuestion !== null) {
+            let newIndex = selectedQuestion + (e.key === 'ArrowDown' ? 1 : -1);
+            if (newIndex < 0) newIndex = questions.length - 1;
+            if (newIndex >= questions.length) newIndex = 0;
+            selectQuestion(newIndex);
+        } 
+        else if (selectedWord !== null) {
+            let newIndex = selectedWord + (e.key === 'ArrowDown' ? 1 : -1);
+            if (newIndex < 0) newIndex = buttons.length - 1;
+            if (newIndex >= buttons.length) newIndex = 0;
+            selectWord(newIndex);
+        }
+    }
+
+    // Type letter when question selected
+    if (selectedQuestion !== null && /^[a-zA-Z]$/.test(e.key)) {
+        const input = document.getElementById(`answer-${selectedQuestion}`);
+        if (input) {
+            input.value = e.key.toUpperCase();
+            handleInput(input, selectedQuestion);
+            if (!isIpad()) input.focus();
+            clearSelections();
+        }
+    }
+});
+
+// Click outside to deselect
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.question-box') && !e.target.closest('.word-bank button')) {
+        clearSelections();
+    }
+});
 
 function handleInput(input, index) {
     const value = input.value.toUpperCase();
