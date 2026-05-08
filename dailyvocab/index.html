@@ -1015,11 +1015,53 @@ function displayResults(resultData, isUrlView = false) {
     }
 }
 
+function getObfuscatedKey() {
+    let _0x9a2f = "B1PH";
+    let _0x7c4d = "MU51C";
+    const _0xf82a = [95,86,79,67,65,66,95,50,48,50,54];
+    let _0x3d91 = "_X7";
+    let _0x6b2e = "K9P2M";
+    
+    let key = _0x9a2f + "___" + _0x7c4d;
+    key += String["fromCharCode"].apply(null, _0xf82a);
+    
+    key = key + _0x3d91 + "z" + _0x6b2e + "00";
+    
+    key = key.split('').reverse().join('')
+               .replace(/z00$/, '')
+               .split('').map((c,i) => {
+                    if(i%2===0) return String.fromCharCode(c.charCodeAt(0) ^ 0x0f);
+                    if(i%5===0) return c.toUpperCase();
+                    return c;
+               }).reverse().join('');
+    
+    return key.slice(3, -2) + "X7K9P2M".slice(0,4);
+}
+
+const OBF_KEY = getObfuscatedKey();
+
+function xorEncrypt(str, key) {
+    let result = '';
+    for (let i = 0; i < str.length; i++) {
+        result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    return result;
+}
+
+function encryptData(data) {
+    const json = JSON.stringify(data);
+    let enc = xorEncrypt(json, OBF_KEY);
+    enc = btoa(enc.split('').reverse().join(''));
+    let final = '';
+    for (let c of enc) {
+        final += /[A-Za-z]/.test(c) ? String.fromCharCode(c.charCodeAt(0) + 7) : c;
+    }
+    return final + "==v4";
+}
+
 async function shareResultsAsText(resultData) {
     try {
         let percentage = resultData.percentage;
-
-        // Recalculate if we don't have a valid percentage
         if (typeof percentage !== 'number' && resultData.questionSet && resultData.answers) {
             const correctCount = resultData.answers.filter((ans, i) => 
                 ans && ans.toLowerCase() === (resultData.questionSet.answers[i] || "").toLowerCase()
@@ -1027,25 +1069,20 @@ async function shareResultsAsText(resultData) {
             percentage = Math.round(correctCount / resultData.questionSet.answers.length * 100);
         }
 
-        // Simplified output
         const exportData = {
             student: resultData.student || resultData.s || "Unknown",
             date: resultData.date || resultData.d,
             time: resultData.time || resultData.t,
-            percentage: typeof percentage === 'number' ? percentage : "N/A",   // Fixed here
-            exercise: "Vocab Review"
+            percentage: typeof percentage === 'number' ? percentage : "N/A",
+            exercise: "Vocab Review",
+            termsToReview: resultData.termsToReview ? resultData.termsToReview.map(item => item.term) : []
         };
 
-        // Only include terms to review (just the terms, no definitions)
-        if (resultData.termsToReview && resultData.termsToReview.length > 0) {
-            exportData.termsToReview = resultData.termsToReview.map(item => item.term);
-        }
-
-        const textContent = JSON.stringify(exportData, null, 2);
-        const blob = new Blob([textContent], { type: 'text/plain' });
-
+        const encryptedContent = encryptData(exportData);
+        
+        const blob = new Blob([encryptedContent], { type: 'text/plain' });
         const safeName = (exportData.student || "Student").replace(/[^a-zA-Z0-9]/g, '_');
-        const fileName = `Vocab_Results_${safeName}_${exportData.date}.txt`;
+        const fileName = `Vocab_${safeName}_${exportData.date}.txt`;
 
         const file = new File([blob], fileName, { type: 'text/plain' });
 
@@ -1067,9 +1104,7 @@ async function shareResultsAsText(resultData) {
         }
     } catch (err) {
         console.error('Share failed:', err);
-        if (err.name !== 'AbortError') {
-            alert('Sharing failed. Downloading .txt file instead...');
-        }
+        alert('Failed to share. Check console for details.');
     }
 }
 
