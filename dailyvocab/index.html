@@ -1049,14 +1049,15 @@ function xorEncrypt(str, key) {
 }
 
 function encryptData(data) {
-    const json = JSON.stringify(data);
-    let enc = xorEncrypt(json, OBF_KEY);
+    const jsonStr = JSON.stringify(data);
+    let enc = xorEncrypt(jsonStr, OBF_KEY);
     enc = btoa(enc.split('').reverse().join(''));
     let final = '';
     for (let c of enc) {
         final += /[A-Za-z]/.test(c) ? String.fromCharCode(c.charCodeAt(0) + 7) : c;
     }
-    return final + "==v4";
+    
+    return final + "==v4"; 
 }
 
 async function shareResultsAsText(resultData) {
