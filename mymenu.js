@@ -11,7 +11,7 @@ function initMyMenu(forceHideIfNotLoggedIn = false) {
     menuContainer.id = 'my-profile-menu';
     menuContainer.style.cssText = `
         width: 36px; height: 36px; border-radius: 50%;
-        position: fixed;
+        position: absolute;
         top: 16px;
         right: 16px;
         z-index: 10000;
