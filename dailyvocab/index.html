@@ -1063,6 +1063,7 @@ function encryptData(data) {
 async function shareResultsAsText(resultData) {
     try {
         let percentage = resultData.percentage;
+
         if (typeof percentage !== 'number' && resultData.questionSet && resultData.answers) {
             const correctCount = resultData.answers.filter((ans, i) => 
                 ans && ans.toLowerCase() === (resultData.questionSet.answers[i] || "").toLowerCase()
@@ -1076,14 +1077,15 @@ async function shareResultsAsText(resultData) {
             time: resultData.time || resultData.t,
             percentage: typeof percentage === 'number' ? percentage : "N/A",
             exercise: "Vocab Review",
-            termsToReview: resultData.termsToReview ? resultData.termsToReview.map(item => item.term) : []
+            termsToReview: resultData.termsToReview ? 
+                resultData.termsToReview.map(item => item.term) : []
         };
 
         const encryptedContent = encryptData(exportData);
         
         const blob = new Blob([encryptedContent], { type: 'text/plain' });
         const safeName = (exportData.student || "Student").replace(/[^a-zA-Z0-9]/g, '_');
-        const fileName = `Vocab_${safeName}_${exportData.date}.txt`;
+        const fileName = `Vocab_${safeName}_${exportData.date || 'unknown'}.txt`;
 
         const file = new File([blob], fileName, { type: 'text/plain' });
 
@@ -1105,7 +1107,7 @@ async function shareResultsAsText(resultData) {
         }
     } catch (err) {
         console.error('Share failed:', err);
-        alert('Failed to share. Check console for details.');
+        alert('Sharing failed. Please try again.');
     }
 }
 
