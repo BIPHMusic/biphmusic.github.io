@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Ear Training</title>
+    <link rel="icon" href="../icons/bg-icon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <script src="../apstudents.js"></script>
+    <script src="../mymenu.js"></script>
+    <style>
+    /* SHARED STYLES - Do not duplicate core styles from common-styles.css */
+    
+    .login-section {
+        text-align: center;
+        margin-top: 80px;
+    }
+
+    .quiz-container {
+        display: flex;
+        gap: 30px;
+        width: 80vw;
+        max-width: 800px;
+        margin: 0 auto;
+        align-items: flex-start;
+    }
+
+    .questions-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* ====================== QUESTION BOXES ====================== */
+
+
+    .section-header {
+        font-size: 1.75rem;
+        font-weight: 400;
+        text-align: center;
+        margin: 10px 0 20px 0;
+        letter-spacing: 1px;
+    }
+
+    .play-button {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 6px;
+        color: white;
+        font-size: 1.05rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .play-button:hover {
+        background-color: #3a6da8;
+    }
+
+    .play-count {
+        color: #d2d2d2;
+        font-size: 0.95rem;
+        margin: 8px 0 12px 0;
+    }
+
+    .answer-select {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 1.05rem;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 1.5px solid rgba(255,255,255,0.25);
+        border-radius: 6px;
+        margin-top: 8px;
+        transition: all 0.2s;
+    }
+        .answer-select:hover {
+        background-color: #3a6da8;
+    }
+
+.play-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background-color: #4c87af;
+}
+
+
+    /* ====================== ACTIONS ====================== */
+    .quiz-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+        justify-content: center;
+    }
+
+    .action-button {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 6px;
+        color: white;
+        font-size: 1.05rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .action-button:hover {
+        background-color: #3a6da8;
+    }
+
+    .action-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* ====================== RESULTS ====================== */
+    .results-section {
+        width: 100%;
+        max-width: 850px;
+        margin: 30px auto;
+        padding: 0 15px;
+        text-align: center;
+    }
+
+    .results-table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 20px 0;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .results-table th,
+    .results-table td {
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 10px 12px;
+        text-align: left;
+    }
+
+    .results-table th {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .incorrect { color: #ff5555; }
+    .correct-mark { color: #16a34a; margin-left: 6px; font-weight: bold; }
+
+    .terms-to-review {
+        margin-top: 30px;
+        text-align: left;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .terms-to-review h3 {
+        margin-top: 0;
+    }
+
+    /* ====================== UTILITY ====================== */
+    .hidden {
+        display: none;
+    }
+
+    .copy-button {
+        margin-top: 25px;
+        padding: 12px 28px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .copy-button:hover {
+        background: rgba(255, 255, 255, 0.35);
+    }
+
+    .error {
+        color: #ff6666;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">Daily Ear Training</h1>
+
+    <div class="logincontainer">
+        <div id="login-section" class="login-section">
+            <h2>Enter your name to begin</h2>
+            <input type="text" id="name-input" placeholder="Your name" autofocus>
+            <button class="action-button" onclick="checkName()">Begin</button>
+            <div id="error-message" class="error"></div>
+        </div>
+
+        <div id="quiz-section" class="quiz-section hidden">
+            <div class="quiz-container">
+                <div class="questions-container" id="quiz-questions"></div>
+            </div>
+            
+            <div class="quiz-actions hidden">
+                <button class="action-button" onclick="submitCurrentAnswer()">Submit Answer</button>
+            </div>
+            <div id="results-section" class="results-section hidden"></div>
+        </div>
+    </div>
+
+    <div class="logocontainer">        
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js"></script>
+
+    <script>
+        let approvedStudents = typeof apStudents !== 'undefined' ? apStudents : [];
+
+        let currentStudent = '';
+        let questionBank = {};
+        let currentSectionIndex = 0;
+        let currentQuestionIndex = 0;
+        let studentAnswers = [];
+        let currentAudio = null;
+        let playsLeft = 2;
+
+        const sections = ['intervals', 'triads', 'seventhChords', 'modes'];
+        const sectionTitles = ['Intervals', 'Triads', 'Seventh Chords', 'Modes'];
+
+
+const audioFiles = {
+    intervals: [
+        { file: 'Major2-1.mp3', answer: 'Major 2nd' },
+        { file: 'Major2-2.mp3', answer: 'Major 2nd' },
+        { file: 'Major2-3.mp3', answer: 'Major 2nd' },
+        { file: 'Major2-4.mp3', answer: 'Major 2nd' },
+        { file: 'Major2-5.mp3', answer: 'Major 2nd' },
+        { file: 'Major2-6.mp3', answer: 'Major 2nd' },
+        { file: 'Major2-7.mp3', answer: 'Major 2nd' },
+        { file: 'Major2-8.mp3', answer: 'Major 2nd' },
+        { file: 'Major2-9.mp3', answer: 'Major 2nd' },
+        { file: 'Major2-10.mp3', answer: 'Major 2nd' },
+        { file: 'Major3-1.mp3', answer: 'Major 3rd' },
+        { file: 'Major3-2.mp3', answer: 'Major 3rd' },
+        { file: 'Major3-3.mp3', answer: 'Major 3rd' },
+        { file: 'Major3-4.mp3', answer: 'Major 3rd' },
+        { file: 'Major3-5.mp3', answer: 'Major 3rd' },
+        { file: 'Major3-6.mp3', answer: 'Major 3rd' },
+        { file: 'Major3-7.mp3', answer: 'Major 3rd' },
+        { file: 'Major3-8.mp3', answer: 'Major 3rd' },
+        { file: 'Major6-1.mp3', answer: 'Major 6th' },
+        { file: 'Major6-2.mp3', answer: 'Major 6th' },
+        { file: 'Major6-3.mp3', answer: 'Major 6th' },
+        { file: 'Major6-4.mp3', answer: 'Major 6th' },
+        { file: 'Major6-5.mp3', answer: 'Major 6th' },
+        { file: 'Major6-6.mp3', answer: 'Major 6th' },
+        { file: 'Major6-7.mp3', answer: 'Major 6th' },
+        { file: 'Major6-8.mp3', answer: 'Major 6th' },
+        { file: 'Major6-9.mp3', answer: 'Major 6th' },
+        { file: 'Major7-1.mp3', answer: 'Major 7th' },
+        { file: 'Major7-2.mp3', answer: 'Major 7th' },
+        { file: 'Major7-3.mp3', answer: 'Major 7th' },
+        { file: 'Major7-4.mp3', answer: 'Major 7th' },
+        { file: 'Minor2-1.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor2-2.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor2-3.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor2-4.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor2-5.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor2-6.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor2-7.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor2-8.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor2-9.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor2-10.mp3', answer: 'Minor 2nd' },
+        { file: 'Minor3-1.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor3-2.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor3-3.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor3-4.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor3-5.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor3-6.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor3-7.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor3-8.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor3-9.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor3-10.mp3', answer: 'Minor 3rd' },
+        { file: 'Minor6-1.mp3', answer: 'Minor 6th' },
+        { file: 'Minor6-2.mp3', answer: 'Minor 6th' },
+        { file: 'Minor6-3.mp3', answer: 'Minor 6th' },
+        { file: 'Minor6-4.mp3', answer: 'Minor 6th' },
+        { file: 'Minor6-5.mp3', answer: 'Minor 6th' },
+        { file: 'Minor6-6.mp3', answer: 'Minor 6th' },
+        { file: 'Minor6-7.mp3', answer: 'Minor 6th' },
+        { file: 'Minor6-8.mp3', answer: 'Minor 6th' },
+        { file: 'Minor6-9.mp3', answer: 'Minor 6th' },
+        { file: 'Minor6-10.mp3', answer: 'Minor 6th' },
+        { file: 'Minor7-1.mp3', answer: 'Minor 7th' },
+        { file: 'Minor7-2.mp3', answer: 'Minor 7th' },
+        { file: 'Minor7-3.mp3', answer: 'Minor 7th' },
+        { file: 'Minor7-4.mp3', answer: 'Minor 7th' },
+        { file: 'Minor7-5.mp3', answer: 'Minor 7th' },
+        { file: 'Minor7-6.mp3', answer: 'Minor 7th' },
+        { file: 'Minor7-7.mp3', answer: 'Minor 7th' },
+        { file: 'Minor7-8.mp3', answer: 'Minor 7th' },
+        { file: 'Perfect4-1.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect4-2.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect4-3.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect4-4.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect4-5.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect4-6.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect4-7.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect4-8.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect4-9.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect4-10.mp3', answer: 'Perfect 4th' },
+        { file: 'Perfect5-1.mp3', answer: 'Perfect 5th' },
+        { file: 'Perfect5-2.mp3', answer: 'Perfect 5th' },
+        { file: 'Perfect5-3.mp3', answer: 'Perfect 5th' },
+        { file: 'Perfect5-4.mp3', answer: 'Perfect 5th' },
+        { file: 'Perfect5-5.mp3', answer: 'Perfect 5th' },
+        { file: 'Perfect5-6.mp3', answer: 'Perfect 5th' },
+        { file: 'Perfect5-7.mp3', answer: 'Perfect 5th' },
+        { file: 'Perfect5-8.mp3', answer: 'Perfect 5th' },
+        { file: 'Perfect5-9.mp3', answer: 'Perfect 5th' },
+        { file: 'Perfect8-1.mp3', answer: 'Perfect 8ve' },
+        { file: 'Perfect8-2.mp3', answer: 'Perfect 8ve' },
+        { file: 'Perfect8-3.mp3', answer: 'Perfect 8ve' },
+        { file: 'Perfect8-4.mp3', answer: 'Perfect 8ve' },
+        { file: 'Perfect8-5.mp3', answer: 'Perfect 8ve' },
+        { file: 'Perfect8-6.mp3', answer: 'Perfect 8ve' },
+        { file: 'Perfect8-7.mp3', answer: 'Perfect 8ve' },
+        { file: 'Perfect8-8.mp3', answer: 'Perfect 8ve' },
+        { file: 'Perfect8-9.mp3', answer: 'Perfect 8ve' },
+        { file: 'Tritone-1.mp3', answer: 'Tritone' },
+        { file: 'Tritone-2.mp3', answer: 'Tritone' },
+        { file: 'Tritone-3.mp3', answer: 'Tritone' },
+        { file: 'Tritone-4.mp3', answer: 'Tritone' },
+        { file: 'Tritone-5.mp3', answer: 'Tritone' },
+        { file: 'Tritone-6.mp3', answer: 'Tritone' },
+        { file: 'Tritone-7.mp3', answer: 'Tritone' },
+        { file: 'Tritone-8.mp3', answer: 'Tritone' },
+        { file: 'Tritone-9.mp3', answer: 'Tritone' },
+        { file: 'Tritone-10.mp3', answer: 'Tritone' }
+    ],
+    triads: [
+        { file: 'Augmented1.mp3', answer: 'Augmented Triad' },
+        { file: 'Augmented2.mp3', answer: 'Augmented Triad' },
+        { file: 'Augmented3.mp3', answer: 'Augmented Triad' },
+        { file: 'Augmented4.mp3', answer: 'Augmented Triad' },
+        { file: 'Augmented5.mp3', answer: 'Augmented Triad' },
+        { file: 'Augmented6.mp3', answer: 'Augmented Triad' },
+        { file: 'Augmented7.mp3', answer: 'Augmented Triad' },
+        { file: 'Augmented8.mp3', answer: 'Augmented Triad' },
+        { file: 'Diminished1.mp3', answer: 'Diminished Triad' },
+        { file: 'Diminished2.mp3', answer: 'Diminished Triad' },
+        { file: 'Diminished3.mp3', answer: 'Diminished Triad' },
+        { file: 'Diminished4.mp3', answer: 'Diminished Triad' },
+        { file: 'Diminished5.mp3', answer: 'Diminished Triad' },
+        { file: 'Diminished6.mp3', answer: 'Diminished Triad' },
+        { file: 'Major1.mp3', answer: 'Major Triad' },
+        { file: 'Major2.mp3', answer: 'Major Triad' },
+        { file: 'Major3.mp3', answer: 'Major Triad' },
+        { file: 'Major4.mp3', answer: 'Major Triad' },
+        { file: 'Major5.mp3', answer: 'Major Triad' },
+        { file: 'Major6.mp3', answer: 'Major Triad' },
+        { file: 'Major7.mp3', answer: 'Major Triad' },
+        { file: 'Major8.mp3', answer: 'Major Triad' },
+        { file: 'Major9.mp3', answer: 'Major Triad' },
+        { file: 'Minor1.mp3', answer: 'Minor Triad' },
+        { file: 'Minor2.mp3', answer: 'Minor Triad' },
+        { file: 'Minor3.mp3', answer: 'Minor Triad' },
+        { file: 'Minor4.mp3', answer: 'Minor Triad' },
+        { file: 'Minor5.mp3', answer: 'Minor Triad' },
+        { file: 'Minor6.mp3', answer: 'Minor Triad' },
+        { file: 'Minor7.mp3', answer: 'Minor Triad' }
+    ],
+    seventhChords: [
+        { file: 'Diminished7-1.mp3', answer: 'Diminished 7' },
+        { file: 'Diminished7-3.mp3', answer: 'Diminished 7' },
+        { file: 'Diminished7-4.mp3', answer: 'Diminished 7' },
+        { file: 'Diminished7-5.mp3', answer: 'Diminished 7' },
+        { file: 'Diminished7-6.mp3', answer: 'Diminished 7' },
+        { file: 'Diminished7-7.mp3', answer: 'Diminished 7' },
+        { file: 'Diminished7-8.mp3', answer: 'Diminished 7' },
+        { file: 'Dominant7-1.mp3', answer: 'Dominant 7' },
+        { file: 'Dominant7-2.mp3', answer: 'Dominant 7' },
+        { file: 'Dominant7-3.mp3', answer: 'Dominant 7' },
+        { file: 'Dominant7-4.mp3', answer: 'Dominant 7' },
+        { file: 'Dominant7-5.mp3', answer: 'Dominant 7' },
+        { file: 'Dominant7-6.mp3', answer: 'Dominant 7' },
+        { file: 'Dominant7-7.mp3', answer: 'Dominant 7' },
+        { file: 'Dominant7-8.mp3', answer: 'Dominant 7' },
+        { file: 'Dominant7-9.mp3', answer: 'Dominant 7' },
+        { file: 'HalfDiminished7-1.mp3', answer: 'Half-Diminished 7' },
+        { file: 'HalfDiminished7-2.mp3', answer: 'Half-Diminished 7' },
+        { file: 'HalfDiminished7-3.mp3', answer: 'Half-Diminished 7' },
+        { file: 'HalfDiminished7-4.mp3', answer: 'Half-Diminished 7' },
+        { file: 'HalfDiminished7-5.mp3', answer: 'Half-Diminished 7' },
+        { file: 'HalfDiminished7-6.mp3', answer: 'Half-Diminished 7' },
+        { file: 'HalfDiminished7-7.mp3', answer: 'Half-Diminished 7' },
+        { file: 'HalfDiminished7-8.mp3', answer: 'Half-Diminished 7' },
+        { file: 'HalfDiminished7-9.mp3', answer: 'Half-Diminished 7' },
+        { file: 'Major7-1.mp3', answer: 'Major 7' },
+        { file: 'Major7-2.mp3', answer: 'Major 7' },
+        { file: 'Major7-3.mp3', answer: 'Major 7' },
+        { file: 'Major7-4.mp3', answer: 'Major 7' },
+        { file: 'Major7-5.mp3', answer: 'Major 7' },
+        { file: 'Major7-6.mp3', answer: 'Major 7' },
+        { file: 'Major7-7.mp3', answer: 'Major 7' },
+        { file: 'Major7-8.mp3', answer: 'Major 7' },
+        { file: 'Major7-9.mp3', answer: 'Major 7' },
+        { file: 'Minor7-1.mp3', answer: 'Minor 7' },
+        { file: 'Minor7-2.mp3', answer: 'Minor 7' },
+        { file: 'Minor7-3.mp3', answer: 'Minor 7' },
+        { file: 'Minor7-4.mp3', answer: 'Minor 7' },
+        { file: 'Minor7-5.mp3', answer: 'Minor 7' },
+        { file: 'Minor7-6.mp3', answer: 'Minor 7' },
+        { file: 'Minor7-7.mp3', answer: 'Minor 7' },
+        { file: 'Minor7-8.mp3', answer: 'Minor 7' }
+    ],
+    modes: [
+        { file: 'Aeolian1.mp3', answer: 'Aeolian' },
+        { file: 'Aeolian2.mp3', answer: 'Aeolian' },
+        { file: 'Aeolian3.mp3', answer: 'Aeolian' },
+        { file: 'Dorian1.mp3', answer: 'Dorian' },
+        { file: 'Dorian2.mp3', answer: 'Dorian' },
+        { file: 'Dorian3.mp3', answer: 'Dorian' },
+        { file: 'Ionian1.mp3', answer: 'Ionian' },
+        { file: 'Ionian2.mp3', answer: 'Ionian' },
+        { file: 'Locrian1.mp3', answer: 'Locrian' },
+        { file: 'Locrian2.mp3', answer: 'Locrian' },
+        { file: 'Locrian3.mp3', answer: 'Locrian' },
+        { file: 'Lydian1.mp3', answer: 'Lydian' },
+        { file: 'Lydian2.mp3', answer: 'Lydian' },
+        { file: 'Lydian3.mp3', answer: 'Lydian' },
+        { file: 'Lydian4.mp3', answer: 'Lydian' },
+        { file: 'Mixolydian1.mp3', answer: 'Mixolydian' },
+        { file: 'Mixolydian2.mp3', answer: 'Mixolydian' },
+        { file: 'Mixolydian3.mp3', answer: 'Mixolydian' },
+        { file: 'Mixolydian4.mp3', answer: 'Mixolydian' },
+        { file: 'Mixolydian5.mp3', answer: 'Mixolydian' },
+        { file: 'Mixolydian6.mp3', answer: 'Mixolydian' },
+        { file: 'Mixolydian7.mp3', answer: 'Mixolydian' },
+        { file: 'Phrygian1.mp3', answer: 'Phrygian' },
+        { file: 'Phrygian2.mp3', answer: 'Phrygian' },
+        { file: 'Phrygian3.mp3', answer: 'Phrygian' },
+        { file: 'Phrygian4.mp3', answer: 'Phrygian' },
+        { file: 'Phrygian5.mp3', answer: 'Phrygian' },
+        { file: 'Phrygian6.mp3', answer: 'Phrygian' },
+        { file: 'Phrygian7.mp3', answer: 'Phrygian' },
+        { file: 'Phrygian8.mp3', answer: 'Phrygian' }
+    ]
+};
+
+function unicodeToBase64(str) {
+            const utf8Bytes = new TextEncoder().encode(str);
+            const binary = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('');
+            return btoa(binary);
+        }
+
+        function capitalizeName(name) {
+            return name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
+        // ====================== LOGIN ======================
+        function autoLoginIfPossible() {
+            const storedName = localStorage.getItem('biph_student_name');
+            if (!storedName) return false;
+
+            const lower = storedName.toLowerCase();
+            const student = approvedStudents.find(s => 
+                s.name.toLowerCase() === lower || (s.altName && s.altName.toLowerCase() === lower)
+            );
+            
+            if (student) {
+                currentStudent = lower;
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('quiz-section').classList.remove('hidden');
+                initQuiz();
+                return true;
+            }
+            return false;
+        }
+
+        function checkName() {
+            const nameInput = document.getElementById('name-input').value.trim();
+            const errorElement = document.getElementById('error-message');
+
+            if (!nameInput) {
+                errorElement.textContent = 'Please enter your name';
+                return;
+            }
+
+            const lower = nameInput.toLowerCase();
+            const student = approvedStudents.find(s =>
+                s.name.toLowerCase() === lower || (s.altName && s.altName.toLowerCase() === lower)
+            );
+
+            if (student) {
+                currentStudent = lower;
+                const displayName = capitalizeName(student.name);
+                localStorage.setItem('biph_student_name', displayName);
+                localStorage.setItem('biph_name_timestamp', Date.now().toString());
+
+                if (typeof initMyMenu === 'function') initMyMenu();
+
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('quiz-section').classList.remove('hidden');
+                initQuiz();
+            } else {
+                errorElement.textContent = 'Name not found in approved list';
+            }
+        }
+
+        // ====================== QUIZ LOGIC ======================
+        function generateQuestionSet(section) {
+            let pool = [...audioFiles[section]];
+            pool.sort(() => Math.random() - 0.5);
+            const selected = pool.slice(0, 5);
+            return {
+                urls: selected.map(item => `audio/${section}/${item.file}`),
+                answers: selected.map(item => item.answer)
+            };
+        }
+
+        function initQuiz() {
+            questionBank[currentStudent] = {
+                intervals: generateQuestionSet('intervals'),
+                triads: generateQuestionSet('triads'),
+                seventhChords: generateQuestionSet('seventhChords'),
+                modes: generateQuestionSet('modes')
+            };
+            studentAnswers = [];
+            currentSectionIndex = 0;
+            currentQuestionIndex = 0;
+            renderCurrentQuestion();
+        }
+
+        function getOrderedOptions(section) {
+            const orderedOptions = {
+                intervals: ['Minor 2nd','Major 2nd','Minor 3rd','Major 3rd','Perfect 4th','Tritone','Perfect 5th','Minor 6th','Major 6th','Minor 7th','Major 7th','Perfect 8ve'],
+                triads: ['Major Triad','Minor Triad','Augmented Triad','Diminished Triad'],
+                seventhChords: ['Major 7','Dominant 7','Minor 7','Half-Diminished 7','Diminished 7'],
+                modes: ['Ionian','Dorian','Phrygian','Lydian','Mixolydian','Aeolian','Locrian']
+            };
+            return orderedOptions[section] || [];
+        }
+
+        function renderCurrentQuestion() {
+    const container = document.getElementById('quiz-questions');
+    container.innerHTML = '';
+
+    const sectionKey = sections[currentSectionIndex];
+
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.innerHTML = `<strong>Part ${currentSectionIndex + 1}: ${sectionTitles[currentSectionIndex]}</strong><br>Question ${currentQuestionIndex + 1}/5`;
+    container.appendChild(header);
+
+    const box = document.createElement('div');
+    box.className = 'question-box';
+    box.innerHTML = `
+        <button class="play-button" onclick="playCurrentAudio()">▶ Play Audio</button>
+        <p id="play-count" class="play-count">Plays remaining: 2</p>
+        <select id="answer-select" class="answer-select">
+            <option value="" disabled selected>Select your answer</option>
+        </select>
+    `;
+    container.appendChild(box);
+
+    // Populate dropdown
+    const select = document.getElementById('answer-select');
+    getOrderedOptions(sectionKey).forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt;
+        o.textContent = opt;
+        select.appendChild(o);
+    });
+
+    // Reset audio button state for new question
+    playsLeft = 2;
+    currentAudio = null;
+    
+    const playBtn = document.querySelector('.play-button');
+    if (playBtn) playBtn.disabled = false;
+
+    document.querySelector('.quiz-actions').classList.remove('hidden');
+}
+
+function playCurrentAudio() {
+    const playBtn = document.querySelector('.play-button');
+    
+    if (!currentAudio) {
+        const sectionKey = sections[currentSectionIndex];
+        const url = questionBank[currentStudent][sectionKey].urls[currentQuestionIndex];
+        currentAudio = new Audio(url);
+    }
+
+    if (playsLeft > 0) {
+        currentAudio.currentTime = 0;
+        currentAudio.play().catch(e => console.error(e));
+        
+        playsLeft--;
+        document.getElementById('play-count').textContent = `Plays remaining: ${playsLeft}`;
+
+        if (playsLeft === 0 && playBtn) {
+            playBtn.disabled = true;
+        }
+    }
+}
+
+        function submitCurrentAnswer() {
+            const answer = document.getElementById('answer-select').value;
+            if (!answer) {
+                alert("Please select an answer.");
+                return;
+            }
+            studentAnswers.push(answer);
+
+            if (currentQuestionIndex < 4) {
+                currentQuestionIndex++;
+                renderCurrentQuestion();
+            } else if (currentSectionIndex < 3) {
+                currentSectionIndex++;
+                currentQuestionIndex = 0;
+                renderCurrentQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // ====================== RESULTS ======================
+function finishQuiz() {
+    const resultData = prepareResultData();
+    
+    document.querySelector('.quiz-container').classList.add('hidden');
+    document.querySelector('.quiz-actions').classList.add('hidden');
+    document.getElementById('results-section').classList.remove('hidden');
+    
+    displayResults(resultData);
+}
+
+        function prepareResultData() {
+            const allCorrect = sections.flatMap(sec => questionBank[currentStudent][sec].answers);
+            const termsToReview = [];
+
+            studentAnswers.forEach((ans, i) => {
+                if (ans.toLowerCase() !== allCorrect[i].toLowerCase()) {
+                    termsToReview.push({ item: `Q${i+1}`, correct: allCorrect[i] });
+                }
+            });
+
+            const correctCount = studentAnswers.filter((a, i) => a.toLowerCase() === allCorrect[i].toLowerCase()).length;
+
+            return {
+                student: capitalizeName(currentStudent),
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+                exercise: "Ear Training",
+                answers: studentAnswers,
+                questionSet: { correctAnswers: allCorrect },
+                termsToReview: termsToReview,
+                percentage: Math.round((correctCount / 20) * 100)
+            };
+        }
+
+        // ====================== INIT ======================
+        document.addEventListener('DOMContentLoaded', () => {
+            autoLoginIfPossible();
+        });
+
+
+        // ====================== SHARING & ENCRYPTION ======================
+function getHiddenKey() {
+    const parts = ["B1PH", "MU51C", "_V0C4B", "2026", "X7K9"];
+    let key = parts.join("_");
+    key = key.split('').map((char, i) => {
+        return String.fromCharCode(char.charCodeAt(0) ^ (i + 7));
+    }).join('');
+    return key;
+}
+
+const SECRET_KEY = getHiddenKey();
+
+function encryptData(data) {
+    const jsonStr = JSON.stringify(data);
+    let encrypted = '';
+    
+    for (let i = 0; i < jsonStr.length; i++) {
+        encrypted += String.fromCharCode(
+            jsonStr.charCodeAt(i) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length)
+        );
+    }
+    
+    return btoa(encrypted) + "==v2";
+}
+
+async function shareResultsAsText(resultData) {
+    try {
+        const exportData = {
+            student: resultData.student || "Unknown",
+            date: resultData.date,
+            time: resultData.time,
+            percentage: resultData.percentage,
+            exercise: "Ear Training",
+            termsToReview: resultData.termsToReview ? 
+                resultData.termsToReview.map(item => item.correct || item.item) : []
+        };
+
+        const encryptedContent = encryptData(exportData);
+        
+        const blob = new Blob([encryptedContent], { type: 'text/plain' });
+        const safeName = (exportData.student || "Student").replace(/[^a-zA-Z0-9]/g, '_');
+        const fileName = `EarTraining_${safeName}_${exportData.date || 'unknown'}.txt`;
+
+        const file = new File([blob], fileName, { type: 'text/plain' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file] });
+        } else {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Failed to export results.');
+    }
+}
+
+// ====================== UPDATED DISPLAY RESULTS ======================
+function displayResults(data) {
+    const container = document.getElementById('results-section');
+    container.innerHTML = '';
+
+    const title = document.createElement('h2');
+    title.textContent = `Results for ${data.student}`;
+    container.appendChild(title);
+
+    const dateTime = document.createElement('p');
+    dateTime.textContent = `Date: ${data.date} | Time: ${data.time}`;
+    container.appendChild(dateTime);
+
+    const score = document.createElement('p');
+    score.innerHTML = `<strong>Score: ${data.percentage}%</strong>`;
+    container.appendChild(score);
+
+    // Results Table
+    let html = `<table class="results-table"><tr><th>#</th><th>Your Answer</th><th>Correct Answer</th></tr>`;
+    data.answers.forEach((ans, i) => {
+        const correct = data.questionSet.correctAnswers[i];
+        const isCorrect = ans.toLowerCase() === correct.toLowerCase();
+        html += `<tr>
+            <td>${i+1}</td>
+            <td class="${isCorrect ? '' : 'incorrect'}">${ans} ${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
+            <td>${correct}</td>
+        </tr>`;
+    });
+    html += `</table>`;
+    container.insertAdjacentHTML('beforeend', html);
+
+    // Items to Review
+    if (data.termsToReview && data.termsToReview.length) {
+        let reviewHTML = `<div class="terms-to-review"><h3>Items to Review</h3><ul>`;
+        data.termsToReview.forEach(item => {
+            reviewHTML += `<li><strong>${item.item}:</strong> ${item.correct}</li>`;
+        });
+        reviewHTML += `</ul></div>`;
+        container.insertAdjacentHTML('beforeend', reviewHTML);
+    }
+
+    // Share Button
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'copy-button';
+    shareBtn.textContent = '📤 Share Results (Airdrop)';
+    shareBtn.onclick = () => shareResultsAsText(data);
+    container.appendChild(shareBtn);
+
+    // ====================== QR CODE (Now identical to Vocab) ======================
+    const qrContainer = document.createElement('div');
+    qrContainer.id = 'qr-code';
+    qrContainer.style.marginTop = '30px';
+    qrContainer.style.width = '200px';
+    qrContainer.style.height = '200px';
+    qrContainer.style.marginLeft = 'auto';
+    qrContainer.style.marginRight = 'auto';
+    container.appendChild(qrContainer);
+
+    const simplified = { 
+        s: data.student, 
+        d: data.date, 
+        t: data.time, 
+        p: data.percentage,
+        e: "Ear" 
+    };
+
+    const resultUrl = `${window.location.origin}${window.location.pathname}?results=${encodeURIComponent(unicodeToBase64(JSON.stringify(simplified)))}`;
+
+    if (typeof kjua !== 'undefined') {
+        const qr = kjua({
+            text: resultUrl,
+            size: 200,
+            fill: '#303f6c',
+            back: '#FFFFFF',
+            quiet: 0,
+            ecLevel: 'M',
+            render: 'canvas'
+        });
+        qrContainer.appendChild(qr);
+    }
+}
+
+
+        // ====================== KEYBOARD SHORTCUTS ======================
+document.addEventListener('keydown', function(e) {
+    const activeElement = document.activeElement;
+    const nameInput = document.getElementById('name-input');
+    const answerSelect = document.getElementById('answer-select');
+    const isQuizVisible = !document.getElementById('quiz-section').classList.contains('hidden');
+    const isLoginVisible = !document.getElementById('login-section').classList.contains('hidden');
+
+    // ==================== TAB ====================
+    if (e.key === 'Tab') {
+        if (isLoginVisible && activeElement !== nameInput) {
+            nameInput.focus();
+            e.preventDefault();
+        }
+        // You can extend Tab navigation inside quiz later if needed
+        return;
+    }
+
+    // ==================== ENTER ====================
+    if (e.key === 'Enter') {
+        if (isLoginVisible) {
+            checkName();
+            e.preventDefault();
+        } 
+        else if (isQuizVisible && answerSelect) {
+            submitCurrentAnswer();
+            e.preventDefault();
+        }
+        return;
+    }
+
+    // ==================== SPACE - Play Audio ====================
+    if ((e.key === ' ' || e.key === 'Spacebar') && isQuizVisible) {
+        // Only trigger if not typing in an input
+        if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'SELECT') {
+            e.preventDefault();
+            playCurrentAudio();
+        }
+    }
+
+    // ==================== ARROW KEYS - Navigate dropdown ====================
+    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isQuizVisible && answerSelect) {
+        const sectionKey = sections[currentSectionIndex];
+        const orderedOptions = {
+            intervals: [
+                'Minor 2nd', 'Major 2nd', 'Minor 3rd', 'Major 3rd',
+                'Perfect 4th', 'Tritone', 'Perfect 5th', 'Minor 6th',
+                'Major 6th', 'Minor 7th', 'Major 7th', 'Perfect 8ve'
+            ],
+            triads: ['Major Triad', 'Minor Triad', 'Augmented Triad', 'Diminished Triad'],
+            seventhChords: ['Major 7', 'Dominant 7', 'Minor 7', 'Half-Diminished 7', 'Diminished 7'],
+            modes: ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian']
+        };
+
+        const options = orderedOptions[sectionKey] || [];
+        if (options.length === 0) return;
+
+        let currentIndex = options.indexOf(answerSelect.value);
+
+        if (e.key === 'ArrowDown') {
+            currentIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
+        } else { // ArrowUp
+            currentIndex = currentIndex === -1 ? options.length - 1 : (currentIndex - 1 + options.length) % options.length;
+        }
+
+        answerSelect.value = options[currentIndex];
+        e.preventDefault();
+    }
+});
+    </script>
+</body>
+</html>
