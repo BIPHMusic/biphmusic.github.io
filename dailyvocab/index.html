@@ -1018,19 +1018,21 @@ function displayResults(resultData, isUrlView = false) {
 async function shareResultsAsText(resultData) {
     try {
         let percentage = resultData.percentage;
-        if (!percentage && resultData.questionSet && resultData.answers) {
+
+        // Recalculate if we don't have a valid percentage
+        if (typeof percentage !== 'number' && resultData.questionSet && resultData.answers) {
             const correctCount = resultData.answers.filter((ans, i) => 
                 ans && ans.toLowerCase() === (resultData.questionSet.answers[i] || "").toLowerCase()
             ).length;
             percentage = Math.round(correctCount / resultData.questionSet.answers.length * 100);
         }
 
-        // Simplified output as requested
+        // Simplified output
         const exportData = {
             student: resultData.student || resultData.s || "Unknown",
             date: resultData.date || resultData.d,
             time: resultData.time || resultData.t,
-            percentage: percentage || "N/A",
+            percentage: typeof percentage === 'number' ? percentage : "N/A",   // Fixed here
             exercise: "Vocab Review"
         };
 
@@ -1067,7 +1069,6 @@ async function shareResultsAsText(resultData) {
         console.error('Share failed:', err);
         if (err.name !== 'AbortError') {
             alert('Sharing failed. Downloading .txt file instead...');
-            // fallback download code remains the same
         }
     }
 }
