@@ -59,7 +59,6 @@ function initMyMenu(forceHideIfNotLoggedIn = false) {
                 ${storedName}
             </div>
             <button class="menu-btn" onclick="goToMyRecords()">📊 My Records</button>
-            <button class="menu-btn" onclick="goToMyHighScores()">🏆 My High Scores</button>
             <hr style="margin: 3px 0; border:none; border-top: 1px solid #eee;">
             <button id="signout-btn" class="menu-btn" onclick="handleSignOutClick(event)">🚪 Sign Out</button>
         `;
@@ -173,7 +172,6 @@ function handleSignOutClick(e) {
 }
 
 function goToMyRecords() { window.location.href = "http://biphmusic.github.io/my-records"; }
-function goToMyHighScores() { window.location.href = "http://biphmusic.github.io/my-high-scores"; }
 
 // Escape key closes the menu
 document.addEventListener('keydown', (e) => {
