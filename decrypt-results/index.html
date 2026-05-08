@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIPH Music - Decrypt Results</title>
+    <link rel="icon" href="../icons/bg-icon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <style>
+        .drop-zone {
+            border: 3px dashed rgba(255, 215, 0, 0.5);
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            margin: 40px auto;
+            max-width: 700px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+        .drop-zone.dragover {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: #ffd700;
+            transform: scale(1.02);
+        }
+        .result-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px 25px 25px;
+            margin: 30px auto;
+            max-width: 700px;
+            display: none;
+        }
+        .success-header {
+            color: #16a34a;
+            font-size: 1.35rem;
+            font-weight: normal;
+            margin: 5px 0 20px 0;
+        }
+        pre {
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 18px;
+            border-radius: 8px;
+            overflow: auto;
+            max-height: 50vh;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+        }
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .action-button {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .summary {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 6px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
+
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">Results Decryptor</h1>
+
+    <div class="drop-zone" id="dropZone">
+        <h2>Drop one or multiple encrypted .txt files here</h2>
+        <p>or click to select files</p>
+        <input type="file" id="fileInput" accept=".txt" multiple style="display:none">
+    </div>
+
+    <div class="result-box" id="resultBox">
+        <h2 class="success-header">✓ Successfully Decrypted</h2>
+        <div id="summary" class="summary"></div>
+        <pre id="decryptedContent"></pre>
+        
+        <div class="action-buttons">
+            <button class="action-button" id="addToRecordsBtn">Add New Entries to Records</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== HIDDEN KEY ====================
+        function getHiddenKey() {
+            const parts = ["B1PH", "MU51C", "_V0C4B", "2026", "X7K9"];
+            let key = parts.join("_");
+            key = key.split('').map((char, i) => {
+                return String.fromCharCode(char.charCodeAt(0) ^ (i + 7));
+            }).join('');
+            return key;
+        }
+
+        const SECRET_KEY = getHiddenKey();
+
+        function decryptContent(encrypted) {
+            try {
+                let data = encrypted.replace(/==v2$/, '');
+                const decoded = atob(data);
+                
+                let result = '';
+                for (let i = 0; i < decoded.length; i++) {
+                    result += String.fromCharCode(
+                        decoded.charCodeAt(i) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length)
+                    );
+                }
+                return JSON.parse(result);
+            } catch (e) {
+                console.error(e);
+                throw new Error("Invalid or corrupted file");
+            }
+        }
+
+        function getEntryKey(entry) {
+            return `${entry.student}|${entry.date}|${entry.time || ''}`.toLowerCase();
+        }
+
+        // ==================== UI ELEMENTS ====================
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const resultBox = document.getElementById('resultBox');
+        const decryptedContent = document.getElementById('decryptedContent');
+        const summaryDiv = document.getElementById('summary');
+        const addToRecordsBtn = document.getElementById('addToRecordsBtn');
+
+        let currentDecryptedEntries = [];
+
+        // Reset page to initial state
+        function resetPage() {
+            currentDecryptedEntries = [];
+            resultBox.style.display = 'none';
+            dropZone.style.display = 'block';
+            fileInput.value = ''; // Clear file input
+        }
+
+        // ==================== DRAG & DROP ====================
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => {
+            if (e.target.files.length > 0) processFiles(e.target.files);
+        });
+
+        dropZone.addEventListener('dragover', e => { 
+            e.preventDefault(); 
+            dropZone.classList.add('dragover'); 
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) processFiles(e.dataTransfer.files);
+        });
+
+        async function processFiles(fileList) {
+            currentDecryptedEntries = [];
+            const errors = [];
+
+            for (let file of fileList) {
+                try {
+                    const text = await file.text();
+                    const entry = decryptContent(text.trim());
+                    currentDecryptedEntries.push(entry);
+                } catch (err) {
+                    errors.push(`${file.name}: ${err.message}`);
+                }
+            }
+
+            if (currentDecryptedEntries.length === 0) {
+                alert("No valid files could be decrypted.");
+                return;
+            }
+
+            decryptedContent.textContent = JSON.stringify(currentDecryptedEntries, null, 2);
+            
+            const summaryText = `${currentDecryptedEntries.length} file(s) decrypted.` +
+                               (errors.length ? `\n${errors.length} file(s) failed.` : '');
+            summaryDiv.textContent = summaryText;
+
+            resultBox.style.display = 'block';
+            dropZone.style.display = 'none';
+        }
+
+        // ==================== ADD TO RECORDS ====================
+        addToRecordsBtn.addEventListener('click', async () => {
+            if (currentDecryptedEntries.length === 0) return;
+
+            try {
+                let existingRecords = [];
+                try {
+                    const response = await fetch('records.js');
+                    const text = await response.text();
+                    const match = text.match(/=\s*(\[[\s\S]*?\]);/);
+                    if (match) {
+                        existingRecords = JSON.parse(match[1]);
+                    }
+                } catch (e) {
+                    console.warn("records.js not found. Starting fresh.");
+                }
+
+                const existingKeys = new Set(existingRecords.map(getEntryKey));
+                const newEntries = currentDecryptedEntries.filter(entry => 
+                    !existingKeys.has(getEntryKey(entry))
+                );
+
+                if (newEntries.length === 0) {
+                    alert("All entries already exist in records.");
+                    resetPage();
+                    return;
+                }
+
+                // Add new entries
+                existingRecords.push(...newEntries);
+
+                // Sort chronologically (oldest first)
+                existingRecords.sort((a, b) => {
+                    const dateA = new Date(a.date + " " + (a.time || "00:00"));
+                    const dateB = new Date(b.date + " " + (b.time || "00:00"));
+                    return dateA - dateB;
+                });
+
+                // Create and download updated records.js
+                const newContent = `const records = ${JSON.stringify(existingRecords, null, 2)};\n\nexport default records;`;
+
+                const blob = new Blob([newContent], { type: 'application/javascript' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'records.js';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // Auto reset after success
+                resetPage();
+
+            } catch (err) {
+                console.error(err);
+                alert('Failed to update records.js');
+            }
+        });
+    </script>
+</body>
+</html>

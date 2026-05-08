@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIPH Music - My Records</title>
+    <link rel="icon" href="../icons/bg-icon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../records.js"></script>
+    <script src="../apstudents.js"></script>
+    <script src="../mymenu.js"></script>
+
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #ddd;
+            border: 1px solid #757575;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+        .tab:first-child { border-top-left-radius: 5px; border-bottom-left-radius: 5px; }
+        .tab:last-child { border-top-right-radius: 5px; border-bottom-right-radius: 5px; }
+        .tab.active { background-color: #4CAF50; color: white; }
+
+        #chart-container {
+            position: relative;
+            height: 480px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #chart-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .default-tooltip, .lock-tooltip {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 2px solid #4CAF50;
+            color: #333;
+            padding: 6px 10px;
+            border-radius: 6px;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-size: 15px;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
+
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">My Records</h1>
+
+    <div class="container">
+        <div id="chart-container">
+            <div id="chart-title">My Progress</div>
+            <div style="position: relative; height: calc(100% - 50px);">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="logocontainer">        
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+    </div>
+
+    <div id="default-tooltip" class="default-tooltip"></div>
+    <div id="lock-tooltip" class="lock-tooltip"></div>
+
+    <script>
+        let chart;
+        let lockedDatasetIndex = null;
+        let lastTooltipX = 0;
+        let lastTooltipY = 0;
+        let animationFrameId = null;
+
+        const currentStudentName = localStorage.getItem('biph_student_name');
+
+        if (!currentStudentName) {
+            alert("Please sign in to view your records.");
+            window.location.href = "../index.html"; // or wherever your login page is
+        }
+
+        // Find student data
+        const studentData = records.find(r => r.student.toLowerCase() === currentStudentName.toLowerCase());
+
+        if (!studentData) {
+            document.getElementById('chart-title').innerHTML = `No data found for <strong>${currentStudentName}</strong>`;
+        }
+
+        const exercises = [
+            { key: "sightSinging", label: "Sight Singing", color: "#FF6384" },
+            { key: "vocab",       label: "Vocab",        color: "#36A2EB" },
+            { key: "mcqs",        label: "MCQs",         color: "#FFCE56" },
+            { key: "earTraining", label: "Ear Training", color: "#4BC0C0" }
+        ];
+
+        function calculateComposite(dataArrays) {
+            const maxLen = Math.max(...dataArrays.map(arr => arr.length));
+            return Array.from({length: maxLen}, (_, i) => {
+                let sum = 0, count = 0;
+                dataArrays.forEach(arr => {
+                    if (arr[i] !== undefined) {
+                        sum += arr[i];
+                        count++;
+                    }
+                });
+                return count ? (sum / count) * 100 : null;
+            });
+        }
+
+        function createChart() {
+            if (!studentData) return;
+
+            const ctx = document.getElementById('progressChart').getContext('2d');
+
+            const datasets = exercises.map((ex, idx) => ({
+                label: ex.label,
+                data: studentData[ex.key] ? studentData[ex.key].map(v => v * 100) : [],
+                borderColor: ex.color,
+                backgroundColor: 'transparent',
+                borderWidth: 3,
+                tension: 0.2,
+                pointRadius: 3,
+                pointHoverRadius: 7
+            }));
+
+            // Composite
+            const allExerciseData = exercises.map(ex => studentData[ex.key] || []);
+            const compositeData = calculateComposite(allExerciseData);
+
+            datasets.unshift({
+                label: "Composite",
+                data: compositeData,
+                borderColor: "#2E7D32",
+                backgroundColor: "rgba(46, 125, 50, 0.1)",
+                borderWidth: 4,
+                borderDash: [2, 2],
+                tension: 0.1,
+                pointRadius: 4,
+                pointHoverRadius: 8
+            });
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: Math.max(...datasets.map(d => d.data.length))}, (_, i) => `Attempt ${i + 1}`),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, title: { display: true, text: 'Score (%)' } }
+                    },
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top', align: 'start' },
+                        tooltip: { enabled: false, external: customTooltip }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const idx = elements[0].datasetIndex;
+                            toggleLockMode(idx);
+                        } else if (lockedDatasetIndex !== null) {
+                            disableLockMode();
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleLockMode(index) {
+            if (lockedDatasetIndex === index) disableLockMode();
+            else enableLockMode(index);
+        }
+
+        function enableLockMode(index) {
+            lockedDatasetIndex = index;
+            document.getElementById('chart-title').textContent = chart.data.datasets[index].label;
+            chart.data.datasets.forEach((ds, i) => {
+                if (i === index) {
+                    ds.borderWidth = 5;
+                    ds.borderColor = exercises[i-1] ? exercises[i-1].color : "#2E7D32";
+                } else {
+                    ds.borderWidth = 1;
+                    ds.borderColor = "rgba(200,200,200,0.3)";
+                }
+            });
+            chart.update();
+        }
+
+        function disableLockMode() {
+            lockedDatasetIndex = null;
+            document.getElementById('chart-title').textContent = "My Progress";
+            chart.data.datasets.forEach((ds, i) => {
+                if (i === 0) { // composite
+                    ds.borderWidth = 4;
+                    ds.borderColor = "#2E7D32";
+                } else {
+                    ds.borderWidth = 3;
+                    ds.borderColor = exercises[i-1].color;
+                }
+            });
+            chart.update();
+        }
+
+        function customTooltip(context) {
+            // (Same smooth tooltip logic as your original, simplified)
+            const tooltipEl = lockedDatasetIndex === null 
+                ? document.getElementById('default-tooltip')
+                : document.getElementById('lock-tooltip');
+
+            if (context.tooltip.opacity === 0) {
+                tooltipEl.style.opacity = 0;
+                return;
+            }
+
+            const value = context.tooltip.dataPoints[0].formattedValue;
+            tooltipEl.innerHTML = `${value}%`;
+            tooltipEl.style.opacity = 1;
+
+            const chartRect = context.chart.canvas.getBoundingClientRect();
+            tooltipEl.style.left = `${chartRect.left + context.tooltip.caretX + 15}px`;
+            tooltipEl.style.top = `${chartRect.top + context.tooltip.caretY - 30}px`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMyMenu();
+            createChart();
+        });
+    </script>
+</body>
+</html>

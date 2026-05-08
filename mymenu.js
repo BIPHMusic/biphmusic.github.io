@@ -172,8 +172,8 @@ function handleSignOutClick(e) {
     }
 }
 
-function goToMyRecords() { alert("My Records page coming soon!"); }
-function goToMyHighScores() { alert("My High Scores page coming soon!"); }
+function goToMyRecords() { window.location.href = "http://biphmusic.github.io/my-records"; }
+function goToMyHighScores() { window.location.href = "http://biphmusic.github.io/my-high-scores"; }
 
 // Escape key closes the menu
 document.addEventListener('keydown', (e) => {

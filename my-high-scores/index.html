@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIPH Music - My High Scores</title>
+    <link rel="icon" href="../icons/bg-icon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../records.js"></script>
+    <script src="../apstudents.js"></script>
+    <script src="../mymenu.js"></script>
+
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        .score-card {
+            display: inline-block;
+            width: 180px;
+            margin: 15px;
+            padding: 25px 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .score-card:hover { transform: translateY(-8px); }
+        .score {
+            font-size: 42px;
+            font-weight: bold;
+            color: #2E7D32;
+        }
+        .label {
+            margin-top: 8px;
+            font-size: 15px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
+
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">My High Scores</h1>
+
+    <div class="container" id="scores-container">
+        <!-- Populated by JS -->
+    </div>
+
+    <div class="logocontainer">        
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+    </div>
+
+    <script>
+        const currentStudentName = localStorage.getItem('biph_student_name');
+
+        if (!currentStudentName) {
+            alert("Please sign in to view your high scores.");
+            window.location.href = "../index.html";
+        }
+
+        const studentData = records.find(r => r.student.toLowerCase() === currentStudentName.toLowerCase());
+
+        function getHighScore(arr) {
+            return arr ? Math.max(...arr) * 100 : 0;
+        }
+
+        function renderHighScores() {
+            const container = document.getElementById('scores-container');
+            if (!studentData) {
+                container.innerHTML = `<h2>No data found for ${currentStudentName}</h2>`;
+                return;
+            }
+
+            const html = `
+                <div class="score-card">
+                    <div class="score">${(getHighScore(studentData.sightSinging)).toFixed(1)}%</div>
+                    <div class="label">Sight Singing</div>
+                </div>
+                <div class="score-card">
+                    <div class="score">${(getHighScore(studentData.vocab)).toFixed(1)}%</div>
+                    <div class="label">Vocabulary</div>
+                </div>
+                <div class="score-card">
+                    <div class="score">${(getHighScore(studentData.mcqs)).toFixed(1)}%</div>
+                    <div class="label">MCQs</div>
+                </div>
+                <div class="score-card">
+                    <div class="score">${(getHighScore(studentData.earTraining)).toFixed(1)}%</div>
+                    <div class="label">Ear Training</div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMyMenu();
+            renderHighScores();
+        });
+    </script>
+</body>
+</html>
