@@ -878,15 +878,15 @@ function displayResults(resultData, isUrlView = false) {
         termsToReview.appendChild(termsList);
         resultsSection.appendChild(termsToReview);
 
-        // ==================== JSON SHARE BUTTON ====================
+        // Share Button (JSON)
         const shareButton = document.createElement('button');
         shareButton.className = 'copy-button';
-        shareButton.style.marginTop = '25px';
+        shareButton.style.marginTop = '12px';
         shareButton.style.marginLeft = 'auto';
         shareButton.style.marginRight = 'auto';
         shareButton.style.display = 'block';
-        shareButton.innerHTML = '📤 Share Results (JSON)';
-        shareButton.onclick = () => shareResultsAsJSON(resultData);
+        shareButton.innerHTML = '📤 Share Results (.txt)';
+        shareButton.onclick = () => shareResultsAsText(resultData);
         resultsSection.appendChild(shareButton);
 
         // QR Code (kept)
@@ -926,7 +926,7 @@ function displayResults(resultData, isUrlView = false) {
     }
 }
 
-async function shareResultsAsJSON(resultData) {
+async function shareResultsAsText(resultData) {
     try {
         // Build the data
         let percentage = resultData.percentage;
@@ -939,7 +939,7 @@ async function shareResultsAsJSON(resultData) {
 
         const fullResultData = {
             student: resultData.student || resultData.s || "Unknown",
-            date: resultData.date || resultData.d || new Date().toISOString().split('T')[0],
+            date: resultData.date || resultData.d,
             time: resultData.time || resultData.t,
             percentage: percentage || "N/A",
             exercise: "Vocab Review",
@@ -956,14 +956,14 @@ async function shareResultsAsJSON(resultData) {
         };
 
         const jsonString = JSON.stringify(fullResultData, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        
+        const blob = new Blob([jsonString], { type: 'text/plain' });   // ← Changed to text/plain
+
         const safeName = (fullResultData.student || "Student").replace(/[^a-zA-Z0-9]/g, '_');
-        const fileName = `Vocabulary_Results_${safeName}_${fullResultData.date}.json`;
+        const fileName = `Vocabulary_Results_${safeName}_${fullResultData.date}.txt`;   // ← .txt
 
-        const file = new File([blob], fileName, { type: 'application/json' });
+        const file = new File([blob], fileName, { type: 'text/plain' });
 
-        // Exact same pattern as your working PNG function
+        // Same exact pattern as your working PNG function
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
                 files: [file],
@@ -971,16 +971,34 @@ async function shareResultsAsJSON(resultData) {
                 text: `Score: ${percentage}%`
             });
         } else {
-            alert("AirDrop / File sharing is not supported in this browser.\n\nPlease use the QR code or screenshot instead.");
+            // Fallback download
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
     } catch (err) {
         console.error('Share failed:', err);
-        
         if (err.name !== 'AbortError') {
-            alert('AirDrop sharing failed.');
+            alert('Sharing failed. Downloading .txt file instead...');
+            
+            // Final fallback
+            const url = URL.createObjectURL(new Blob([JSON.stringify(fullResultData, null, 2)], { type: 'text/plain' }));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Vocabulary_Results_${(resultData.student || 'Unknown').replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
     }
 }
+
 
 function prepareResultData() {
     const correctAnswers = questionBank[currentStudent].answers;
