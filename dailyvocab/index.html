@@ -1055,7 +1055,7 @@ async function shareResultsAsText(resultData) {
             date: resultData.date || resultData.d,
             time: resultData.time || resultData.t,
             percentage: typeof percentage === 'number' ? percentage : "N/A",
-            exercise: "Vocab Review",
+            exercise: "Vocab",                    // ← Changed here
             termsToReview: resultData.termsToReview ? 
                 resultData.termsToReview.map(item => item.term) : []
         };
@@ -1096,7 +1096,7 @@ function prepareResultData() {
         student: capitalizeName(currentStudent),
         date: new Date().toISOString().split('T')[0],
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
-        exercise: "Vocab Review",
+        exercise: "Vocab",  
         answers: Array.from({ length: 15 }, (_, index) => answers[index] || ""),
         questionSet: questionBank[currentStudent],
         termsToReview: termsToReview.map(term => ({
