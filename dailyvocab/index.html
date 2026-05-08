@@ -322,7 +322,6 @@
             <div id="results-section" class="results-section hidden"></div>
         </div>
     </div>
-    
 
     <div class="logocontainer">        
         <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
@@ -781,7 +780,7 @@ function submitQuiz() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ==================== DISPLAY RESULTS (with both buttons) ====================
+// ==================== DISPLAY RESULTS ====================
 function displayResults(resultData, isUrlView = false) {
     const resultsSection = document.getElementById('results-section');
     resultsSection.innerHTML = '';
@@ -807,14 +806,7 @@ function displayResults(resultData, isUrlView = false) {
     }
 
     const score = document.createElement('p');
-    if (!isUrlView && resultData.questionSet && resultData.answers) {
-        const correctCount = resultData.answers.filter((ans, idx) => 
-            ans && ans.toLowerCase() === resultData.questionSet.answers[idx].toLowerCase()
-        ).length;
-        score.textContent = `Score: ${correctCount}/${resultData.questionSet.answers.length} (${percentage}%)`;
-    } else {
-        score.textContent = `Score: ${percentage}%`;
-    }
+    score.textContent = `Score: ${percentage}%`;
     resultsSection.appendChild(score);
 
     if (!isUrlView && resultData.questionSet) {
@@ -870,16 +862,15 @@ function displayResults(resultData, isUrlView = false) {
         heading.textContent = (percentage === 100) ? 'Great job!' : 'Terms to Review';
         termsToReview.appendChild(heading);
 
-        // Improved Terms to Review (no bullets, left-aligned, better spacing)
         const termsList = document.createElement('div');
         termsList.style.marginTop = '12px';
         termsList.style.textAlign = 'left';
-        termsList.style.lineHeight = '1.8';           // Increased vertical spacing
+        termsList.style.lineHeight = '1.8';
         termsList.style.paddingLeft = '10px';
 
         resultData.termsToReview.forEach(item => {
             const termLine = document.createElement('div');
-            termLine.style.marginBottom = '14px';     // Extra space between terms
+            termLine.style.marginBottom = '14px';
             termLine.innerHTML = `<strong>${item.term}:</strong> ${item.definition}`;
             termsList.appendChild(termLine);
         });
@@ -887,150 +878,18 @@ function displayResults(resultData, isUrlView = false) {
         termsToReview.appendChild(termsList);
         resultsSection.appendChild(termsToReview);
 
-        const isMobileOrTablet = /iPad|iPhone|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-        // PNG Button - Full original logic
-        const pngButton = document.createElement('button');
-        pngButton.className = 'copy-button';
-        pngButton.id = 'copy-png-button';
-        pngButton.textContent = isMobileOrTablet ? 'Download Results' : 'Copy Results';
-        pngButton.style.display = 'block';
-        pngButton.style.marginLeft = 'auto';
-        pngButton.style.marginRight = 'auto';
-        pngButton.style.marginTop = '20px';
-
-        pngButton.onclick = () => {
-            const flash = document.createElement('div');
-            flash.style.position = 'fixed';
-            flash.style.top = '0';
-            flash.style.left = '0';
-            flash.style.width = '100%';
-            flash.style.height = '100%';
-            flash.style.backgroundColor = 'white';
-            flash.style.opacity = '1';
-            flash.style.zIndex = '9999';
-            flash.style.transition = 'opacity 0.3s ease-out';
-            document.body.appendChild(flash);
-
-            setTimeout(() => {
-                flash.style.opacity = '0';
-                setTimeout(() => {
-                    document.body.removeChild(flash);
-
-                    const background = document.querySelector('.background');
-                    const overlay = document.querySelector('.overlay');
-                    const overlay2 = document.querySelector('.overlay2');
-                    const logo = document.querySelector('.logo');
-                    const copyPngBtn = document.getElementById('copy-png-button');
-
-                    background.style.display = 'none';
-                    overlay.style.display = 'none';
-                    overlay2.style.display = 'none';
-                    if (logo) logo.style.display = 'none'; 
-                    if (copyPngBtn) copyPngBtn.style.visibility = 'hidden';
-
-                    html2canvas(document.body, {
-                        scale: 2,
-                        useCORS: true,
-                        scrollX: 0,
-                        scrollY: 0,
-                        width: document.body.scrollWidth,
-                        height: document.body.scrollHeight,
-                        backgroundColor: 'rgb(45, 70, 119)'
-                    }).then(canvas => {
-                        const logoImg = new Image();
-                        logoImg.crossOrigin = 'anonymous';
-                        logoImg.src = '../icons/Full Logo White on Transparent.png';
-
-                        logoImg.onload = () => {
-                            const ctx = canvas.getContext('2d');
-                            const logoWidth = canvas.width * 0.25;
-                            const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
-                            const padding = 50 * 2;
-                            const x = canvas.width - logoWidth - padding;
-                            const y = canvas.height - logoHeight - padding;
-                            ctx.drawImage(logoImg, x, y, logoWidth, logoHeight);
-
-                            canvas.toBlob(blob => {
-                                if (isMobileOrTablet) {
-                                    const link = document.createElement('a');
-                                    link.download = `Vocabulary_Results_${resultData.student || resultData.s}_${resultData.date || resultData.d}.png`;
-                                    link.href = URL.createObjectURL(blob);
-                                    link.click();
-                                    URL.revokeObjectURL(link.href);
-                                } else {
-                                    const item = new ClipboardItem({ 'image/png': blob });
-                                    navigator.clipboard.write([item]).then(() => {
-                                        pngButton.textContent = '√ Copied';
-                                        setTimeout(() => {
-                                            pngButton.textContent = isMobileOrTablet ? 'Download Results' : 'Copy Results';
-                                        }, 2000);
-                                    }).catch(err => {
-                                        console.error('Failed to copy PNG:', err);
-                                        if (confirm('Failed to copy. Download instead?')) {
-                                            const link = document.createElement('a');
-                                            link.download = `Vocabulary_Results_${resultData.student || resultData.s}_${resultData.date || resultData.d}.png`;
-                                            link.href = URL.createObjectURL(blob);
-                                            link.click();
-                                            URL.revokeObjectURL(link.href);
-                                        }
-                                    });
-                                }
-
-                                background.style.display = '';
-                                overlay.style.display = '';
-                                overlay2.style.display = '';
-                                if (logo) logo.style.display = '';
-                                if (copyPngBtn) copyPngBtn.style.visibility = 'visible';
-                            }, 'image/png');
-                        };
-
-                        logoImg.onerror = () => {
-                            canvas.toBlob(blob => {
-                                if (isMobileOrTablet) {
-                                    const link = document.createElement('a');
-                                    link.download = `Vocabulary_Results_${resultData.student || resultData.s}_${resultData.date || resultData.d}.png`;
-                                    link.href = URL.createObjectURL(blob);
-                                    link.click();
-                                    URL.revokeObjectURL(link.href);
-                                } else {
-                                    const item = new ClipboardItem({ 'image/png': blob });
-                                    navigator.clipboard.write([item]);
-                                }
-                                background.style.display = '';
-                                overlay.style.display = '';
-                                overlay2.style.display = '';
-                                if (logo) logo.style.display = '';
-                                if (copyPngBtn) copyPngBtn.style.visibility = 'visible';
-                            }, 'image/png');
-                        };
-                    }).catch(err => {
-                        console.error('html2canvas error:', err);
-                        alert('Failed to generate image.');
-                        background.style.display = '';
-                        overlay.style.display = '';
-                        overlay2.style.display = '';
-                        if (logo) logo.style.display = '';
-                        if (copyPngBtn) copyPngBtn.style.visibility = 'visible';
-                    });
-                }, 300);
-            }, 100);
-        };
-
-        resultsSection.appendChild(pngButton);
-
-        // Share Button (Airdrop)
+        // ==================== JSON SHARE BUTTON ====================
         const shareButton = document.createElement('button');
         shareButton.className = 'copy-button';
-        shareButton.style.marginTop = '12px';
+        shareButton.style.marginTop = '25px';
         shareButton.style.marginLeft = 'auto';
         shareButton.style.marginRight = 'auto';
         shareButton.style.display = 'block';
-        shareButton.innerHTML = '📤 Share Results (Airdrop)';
-        shareButton.onclick = () => shareResultsAsPNG(resultData);
+        shareButton.innerHTML = '📤 Share Results (JSON)';
+        shareButton.onclick = () => shareResultsAsJSON(resultData);
         resultsSection.appendChild(shareButton);
 
-        // QR Code
+        // QR Code (kept)
         if (resultData.questionSet && resultData.answers) {
             const correctCount = resultData.answers.filter((ans, idx) => 
                 ans && ans.toLowerCase() === resultData.questionSet.answers[idx].toLowerCase()
@@ -1044,8 +903,7 @@ function displayResults(resultData, isUrlView = false) {
 
             const qrContainer = document.createElement('div');
             qrContainer.id = 'qr-code';
-            qrContainer.style.marginTop = '20px';
-            qrContainer.style.marginBottom = '-100px';
+            qrContainer.style.marginTop = '30px';
             qrContainer.style.width = '200px';
             qrContainer.style.height = '200px';
             qrContainer.style.marginLeft = 'auto';
@@ -1068,69 +926,84 @@ function displayResults(resultData, isUrlView = false) {
     }
 }
 
-async function shareResultsAsPNG(resultData) {
+async function shareResultsAsJSON(resultData) {
     try {
-        const background = document.querySelector('.background');
-        const overlay = document.querySelector('.overlay');
-        const overlay2 = document.querySelector('.overlay2');
-        const logo = document.querySelector('.logo');
-        const copyPngBtn = document.getElementById('copy-png-button');
+        // Calculate percentage reliably
+        let percentage = resultData.percentage;
+        if (!percentage && resultData.questionSet && resultData.answers) {
+            const correctCount = resultData.answers.filter((ans, i) => 
+                ans && ans.toLowerCase() === (resultData.questionSet.answers[i] || "").toLowerCase()
+            ).length;
+            percentage = Math.round(correctCount / resultData.questionSet.answers.length * 100);
+        }
 
-        const tempHide = [background, overlay, overlay2, logo, copyPngBtn].filter(el => el);
-        tempHide.forEach(el => el.style.display = 'none');
+        const fullResultData = {
+            student: resultData.student || resultData.s || "Unknown",
+            date: resultData.date || resultData.d || new Date().toISOString().split('T')[0],
+            time: resultData.time || resultData.t,
+            percentage: percentage || "N/A",
+            exercise: "Vocab Review",
+            timestamp: new Date().toISOString(),
+            questions: (resultData.questionSet?.questions || []).map((q, i) => ({
+                number: i + 1,
+                definition: q.Definition,
+                studentAnswer: resultData.answers?.[i] || "",
+                correctAnswer: resultData.questionSet?.answers?.[i] || "",
+                isCorrect: !!(resultData.answers?.[i] && 
+                            resultData.answers[i].toLowerCase() === (resultData.questionSet?.answers?.[i] || "").toLowerCase())
+            })),
+            termsToReview: resultData.termsToReview || []
+        };
 
-        const canvas = await html2canvas(document.body, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: 'rgb(45, 70, 119)'
-        });
+        const jsonString = JSON.stringify(fullResultData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        
+        const safeName = fullResultData.student.replace(/[^a-zA-Z0-9]/g, '_');
+        const fileName = `Vocabulary_Results_${safeName}_${fullResultData.date}.json`;
 
-        // Add logo back
-        const logoImg = new Image();
-        logoImg.crossOrigin = 'anonymous';
-        logoImg.src = '../icons/Full Logo White on Transparent.png';
+        const file = new File([blob], fileName, { type: 'application/json' });
 
-        await new Promise(resolve => {
-            logoImg.onload = () => {
-                const ctx = canvas.getContext('2d');
-                const logoWidth = canvas.width * 0.25;
-                const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
-                ctx.drawImage(logoImg, canvas.width - logoWidth - 100, canvas.height - logoHeight - 100, logoWidth, logoHeight);
-                resolve();
-            };
-            logoImg.onerror = resolve;
-        });
-
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-
-        // Restore UI
-        tempHide.forEach(el => { if (el) el.style.display = ''; });
-        if (copyPngBtn) copyPngBtn.style.visibility = 'visible';
-
-        const fileName = `Vocabulary_Results_${resultData.student || resultData.s}_${resultData.date || resultData.d}.png`;
-        const file = new File([blob], fileName, { type: 'image/png' });
-
+        // Try Web Share first (same pattern as your old PNG)
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-                files: [file],
-                title: `Vocabulary Results - ${resultData.student || resultData.s}`,
-                text: `Score: ${resultData.p || 'N/A'}%`
-            });
-        } else {
-            // Fallback download
-            const url = URL.createObjectURL(blob);
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: `Vocabulary Results - ${fullResultData.student}`,
+                    text: `Score: ${percentage}%`
+                });
+                return; // Success
+            } catch (shareErr) {
+                if (shareErr.name === 'AbortError') return; // User cancelled
+                console.warn('Web Share failed, falling back to download:', shareErr);
+            }
+        }
+
+        // Fallback: Direct download (this is what most users will actually get)
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+    } catch (err) {
+        console.error('Share failed:', err);
+        
+        // Final safety net download
+        try {
+            const fallbackBlob = new Blob([JSON.stringify(resultData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(fallbackBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = fileName;
+            a.download = `Vocabulary_Results_${(resultData.student || 'Unknown').replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        }
-    } catch (err) {
-        console.error('Share failed:', err);
-        if (err.name !== 'AbortError') {
-            alert('Sharing failed. Please use the "Copy Results" button instead.');
+        } catch (e) {
+            alert('Failed to share or download results.');
         }
     }
 }
