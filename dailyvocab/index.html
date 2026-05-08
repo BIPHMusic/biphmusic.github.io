@@ -928,7 +928,7 @@ function displayResults(resultData, isUrlView = false) {
 
 async function shareResultsAsJSON(resultData) {
     try {
-        // Calculate percentage reliably
+        // Build the data
         let percentage = resultData.percentage;
         if (!percentage && resultData.questionSet && resultData.answers) {
             const correctCount = resultData.answers.filter((ans, i) => 
@@ -958,52 +958,26 @@ async function shareResultsAsJSON(resultData) {
         const jsonString = JSON.stringify(fullResultData, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json' });
         
-        const safeName = fullResultData.student.replace(/[^a-zA-Z0-9]/g, '_');
+        const safeName = (fullResultData.student || "Student").replace(/[^a-zA-Z0-9]/g, '_');
         const fileName = `Vocabulary_Results_${safeName}_${fullResultData.date}.json`;
 
         const file = new File([blob], fileName, { type: 'application/json' });
 
-        // Try Web Share first (same pattern as your old PNG)
+        // Exact same pattern as your working PNG function
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({
-                    files: [file],
-                    title: `Vocabulary Results - ${fullResultData.student}`,
-                    text: `Score: ${percentage}%`
-                });
-                return; // Success
-            } catch (shareErr) {
-                if (shareErr.name === 'AbortError') return; // User cancelled
-                console.warn('Web Share failed, falling back to download:', shareErr);
-            }
+            await navigator.share({
+                files: [file],
+                title: `Vocabulary Results - ${fullResultData.student}`,
+                text: `Score: ${percentage}%`
+            });
+        } else {
+            alert("AirDrop / File sharing is not supported in this browser.\n\nPlease use the QR code or screenshot instead.");
         }
-
-        // Fallback: Direct download (this is what most users will actually get)
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
     } catch (err) {
         console.error('Share failed:', err);
         
-        // Final safety net download
-        try {
-            const fallbackBlob = new Blob([JSON.stringify(resultData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(fallbackBlob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Vocabulary_Results_${(resultData.student || 'Unknown').replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        } catch (e) {
-            alert('Failed to share or download results.');
+        if (err.name !== 'AbortError') {
+            alert('AirDrop sharing failed.');
         }
     }
 }
