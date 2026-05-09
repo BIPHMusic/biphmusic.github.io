@@ -199,5 +199,108 @@ const records = [
       "Tendency Tones",
       "Whole Tone Scale"
     ]
+  },
+  {
+    "student": "Jim",
+    "date": "2026-05-08",
+    "time": "11:43 PM",
+    "percentage": 15,
+    "exercise": "Ear Training",
+    "termsToReview": [
+      "Major 2nd",
+      "Major 3rd",
+      "Major 6th",
+      "Minor 2nd",
+      "Major Triad",
+      "Major Triad",
+      "Major Triad",
+      "Augmented Triad",
+      "Augmented Triad",
+      "Dominant 7",
+      "Minor 7",
+      "Major 7",
+      "Half-Diminished 7",
+      "Phrygian",
+      "Mixolydian",
+      "Ionian",
+      "Locrian"
+    ]
+  },
+  {
+    "student": "Jim",
+    "date": "2026-05-08",
+    "time": "11:43 PM",
+    "percentage": 15,
+    "exercise": "Ear Training",
+    "termsToReview": [
+      "Major 2nd",
+      "Major 3rd",
+      "Major 6th",
+      "Minor 2nd",
+      "Major Triad",
+      "Major Triad",
+      "Major Triad",
+      "Augmented Triad",
+      "Augmented Triad",
+      "Dominant 7",
+      "Minor 7",
+      "Major 7",
+      "Half-Diminished 7",
+      "Phrygian",
+      "Mixolydian",
+      "Ionian",
+      "Locrian"
+    ]
+  },
+  {
+    "student": "Jimmy",
+    "date": "2026-05-08",
+    "time": "11:44 PM",
+    "percentage": 20,
+    "exercise": "Ear Training",
+    "termsToReview": [
+      "Perfect 5th",
+      "Major 3rd",
+      "Major 2nd",
+      "Major 6th",
+      "Major 6th",
+      "Minor Triad",
+      "Augmented Triad",
+      "Augmented Triad",
+      "Major Triad",
+      "Half-Diminished 7",
+      "Major 7",
+      "Half-Diminished 7",
+      "Mixolydian",
+      "Dorian",
+      "Aeolian",
+      "Phrygian"
+    ]
+  },
+  {
+    "student": "Jimmy",
+    "date": "2026-05-08",
+    "time": "11:48 PM",
+    "percentage": 15,
+    "exercise": "Ear Training",
+    "termsToReview": [
+      "Minor 7th",
+      "Major 2nd",
+      "Major 6th",
+      "Minor 2nd",
+      "Major Triad",
+      "Diminished Triad",
+      "Minor Triad",
+      "Augmented Triad",
+      "Augmented Triad",
+      "Dominant 7",
+      "Major 7",
+      "Diminished 7",
+      "Diminished 7",
+      "Aeolian",
+      "Aeolian",
+      "Lydian",
+      "Phrygian"
+    ]
   }
 ];

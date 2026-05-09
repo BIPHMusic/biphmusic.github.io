@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="common-styles.css">
     <link rel="preload" href="fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <script src="apstudents.js"></script>
+    <script src="login-screen.js"></script>
     <style>
         /* SHARED STYLES */
         /* Loaded from common-styles.css - Do not duplicate/edit: */
@@ -175,31 +176,7 @@
     </style>
 </head>
 <body>
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen">
-        <div class="login-box">
-            <h1 class="Title">BIPH</h1>
-            <h1 class="Subtitle">AP Music Theory</h1>
-            <h2>Enter your name to begin</h2>
-            
-            <input 
-                type="text" 
-                id="name-input" 
-                placeholder="Your name" 
-                autofocus
-                autocomplete="off"
-                autocorrect="off"
-                autocapitalize="off"
-                spellcheck="false"
-            >
-            
-            <button onclick="handleLogin()">Begin</button>
-            <div id="error-message" class="error"></div>
-        </div>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main-content" style="display: none;">
+   <div id="main-content" style="display: none;">
         <div id="shared-menu"></div>
         <script src="menu.js"></script>
         <script src="mymenu.js"></script>
@@ -233,97 +210,6 @@
     </div>
 
     <script>
-        // Name utilities
-        function normalizeName(name) {
-            return name.trim().toLowerCase();
-        }
-
-        function findStudent(inputName) {
-            const lowerInput = normalizeName(inputName);
-            return apStudents.find(student => 
-                normalizeName(student.name) === lowerInput || 
-                normalizeName(student.altName) === lowerInput
-            );
-        }
-
-        function capitalizeName(name) {
-            return name.trim().split(' ').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            ).join(' ');
-        }
-
-        function getStoredName() {
-            const name = localStorage.getItem('biph_student_name');
-            const timestamp = localStorage.getItem('biph_name_timestamp');
-            if (!name || !timestamp) return null;
-            if (Date.now() - parseInt(timestamp) > 60 * 60 * 1000) {
-                localStorage.removeItem('biph_student_name');
-                localStorage.removeItem('biph_name_timestamp');
-                return null;
-            }
-            return name;
-        }
-
-        function storeName(name) {
-            localStorage.setItem('biph_student_name', name);
-            localStorage.setItem('biph_name_timestamp', Date.now().toString());
-        }
-
-        // Login Handler
-        function handleLogin() {
-            const input = document.getElementById('name-input');
-            const error = document.getElementById('error-message');
-            const rawName = input.value.trim();
-
-            if (!rawName) {
-                error.textContent = "Please enter your first name";
-                return;
-            }
-
-            const student = findStudent(rawName);
-            if (!student) {
-                error.innerHTML = "Name not recognized.<br>(First name only)";
-                input.value = "";
-                return;
-            }
-
-            const displayName = capitalizeName(student.name);
-            storeName(displayName);
-            showMainContent(displayName);
-        }
-
-        // Enter key support
-        document.getElementById('name-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') handleLogin();
-        });
-
-        function showMainContent(displayName) {
-            const loginScreen = document.getElementById('login-screen');
-            loginScreen.style.opacity = '0';
-
-            setTimeout(() => {
-                loginScreen.style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-
-                const banner = document.getElementById('banner-section');
-                const logo = document.getElementById('logo-section');
-                const datesTitle = document.getElementById('dates-title');
-                const mockExam = document.getElementById('mock-exam');
-                const apExam = document.getElementById('ap-exam');
-                const dailyBtn = document.getElementById('daily-btn');
-
-                setTimeout(() => { banner.classList.add('visible'); logo.classList.add('visible'); }, 100);
-                setTimeout(() => datesTitle.classList.add('visible'), 600);
-                setTimeout(() => mockExam.classList.add('visible'), 900);
-                setTimeout(() => apExam.classList.add('visible'), 1200);
-                setTimeout(() => dailyBtn.classList.add('visible'), 1600);
-
-                document.getElementById('banner-text').innerHTML = getGreeting(displayName);
-
-                if (typeof initMyMenu === 'function') initMyMenu(false);
-            }, 600);
-        }
-
         function getGreeting(displayName = "") {
             const now = new Date();
             const hours = now.getHours();
@@ -340,37 +226,50 @@
                     <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
         }
 
-function startDailyExercises() {
-    const urls = [
-        "https://biphmusic.github.io/dailysightsinging/",
-        "https://biphmusic.github.io/dailymcqs/",
-        "https://biphmusic.github.io/eartraining/",
-        "https://biphmusic.github.io/dailyvocab/"
-    ];
+        // This function is called after successful login (from login-screen.js)
+        window.onSuccessfulLogin = function(displayName) {
+            const banner = document.getElementById('banner-section');
+            const logo = document.getElementById('logo-section');
+            const datesTitle = document.getElementById('dates-title');
+            const mockExam = document.getElementById('mock-exam');
+            const apExam = document.getElementById('ap-exam');
+            const dailyBtn = document.getElementById('daily-btn');
 
-    window.location.href = urls[0];
+            setTimeout(() => { banner.classList.add('visible'); logo.classList.add('visible'); }, 100);
+            setTimeout(() => datesTitle.classList.add('visible'), 600);
+            setTimeout(() => mockExam.classList.add('visible'), 900);
+            setTimeout(() => apExam.classList.add('visible'), 1200);
+            setTimeout(() => dailyBtn.classList.add('visible'), 1600);
 
-    setTimeout(() => {
-        urls.slice(1).forEach(url => {
-            const win = window.open(url, '_blank', 'noopener,noreferrer');
-            if (win) {
-                win.blur();
-                setTimeout(() => window.focus(), 50);
-            }
-        });
-    }, 150);
-}
+            document.getElementById('banner-text').innerHTML = getGreeting(displayName);
 
-        // Auto-login
+            if (typeof initMyMenu === 'function') initMyMenu(false);
+        };
+
+        function startDailyExercises() {
+            const urls = [
+                "https://biphmusic.github.io/dailysightsinging/",
+                "https://biphmusic.github.io/dailymcqs/",
+                "https://biphmusic.github.io/eartraining/",
+                "https://biphmusic.github.io/dailyvocab/"
+            ];
+
+            window.location.href = urls[0];
+
+            setTimeout(() => {
+                urls.slice(1).forEach(url => {
+                    const win = window.open(url, '_blank', 'noopener,noreferrer');
+                    if (win) {
+                        win.blur();
+                        setTimeout(() => window.focus(), 50);
+                    }
+                });
+            }, 150);
+        }
+
+        // Initialize
         window.onload = () => {
-            const stored = getStoredName();
-            if (stored) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-                showMainContent(stored);
-            } else {
-                if (typeof initMyMenu === 'function') initMyMenu(true);
-            }
+            initLogin();        // Only this line needed for login
         };
     </script>
 </body>

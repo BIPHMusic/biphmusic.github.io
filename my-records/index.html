@@ -6,64 +6,41 @@
     <title>BIPH Music - My Records</title>
     <link rel="icon" href="../icons/bg-icon.png">
     <link rel="stylesheet" href="../common-styles.css">
-    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../records.js"></script>
     <script src="../apstudents.js"></script>
     <script src="../mymenu.js"></script>
 
     <style>
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .tab {
-            padding: 10px 20px;
-            background-color: #ddd;
-            border: 1px solid #757575;
-            cursor: pointer;
-            transition: background-color 0.1s;
-        }
-        .tab:first-child { border-top-left-radius: 5px; border-bottom-left-radius: 5px; }
-        .tab:last-child { border-top-right-radius: 5px; border-bottom-right-radius: 5px; }
-        .tab.active { background-color: #4CAF50; color: white; }
-
+        .container { max-width: 920px; margin: 0 auto; }
         #chart-container {
             position: relative;
-            height: 480px;
-            background-color: white;
-            border-radius: 10px;
+            height: 500px;
+            background: white;
+            border-radius: 12px;
             padding: 20px;
             margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-
         #chart-title {
             text-align: center;
-            font-size: 20px;
+            font-size: 21px;
             font-weight: bold;
             margin-bottom: 12px;
-            color: #333;
+            color: #222;
         }
-
         .default-tooltip, .lock-tooltip {
             position: absolute;
-            background-color: rgba(255, 255, 255, 0.95);
-            border: 2px solid #4CAF50;
-            color: #333;
-            padding: 6px 10px;
-            border-radius: 6px;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.97);
+            border: 3px solid #4CAF50;
+            padding: 10px 14px;
+            border-radius: 8px;
             font-size: 15px;
-            z-index: 1000;
-            white-space: nowrap;
+            font-weight: 600;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            z-index: 10000;
+            min-width: 160px;
         }
     </style>
 </head>
@@ -81,14 +58,14 @@
     <div class="container">
         <div id="chart-container">
             <div id="chart-title">My Progress</div>
-            <div style="position: relative; height: calc(100% - 50px);">
+            <div style="position:relative; height: calc(100% - 60px);">
                 <canvas id="progressChart"></canvas>
             </div>
         </div>
     </div>
 
     <div class="logocontainer">        
-        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+        <img src="../icons/Full Logo White on Transparent.png" alt="Logo" class="logo">
     </div>
 
     <div id="default-tooltip" class="default-tooltip"></div>
@@ -97,101 +74,121 @@
     <script>
         let chart;
         let lockedDatasetIndex = null;
-        let lastTooltipX = 0;
-        let lastTooltipY = 0;
-        let animationFrameId = null;
 
-        const currentStudentName = localStorage.getItem('biph_student_name');
-
-        if (!currentStudentName) {
-            alert("Please sign in to view your records.");
-            window.location.href = "../index.html"; // or wherever your login page is
+        const currentStudent = localStorage.getItem('biph_student_name');
+        if (!currentStudent) {
+            alert("Please sign in first.");
+            window.location.href = "../index.html";
+            throw new Error("No student signed in");
         }
 
-        // Find student data
-        const studentData = records.find(r => r.student.toLowerCase() === currentStudentName.toLowerCase());
+        // Filter records for current student
+        const myRecords = records.filter(r => 
+            r.student.toLowerCase() === currentStudent.toLowerCase()
+        );
 
-        if (!studentData) {
-            document.getElementById('chart-title').innerHTML = `No data found for <strong>${currentStudentName}</strong>`;
-        }
+        const exerciseMap = {
+            "Vocab":        { label: "Vocab",        color: "#36A2EB" },
+            "Sight Singing":{ label: "Sight Singing",color: "#FF6384" },
+            "MCQs":         { label: "MCQs",         color: "#FFCE56" },
+            "Ear Training": { label: "Ear Training", color: "#4BC0C0" }
+        };
 
-        const exercises = [
-            { key: "sightSinging", label: "Sight Singing", color: "#FF6384" },
-            { key: "vocab",       label: "Vocab",        color: "#36A2EB" },
-            { key: "mcqs",        label: "MCQs",         color: "#FFCE56" },
-            { key: "earTraining", label: "Ear Training", color: "#4BC0C0" }
-        ];
-
-        function calculateComposite(dataArrays) {
-            const maxLen = Math.max(...dataArrays.map(arr => arr.length));
-            return Array.from({length: maxLen}, (_, i) => {
-                let sum = 0, count = 0;
-                dataArrays.forEach(arr => {
-                    if (arr[i] !== undefined) {
-                        sum += arr[i];
-                        count++;
-                    }
+        function groupAndSortData() {
+            const grouped = {};
+            myRecords.forEach(record => {
+                const ex = record.exercise;
+                if (!grouped[ex]) grouped[ex] = [];
+                grouped[ex].push({
+                    percentage: record.percentage,
+                    date: record.date,
+                    time: record.time,
+                    exercise: ex
                 });
-                return count ? (sum / count) * 100 : null;
             });
+
+            // Sort each exercise chronologically
+            Object.keys(grouped).forEach(ex => {
+                grouped[ex].sort((a, b) => {
+                    if (a.date !== b.date) return a.date.localeCompare(b.date);
+                    return a.time.localeCompare(b.time);
+                });
+            });
+
+            return grouped;
         }
 
         function createChart() {
-            if (!studentData) return;
-
+            const grouped = groupAndSortData();
             const ctx = document.getElementById('progressChart').getContext('2d');
 
-            const datasets = exercises.map((ex, idx) => ({
-                label: ex.label,
-                data: studentData[ex.key] ? studentData[ex.key].map(v => v * 100) : [],
-                borderColor: ex.color,
-                backgroundColor: 'transparent',
-                borderWidth: 3,
-                tension: 0.2,
-                pointRadius: 3,
-                pointHoverRadius: 7
-            }));
+            const datasets = [];
+
+            Object.keys(exerciseMap).forEach(exKey => {
+                const dataPoints = grouped[exKey] || [];
+                if (dataPoints.length > 0) {
+                    datasets.push({
+                        label: exerciseMap[exKey].label,
+                        data: dataPoints.map(item => item.percentage),
+                        borderColor: exerciseMap[exKey].color,
+                        borderWidth: 3,
+                        tension: 0.25,
+                        pointRadius: 4,
+                        pointHoverRadius: 8,
+                        // Store metadata for tooltip
+                        meta: dataPoints
+                    });
+                }
+            });
 
             // Composite
-            const allExerciseData = exercises.map(ex => studentData[ex.key] || []);
-            const compositeData = calculateComposite(allExerciseData);
+            const maxAttempts = Math.max(...Object.values(grouped).map(arr => arr.length), 1);
+            const compositeData = [];
+            for (let i = 0; i < maxAttempts; i++) {
+                let sum = 0, count = 0;
+                Object.values(grouped).forEach(arr => {
+                    if (arr[i]) {
+                        sum += arr[i].percentage;
+                        count++;
+                    }
+                });
+                compositeData.push(count ? Math.round(sum / count) : null);
+            }
 
             datasets.unshift({
                 label: "Composite",
                 data: compositeData,
                 borderColor: "#2E7D32",
-                backgroundColor: "rgba(46, 125, 50, 0.1)",
-                borderWidth: 4,
-                borderDash: [2, 2],
-                tension: 0.1,
-                pointRadius: 4,
-                pointHoverRadius: 8
+                borderWidth: 4.5,
+                borderDash: [3, 2],
+                tension: 0.2,
+                pointRadius: 5,
+                pointHoverRadius: 9,
+                meta: null // Composite doesn't have single record
             });
+
+            // Set initial title
+            document.getElementById('chart-title').textContent = `My Progress — ${currentStudent}`;
 
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: Array.from({length: Math.max(...datasets.map(d => d.data.length))}, (_, i) => `Attempt ${i + 1}`),
+                    labels: Array.from({length: maxAttempts}, (_, i) => `Attempt ${i+1}`),
                     datasets: datasets
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: true, max: 100, title: { display: true, text: 'Score (%)' } }
+                        y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } }
                     },
-                    interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        legend: { position: 'top', align: 'start' },
+                        legend: { position: 'top' },
                         tooltip: { enabled: false, external: customTooltip }
                     },
-                    onClick: (event, elements) => {
-                        if (elements.length > 0) {
-                            const idx = elements[0].datasetIndex;
-                            toggleLockMode(idx);
-                        } else if (lockedDatasetIndex !== null) {
-                            disableLockMode();
-                        }
+                    onClick: (evt, elements) => {
+                        if (elements.length) toggleLockMode(elements[0].datasetIndex);
+                        else if (lockedDatasetIndex !== null) disableLockMode();
                     }
                 }
             });
@@ -206,55 +203,67 @@
             lockedDatasetIndex = index;
             document.getElementById('chart-title').textContent = chart.data.datasets[index].label;
             chart.data.datasets.forEach((ds, i) => {
-                if (i === index) {
-                    ds.borderWidth = 5;
-                    ds.borderColor = exercises[i-1] ? exercises[i-1].color : "#2E7D32";
-                } else {
-                    ds.borderWidth = 1;
-                    ds.borderColor = "rgba(200,200,200,0.3)";
-                }
+                ds.borderWidth = (i === index) ? 5 : 1.5;
+                ds.borderColor = (i === index) 
+                    ? ds.borderColor 
+                    : "rgba(180,180,180,0.4)";
             });
             chart.update();
         }
 
         function disableLockMode() {
             lockedDatasetIndex = null;
-            document.getElementById('chart-title').textContent = "My Progress";
-            chart.data.datasets.forEach((ds, i) => {
-                if (i === 0) { // composite
-                    ds.borderWidth = 4;
-                    ds.borderColor = "#2E7D32";
-                } else {
-                    ds.borderWidth = 3;
-                    ds.borderColor = exercises[i-1].color;
-                }
+            document.getElementById('chart-title').textContent = `My Progress — ${currentStudent}`;
+            chart.data.datasets.forEach(ds => {
+                if (ds.label === "Composite") ds.borderWidth = 4.5;
+                else ds.borderWidth = 3;
             });
             chart.update();
         }
 
-        function customTooltip(context) {
-            // (Same smooth tooltip logic as your original, simplified)
+        function customTooltip(ctx) {
             const tooltipEl = lockedDatasetIndex === null 
                 ? document.getElementById('default-tooltip')
                 : document.getElementById('lock-tooltip');
 
-            if (context.tooltip.opacity === 0) {
+            if (ctx.tooltip.opacity === 0) {
                 tooltipEl.style.opacity = 0;
                 return;
             }
 
-            const value = context.tooltip.dataPoints[0].formattedValue;
-            tooltipEl.innerHTML = `${value}%`;
+            const dataPoint = ctx.tooltip.dataPoints[0];
+            const dataset = chart.data.datasets[dataPoint.datasetIndex];
+            const index = dataPoint.dataIndex;
+
+            let html = `<strong>${dataset.label}</strong><br>`;
+
+            if (dataset.meta && dataset.meta[index]) {
+                const record = dataset.meta[index];
+                html += `
+                    ${record.date} &nbsp; ${record.time}<br>
+                    <strong>${record.percentage}%</strong>
+                `;
+            } else {
+                // Composite
+                html += `<strong>${dataPoint.formattedValue}%</strong>`;
+            }
+
+            tooltipEl.innerHTML = html;
             tooltipEl.style.opacity = 1;
 
-            const chartRect = context.chart.canvas.getBoundingClientRect();
-            tooltipEl.style.left = `${chartRect.left + context.tooltip.caretX + 15}px`;
-            tooltipEl.style.top = `${chartRect.top + context.tooltip.caretY - 30}px`;
+            const rect = ctx.chart.canvas.getBoundingClientRect();
+            tooltipEl.style.left = `${rect.left + ctx.tooltip.caretX + 20}px`;
+            tooltipEl.style.top  = `${rect.top + ctx.tooltip.caretY - 40}px`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             initMyMenu();
-            createChart();
+            if (myRecords.length > 0) {
+                createChart();
+            } else {
+                document.getElementById('chart-title').innerHTML = 
+                    `No records found for <b>${currentStudent}</b>`;
+            }
         });
     </script>
 </body>
