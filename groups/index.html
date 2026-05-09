@@ -7,11 +7,8 @@
     <link rel="icon" href="../icons/bg-icon.png">
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <script src="../apstudents.js"></script>
     <style>
-        /* SHARED STYLES */
-        /* Loaded from common-styles.css - Do not duplicate/edit: */
-        /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
-
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
@@ -35,20 +32,31 @@
             color: white;
         }
 
-        button:not(.menu-toggle) {
-            font-size: 2em;
+        .controls button {
             background-color: rgba(255, 255, 255, 0.1);
             border: none;
-            padding: 10px 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            font-size: 2em;
+            padding: 10.4px 24px;
+            color: white;
+        }
+
+        .controls button:hover, .shuffle-btn:hover, .edit-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .shuffle-btn, .edit-btn {
+            font-size: 1.8em;
+            border-radius: 50px;
+            padding: 10px 14px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
             cursor: pointer;
             transition: all 0.3s;
             color: white;
         }
 
-        button:not(.menu-toggle):hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        
         .groups {
             position: relative;
             top: 15px;
@@ -98,24 +106,110 @@
         }
 
         @keyframes sheenAnimation {
-            0% { 
-                background-position: 0% 50%; 
-                opacity: 0.5; 
-            }
-            50% { 
-                background-position: 100% 50%; 
-                opacity: 1; 
-            }
-            100% { 
-                background-position: 0% 50%; 
-                opacity: 0;
-            }
+            0% { background-position: 0% 50%; opacity: 0.5; }
+            50% { background-position: 100% 50%; opacity: 1; }
+            100% { background-position: 0% 50%; opacity: 0; }
         }
+
+        /* Sleek Edit Modal */
+        #editPanel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            padding: 25px 30px;
+            width: 92%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        #editPanel h3 {
+            margin: 0 0 20px 0;
+            text-align: center;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .student-list {
+            max-height: 58vh;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .student-item:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .remove-btn {
+            background: rgba(255, 70, 70, 0.524);
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: rgba(255, 70, 70, 0.828);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 14px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            border: none;
+            background: rgba(255, 255, 255, 0.135);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-buttons button:hover{
+           background: rgba(255, 255, 255, 0.404); 
+        }
+
+        
     </style>
 </head>
 <body>
     <div id="shared-menu"></div>
     <script src="../menu.js"></script> 
+
+    <!-- Edit Button -->
+    <button onclick="toggleEditPanel()" class="edit-btn"
+            style="position: fixed; top: 70px; left: 20px; font-size: 1.4em; z-index: 999;">
+        ✏️
+    </button>
+
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
@@ -128,46 +222,29 @@
         <div class="group-display" id="groupDisplay">3~4 students</div>
         <button onclick="increment()">+</button>
     </div>
-    <button onclick="shuffleStudents()">🔀</button>
+    
+    <button onclick="shuffleStudents()" class="shuffle-btn">🔀</button>
+
     <div class="groups"></div>
+
+    <!-- Sleek Edit Panel -->
+    <div id="editPanel">
+        <h3>Edit Roster</h3>
+        <div class="student-list" id="studentList"></div>
+        
+        <div class="modal-buttons">
+            <button onclick="toggleEditPanel()">Done</button>
+            <button onclick="resetToFullRoster()">Reset Full Roster</button>
+        </div>
+    </div>
+
     <audio id="chime" src="audio/barchimes.mp3"></audio>
     <div class="logocontainer">        
         <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
 
-      <!--FULL CLASS LIST
-'Ben', 
-'Howard',
-'Terry', 
-'Alice',
-'Vincent', 
-'Chris', 
-'Lucy',
-'Diego', 
-'Hailey', 
-'Eileen', 
-'Angelina',
-'Serena', 
-'Catherine', 
-'Jennifer'
-            -->
     <script>
-        const students = [
-'Ben', 
-'Howard',
-'Terry', 
-'Alice',
-'Vincent', 
-'Chris', 
-'Lucy',
-'Diego', 
-'Hailey', 
-'Eileen', 
-'Angelina',
-'Serena', 
-'Catherine', 
-'Jennifer'
-        ];
+        let currentStudents = [];
 
         const groupOptions = [
             { text: "Partners", size: 2 },
@@ -175,7 +252,7 @@
             { text: "4~5 students", size: 4 },
             { text: "7 students", size: 7 }
         ];
-        let currentIndex = 1; // Start at "3~4 students"
+        let currentIndex = 1;
 
         function updateDisplay() {
             document.getElementById('groupDisplay').textContent = groupOptions[currentIndex].text;
@@ -200,101 +277,136 @@
             groupsContainer.innerHTML = '';
 
             const groupSize = groupOptions[currentIndex].size;
-            const shuffledStudents = students.slice().sort(() => Math.random() - 0.5);
+            const shuffled = currentStudents.slice().sort(() => Math.random() - 0.5);
 
-            const totalStudents = shuffledStudents.length;
+            const totalStudents = shuffled.length;
             const idealNumGroups = Math.floor(totalStudents / groupSize);
-            const remainingStudents = totalStudents % groupSize;
+            const remaining = totalStudents % groupSize;
+
             playChime();
 
-            // Create the groups
             for (let i = 0; i < idealNumGroups; i++) {
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'group';
-
-                // Create sheen element
-                const sheenDiv = document.createElement('div');
-                sheenDiv.className = 'sheen';
-                groupDiv.appendChild(sheenDiv);
-
-                // Distribute students into ideal groups
+                const groupDiv = createGroupElement();
                 for (let j = 0; j < groupSize; j++) {
-                    const studentIndex = i * groupSize + j;
-                    if (studentIndex < totalStudents) {
-                        const studentDiv = document.createElement('div');
-                        studentDiv.className = 'student';
-                        studentDiv.textContent = shuffledStudents[studentIndex];
-                        groupDiv.appendChild(studentDiv);
+                    const idx = i * groupSize + j;
+                    if (idx < totalStudents) {
+                        addStudentToGroup(groupDiv, shuffled[idx].name);
                     }
                 }
-
                 groupsContainer.appendChild(groupDiv);
             }
 
-            // Distribute remaining students
-            for (let i = 0; i < remainingStudents; i++) {
-                const groupIndex = Math.floor(i % idealNumGroups);
+            for (let i = 0; i < remaining; i++) {
+                const groupIndex = i % idealNumGroups;
                 const studentDiv = document.createElement('div');
                 studentDiv.className = 'student';
-                studentDiv.textContent = shuffledStudents[idealNumGroups * groupSize + i];
+                studentDiv.textContent = shuffled[idealNumGroups * groupSize + i].name;
                 groupsContainer.children[groupIndex].appendChild(studentDiv);
             }
         }
 
-        function playChime() {
-            const chimeAudio = new Audio('audio/barchimes.mp3');
-            chimeAudio.volume = 0.3;
-            chimeAudio.play();
+        function createGroupElement() {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'group';
+            const sheenDiv = document.createElement('div');
+            sheenDiv.className = 'sheen';
+            groupDiv.appendChild(sheenDiv);
+            return groupDiv;
         }
 
+        function addStudentToGroup(groupDiv, name) {
+            const studentDiv = document.createElement('div');
+            studentDiv.className = 'student';
+            studentDiv.textContent = name;
+            groupDiv.appendChild(studentDiv);
+        }
+
+        function playChime() {
+            const chime = new Audio('audio/barchimes.mp3');
+            chime.volume = 0.3;
+            chime.play().catch(() => {});
+        }
+
+        // ==================== EDIT PANEL ====================
+        function toggleEditPanel() {
+            const panel = document.getElementById('editPanel');
+            const list = document.getElementById('studentList');
+
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                list.innerHTML = '';
+                currentStudents.forEach((student, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'student-item';
+                    div.innerHTML = `
+                        <span>${student.name}</span>
+                        <button class="remove-btn" onclick="removeStudent(${index})">Remove</button>
+                    `;
+                    list.appendChild(div);
+                });
+                panel.style.display = 'block';
+            }
+        }
+
+        // Close modal on Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const panel = document.getElementById('editPanel');
+        if (panel.style.display === 'block') {
+            toggleEditPanel();
+        }
+    }
+});
+
+// Close modal when clicking outside
+document.addEventListener('click', function(event) {
+    const panel = document.getElementById('editPanel');
+    if (panel.style.display === 'block' && 
+        !panel.contains(event.target) && 
+        event.target.closest('.edit-btn') === null) {
+        toggleEditPanel();
+    }
+});
+
+        function removeStudent(index) {
+                currentStudents.splice(index, 1);
+                toggleEditPanel();
+                toggleEditPanel();
+        }
+
+        function resetToFullRoster() {
+                currentStudents = apStudents.slice();
+                toggleEditPanel();
+                toggleEditPanel();
+        }
+
+        // Keyboard Controls
         document.addEventListener('keydown', function(event) {
             switch (event.key) {
-                case 'ArrowLeft':
-                case 'ArrowDown':
-                case '-':
-                case '_':
-                    event.preventDefault();
-                    decrement();
-                    break;
-                case 'ArrowRight':
-                case 'ArrowUp':
-                case '=':
-                case '+':
-                    event.preventDefault();
-                    increment();
-                    break;
-                case ' ':
-                case 'Enter':
-                    event.preventDefault();
-                    shuffleStudents();
-                    break;
-                case '2':
-                    event.preventDefault();
-                    currentIndex = 0; // Partners
-                    updateDisplay();
-                    break;
-                case '3':
-                    event.preventDefault();
-                    currentIndex = 1; // 3~4 students
-                    updateDisplay();
-                    break;
-                case '4':
-                case '5': 
-                    event.preventDefault();
-                    currentIndex = 2; // 4~5 students
-                    updateDisplay();
-                    break;
-                    case '6': 
-                case '7':
-                    event.preventDefault();
-                    currentIndex = 3; // 7 students
-                    updateDisplay();
-                    break;
+                case 'ArrowLeft': case 'ArrowDown': case '-': case '_':
+                    event.preventDefault(); decrement(); break;
+                case 'ArrowRight': case 'ArrowUp': case '=': case '+':
+                    event.preventDefault(); increment(); break;
+                case ' ': case 'Enter':
+                    event.preventDefault(); shuffleStudents(); break;
+                case '2': currentIndex = 0; updateDisplay(); break;
+                case '3': currentIndex = 1; updateDisplay(); break;
+                case '4': case '5': currentIndex = 2; updateDisplay(); break;
+                case '6': case '7': currentIndex = 3; updateDisplay(); break;
             }
         });
 
-        // Initial display update
-        updateDisplay();
+        function init() {
+            if (typeof apStudents !== 'undefined' && apStudents.length > 0) {
+                currentStudents = apStudents.slice();
+            } else {
+                console.error("apStudents not found!");
+            }
+            updateDisplay();
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
