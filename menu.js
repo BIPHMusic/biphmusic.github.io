@@ -30,7 +30,7 @@
                 <a href="https://biphmusic.github.io/progresstracker">Progress Tracker</a>
                 <a href="https://biphmusic.github.io/authenticator">Authenticator</a>
                 <a href="http://biphmusic.github.io/sightreadingresults">Sight Reading Results</a>
-                <a href="https://biphmusic.github.io/studentdata">Student Data</a>
+                <a href="https://biphmusic.github.io/studentprogress">Student Progress</a>
                 <div class="menu-footer">© Garrison Tubbs 2026</div>
             </div>
         </div>

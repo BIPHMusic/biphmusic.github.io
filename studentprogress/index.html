@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Progress</title>
+    <link rel="icon" href="../icons/bg-icon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../apstudents.js"></script>
+    <script src="../records.js"></script>
+    <style>
+        /* SHARED STYLES */
+        /* Loaded from common-styles.css - Do not duplicate/edit: */
+        /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #ddd;
+            border: solid;
+            border-width: 1px;
+            border-color: #757575;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+        .tab:first-child {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+        .tab:last-child {
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        .tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #chart-container {
+            position: relative;
+            height: 430px; /* Increased height to accommodate title */
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        #chart-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        #chart-wrapper {
+            position: relative;
+            height: calc(100% - 30px); /* Subtract title height */
+        }
+
+        .default-tooltip, .lock-tooltip {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #4CAF50;
+            color: #333;
+            padding: 3px;
+            border-radius: 5px;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            opacity: 0;
+            transform: translateY(10px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        .lock-tooltip {
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 2px solid #4CAF50;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script> 
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">Student Progress</h1>
+
+    <div class="container">
+
+
+<div class="tabs">
+<button class="tab active" onclick="switchTab('vocabulary')">Vocab</button>
+<button class="tab" onclick="switchTab('earTraining')">Ear Training</button>
+<button class="tab" onclick="switchTab('sightSinging')">Sight Singing</button>
+<button class="tab" onclick="switchTab('mcq')">MCQs</button>
+</div>
+        <div id="chart-container">
+            <div id="chart-title">Class Average</div>
+            <div id="chart-wrapper">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </div>
+
+       
+    </div>
+
+    <div class="logocontainer">        
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+    </div>
+    
+ <script>
+// ==================== GLOBALS ====================
+let chart;
+let activeDataset = [];
+let fullNames = [];
+let lockedDatasetIndex = null;
+let allProcessedData = {};
+let lastTooltipX = 0;
+let lastTooltipY = 0;
+let animationFrameId = null;
+
+const colors = [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', 
+    '#FF9F40', '#4CAF50', '#E91E63', '#9C27B0', '#FF9800'
+];
+
+// ==================== DATA PROCESSING ====================
+function processAllData() {
+    const allStudents = apStudents.map(s => s.name);
+
+    const vocabMap = new Map();
+    const earMap = new Map();
+    const sightMap = new Map();
+    const mcqMap = new Map();
+
+    allStudents.forEach(student => {
+        vocabMap.set(student, []);
+        earMap.set(student, []);
+        sightMap.set(student, []);
+        mcqMap.set(student, []);
+    });
+
+    records.forEach(record => {
+        if (!record.student || !record.date || record.percentage == null) return;
+
+        const student = record.student.trim();
+        const percentage = parseFloat(record.percentage);
+        const date = record.date;
+        const time = record.time || "";
+
+        const entry = { 
+            percentage: percentage,
+            date: date,
+            time: time,
+            datetime: new Date(date + " " + (time || "00:00"))
+        };
+
+        const ex = (record.exercise || "").toLowerCase();
+
+        if (ex.includes("vocab")) vocabMap.get(student)?.push(entry);
+        else if (ex.includes("ear")) earMap.get(student)?.push(entry);
+        else if (ex.includes("sight") || ex.includes("singing")) sightMap.get(student)?.push(entry);
+        else if (ex.includes("mcq") || ex.includes("multiple")) mcqMap.get(student)?.push(entry);
+    });
+
+    const toChartFormat = (map) => {
+        return Array.from(map.entries()).map(([name, entries]) => {
+            entries.sort((a, b) => a.datetime - b.datetime);
+            return {
+                name: name,
+                data: entries.map(e => e.percentage / 100),
+                dates: entries.map(e => e.date),
+                times: entries.map(e => e.time)
+            };
+        });
+    };
+
+    return {
+        vocabularyData: toChartFormat(vocabMap),
+        earTrainingData: toChartFormat(earMap),
+        sightSingingData: toChartFormat(sightMap),
+        mcqData: toChartFormat(mcqMap)
+    };
+}
+
+// ==================== CHART CREATION ====================
+function createChart() {
+    allProcessedData = processAllData();
+    activeDataset = allProcessedData.vocabularyData || [];
+    fullNames = activeDataset.map(s => s.name);
+
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    const classAverage = calculateClassAverage(activeDataset);
+
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: activeDataset[0] ? 
+                Array.from({length: activeDataset[0].data.length}, (_, i) => `Attempt ${i+1}`) : [],
+            datasets: [
+                {
+                    label: 'Class Avg.',
+                    data: classAverage,
+                    borderColor: '#1e88e5',
+                    backgroundColor: 'rgba(30, 136, 229, 0.1)',
+                    borderWidth: 4,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    tension: 0.2
+                },
+                ...activeDataset.map((student, index) => ({
+                    label: student.name,
+                    data: student.data.map(v => v * 100),
+                    borderColor: colors[index % colors.length],
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 7,
+                    tension: 0.2
+                }))
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { 
+                    beginAtZero: true,
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20
+                    }
+                },
+                x: { 
+                    title: { display: true, text: 'Attempt Number' } 
+                }
+            },
+            interaction: { 
+                mode: 'nearest',
+                intersect: true
+            },
+            plugins: {
+                legend: {
+                    position: 'right',
+                    align: 'start',
+                    onHover: (event, legendItem) => {
+                        if (legendItem.datasetIndex > 0 && lockedDatasetIndex === null) 
+                            highlightDataset(legendItem.datasetIndex);
+                    },
+                    onLeave: () => { if (lockedDatasetIndex === null) resetHighlight(); },
+                    onClick: (e, legendItem) => {
+                        if (legendItem.datasetIndex === 0) return;
+                        toggleLockMode(legendItem.datasetIndex);
+                    }
+                },
+                tooltip: { 
+                    enabled: false, 
+                    external: customTooltip 
+                }
+            },
+            onClick: (event, elements) => {
+                if (lockedDatasetIndex !== null) disableLockMode();
+                else if (elements.length > 0 && elements[0].datasetIndex > 0) 
+                    toggleLockMode(elements[0].datasetIndex);
+            }
+        }
+    });
+
+    setDefaultState();
+}
+
+// ==================== LOCK / HIGHLIGHT / TABS / TOOLTIP (unchanged) ====================
+function calculateClassAverage(dataset) {
+    if (!dataset.length) return [];
+    const maxAttempts = Math.max(...dataset.map(s => s.data.length), 0);
+    const averages = [];
+    for (let i = 0; i < maxAttempts; i++) {
+        let sum = 0, count = 0;
+        dataset.forEach(student => {
+            if (i < student.data.length) {
+                sum += student.data[i] * 100;
+                count++;
+            }
+        });
+        averages.push(count > 0 ? Math.round((sum / count) * 10) / 10 : null);
+    }
+    return averages;
+}
+
+function toggleLockMode(index) { 
+    if (lockedDatasetIndex === index) disableLockMode();
+    else enableLockMode(index);
+}
+
+function enableLockMode(index) {
+    lockedDatasetIndex = index;
+    document.getElementById('chart-title').textContent = fullNames[index - 1] || "Student";
+
+    chart.data.datasets.forEach((dataset, i) => {
+        if (i === 0) {
+            dataset.borderWidth = 1; dataset.borderDash = [5, 5]; dataset.pointRadius = 0;
+            dataset.backgroundColor = 'transparent';
+        } else if (i === index) {
+            dataset.borderColor = colors[(i-1) % colors.length];
+            dataset.borderWidth = 3; dataset.pointRadius = 5;
+            chart.getDatasetMeta(i).hidden = false;
+        } else {
+            dataset.borderColor = 'rgba(200, 200, 200, 0.3)';
+            dataset.borderWidth = 1; dataset.pointRadius = 0;
+            chart.getDatasetMeta(i).hidden = true;
+        }
+    });
+    chart.update();
+}
+
+function disableLockMode() {
+    lockedDatasetIndex = null;
+    document.getElementById('chart-title').textContent = 'Class Average';
+
+    chart.data.datasets.forEach((dataset, i) => {
+        if (i === 0) {
+            dataset.borderWidth = 4; dataset.borderDash = [];
+            dataset.pointRadius = 5; dataset.backgroundColor = 'rgba(30, 136, 229, 0.1)';
+        } else {
+            dataset.borderColor = 'rgba(200, 200, 200, 0.5)';
+            dataset.borderWidth = 2; dataset.pointRadius = 3;
+            chart.getDatasetMeta(i).hidden = false;
+        }
+    });
+    chart.update();
+}
+
+function highlightDataset(index) {
+    if (lockedDatasetIndex !== null) return;
+    chart.data.datasets.forEach((dataset, i) => {
+        if (i === 0) {
+            dataset.borderWidth = 2; dataset.borderDash = [5, 5]; dataset.pointRadius = 0;
+        } else if (i === index) {
+            dataset.borderColor = colors[(i-1) % colors.length];
+            dataset.borderWidth = 3; chart.getDatasetMeta(i).hidden = false;
+        } else {
+            dataset.borderColor = 'rgba(200, 200, 200, 0.3)'; dataset.borderWidth = 1;
+        }
+    });
+    chart.update();
+}
+
+function resetHighlight() {
+    if (lockedDatasetIndex !== null) return;
+    chart.data.datasets.forEach((dataset, i) => {
+        if (i === 0) {
+            dataset.borderWidth = 4; dataset.borderDash = []; dataset.pointRadius = 5;
+        } else {
+            dataset.borderColor = 'rgba(200, 200, 200, 0.5)'; dataset.borderWidth = 2;
+        }
+    });
+    chart.update();
+}
+
+function setDefaultState() { disableLockMode(); }
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    if (tab === 'vocabulary') activeDataset = allProcessedData.vocabularyData || [];
+    else if (tab === 'earTraining') activeDataset = allProcessedData.earTrainingData || [];
+    else if (tab === 'sightSinging') activeDataset = allProcessedData.sightSingingData || [];
+    else if (tab === 'mcq') activeDataset = allProcessedData.mcqData || [];
+
+    fullNames = activeDataset.map(s => s.name);
+    updateChart();
+}
+
+function updateChart() {
+    if (!chart) return;
+    const classAverage = calculateClassAverage(activeDataset);
+    const maxAttempts = activeDataset[0] ? activeDataset[0].data.length : 0;
+
+    chart.data.labels = Array.from({length: maxAttempts}, (_, i) => `Attempt ${i+1}`);
+    chart.data.datasets[0].data = classAverage;
+
+    activeDataset.forEach((student, i) => {
+        const ds = chart.data.datasets[i + 1];
+        if (ds) ds.data = student.data.map(v => v * 100);
+    });
+
+    chart.update();
+}
+
+// ==================== TOOLTIP (locked to point) ====================
+function customTooltip(context) {
+    const defaultTooltip = document.getElementById('default-tooltip');
+    const lockTooltip = document.getElementById('lock-tooltip');
+    const {chart: chartInstance, tooltip: tooltipModel} = context;
+
+    if (tooltipModel.opacity === 0) { 
+        hideTooltip(); 
+        return; 
+    }
+
+    const activeTooltip = lockedDatasetIndex === null ? defaultTooltip : lockTooltip;
+    const inactiveTooltip = lockedDatasetIndex === null ? lockTooltip : defaultTooltip;
+
+    const dataPoint = tooltipModel.dataPoints[0];
+    const dataIndex = dataPoint.dataIndex;
+    const datasetIndex = dataPoint.datasetIndex;
+
+    let html = '';
+
+    if (lockedDatasetIndex !== null) {
+        const val = chartInstance.data.datasets[lockedDatasetIndex].data[dataIndex].toFixed(1);
+        const studentData = activeDataset[lockedDatasetIndex - 1];
+        html = `<b>${val}%</b><br>${studentData.dates[dataIndex] || ''}<br>${studentData.times[dataIndex] || ''}`;
+    } 
+    else if (datasetIndex === 0) {
+        const val = chartInstance.data.datasets[0].data[dataIndex].toFixed(1);
+        html = `Class Average<br><b>${val}%</b>`;
+    } 
+    else {
+        const val = chartInstance.data.datasets[datasetIndex].data[dataIndex].toFixed(1);
+        const studentName = chartInstance.data.datasets[datasetIndex].label;
+        html = `${studentName}<br><b>${val}%</b>`;
+    }
+
+    activeTooltip.innerHTML = html;
+
+    const rect = chartInstance.canvas.getBoundingClientRect();
+    let targetX = tooltipModel.caretX + rect.left;
+    let targetY = tooltipModel.caretY + rect.top - 35;
+
+    function animateTooltip() {
+        lastTooltipX += (targetX - lastTooltipX) * 0.4;
+        lastTooltipY += (targetY - lastTooltipY) * 0.4;
+        activeTooltip.style.left = `${lastTooltipX}px`;
+        activeTooltip.style.top = `${lastTooltipY}px`;
+        if (Math.abs(targetX - lastTooltipX) > 0.8 || Math.abs(targetY - lastTooltipY) > 0.8) {
+            animationFrameId = requestAnimationFrame(animateTooltip);
+        }
+    }
+
+    if (!animationFrameId) animationFrameId = requestAnimationFrame(animateTooltip);
+
+    activeTooltip.style.opacity = '1';
+    inactiveTooltip.style.opacity = '0';
+}
+
+function hideTooltip() {
+    document.getElementById('default-tooltip').style.opacity = '0';
+    document.getElementById('lock-tooltip').style.opacity = '0';
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+    createChart();
+});
+</script>
+
+<!-- Tooltips -->
+<div id="default-tooltip" class="default-tooltip"></div>
+<div id="lock-tooltip" class="lock-tooltip"></div>
+</body>
+</html>
