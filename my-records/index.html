@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script src="../apstudents.js"></script>
-    <script src="../records.js"></script>           <!-- ← Must be loaded -->
+    <script src="../records.js"></script> 
     <script src="../login-screen.js"></script>
     <script src="../mymenu.js"></script>
 
@@ -17,7 +17,7 @@
         .container { max-width: 920px; margin: 0 auto; }
         #chart-container {
             position: relative;
-            height: 500px;
+            height: 450px;
             background: white;
             border-radius: 12px;
             padding: 20px;
@@ -61,160 +61,183 @@
     </div>
 
     <script>
-        let chart;
-        let lockedDatasetIndex = null;
+    let chart;
+    let focusedIndex = null;   // null = all visible
 
-        function onSuccessfulLogin(displayName) {
-            document.getElementById('main-content').style.display = 'block';
-            
-            const currentStudent = localStorage.getItem('biph_student_name');
-            if (!currentStudent) return;
+    function onSuccessfulLogin(displayName) {
+        document.getElementById('main-content').style.display = 'block';
+       
+        const currentStudent = localStorage.getItem('biph_student_name');
+        if (!currentStudent) return;
 
-            // Filter records for current student
-            const myRecords = records.filter(r => 
-                r.student.toLowerCase() === currentStudent.toLowerCase()
-            );
+        const myRecords = records.filter(r =>
+            r.student.toLowerCase() === currentStudent.toLowerCase()
+        );
 
-            if (myRecords.length > 0) {
-                createChart(myRecords, currentStudent);
-            } else {
-                document.getElementById('chart-title').innerHTML = 
-                    `No records found for <b>${currentStudent}</b>`;
-            }
-
-            if (typeof initMyMenu === 'function') initMyMenu(false);
+        if (myRecords.length > 0) {
+            createChart(myRecords, currentStudent);
+        } else {
+            document.getElementById('chart-title').innerHTML = 
+                `No records found for <b>${currentStudent}</b>`;
         }
+        
+        if (typeof initMyMenu === 'function') initMyMenu(false);
+    }
 
-        // ====================== CHART FUNCTIONS ======================
-        function getExerciseColor(exercise) {
-            const map = {
-                "Vocab": "#36A2EB",
-                "Sight Singing": "#FF6384",
-                "MCQs": "#FFCE56",
-                "Ear Training": "#4BC0C0"
-            };
-            return map[exercise] || "#9966FF";
-        }
+    function getExerciseColor(exercise) {
+        const map = {
+            "Vocab": "#36A2EB",
+            "Sight Singing": "#FF6384",
+            "MCQs": "#FFCE56",
+            "Ear Training": "#4BC0C0"
+        };
+        return map[exercise] || "#9966FF";
+    }
 
-        function groupAndSortData(myRecords) {
-            const grouped = {};
-            myRecords.forEach(record => {
-                const ex = record.exercise;
-                if (!grouped[ex]) grouped[ex] = [];
-                grouped[ex].push(record);
+    function groupAndSortData(myRecords) {
+        const grouped = {};
+        myRecords.forEach(record => {
+            const ex = record.exercise;
+            if (!grouped[ex]) grouped[ex] = [];
+            grouped[ex].push(record);
+        });
+        
+        Object.keys(grouped).forEach(ex => {
+            grouped[ex].sort((a, b) => {
+                if (a.date !== b.date) return a.date.localeCompare(b.date);
+                return a.time.localeCompare(b.time);
             });
+        });
+        return grouped;
+    }
 
-            Object.keys(grouped).forEach(ex => {
-                grouped[ex].sort((a, b) => {
-                    if (a.date !== b.date) return a.date.localeCompare(b.date);
-                    return a.time.localeCompare(b.time);
-                });
+    function createChart(myRecords, currentStudent) {
+        const grouped = groupAndSortData(myRecords);
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        const datasets = [];
+
+        Object.keys(grouped).forEach((ex) => {
+            const dataPoints = grouped[ex];
+            datasets.push({
+                label: ex,
+                data: dataPoints.map(item => item.percentage),
+                borderColor: getExerciseColor(ex),
+                borderWidth: 3,
+                tension: 0.25,
+                pointRadius: 4,
+                pointHoverRadius: 8,
+                hidden: false
             });
+        });
 
-            return grouped;
-        }
+        const maxAttempts = Math.max(...Object.values(grouped).map(arr => arr.length), 1);
 
-        function createChart(myRecords, currentStudent) {
-            const grouped = groupAndSortData(myRecords);
-            const ctx = document.getElementById('progressChart').getContext('2d');
+        document.getElementById('chart-title').textContent = `My Progress — ${currentStudent}`;
 
-            const datasets = [];
-
-            Object.keys(grouped).forEach((ex) => {
-                const dataPoints = grouped[ex];
-                datasets.push({
-                    label: ex,
-                    data: dataPoints.map(item => item.percentage),
-                    borderColor: getExerciseColor(ex),
-                    borderWidth: 3,
-                    tension: 0.25,
-                    pointRadius: 4,
-                    pointHoverRadius: 8
-                });
-            });
-
-            // Composite average
-            const maxAttempts = Math.max(...Object.values(grouped).map(arr => arr.length), 1);
-            const compositeData = [];
-            for (let i = 0; i < maxAttempts; i++) {
-                let sum = 0, count = 0;
-                Object.values(grouped).forEach(arr => {
-                    if (arr[i]) {
-                        sum += arr[i].percentage;
-                        count++;
-                    }
-                });
-                compositeData.push(count ? Math.round(sum / count) : null);
-            }
-
-            datasets.unshift({
-                label: "Composite",
-                data: compositeData,
-                borderColor: "#2E7D32",
-                borderWidth: 4.5,
-                borderDash: [3, 2],
-                tension: 0.2,
-                pointRadius: 5,
-                pointHoverRadius: 9
-            });
-
-            document.getElementById('chart-title').textContent = `My Progress — ${currentStudent}`;
-
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array.from({length: maxAttempts}, (_, i) => `Attempt ${i+1}`),
-                    datasets: datasets
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: maxAttempts}, (_, i) => `Attempt ${i+1}`),
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 300,           // 0.3s transition
+                    easing: 'easeInOutQuart'
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } }
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 100, 
+                        ticks: { stepSize: 20 }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        onClick: (e, legendItem, legend) => {
+                            const index = legendItem.datasetIndex;
+                            toggleFocus(index);
+                        }
                     },
-                    plugins: {
-                        legend: { position: 'top' }
-                    },
-                    onClick: (evt, elements) => {
-                        if (elements.length) toggleLockMode(elements[0].datasetIndex);
-                        else if (lockedDatasetIndex !== null) disableLockMode();
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                label += context.parsed.y + '%';
+                                return label;
+                            }
+                        }
+                    }
+                },
+                onClick: (evt, elements) => {
+                    if (elements.length) {
+                        toggleFocus(elements[0].datasetIndex);
+                    } else {
+                        // Clicked on empty area → reset
+                        resetFocus();
                     }
                 }
-            });
-        }
+            }
+        });
+    }
 
-        function toggleLockMode(index) {
-            if (lockedDatasetIndex === index) disableLockMode();
-            else enableLockMode(index);
+    // ====================== FOCUS LOGIC ======================
+    function toggleFocus(index) {
+        if (focusedIndex === index) {
+            resetFocus();
+        } else {
+            focusOn(index);
         }
+    }
 
-        function enableLockMode(index) {
-            lockedDatasetIndex = index;
-            document.getElementById('chart-title').textContent = chart.data.datasets[index].label;
-            chart.data.datasets.forEach((ds, i) => {
-                ds.borderWidth = (i === index) ? 5 : 1.5;
-                ds.borderColor = (i === index) 
-                    ? ds.borderColor 
-                    : "rgba(180,180,180,0.4)";
-            });
-            chart.update();
-        }
+    function focusOn(index) {
+        focusedIndex = index;
+        
+        chart.data.datasets.forEach((ds, i) => {
+            const originalColor = getExerciseColor(ds.label) || ds.borderColor;
+            
+            if (i === index) {
+                ds.hidden = false;
+                ds.borderColor = originalColor;           // full opacity
+                ds.borderWidth = 5;
+                ds.pointRadius = 6;
+            } else {
+                ds.hidden = false;                        // keep rendered
+                ds.borderColor = originalColor + "22";   // very low opacity (fade out)
+                ds.borderWidth = 1.5;
+                ds.pointRadius = 2;
+            }
+        });
 
-        function disableLockMode() {
-            lockedDatasetIndex = null;
-            const currentStudent = localStorage.getItem('biph_student_name');
-            document.getElementById('chart-title').textContent = `My Progress — ${currentStudent}`;
-            chart.data.datasets.forEach(ds => {
-                if (ds.label === "Composite") ds.borderWidth = 4.5;
-                else ds.borderWidth = 3;
-            });
-            chart.update();
-        }
+        document.getElementById('chart-title').textContent = chart.data.datasets[index].label;
+        chart.update();
+    }
 
-        // ====================== INITIALIZATION ======================
-        window.onload = () => {
-            initLogin();   // This now fully controls login flow
-        };
-    </script>
+    function resetFocus() {
+        focusedIndex = null;
+        
+        const currentStudent = localStorage.getItem('biph_student_name');
+        document.getElementById('chart-title').textContent = `My Progress — ${currentStudent}`;
+
+        chart.data.datasets.forEach(ds => {
+            const originalColor = getExerciseColor(ds.label) || ds.borderColor;
+            
+            ds.hidden = false;
+            ds.borderColor = originalColor;   // full opacity
+            ds.borderWidth = 3;
+            ds.pointRadius = 4;
+        });
+
+        chart.update();
+    }
+
+    window.onload = () => {
+        initLogin();
+    };
+</script>
 </body>
 </html>
