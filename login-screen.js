@@ -1,3 +1,108 @@
+function injectLoginStyles() {
+    if (document.getElementById('biph-login-styles')) return; // Prevent duplicates
+
+    const style = document.createElement('style');
+    style.id = 'biph-login-styles';
+    style.textContent = `
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease;
+        }
+
+        .login-box {
+            background: rgba(255,255,255,0.95);
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 380px;
+            color: #344d87;
+        }
+
+        .login-box h1.Title {
+            margin: 0 0 8px 0;
+            font-size: 2.4em;
+        }
+
+        .login-box .Subtitle {
+            margin-bottom: 25px;
+            color: #344d87;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 14px;
+            margin: 15px 0;
+            font-size: 1.1em;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1em;
+            background: #3b6cac;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .login-box button:hover {
+            background: #3680ce;
+        }
+
+        .error {
+            color: #c00;
+            margin-top: 10px;
+            min-height: 1.2em;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Create login overlay
+function createLoginScreen() {
+    injectLoginStyles();
+
+    const loginHTML = `
+    <div id="login-screen">
+        <div class="login-box">
+            <h1 class="Title">BIPH</h1>
+            <h1 class="Subtitle">AP Music Theory</h1>
+            <h2>Enter your name to begin</h2>
+            
+            <input 
+                type="text" 
+                id="name-input" 
+                placeholder="Your name" 
+                autofocus
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+            >
+            
+            <button onclick="handleLogin()">Begin</button>
+            <div id="error-message" class="error"></div>
+        </div>
+    </div>`;
+
+    const temp = document.createElement('div');
+    temp.innerHTML = loginHTML;
+    document.body.appendChild(temp.firstElementChild);
+}
+
+// Rest of the logic (unchanged)
 function normalizeName(name) {
     return name.trim().toLowerCase();
 }
@@ -33,37 +138,6 @@ function storeName(name) {
     localStorage.setItem('biph_name_timestamp', Date.now().toString());
 }
 
-// Create login overlay
-function createLoginScreen() {
-    const loginHTML = `
-    <div id="login-screen">
-        <div class="login-box">
-            <h1 class="Title">BIPH</h1>
-            <h1 class="Subtitle">AP Music Theory</h1>
-            <h2>Enter your name to begin</h2>
-            
-            <input 
-                type="text" 
-                id="name-input" 
-                placeholder="Your name" 
-                autofocus
-                autocomplete="off"
-                autocorrect="off"
-                autocapitalize="off"
-                spellcheck="false"
-            >
-            
-            <button onclick="handleLogin()">Begin</button>
-            <div id="error-message" class="error"></div>
-        </div>
-    </div>`;
-
-    const temp = document.createElement('div');
-    temp.innerHTML = loginHTML;
-    document.body.appendChild(temp.firstElementChild);
-}
-
-// Main login handler
 function handleLogin() {
     const input = document.getElementById('name-input');
     const error = document.getElementById('error-message');
@@ -120,9 +194,8 @@ function initLogin() {
         loginScreen.style.display = 'flex';
         addEnterKeyListener();
         
-        // Important: Tell mymenu.js not to show profile menu while login screen is active
         if (typeof initMyMenu === 'function') {
-            initMyMenu(true);   // forceHideIfNotLoggedIn = true
+            initMyMenu(true);   // hide profile menu while on login screen
         }
     }
 }
