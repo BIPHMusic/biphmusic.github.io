@@ -326,26 +326,17 @@
         }
 
         // ==================== EDIT PANEL ====================
-        function toggleEditPanel() {
-            const panel = document.getElementById('editPanel');
-            const list = document.getElementById('studentList');
+function toggleEditPanel() {
+    const panel = document.getElementById('editPanel');
+    const list = document.getElementById('studentList');
 
-            if (panel.style.display === 'block') {
-                panel.style.display = 'none';
-            } else {
-                list.innerHTML = '';
-                currentStudents.forEach((student, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'student-item';
-                    div.innerHTML = `
-                        <span>${student.name}</span>
-                        <button class="remove-btn" onclick="removeStudent(${index})">Remove</button>
-                    `;
-                    list.appendChild(div);
-                });
-                panel.style.display = 'block';
-            }
-        }
+    if (panel.style.display === 'block') {
+        panel.style.display = 'none';
+    } else {
+        refreshStudentList();           // ← use this instead of duplicating the code
+        panel.style.display = 'block';
+    }
+}
 
         // Close modal on Escape key
 document.addEventListener('keydown', function(event) {
@@ -367,17 +358,46 @@ document.addEventListener('click', function(event) {
     }
 });
 
-        function removeStudent(index) {
-                currentStudents.splice(index, 1);
-                toggleEditPanel();
-                toggleEditPanel();
-        }
+function removeStudent(index) {
+    if (index < 0 || index >= currentStudents.length) return;
+    
+    currentStudents.splice(index, 1);
+    
+    // Refresh without closing
+    refreshStudentList();
+}
 
-        function resetToFullRoster() {
-                currentStudents = apStudents.slice();
-                toggleEditPanel();
-                toggleEditPanel();
-        }
+function resetToFullRoster() {
+    currentStudents = apStudents.slice();
+    refreshStudentList();               // refresh instead of toggling
+}
+
+function refreshStudentList() {
+    const list = document.getElementById('studentList');
+    list.innerHTML = '';
+    
+    currentStudents.forEach((student, index) => {
+        const div = document.createElement('div');
+        div.className = 'student-item';
+        
+        const span = document.createElement('span');
+        span.textContent = student.name;
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
+        removeBtn.textContent = 'Remove';
+        
+        // CRITICAL: Stop the click from reaching the outside-click listener
+        removeBtn.addEventListener('click', function(e) {
+            e.stopImmediatePropagation();   // This is the key
+            removeStudent(index);
+        });
+        
+        div.appendChild(span);
+        div.appendChild(removeBtn);
+        list.appendChild(div);
+    });
+}
 
         // Keyboard Controls
         document.addEventListener('keydown', function(event) {
