@@ -127,7 +127,7 @@
         <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
     
-   <script>
+ <script>
 // ==================== GLOBALS ====================
 let chart;
 let activeDataset = [];
@@ -143,7 +143,7 @@ const colors = [
     '#FF9F40', '#4CAF50', '#E91E63', '#9C27B0', '#FF9800'
 ];
 
-// ==================== DATA PROCESSING ====================
+// ==================== DATA PROCESSING (unchanged) ====================
 function processAllData() {
     const allStudents = apStudents.map(s => s.name);
 
@@ -184,13 +184,10 @@ function processAllData() {
 
     const toChartFormat = (map) => {
         return Array.from(map.entries()).map(([name, entries]) => {
-            // Sort chronologically (oldest → newest)
             entries.sort((a, b) => a.datetime - b.datetime);
-
             return {
                 name: name,
                 data: entries.map(e => e.percentage / 100),
-                labels: entries.map(e => `Attempt ${entries.indexOf(e) + 1}`),
                 dates: entries.map(e => e.date),
                 times: entries.map(e => e.time)
             };
@@ -205,12 +202,11 @@ function processAllData() {
     };
 }
 
-// ==================== HELPERS ====================
+// ==================== HELPERS & CHART CREATION ====================
 function calculateClassAverage(dataset) {
     if (!dataset.length) return [];
     const maxAttempts = Math.max(...dataset.map(s => s.data.length), 0);
     const averages = [];
-
     for (let i = 0; i < maxAttempts; i++) {
         let sum = 0, count = 0;
         dataset.forEach(student => {
@@ -224,7 +220,6 @@ function calculateClassAverage(dataset) {
     return averages;
 }
 
-// ==================== CREATE CHART ====================
 function createChart() {
     allProcessedData = processAllData();
     activeDataset = allProcessedData.vocabularyData || [];
@@ -236,7 +231,8 @@ function createChart() {
     chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: activeDataset[0] ? activeDataset[0].labels : [],
+            labels: activeDataset[0] ? 
+                Array.from({length: activeDataset[0].data.length}, (_, i) => `Attempt ${i+1}`) : [],
             datasets: [
                 {
                     label: 'Class Avg.',
@@ -266,7 +262,10 @@ function createChart() {
                 y: { beginAtZero: true, max: 100 },
                 x: { title: { display: true, text: 'Attempt Number' } }
             },
-            interaction: { mode: 'index', intersect: false },
+            interaction: { 
+                mode: 'nearest',
+                intersect: true
+            },
             plugins: {
                 legend: {
                     position: 'right',
@@ -281,7 +280,10 @@ function createChart() {
                         toggleLockMode(legendItem.datasetIndex);
                     }
                 },
-                tooltip: { enabled: false, external: customTooltip }
+                tooltip: { 
+                    enabled: false, 
+                    external: customTooltip 
+                }
             },
             onClick: (event, elements) => {
                 if (lockedDatasetIndex !== null) disableLockMode();
@@ -294,8 +296,8 @@ function createChart() {
     setDefaultState();
 }
 
-// ==================== LOCK / HIGHLIGHT LOGIC ====================
-function toggleLockMode(index) {
+// ==================== LOCK / HIGHLIGHT (unchanged) ====================
+function toggleLockMode(index) { 
     if (lockedDatasetIndex === index) disableLockMode();
     else enableLockMode(index);
 }
@@ -367,7 +369,7 @@ function resetHighlight() {
 
 function setDefaultState() { disableLockMode(); }
 
-// ==================== TABS & UPDATE ====================
+// ==================== TABS ====================
 function switchTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     event.currentTarget.classList.add('active');
@@ -383,7 +385,6 @@ function switchTab(tab) {
 
 function updateChart() {
     if (!chart) return;
-
     const classAverage = calculateClassAverage(activeDataset);
     const maxAttempts = activeDataset[0] ? activeDataset[0].data.length : 0;
 
@@ -398,48 +399,57 @@ function updateChart() {
     chart.update();
 }
 
-// ==================== CUSTOM TOOLTIP (with Date + Time) ====================
+// ==================== CUSTOM TOOLTIP - LOCKED TO POINT ====================
 function customTooltip(context) {
     const defaultTooltip = document.getElementById('default-tooltip');
     const lockTooltip = document.getElementById('lock-tooltip');
     const {chart: chartInstance, tooltip: tooltipModel} = context;
 
-    if (tooltipModel.opacity === 0) { hideTooltip(); return; }
+    if (tooltipModel.opacity === 0) { 
+        hideTooltip(); 
+        return; 
+    }
 
     const activeTooltip = lockedDatasetIndex === null ? defaultTooltip : lockTooltip;
     const inactiveTooltip = lockedDatasetIndex === null ? lockTooltip : defaultTooltip;
 
-    const dataIndex = tooltipModel.dataPoints[0].dataIndex;
+    const dataPoint = tooltipModel.dataPoints[0];
+    const dataIndex = dataPoint.dataIndex;
+    const datasetIndex = dataPoint.datasetIndex;
+
     let html = '';
 
-    if (lockedDatasetIndex === null) {
+    if (lockedDatasetIndex !== null) {
+        const val = chartInstance.data.datasets[lockedDatasetIndex].data[dataIndex].toFixed(1);
+        const studentData = activeDataset[lockedDatasetIndex - 1];
+        html = `<b>${val}%</b><br>${studentData.dates[dataIndex] || ''}<br>${studentData.times[dataIndex] || ''}`;
+    } 
+    else if (datasetIndex === 0) {
         const val = chartInstance.data.datasets[0].data[dataIndex].toFixed(1);
-        html = `${val}%`;
-    } else {
-        const studentIndex = lockedDatasetIndex;
-        const val = chartInstance.data.datasets[studentIndex].data[dataIndex].toFixed(1);
-        const studentData = activeDataset[studentIndex - 1];
-        
-        html = `
-            <b>${val}%</b><br>
-            ${studentData.dates[dataIndex] || ''}<br>
-            ${studentData.times[dataIndex] || ''}
-        `;
+        html = `Class Average<br><b>${val}%</b>`;
+    } 
+    else {
+        const val = chartInstance.data.datasets[datasetIndex].data[dataIndex].toFixed(1);
+        const studentName = chartInstance.data.datasets[datasetIndex].label;
+        html = `${studentName}<br><b>${val}%</b>`;
     }
 
     activeTooltip.innerHTML = html;
 
+    // === LOCKED TO POINT POSITIONING ===
     const rect = chartInstance.canvas.getBoundingClientRect();
-    const targetX = tooltipModel.caretX + rect.left;
-    const targetY = tooltipModel.caretY + rect.top;
+    let targetX = tooltipModel.caretX + rect.left;
+    let targetY = tooltipModel.caretY + rect.top - 35;   // Position slightly above the point
 
+    // Smooth animation to final position
     function animateTooltip() {
-        lastTooltipX += (targetX - lastTooltipX) * 0.3;
-        lastTooltipY += (targetY - lastTooltipY) * 0.3;
-        activeTooltip.style.left = `${lastTooltipX + 15}px`;
-        activeTooltip.style.top = `${lastTooltipY - 30}px`;
+        lastTooltipX += (targetX - lastTooltipX) * 0.4;
+        lastTooltipY += (targetY - lastTooltipY) * 0.4;
 
-        if (Math.abs(targetX - lastTooltipX) > 0.5 || Math.abs(targetY - lastTooltipY) > 0.5) {
+        activeTooltip.style.left = `${lastTooltipX}px`;
+        activeTooltip.style.top = `${lastTooltipY}px`;
+
+        if (Math.abs(targetX - lastTooltipX) > 0.8 || Math.abs(targetY - lastTooltipY) > 0.8) {
             animationFrameId = requestAnimationFrame(animateTooltip);
         }
     }
@@ -462,15 +472,7 @@ function hideTooltip() {
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
     createChart();
-
-    const canvas = document.getElementById('progressChart');
-    canvas.addEventListener('mousemove', (e) => {
-        const tooltip = lockedDatasetIndex === null ? 
-            document.getElementById('default-tooltip') : 
-            document.getElementById('lock-tooltip');
-        tooltip.style.left = `${e.clientX + 15}px`;
-        tooltip.style.top = `${e.clientY - 30}px`;
-    });
+    // Removed mouse-following listener so tooltip stays tied to the point
 });
 </script>
 
