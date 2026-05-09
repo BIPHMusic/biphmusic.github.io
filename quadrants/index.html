@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../icons/bg-icon.png">
+    <script src="../apstudents.js"></script>
     <title>Quadrants - Non-overlapping Students</title>
     <style>
-        /* NO SHARED STYLES */
-        /* Simple enough app to warrant its own */
         body {
             margin: 0;
             height: 100vh;
@@ -25,16 +24,7 @@
             position: relative;
             overflow: hidden;
         }
-        .box {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            font-size: 2em;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+
         .student {
             position: absolute;
             background: rgba(255, 255, 255, 0.12);
@@ -49,6 +39,7 @@
             font-size: 1.1em;
             opacity: 0;
         }
+
         .shuffle-btn {
             position: absolute;
             left: 50%;
@@ -61,59 +52,109 @@
             width: 100px;
             height: 100px;
             cursor: pointer;
-            transition: all 0.3s;
-            z-index: 100;
+            transition: all 0.3s ease;
+            z-index: 200;           /* Increased */
+            pointer-events: auto;
         }
-                input {
+        
+        .box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 2em;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quad-input {
             width: 100%;
             height: 100%;
             background: transparent;
             border: none;
             color: white;
-            font-size: 2em;
+            font-size: 1.85em;
             text-align: center;
+            outline: none;
+            padding: 0 20px;
+            box-sizing: border-box;
+            font-family: inherit;
         }
-        input:focus {
+
+        .quad-input:focus {
             outline: none;
         }
+
         .shuffle-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: translate(-50%, -50%) scale(1.1);
+            background: rgba(255, 255, 255, 0.35);
+            transform: translate(-50%, -50%) scale(1.15);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .shuffle-btn:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        .shuffle-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translate(-50%, -50%) scale(1.15);
         }
     </style>
 </head>
 <body>
     <div id="shared-menu"></div>
     <script src="../menu.js"></script> 
+
     <div class="container">
-        <div class="box"><input type="text" placeholder=""></div>
-        <div class="box"><input type="text" placeholder=""></div>
-        <div class="box"><input type="text" placeholder=""></div>
-        <div class="box"><input type="text" placeholder=""></div>
+        <div class="box"><input type="text" class="quad-input" placeholder=""></div>
+        <div class="box"><input type="text" class="quad-input" placeholder=""></div>
+        <div class="box"><input type="text" class="quad-input" placeholder=""></div>
+        <div class="box"><input type="text" class="quad-input" placeholder=""></div>
         <button class="shuffle-btn">🔀</button>
     </div>
 
     <script>
-        const students = [
-            'Ben', 'Howard', 'Terry', 'Alice', 'Vincent', 'Tiger', 'Chris', 'Lucy',
-            'Diego', 'Hailey', 'Eileen', 'Angelina', 'Serena', 'Catherine', 'Andrew', 'Jennifer'
-        ];
+        // Use students from apstudents.js
+        const students = apStudents.map(s => s.name || s.altName || "");
 
         const container = document.querySelector('.container');
         const shuffleBtn = document.querySelector('.shuffle-btn');
+        let isInputFocused = false;
 
         // Create student elements
         students.forEach(name => {
+            if (!name) return;
             const div = document.createElement('div');
             div.className = 'student';
             div.textContent = name;
-            // Start at center
             div.style.left = '50%';
             div.style.top = '50%';
             container.appendChild(div);
         });
 
         const studentElements = document.querySelectorAll('.student');
+        const quadInputs = document.querySelectorAll('.quad-input');
+
+        // Input event listeners
+        quadInputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                isInputFocused = true;
+            });
+
+            input.addEventListener('blur', () => {
+                isInputFocused = false;
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    input.blur();
+                }
+            });
+        });
 
         function getRandomPositionInQuadrant(quadIndex, existingPositions, minDistance = 90) {
             const rect = container.getBoundingClientRect();
@@ -123,17 +164,14 @@
             const baseX = (quadIndex % 2) * qWidth;
             const baseY = Math.floor(quadIndex / 2) * qHeight;
 
-            const maxAttempts = 80;   // prevent infinite loop
+            const maxAttempts = 80;
             let attempts = 0;
 
             while (attempts < maxAttempts) {
                 attempts++;
-
-                // Keep some margin from quadrant edges
                 const x = baseX + 80 + Math.random() * (qWidth - 160);
                 const y = baseY + 70 + Math.random() * (qHeight - 140);
 
-                // Check distance to all existing positions
                 let tooClose = false;
                 for (const pos of existingPositions) {
                     const dx = x - pos.x;
@@ -143,13 +181,9 @@
                         break;
                     }
                 }
-
-                if (!tooClose) {
-                    return { x, y };
-                }
+                if (!tooClose) return { x, y };
             }
 
-            // Fallback: just return a random position if we can't find a good one
             return {
                 x: baseX + 80 + Math.random() * (qWidth - 160),
                 y: baseY + 70 + Math.random() * (qHeight - 140)
@@ -157,25 +191,28 @@
         }
 
         function shuffle() {
-            // Make all visible
+            shuffleBtn.style.transform = 'translate(-50%, -50%) scale(1.2)';
+            shuffleBtn.style.background = 'rgba(255, 255, 255, 0.35)';
+            
+            setTimeout(() => {
+                shuffleBtn.style.transform = 'translate(-50%, -50%)';
+                shuffleBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+            }, 180);
+
             studentElements.forEach(s => s.style.opacity = '1');
 
             const quadrants = [[], [], [], []];
             const shuffled = [...studentElements].sort(() => Math.random() - 0.5);
 
-            // Distribute evenly
             shuffled.forEach((student, i) => {
                 quadrants[i % 4].push(student);
             });
 
-            // Position each quadrant
             quadrants.forEach((quadStudents, qIndex) => {
-                const positions = [];   // track occupied spots in this quadrant
-
+                const positions = [];
                 quadStudents.forEach(student => {
                     const pos = getRandomPositionInQuadrant(qIndex, positions, 95);
                     positions.push(pos);
-
                     student.style.left = `${pos.x}px`;
                     student.style.top = `${pos.y}px`;
                 });
@@ -184,21 +221,27 @@
 
         shuffleBtn.addEventListener('click', shuffle);
 
-        // Initial shuffle on load
-        window.addEventListener('load', () => {
-            setTimeout(shuffle, 300);
-        });
+        // Initial shuffle
+        window.addEventListener('load', () => setTimeout(shuffle, 300));
 
         // Resize handling
         window.addEventListener('resize', () => {
             const rect = container.getBoundingClientRect();
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
-
             studentElements.forEach(s => {
                 s.style.left = `${centerX}px`;
                 s.style.top = `${centerY}px`;
             });
+        });
+
+        // Global keyboard
+        document.addEventListener('keydown', (e) => {
+            if (isInputFocused) return;
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                shuffle();
+            }
         });
     </script>
 </body>
