@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'Zapfino';
+    src: url('../fonts/Zapfino.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 body {
     background-color: rgb(45, 70, 119);
     color: white;
@@ -52,7 +60,7 @@ h1 {
 }
 
 .Subtitle {
-    font-family: 'Zapfino', sans-serif;
+    font-family: 'Zapfino', cursive;
     color: white;
     margin-top: -0.7em;
     font-size: 40px;
