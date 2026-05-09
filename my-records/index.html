@@ -29,19 +29,6 @@
             margin-bottom: 12px;
             color: #222;
         }
-        .default-tooltip, .lock-tooltip {
-            position: absolute;
-            background: rgba(255,255,255,0.97);
-            border: 3px solid #4CAF50;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            pointer-events: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-            z-index: 10000;
-            min-width: 160px;
-        }
     </style>
 </head>
 <body>
@@ -68,9 +55,6 @@
         <img src="../icons/Full Logo White on Transparent.png" alt="Logo" class="logo">
     </div>
 
-    <div id="default-tooltip" class="default-tooltip"></div>
-    <div id="lock-tooltip" class="lock-tooltip"></div>
-
     <script>
         let chart;
         let lockedDatasetIndex = null;
@@ -87,24 +71,25 @@
             r.student.toLowerCase() === currentStudent.toLowerCase()
         );
 
-        const exerciseMap = {
-            "Vocab":        { label: "Vocab",        color: "#36A2EB" },
-            "Sight Singing":{ label: "Sight Singing",color: "#FF6384" },
-            "MCQs":         { label: "MCQs",         color: "#FFCE56" },
-            "Ear Training": { label: "Ear Training", color: "#4BC0C0" }
-        };
+        // Dynamic color palette
+        const colorPalette = ["#36A2EB", "#FF6384", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#FF6B6B"];
+
+        function getExerciseColor(exercise) {
+            const map = {
+                "Vocab": "#36A2EB",
+                "Sight Singing": "#FF6384",
+                "MCQs": "#FFCE56",
+                "Ear Training": "#4BC0C0"
+            };
+            return map[exercise] || colorPalette[Object.keys(map).length % colorPalette.length];
+        }
 
         function groupAndSortData() {
             const grouped = {};
             myRecords.forEach(record => {
                 const ex = record.exercise;
                 if (!grouped[ex]) grouped[ex] = [];
-                grouped[ex].push({
-                    percentage: record.percentage,
-                    date: record.date,
-                    time: record.time,
-                    exercise: ex
-                });
+                grouped[ex].push(record);
             });
 
             // Sort each exercise chronologically
@@ -124,24 +109,20 @@
 
             const datasets = [];
 
-            Object.keys(exerciseMap).forEach(exKey => {
-                const dataPoints = grouped[exKey] || [];
-                if (dataPoints.length > 0) {
-                    datasets.push({
-                        label: exerciseMap[exKey].label,
-                        data: dataPoints.map(item => item.percentage),
-                        borderColor: exerciseMap[exKey].color,
-                        borderWidth: 3,
-                        tension: 0.25,
-                        pointRadius: 4,
-                        pointHoverRadius: 8,
-                        // Store metadata for tooltip
-                        meta: dataPoints
-                    });
-                }
+            Object.keys(grouped).forEach((ex) => {
+                const dataPoints = grouped[ex];
+                datasets.push({
+                    label: ex,
+                    data: dataPoints.map(item => item.percentage),
+                    borderColor: getExerciseColor(ex),
+                    borderWidth: 3,
+                    tension: 0.25,
+                    pointRadius: 4,
+                    pointHoverRadius: 8
+                });
             });
 
-            // Composite
+            // Composite average
             const maxAttempts = Math.max(...Object.values(grouped).map(arr => arr.length), 1);
             const compositeData = [];
             for (let i = 0; i < maxAttempts; i++) {
@@ -163,11 +144,9 @@
                 borderDash: [3, 2],
                 tension: 0.2,
                 pointRadius: 5,
-                pointHoverRadius: 9,
-                meta: null // Composite doesn't have single record
+                pointHoverRadius: 9
             });
 
-            // Set initial title
             document.getElementById('chart-title').textContent = `My Progress — ${currentStudent}`;
 
             chart = new Chart(ctx, {
@@ -184,7 +163,7 @@
                     },
                     plugins: {
                         legend: { position: 'top' },
-                        tooltip: { enabled: false, external: customTooltip }
+                        tooltip: { enabled: true }   // Default Chart.js tooltip is now back on
                     },
                     onClick: (evt, elements) => {
                         if (elements.length) toggleLockMode(elements[0].datasetIndex);
@@ -219,41 +198,6 @@
                 else ds.borderWidth = 3;
             });
             chart.update();
-        }
-
-        function customTooltip(ctx) {
-            const tooltipEl = lockedDatasetIndex === null 
-                ? document.getElementById('default-tooltip')
-                : document.getElementById('lock-tooltip');
-
-            if (ctx.tooltip.opacity === 0) {
-                tooltipEl.style.opacity = 0;
-                return;
-            }
-
-            const dataPoint = ctx.tooltip.dataPoints[0];
-            const dataset = chart.data.datasets[dataPoint.datasetIndex];
-            const index = dataPoint.dataIndex;
-
-            let html = `<strong>${dataset.label}</strong><br>`;
-
-            if (dataset.meta && dataset.meta[index]) {
-                const record = dataset.meta[index];
-                html += `
-                    ${record.date} &nbsp; ${record.time}<br>
-                    <strong>${record.percentage}%</strong>
-                `;
-            } else {
-                // Composite
-                html += `<strong>${dataPoint.formattedValue}%</strong>`;
-            }
-
-            tooltipEl.innerHTML = html;
-            tooltipEl.style.opacity = 1;
-
-            const rect = ctx.chart.canvas.getBoundingClientRect();
-            tooltipEl.style.left = `${rect.left + ctx.tooltip.caretX + 20}px`;
-            tooltipEl.style.top  = `${rect.top + ctx.tooltip.caretY - 40}px`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
