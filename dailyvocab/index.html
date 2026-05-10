@@ -8,15 +8,12 @@
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <script src="../apstudents.js"></script>
+    <script src="../login-screen.js"></script>
     <script src="../mymenu.js"></script>
     <style>
         /* SHARED STYLES */
         /* Loaded from common-styles.css - Do not duplicate/edit: */
         /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
-        
-        .login-section {
-            text-align: center;
-        }
 
         .quiz-container {
             display: flex;
@@ -244,38 +241,6 @@
             display: none;
         }
 
-        /* ====================== AUTHENTICATION ====================== */
-        .auth-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 40px;
-            padding: 20px;
-            margin: 20px auto;
-            width: fit-content;
-            max-width: 300px;
-        }
-
-        .auth-check {
-            color: #16a34a;
-            font-size: 1.5rem;
-            margin-right: 10px;
-            opacity: 0;
-            transform: scale(0);
-            animation: checkFadeIn 0.5s ease-out forwards;
-            animation-delay: 0.2s;
-        }
-
-        .auth-text {
-            font-size: 1rem;
-            color: white;
-            opacity: 0;
-            animation: textFadeIn 0.5s ease-out forwards;
-            animation-delay: 0.4s;
-        }
-
         @keyframes checkFadeIn {
             to {
                 opacity: 1;
@@ -294,6 +259,7 @@
 <body>
     <div id="shared-menu"></div>
     <script src="../menu.js"></script>
+
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
@@ -301,26 +267,19 @@
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Daily Vocab</h1>
 
-    <div class="logincontainer">
-        <div id="login-section" class="login-section">
-            <h2>Enter your name to begin</h2>
-            <input type="text" id="name-input" placeholder="Your name" autofocus><br>
-            <button class="action-button" onclick="checkName()">Begin</button>
-            <div id="error-message" class="error"></div>
+    <div id="main-content" style="display: none;">
+        <div class="quiz-container">
+            <div class="questions-container" id="quiz-questions"></div>
+            <div class="word-bank-container">
+                <div class="word-bank" id="word-bank"></div>
+            </div>
         </div>
 
-        <div id="quiz-section" class="quiz-section hidden">
-            <div class="quiz-container">
-                <div class="questions-container" id="quiz-questions"></div>
-                <div class="word-bank-container">
-                    <div class="word-bank" id="word-bank"></div>
-                </div>
-            </div>
-            <div class="quiz-actions hidden">
-                <button class="action-button" onclick="submitQuiz()" tabindex="0">Submit</button>
-            </div>
-            <div id="results-section" class="results-section hidden"></div>
+        <div class="quiz-actions hidden">
+            <button class="action-button" onclick="submitQuiz()" tabindex="0">Submit</button>
         </div>
+
+        <div id="results-section" class="results-section hidden"></div>
     </div>
 
     <div class="logocontainer">        
@@ -378,29 +337,6 @@ let usedTerms = {};
 let selectedQuestion = null;
 let selectedWord = null;     
 
-// Auto-login if already signed in via menu
-function autoLoginIfPossible() {
-    const storedName = localStorage.getItem('biph_student_name');
-    if (!storedName) return false;
-
-    const lower = storedName.toLowerCase();
-    const student = approvedStudents.find(s => 
-        s.name.toLowerCase() === lower || 
-        (s.altName && s.altName.toLowerCase() === lower)
-    );
-    
-    if (student) {
-        currentStudent = lower;
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('quiz-section').classList.remove('hidden');
-        document.querySelector('.quiz-actions').classList.remove('hidden');
-        
-        questionBank[currentStudent] = generateQuestionSet(currentStudent);
-        initializeQuiz();
-        return true;
-    }
-    return false;
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -440,47 +376,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    autoLoginIfPossible();
 });
 
-function checkName() {
-    const nameInput = document.getElementById('name-input').value.trim();
-    const errorElement = document.getElementById('error-message');
-
-    if (!nameInput) {
-        errorElement.textContent = 'Please enter your name';
-        return;
-    }
-
-    const lower = nameInput.toLowerCase();
-    const student = approvedStudents.find(s =>
-        s.name.toLowerCase() === lower || (s.altName && s.altName.toLowerCase() === lower)
-    );
-
-    if (student) {
-        currentStudent = lower;
-        
-        // Save to localStorage so mymenu.js reflects the login
-        const displayName = capitalizeName(student.name);
-        localStorage.setItem('biph_student_name', displayName);
-        localStorage.setItem('biph_name_timestamp', Date.now().toString());
-
-        // Refresh the profile menu immediately
-        if (typeof initMyMenu === 'function') {
-            initMyMenu();
-        }
-
-        questionBank[currentStudent] = generateQuestionSet(currentStudent);
-        
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('quiz-section').classList.remove('hidden');
-        document.querySelector('.quiz-actions').classList.remove('hidden');
-        initializeQuiz();
-        document.getElementById('answer-0').focus();
-    } else {
-        errorElement.textContent = 'Name not found in approved list';
-    }
-}
 
 function capitalizeName(name) {
     return name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
@@ -1105,6 +1002,21 @@ function prepareResultData() {
         })).sort((a, b) => a.term.localeCompare(b.term))
     };
 }
+
+// ==================== LOGIN CALLBACK ====================
+        window.onSuccessfulLogin = function(displayName) {
+            currentStudent = displayName.toLowerCase();
+            questionBank[currentStudent] = generateQuestionSet(currentStudent);
+            initializeQuiz();
+            document.querySelector('.quiz-actions').classList.remove('hidden');
+            if (typeof initMyMenu === 'function') {
+                initMyMenu();
+            }
+        };
+
+        window.onload = function() {
+            initLogin();
+        };
 </script>
 </body>
 </html>
