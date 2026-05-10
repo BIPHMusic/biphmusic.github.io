@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <script src="../apstudents.js"></script>
+    <script src="../login-screen.js"></script>
     <script src="../mymenu.js"></script>
     <style>
          /* SHARED STYLES */
@@ -22,13 +23,8 @@
             gap: 20px;
         }
 
-        .login-section, .quiz-section {
+        .quiz-section {
             width: 100%;
-        }
-
-        .login-section {
-            text-align: center;
-            margin-bottom: 20px;
         }
 
         .quiz-container {
@@ -122,10 +118,13 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
+
         .results-section {
             width: 100%;
             max-width: 800px;
-            margin-top: 20px;
+            margin: 1rem auto;
+            padding: 0 15px;
+            text-align: center;
         }
 
         .results-table {
@@ -179,6 +178,7 @@
 <body>
     <div id="shared-menu"></div>
     <script src="../menu.js"></script>
+
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
@@ -187,46 +187,31 @@
     <h1 class="Subtitle">Daily MCQs</h1>
     <div id="date-display" style="font-size: 1rem; text-align: center; margin-top: -30px; margin-bottom: 15px;"></div>
 
-    <div class="logincontainer">
-        <div id="login-section" class="login-section">
-    <h2>Enter your name to begin</h2>
-    <input type="text" id="name-input" placeholder="Your name" autofocus autocomplete="off">
-    <button type="button" onclick="checkName()">Begin</button>
-    <div id="error-message" class="error"></div>
-</div>
-
-        <div id="quiz-section" class="quiz-section hidden">
-            <div class="quiz-container" id="quiz-container"></div>
-            <div id="results-section" class="results-section hidden"></div>
-        </div>
+    <div id="main-content" style="display: none;">
+        <div class="quiz-container" id="quiz-container"></div>
+        <div id="results-section" class="results-section hidden"></div>
     </div>
 
     <div class="logocontainer">        
         <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
 
-    <script src="names.js"></script>
     <script src="answerkey.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        document.getElementById('name-input').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                checkName();
-            }
-        });
-
-        let currentStudent = '';
-        let currentQuestion = 0;
-        let studentAnswers = [];
-        const totalQuestions = 10;
-        let selectedOptionIndex = 0; // Tracks the currently selected option (0=A, 1=B, 2=C, 3=D)
-        let isQuestionDisplayed = false; // Tracks if a question is currently displayed
+let currentStudent = '';
+    let currentQuestion = 0;
+    let studentAnswers = [];
+    let correctAnswers = [];
+    let totalQuestions = 0;
+    let selectedOptionIndex = -1;
+    let isQuestionDisplayed = false;
 
         const questionSets = {
-            '2026-08-17': { start: 1, end: 5 }, 
+            '2026-05-10': { start: 1, end: 5 }, 
+            // '2026-08-17': { start: 1, end: 5 }, 
             '2026-08-18': { start: 6, end: 10 }, 
             '2026-08-19': { start: 11, end: 15 }, 
             '2026-08-20': { start: 16, end: 20 }, 
@@ -395,47 +380,65 @@
             '2027-05-21': { start: 831, end: 835 }, 
         };
 
-        // Move date calculation to the top
-        const systemDate = new Date();
-        const year = systemDate.getFullYear();
-        const month = String(systemDate.getMonth() + 1).padStart(2, '0');
-        const day = String(systemDate.getDate()).padStart(2, '0');
-        const today = `${year}-${month}-${day}`;
+       const systemDate = new Date();
+    const today = systemDate.toISOString().slice(0, 10);
+    const sortedQuestionDates = Object.keys(questionSets).sort();
 
-        const sortedQuestionDates = Object.keys(questionSets).sort();
-
-function getCurrentSet() {
-    if (questionSets[today]) {
-        return { set: questionSets[today], found: true };
-    }
-
-    let mostRecentDate = null;
-    for (const date of sortedQuestionDates) {
-        if (date <= today) {
-            mostRecentDate = date;
-        } else {
-            break;
+    function getCurrentSet() {
+        if (questionSets[today]) {
+            return { set: questionSets[today], found: true };
         }
+
+        let mostRecentDate = null;
+        for (const date of sortedQuestionDates) {
+            if (date <= today) mostRecentDate = date;
+            else break;
+        }
+
+        if (mostRecentDate) {
+            return { set: questionSets[mostRecentDate], found: true };
+        }
+
+        const nextDate = sortedQuestionDates[0];
+        const diffDays = Math.ceil((new Date(nextDate) - systemDate) / (86400000));
+        return { set: null, found: false, nextDate, daysUntil: diffDays };
     }
 
-    if (mostRecentDate) {
-        return { set: questionSets[mostRecentDate], found: true };
+    const currentSetResult = getCurrentSet();
+
+function showNoQuestionsYet() {
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = `
+                <div class="confirmation-container">
+                    <span class="confirmation-symbol">⏳</span>
+                    <div class="confirmation-text">
+                        No questions available yet.<br>
+                        Next set unlocks in <strong>${currentSetResult.daysUntil} day${currentSetResult.daysUntil !== 1 ? 's' : ''}</strong><br>
+                        (${currentSetResult.nextDate})
+                    </div>
+                </div>
+            `;
+        }
+
+        function buildQuestionSet() {
+        if (!currentSetResult.found || !currentSetResult.set) return [];
+
+        const { start, end } = currentSetResult.set;
+        const numQuestions = end - start + 1;   // This was the missing piece
+
+        return Array.from({ length: numQuestions }, (_, i) => {
+            const questionNum = start + i;
+            return {
+                question: questionNum,
+                answer: getCorrectAnswer(questionNum)
+            };
+        });
     }
-
-    const nextDate = sortedQuestionDates[0];
-    const nextDateObj = new Date(nextDate + 'T00:00:00');
-    const diffMs = nextDateObj - systemDate;
-    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-    return { set: null, found: false, nextDate, daysUntil: diffDays };
-}
-
-const currentSetResult = getCurrentSet();
 
         function findAnswer(originalQuestion) {
             const scrambledKey = originalQuestion * 3 + 7;
-            const entry = hiddenData.find(([key]) => key === scrambledKey);
-            return entry ? entry[1] : null; // Returns base64-encoded answer or null if not found
+            const entry = hiddenData?.find(([key]) => key === scrambledKey);
+            return entry ? entry[1] : null;
         }
 
         function unshiftString(str, shift) {
@@ -451,79 +454,27 @@ const currentSetResult = getCurrentSet();
 
         function getCorrectAnswer(questionNum) {
             const scrambledAnswer = findAnswer(questionNum);
-            if (!scrambledAnswer) return null;
-            return unshiftString(atob(scrambledAnswer), 3);
+            return scrambledAnswer ? unshiftString(atob(scrambledAnswer), 3) : null;
         }
-
-        const correctAnswers = Array.from({ length: 10 }, (_, i) => {
-            const question = currentSet.start + i;
-            return { question, answer: getCorrectAnswer(question) };
-        });
 
         function loadStudentProgress(name) {
-            const key = `quiz_${name}_${today}`;
-            const savedData = localStorage.getItem(key);
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                studentAnswers = data.answers || [];
-                currentQuestion = studentAnswers.length < totalQuestions ? studentAnswers.length : totalQuestions;
-                return true;
-            }
-            return false;
+        const key = `quiz_${name}_${today}`;
+        const savedData = localStorage.getItem(key);
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            studentAnswers = data.answers || [];
+            currentQuestion = Math.min(studentAnswers.length, totalQuestions);
+            return true;
         }
-        
+        return false;
+    }
+
         function saveStudentProgress() {
+            if (!currentStudent) return;
             const key = `quiz_${currentStudent}_${today}`;
-            const data = {
-                answers: studentAnswers
-            };
-            localStorage.setItem(key, JSON.stringify(data));
+            localStorage.setItem(key, JSON.stringify({ answers: studentAnswers }));
         }
         
-        function checkName() {
-            const nameInput = document.getElementById('name-input').value.toLowerCase().trim();
-            const errorElement = document.getElementById('error-message');
-        
-            if (!nameInput) {
-                errorElement.textContent = 'Please enter your name';
-                return;
-            }
-        
-            if (approvedNames.includes(nameInput)) {
-                currentStudent = nameInput;
-                const hasProgress = loadStudentProgress(currentStudent);
-        
-                document.getElementById('login-section').classList.add('hidden');
-document.getElementById('quiz-section').classList.remove('hidden');
-
-if (!currentSetResult.found) {
-    const quizContainer = document.getElementById('quiz-container');
-    quizContainer.innerHTML = `
-        <div class="confirmation-container">
-            <span class="confirmation-symbol">⏳</span>
-            <div class="confirmation-text">
-                No questions available yet.<br>
-                Next set unlocks in <strong>${currentSetResult.daysUntil} day${currentSetResult.daysUntil !== 1 ? 's' : ''}</strong><br>
-                (${currentSetResult.nextDate})
-            </div>
-        </div>
-    `;
-    return;
-}
-
-if (hasProgress && currentQuestion >= totalQuestions) {
-                    showResults();
-                } else {
-                    if (!hasProgress) {
-                        studentAnswers = [];
-                        currentQuestion = 0;
-                    }
-                    displayQuestion();
-                }
-            } else {
-                errorElement.textContent = 'Name not found in approved list';
-            }
-        }
         
         function updateSelectedOption() {
             const buttons = document.querySelectorAll('.option-button');
@@ -531,7 +482,7 @@ if (hasProgress && currentQuestion >= totalQuestions) {
                 button.classList.toggle('selected', index === selectedOptionIndex);
             });
         }
-
+        
         function displayQuestion() {
     isQuestionDisplayed = true;
     selectedOptionIndex = -1; // No option selected initially
@@ -635,16 +586,12 @@ if (hasProgress && currentQuestion >= totalQuestions) {
             `;
             resultsSection.appendChild(table);
         
-            const pngButton = document.createElement('button');
-            pngButton.className = 'copy-button';
-            pngButton.id = 'copy-png-button';
-            pngButton.textContent = 'Download Results';
-            pngButton.style.display = 'block';
-            pngButton.style.marginLeft = 'auto';
-            pngButton.style.marginRight = 'auto';
-            pngButton.style.marginTop = '20px';
-            pngButton.onclick = () => generatePng(resultData);
-            resultsSection.appendChild(pngButton);
+            const shareButton = document.createElement('button');
+            shareButton.className = 'copy-button';
+            shareButton.textContent = '📤 Share Results (Airdrop)';
+            shareButton.style.marginTop = '20px';
+            shareButton.onclick = shareResultsAsText;
+            resultsSection.appendChild(shareButton);
         
             const qrContainer = document.createElement('div');
             qrContainer.id = 'qr-code';
@@ -674,73 +621,70 @@ if (hasProgress && currentQuestion >= totalQuestions) {
                 qrContainer.appendChild(qr);
             }
         }
-        
-        function generatePng(resultData) {
-            const background = document.querySelector('.background');
-            const overlay = document.querySelector('.overlay');
-            const overlay2 = document.querySelector('.overlay2');
-            const hamburgerMenu = document.querySelector('.hamburger-menu');
-            const logo = document.querySelector('.logo');
-            const copyPngBtn = document.getElementById('copy-png-button');
-        
-            background.style.display = 'none';
-            overlay.style.display = 'none';
-            overlay2.style.display = 'none';
-            hamburgerMenu.style.display = 'none';
-            if (logo) logo.style.display = 'none';
-            copyPngBtn.style.visibility = 'hidden';
-        
-            html2canvas(document.body, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: 'rgb(45, 70, 119)'
-            }).then(canvas => {
-                const logoImg = new Image();
-                logoImg.crossOrigin = 'anonymous';
-                logoImg.src = '../icons/Full Logo White on Transparent.png';
-        
-                logoImg.onload = () => {
-                    const ctx = canvas.getContext('2d');
-                    const logoWidth = canvas.width * 0.25;
-                    const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
-                    const padding = 50 * 2;
-                    ctx.drawImage(logoImg, canvas.width - logoWidth - padding, canvas.height - logoHeight - padding, logoWidth, logoHeight);
-        
-                    canvas.toBlob(blob => {
-                        const link = document.createElement('a');
-                        link.download = `Quiz_Results_${resultData.student}_${resultData.date}.png`;
-                        link.href = URL.createObjectURL(blob);
-                        link.click();
-                        URL.revokeObjectURL(link.href);
-                        resetDisplay();
-                    });
-                };
-        
-                logoImg.onerror = () => {
-                    console.error('Failed to load logo image');
-                    canvas.toBlob(blob => {
-                        const link = document.createElement('a');
-                        link.download = `Quiz_Results_${resultData.student}_${resultData.date}.png`;
-                        link.href = URL.createObjectURL(blob);
-                        link.click();
-                        URL.revokeObjectURL(link.href);
-                        resetDisplay();
-                    });
-                };
-            }).catch(err => {
-                console.error('Failed to generate PNG:', err);
-                resetDisplay();
-            });
-        
-            function resetDisplay() {
-                background.style.display = '';
-                overlay.style.display = '';
-                overlay2.style.display = '';
-                hamburgerMenu.style.display = '';
-                if (logo) logo.style.display = '';
-                copyPngBtn.style.visibility = 'visible';
-            }
+
+        function getHiddenKey() {
+    const parts = ["B1PH", "MU51C", "_MCQ", "2026", "X7K9"];
+    let key = parts.join("_");
+    key = key.split('').map((char, i) => 
+        String.fromCharCode(char.charCodeAt(0) ^ (i + 7))
+    ).join('');
+    return key;
+}
+
+const SECRET_KEY = getHiddenKey();
+
+function encryptData(data) {
+    const jsonStr = JSON.stringify(data);
+    let encrypted = '';
+    for (let i = 0; i < jsonStr.length; i++) {
+        encrypted += String.fromCharCode(
+            jsonStr.charCodeAt(i) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length)
+        );
+    }
+    return btoa(encrypted) + "==v2";
+}
+
+async function shareResultsAsText() {
+    if (!currentStudent) return;
+
+    const correctCount = studentAnswers.filter((ans, i) => 
+        ans === correctAnswers[i]?.answer
+    ).length;
+    const percentage = Math.round((correctCount / totalQuestions) * 100);
+
+    const exportData = {
+        student: capitalizeFirstLetter(currentStudent),
+        date: today,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+        percentage: percentage,
+        exercise: "Daily MCQ",
+        correctCount: correctCount,
+        total: totalQuestions
+    };
+
+    const encryptedContent = encryptData(exportData);
+    const safeName = exportData.student.replace(/[^a-zA-Z0-9]/g, '_');
+    const fileName = `MCQ_${safeName}_${today}.txt`;
+
+    const blob = new Blob([encryptedContent], { type: 'text/plain' });
+    const file = new File([blob], fileName, { type: 'text/plain' });
+
+    try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file] });
+        } else {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(url);
         }
+    } catch (err) {
+        console.error(err);
+        alert('Failed to share results.');
+    }
+}
         
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -749,9 +693,7 @@ if (hasProgress && currentQuestion >= totalQuestions) {
 
         // Hotkey functionality for quiz navigation
         document.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && document.activeElement.id === 'name-input') {
-        checkName();
-    } else if (isQuestionDisplayed) {
+   if (isQuestionDisplayed) {
         // Handle question navigation and submission
         if (event.key === 'ArrowLeft') {
             event.preventDefault();
@@ -780,7 +722,7 @@ if (hasProgress && currentQuestion >= totalQuestions) {
         // Handle results page download
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            const downloadButton = document.getElementById('copy-png-button');
+            const downloadButton = document.getElementById('copy-button');
             if (downloadButton) downloadButton.click();
         }
     }
@@ -790,6 +732,42 @@ if (hasProgress && currentQuestion >= totalQuestions) {
             const dateOptions = { weekday: 'long', month: 'long', day: 'numeric' };
             const formattedDate = systemDate.toLocaleDateString('en-US', dateOptions);
             document.getElementById('date-display').textContent = formattedDate;
+        });
+
+       // ==================== LOGIN CALLBACK ====================
+    window.onSuccessfulLogin = function(displayName) {
+        currentStudent = displayName.toLowerCase().trim();
+
+        if (!currentSetResult.found) {
+            showNoQuestionsYet();
+            return;
+        }
+
+        correctAnswers = buildQuestionSet();   // Now correctly uses start/end
+        totalQuestions = correctAnswers.length;   // Important: update this
+
+        const hasProgress = loadStudentProgress(currentStudent);
+
+        if (hasProgress && currentQuestion >= totalQuestions) {
+            showResults();
+        } else {
+            if (!hasProgress) {
+                studentAnswers = [];
+                currentQuestion = 0;
+            }
+            displayQuestion();
+        }
+
+        if (typeof initMyMenu === 'function') initMyMenu();
+    };
+
+        window.onload = () => initLogin();
+
+        // Date display
+        document.addEventListener('DOMContentLoaded', () => {
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            document.getElementById('date-display').textContent = 
+                systemDate.toLocaleDateString('en-US', options);
         });
     </script>
 </body>
