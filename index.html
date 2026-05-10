@@ -173,6 +173,7 @@
             box-shadow: 0 0 0 30px white inset !important;
             transition: background-color 5000s ease-in-out 0s !important;
         }
+
     </style>
 </head>
 <body>
@@ -204,9 +205,9 @@
             </div>
         </div>
 
-        <div class="logocontainer fade-in" id="logo-section">        
-            <img src="icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
-        </div>
+<div class="logo-container">
+    <img src="icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+</div>
     </div>
 
     <script>
@@ -226,25 +227,36 @@
                     <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
         }
 
-        // This function is called after successful login (from login-screen.js)
-        window.onSuccessfulLogin = function(displayName) {
-            const banner = document.getElementById('banner-section');
-            const logo = document.getElementById('logo-section');
-            const datesTitle = document.getElementById('dates-title');
-            const mockExam = document.getElementById('mock-exam');
-            const apExam = document.getElementById('ap-exam');
-            const dailyBtn = document.getElementById('daily-btn');
+// This function is called after successful login (from login-screen.js)
+window.onSuccessfulLogin = function(displayName) {
+    const banner = document.getElementById('banner-section');
+    const datesTitle = document.getElementById('dates-title');
+    const mockExam = document.getElementById('mock-exam');
+    const apExam = document.getElementById('ap-exam');
+    const dailyBtn = document.getElementById('daily-btn');
+    const logoContainer = document.querySelector('.logo-container');
 
-            setTimeout(() => { banner.classList.add('visible'); logo.classList.add('visible'); }, 100);
-            setTimeout(() => datesTitle.classList.add('visible'), 600);
-            setTimeout(() => mockExam.classList.add('visible'), 900);
-            setTimeout(() => apExam.classList.add('visible'), 1200);
-            setTimeout(() => dailyBtn.classList.add('visible'), 1600);
+    // Fade in main elements
+    setTimeout(() => { 
+        if (banner) banner.classList.add('visible'); 
+    }, 100);
 
-            document.getElementById('banner-text').innerHTML = getGreeting(displayName);
+    setTimeout(() => { if (datesTitle) datesTitle.classList.add('visible'); }, 600);
+    setTimeout(() => { if (mockExam) mockExam.classList.add('visible'); }, 900);
+    setTimeout(() => { if (apExam) apExam.classList.add('visible'); }, 1200);
+    setTimeout(() => { if (dailyBtn) dailyBtn.classList.add('visible'); }, 1600);
 
-            if (typeof initMyMenu === 'function') initMyMenu(false);
-        };
+    // Logo fades in a bit later so it feels natural
+    setTimeout(() => {
+        if (logoContainer) {
+            logoContainer.classList.add('visible');
+        }
+    }, 1400);
+
+    document.getElementById('banner-text').innerHTML = getGreeting(displayName);
+
+    if (typeof initMyMenu === 'function') initMyMenu(false);
+};
 
         function startDailyExercises() {
             const urls = [

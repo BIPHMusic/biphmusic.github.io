@@ -59,12 +59,6 @@ h1 {
     letter-spacing: 2px;
 }
 
-h2 { 
-    margin-top: 0px;
-    margin-bottom: 0px;
-    font-size: large; 
-}
-
 .Subtitle {
     font-family: 'Zapfino', cursive;
     color: white;
@@ -73,9 +67,19 @@ h2 {
     transform: translateX(-1.8%);
 }
 
-.logocontainer {
-    min-height: 10vh;
-    padding-bottom: 50px;
+.logo-container {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    padding: 0 25px 35px 0;     /* Fine-tune spacing here */
+    opacity: 0;
+    transition: opacity 2s ease;
+    pointer-events: none;
+}
+
+.logo-container.visible {
+    opacity: 1;
 }
 
 .logo {
