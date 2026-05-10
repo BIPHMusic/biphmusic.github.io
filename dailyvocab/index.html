@@ -257,17 +257,17 @@
     </style>
 </head>
 <body>
-    <div id="shared-menu"></div>
-    <script src="../menu.js"></script>
 
-    <div class="background"></div>
-    <div class="overlay"></div>
-    <div class="overlay2"></div>
-
-    <h1 class="Title">BIPH Music</h1>
-    <h1 class="Subtitle">Daily Vocab</h1>
-
+    <!-- MAIN CONTENT - Hidden until login -->
     <div id="main-content" style="display: none;">
+
+        <div class="background"></div>
+        <div class="overlay"></div>
+        <div class="overlay2"></div>
+
+        <h1 class="Title">BIPH Music</h1>
+        <h1 class="Subtitle">Daily Vocab</h1>
+
         <div class="quiz-container">
             <div class="questions-container" id="quiz-questions"></div>
             <div class="word-bank-container">
@@ -280,15 +280,19 @@
         </div>
 
         <div id="results-section" class="results-section hidden"></div>
+
+        <div class="logocontainer">        
+            <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+        </div>
+
+        <div id="shared-menu"></div>
     </div>
 
-    <div class="logocontainer">        
-        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
-    </div>
-
+    <script src="../menu.js"></script>
     <script src="vocab.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
 <script>
 // Unicode-safe base64 encoding and decoding functions
 function unicodeToBase64(str) {
