@@ -59,6 +59,12 @@ h1 {
     letter-spacing: 2px;
 }
 
+h2 { 
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-size: large; 
+}
+
 .Subtitle {
     font-family: 'Zapfino', cursive;
     color: white;
