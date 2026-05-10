@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <script src="../apstudents.js"></script>
+    <script src="../login-screen.js"></script>
     <script src="../mymenu.js"></script>
     <style>
     /* SHARED STYLES - Do not duplicate core styles from common-styles.css */
@@ -189,24 +190,18 @@
 </style>
 </head>
 <body>
-    <div id="shared-menu"></div>
-    <script src="../menu.js"></script>
-    <div class="background"></div>
-    <div class="overlay"></div>
-    <div class="overlay2"></div>
 
-    <h1 class="Title">BIPH Music</h1>
-    <h1 class="Subtitle">Daily Ear Training</h1>
+    <!-- MAIN CONTENT - Hidden until successful login -->
+    <div id="main-content" style="display: none;">
 
-    <div class="logincontainer">
-        <div id="login-section" class="login-section">
-            <h2>Enter your name to begin</h2>
-            <input type="text" id="name-input" placeholder="Your name" autofocus>
-            <button class="action-button" onclick="checkName()">Begin</button>
-            <div id="error-message" class="error"></div>
-        </div>
+        <div class="background"></div>
+        <div class="overlay"></div>
+        <div class="overlay2"></div>
 
-        <div id="quiz-section" class="quiz-section hidden">
+        <h1 class="Title">BIPH Music</h1>
+        <h1 class="Subtitle">Daily Ear Training</h1>
+
+        <div class="quiz-section">
             <div class="quiz-container">
                 <div class="questions-container" id="quiz-questions"></div>
             </div>
@@ -216,12 +211,15 @@
             </div>
             <div id="results-section" class="results-section hidden"></div>
         </div>
+
+        <div class="logocontainer">        
+            <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+        </div>
+
+        <div id="shared-menu"></div>
     </div>
 
-    <div class="logocontainer">        
-        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
-    </div>
-
+    <script src="../menu.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js"></script>
 
     <script>
@@ -234,6 +232,19 @@
         let studentAnswers = [];
         let currentAudio = null;
         let playsLeft = 2;
+
+        // ==================== LOGIN INTEGRATION ====================
+window.onSuccessfulLogin = function(displayName) {
+    document.getElementById('main-content').style.display = 'block';
+    
+    // Store name
+    localStorage.setItem('biph_student_name', displayName);
+    localStorage.setItem('biph_name_timestamp', Date.now().toString());
+
+    if (typeof initMyMenu === 'function') initMyMenu();
+    
+    initQuiz();           // Start the quiz automatically after login
+};
 
         const sections = ['intervals', 'triads', 'seventhChords', 'modes'];
         const sectionTitles = ['Intervals', 'Triads', 'Seventh Chords', 'Modes'];
@@ -469,56 +480,6 @@ function unicodeToBase64(str) {
             return name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         }
 
-        // ====================== LOGIN ======================
-        function autoLoginIfPossible() {
-            const storedName = localStorage.getItem('biph_student_name');
-            if (!storedName) return false;
-
-            const lower = storedName.toLowerCase();
-            const student = approvedStudents.find(s => 
-                s.name.toLowerCase() === lower || (s.altName && s.altName.toLowerCase() === lower)
-            );
-            
-            if (student) {
-                currentStudent = lower;
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('quiz-section').classList.remove('hidden');
-                initQuiz();
-                return true;
-            }
-            return false;
-        }
-
-        function checkName() {
-            const nameInput = document.getElementById('name-input').value.trim();
-            const errorElement = document.getElementById('error-message');
-
-            if (!nameInput) {
-                errorElement.textContent = 'Please enter your name';
-                return;
-            }
-
-            const lower = nameInput.toLowerCase();
-            const student = approvedStudents.find(s =>
-                s.name.toLowerCase() === lower || (s.altName && s.altName.toLowerCase() === lower)
-            );
-
-            if (student) {
-                currentStudent = lower;
-                const displayName = capitalizeName(student.name);
-                localStorage.setItem('biph_student_name', displayName);
-                localStorage.setItem('biph_name_timestamp', Date.now().toString());
-
-                if (typeof initMyMenu === 'function') initMyMenu();
-
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('quiz-section').classList.remove('hidden');
-                initQuiz();
-            } else {
-                errorElement.textContent = 'Name not found in approved list';
-            }
-        }
-
         // ====================== QUIZ LOGIC ======================
         function generateQuestionSet(section) {
             let pool = [...audioFiles[section]];
@@ -671,10 +632,10 @@ function finishQuiz() {
             };
         }
 
-        // ====================== INIT ======================
-        document.addEventListener('DOMContentLoaded', () => {
-            autoLoginIfPossible();
-        });
+// Initialize standard login
+window.onload = () => {
+    initLogin();
+};
 
 
         // ====================== SHARING & ENCRYPTION ======================
