@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+•<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -623,7 +623,7 @@ function showNoQuestionsYet() {
         }
 
         function getHiddenKey() {
-    const parts = ["B1PH", "MU51C", "_MCQ", "2026", "X7K9"];
+    const parts = ["B1PH", "MU51C", "_V0C4B", "2026", "X7K9"];
     let key = parts.join("_");
     key = key.split('').map((char, i) => 
         String.fromCharCode(char.charCodeAt(0) ^ (i + 7))
@@ -636,20 +636,23 @@ const SECRET_KEY = getHiddenKey();
 function encryptData(data) {
     const jsonStr = JSON.stringify(data);
     let encrypted = '';
+    
     for (let i = 0; i < jsonStr.length; i++) {
         encrypted += String.fromCharCode(
             jsonStr.charCodeAt(i) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length)
         );
     }
+    
     return btoa(encrypted) + "==v2";
 }
 
 async function shareResultsAsText() {
-    if (!currentStudent) return;
+    if (!currentStudent || correctAnswers.length === 0) return;
 
     const correctCount = studentAnswers.filter((ans, i) => 
-        ans === correctAnswers[i]?.answer
+        ans && ans === correctAnswers[i]?.answer
     ).length;
+
     const percentage = Math.round((correctCount / totalQuestions) * 100);
 
     const exportData = {
@@ -657,14 +660,16 @@ async function shareResultsAsText() {
         date: today,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
         percentage: percentage,
-        exercise: "Daily MCQ",
+        exercise: "MCQs",
         correctCount: correctCount,
-        total: totalQuestions
+        total: totalQuestions,
+        answers: studentAnswers,
+        correctAnswers: correctAnswers.map(q => q.answer)
     };
 
     const encryptedContent = encryptData(exportData);
     const safeName = exportData.student.replace(/[^a-zA-Z0-9]/g, '_');
-    const fileName = `MCQ_${safeName}_${today}.txt`;
+    const fileName = `MCQs_${safeName}_${today}.txt`;
 
     const blob = new Blob([encryptedContent], { type: 'text/plain' });
     const file = new File([blob], fileName, { type: 'text/plain' });
