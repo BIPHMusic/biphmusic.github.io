@@ -1,4 +1,4 @@
-•<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -655,6 +655,14 @@ async function shareResultsAsText() {
 
     const percentage = Math.round((correctCount / totalQuestions) * 100);
 
+    // Build questionsToReview (numbers of questions gotten wrong)
+    const questionsToReview = [];
+    studentAnswers.forEach((answer, index) => {
+        if (answer !== correctAnswers[index]?.answer) {
+            questionsToReview.push(correctAnswers[index].question);   // e.g. 7, 12, 19
+        }
+    });
+
     const exportData = {
         student: capitalizeFirstLetter(currentStudent),
         date: today,
@@ -663,8 +671,7 @@ async function shareResultsAsText() {
         exercise: "MCQs",
         correctCount: correctCount,
         total: totalQuestions,
-        answers: studentAnswers,
-        correctAnswers: correctAnswers.map(q => q.answer)
+        questionsToReview: questionsToReview
     };
 
     const encryptedContent = encryptData(exportData);
