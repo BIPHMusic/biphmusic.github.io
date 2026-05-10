@@ -127,6 +127,7 @@
         margin: 30px auto;
         padding: 0 15px;
         text-align: center;
+        box-sizing: border-box;
     }
 
     .results-table {
@@ -782,31 +783,38 @@ function displayResults(data) {
 }
 
 
-        // ====================== KEYBOARD SHORTCUTS ======================
+ // ====================== KEYBOARD SHORTCUTS ======================
 document.addEventListener('keydown', function(e) {
     const activeElement = document.activeElement;
-    const nameInput = document.getElementById('name-input');
     const answerSelect = document.getElementById('answer-select');
-    const isQuizVisible = !document.getElementById('quiz-section').classList.contains('hidden');
-    const isLoginVisible = !document.getElementById('login-section').classList.contains('hidden');
 
-    // ==================== TAB ====================
-    if (e.key === 'Tab') {
-        if (isLoginVisible && activeElement !== nameInput) {
+    // Check if we're in the quiz (more reliable method)
+    const quizContainer = document.querySelector('.quiz-container');
+    const isQuizActive = quizContainer && 
+                        !quizContainer.classList.contains('hidden') &&
+                        document.getElementById('main-content').style.display !== 'none';
+
+    const isLoginActive = document.getElementById('login-section') !== null && 
+                         !document.getElementById('login-section').classList.contains('hidden');
+
+    // ==================== TAB (Login) ====================
+    if (e.key === 'Tab' && isLoginActive) {
+        const nameInput = document.getElementById('name-input');
+        if (nameInput) {
             nameInput.focus();
             e.preventDefault();
         }
-        // You can extend Tab navigation inside quiz later if needed
         return;
     }
 
     // ==================== ENTER ====================
     if (e.key === 'Enter') {
-        if (isLoginVisible) {
-            checkName();
+        if (isLoginActive) {
+            // Assuming checkName() is defined in login-screen.js
+            if (typeof checkName === 'function') checkName();
             e.preventDefault();
         } 
-        else if (isQuizVisible && answerSelect) {
+        else if (isQuizActive && answerSelect) {
             submitCurrentAnswer();
             e.preventDefault();
         }
@@ -814,8 +822,8 @@ document.addEventListener('keydown', function(e) {
     }
 
     // ==================== SPACE - Play Audio ====================
-    if ((e.key === ' ' || e.key === 'Spacebar') && isQuizVisible) {
-        // Only trigger if not typing in an input
+    if ((e.key === ' ' || e.key === 'Spacebar') && isQuizActive) {
+        // Prevent triggering when typing in select or input
         if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'SELECT') {
             e.preventDefault();
             playCurrentAudio();
@@ -823,14 +831,11 @@ document.addEventListener('keydown', function(e) {
     }
 
     // ==================== ARROW KEYS - Navigate dropdown ====================
-    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isQuizVisible && answerSelect) {
+    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isQuizActive && answerSelect) {
         const sectionKey = sections[currentSectionIndex];
         const orderedOptions = {
-            intervals: [
-                'Minor 2nd', 'Major 2nd', 'Minor 3rd', 'Major 3rd',
-                'Perfect 4th', 'Tritone', 'Perfect 5th', 'Minor 6th',
-                'Major 6th', 'Minor 7th', 'Major 7th', 'Perfect 8ve'
-            ],
+            intervals: ['Minor 2nd', 'Major 2nd', 'Minor 3rd', 'Major 3rd', 'Perfect 4th', 'Tritone', 
+                       'Perfect 5th', 'Minor 6th', 'Major 6th', 'Minor 7th', 'Major 7th', 'Perfect 8ve'],
             triads: ['Major Triad', 'Minor Triad', 'Augmented Triad', 'Diminished Triad'],
             seventhChords: ['Major 7', 'Dominant 7', 'Minor 7', 'Half-Diminished 7', 'Diminished 7'],
             modes: ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian']
@@ -843,7 +848,7 @@ document.addEventListener('keydown', function(e) {
 
         if (e.key === 'ArrowDown') {
             currentIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
-        } else { // ArrowUp
+        } else {
             currentIndex = currentIndex === -1 ? options.length - 1 : (currentIndex - 1 + options.length) % options.length;
         }
 
