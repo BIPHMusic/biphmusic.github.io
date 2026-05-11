@@ -77,8 +77,8 @@ function createLoginScreen() {
     const loginHTML = `
     <div id="login-screen">
         <div class="login-box">
-            <h1 class="Title">BIPH</h1>
-            <h1 class="Subtitle">AP Music Theory</h1>
+            <h1 class="Title" style="margin-top:-10px; font-size: 2rem;">BIPH</h1>
+            <h1 class="Subtitle" style="margin-top:-10px; font-size: 1.6rem; margin-bottom: 10px;">AP Music Theory</h1>
             <h2>Enter your name to begin</h2>
             
             <input 
