@@ -221,15 +221,16 @@
 
     <div class="container">
         <!-- Color Picker -->
+         <!-- Blue, Pink, Purple, Red, Green, Orange -->
         <div id="colorScreen" class="color-picker">
             <h1>Choose your color</h1>
             <div class="colors">
-                <div class="color-btn" style="background: #1e40af;" data-color="#1e40af"></div>
-                <div class="color-btn" style="background: #9f1239;" data-color="#9f1239"></div>
-                <div class="color-btn" style="background: #6b21a8;" data-color="#6b21a8"></div>
-                <div class="color-btn" style="background: #b45309;" data-color="#b45309"></div>
-                <div class="color-btn" style="background: #166534;" data-color="#166534"></div>
-                <div class="color-btn" style="background: #991b1b;" data-color="#991b1b"></div>
+                <div class="color-btn" style="background: #1e40af;" data-color="#162c76"></div>
+                <div class="color-btn" style="background: #f666ce;" data-color="#a44288"></div>
+                <div class="color-btn" style="background: #6b21a8;" data-color="#4f197b"></div>
+                <div class="color-btn" style="background: #b40909;" data-color="#810808"></div>
+                <div class="color-btn" style="background: #0e8c3e;" data-color="#0a602b"></div>
+                <div class="color-btn" style="background: #e76d22;" data-color="#984816"></div>
             </div>
         </div>
 
@@ -280,11 +281,13 @@
     const incorrectSound = new Audio('incorrect.mp3');
     const gongSound = new Audio('gong.wav');
     const gameOverSound = new Audio('gameover.mp3');
+    const tickTockSound = new Audio('ticktock.mp3');
 
     correctSound.volume = 0.1;
     incorrectSound.volume = 0.1;
     gongSound.volume = 0.1;
     gameOverSound.volume = 0.1;
+    tickTockSound.volume = 0.2;
 
     function shuffle(array) {
         return [...array].sort(() => Math.random() - 0.5);
@@ -366,10 +369,12 @@
 
         messageEl.textContent = `Penalty: ${timeLeft}s`;
         messageEl.style.opacity = '1';
+        playSound(tickTockSound);
 
         const countdown = setInterval(() => {
             timeLeft--;
             if (timeLeft > 0) {
+                playSound(tickTockSound);
                 messageEl.textContent = `Penalty: ${timeLeft}s`;
             } else {
                 clearInterval(countdown);
