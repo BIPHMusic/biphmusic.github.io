@@ -429,22 +429,6 @@ const allQuestions = [
         answer: "A"
     },
     {
-        question: "Label the following clauses in the sentence.",
-        options: [
-            "A.  Dependent",
-            "B.  Independent"
-        ],
-        answer: "a, b"
-    },
-    {
-        question: "Label the following clauses in the sentence.",
-        options: [
-            "A.  Dependent",
-            "B.  Independent"
-        ],
-        answer: "a, b"
-    },
-    {
         question: "If you have made your decision and are sure",
         options: [
             "A.  Dependent",

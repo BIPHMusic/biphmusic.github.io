@@ -174,7 +174,6 @@
         
         .option.correct { background: #22c55e; color: white; }
         .option.incorrect { background: #ef4444; }
-
         .option.disabled {
             opacity: 0.45;
             cursor: not-allowed;
@@ -201,7 +200,7 @@
             font-weight: 700;
             background: rgba(107, 107, 107, 0.95);
             padding: 1.2rem 3rem;
-            border-radius: 9999px;
+            border-radius: 20px;
             opacity: 0;
             pointer-events: none;
             transition: all 0.4s ease;
@@ -213,15 +212,12 @@
     </style>
 </head>
 <body>
-    <!-- Fixed Header -->
     <div class="header">
         <div id="setScore" class="score">0/10</div>
         <button id="menuBtn" class="menu-btn">☰</button>
     </div>
 
     <div class="container">
-        <!-- Color Picker -->
-         <!-- Blue, Pink, Purple, Red, Green, Orange -->
         <div id="colorScreen" class="color-picker">
             <h1>Choose your color</h1>
             <div class="colors">
@@ -230,17 +226,15 @@
                 <div class="color-btn" style="background: #6b21a8;" data-color="#4f197b"></div>
                 <div class="color-btn" style="background: #b40909;" data-color="#810808"></div>
                 <div class="color-btn" style="background: #0e8c3e;" data-color="#0a602b"></div>
-                <div class="color-btn" style="background: #e76d22;" data-color="#984816"></div>
+                <div class="color-btn" style="background: #e76d22;" data-color="#e15802"></div>
             </div>
         </div>
 
-        <!-- Quiz -->
         <div id="quizScreen" class="quiz-container">
             <div id="questionText" class="question"></div>
             <div id="options" class="options"></div>
         </div>
 
-        <!-- Menu -->
         <div id="menu" class="menu">
             <button id="resetBtn">Reset the Game</button>
             <button id="gameOverBtn">Game Over</button>
@@ -351,9 +345,7 @@
         if (isPenalty) {
             isInPenalty = true;
             const options = optionsEl.children;
-            for (let opt of options) {
-                opt.classList.add('disabled');
-            }
+            for (let opt of options) opt.classList.add('disabled');
         }
     }
 
@@ -369,6 +361,7 @@
 
         messageEl.textContent = `Penalty: ${timeLeft}s`;
         messageEl.style.opacity = '1';
+        messageEl.style.background = 'rgba(107, 107, 107, 0.95)';
         playSound(tickTockSound);
 
         const countdown = setInterval(() => {
@@ -381,13 +374,35 @@
                 messageEl.style.opacity = '0';
                 isInPenalty = false;
 
-                // Re-enable buttons
                 const options = optionsEl.children;
-                for (let opt of options) {
-                    opt.classList.remove('disabled');
-                }
+                for (let opt of options) opt.classList.remove('disabled');
             }
         }, 1000);
+    }
+
+    function triggerCelebration() {
+        if (gameOverMode) return;
+        
+        playSound(gongSound);
+        confetti({ particleCount: 400, spread: 90, origin: { y: 0.6 } });
+        setTimeout(() => confetti({ particleCount: 250, angle: 60, spread: 70 }), 250);
+        
+        messageEl.textContent = "Flip your timer!";
+        messageEl.style.background = 'rgba(234, 88, 12, 0.95)';
+        messageEl.style.opacity = '1';
+        
+        setTimeout(() => {
+            messageEl.style.opacity = '0';
+            
+            setCorrect = 0;
+            updateSetScore();
+            startNewSet();
+        }, 1600);
+    }
+
+    function startNewSet() {
+        currentIndex = 0;
+        loadQuestion();
     }
 
     function selectAnswer(selectedOptionText, element, correctAnswer) {
@@ -413,7 +428,13 @@
             setCorrect++;
             totalCorrect++;
             updateSetScore();
-            
+            updateTotalFooter();
+
+            if (setCorrect >= 10) {
+                triggerCelebration();
+                return;
+            }
+
             setTimeout(() => {
                 currentIndex++;
                 loadQuestion();
@@ -425,40 +446,10 @@
 
             setTimeout(() => {
                 currentIndex++;
-                loadQuestion(true);           // Load new question with buttons disabled
-                startPenalty(totalWrong);     // Start penalty immediately
+                loadQuestion(true);
+                startPenalty(totalWrong);
             }, 900);
-            return;
         }
-
-        updateTotalFooter();
-    }
-
-    function triggerCelebration() {
-        if (gameOverMode) return;
-        
-        playSound(gongSound);
-        confetti({ particleCount: 400, spread: 90, origin: { y: 0.6 } });
-        setTimeout(() => confetti({ particleCount: 250, angle: 60, spread: 70 }), 250);
-        
-        messageEl.style.opacity = '1';
-        messageEl.style.transform = 'translateX(-50%) scale(1)';
-        messageEl.style.background = 'rgba(0,0,0,0.9)';
-        messageEl.textContent = "Great Job! 🎉";
-        
-        setTimeout(() => {
-            messageEl.style.opacity = '0';
-            messageEl.style.background = 'rgba(234, 88, 12, 0.95)';
-            
-            setCorrect = 0;
-            updateSetScore();
-            startNewSet();
-        }, 1400);
-    }
-
-    function startNewSet() {
-        currentIndex = 0;
-        loadQuestion();
     }
 
     // Color selection
@@ -475,7 +466,6 @@
         menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     });
 
-    // Reset Button
     document.getElementById('resetBtn').addEventListener('click', () => {
         if (confirm('Reset the game and return to color selection?')) {
             setCorrect = 0;
@@ -491,7 +481,6 @@
         }
     });
 
-    // Game Over Button
     document.getElementById('gameOverBtn').addEventListener('click', () => {
         if (confirm('End the current session? Background will turn black.')) {
             playSound(gameOverSound);
@@ -502,9 +491,7 @@
         }
     });
 
-    document.addEventListener('click', () => {
-        menu.style.display = 'none';
-    });
+    document.addEventListener('click', () => menu.style.display = 'none');
 
     // Initialize
     updateSetScore();
