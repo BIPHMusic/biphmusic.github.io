@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Tally</title>
+    <link rel="icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script src="questions.js"></script>
     
@@ -98,7 +99,6 @@
         
         .menu button:hover { background: #f3f4f6; }
         
-        /* Improved Color Picker */
         .color-picker {
             text-align: center;
             margin-top: 100px;
@@ -175,6 +175,12 @@
         
         .option.correct { background: #22c55e; color: white; }
         .option.incorrect { background: #ef4444; }
+
+        .option.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            background: rgba(255,255,255,0.08);
+        }
         
         .footer {
             position: fixed;
@@ -189,18 +195,21 @@
         
         .message {
             position: fixed;
-            top: 42%;
+            top: 20px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2.8rem;
+            transform: translateX(-50%);
+            font-size: 2.4rem;
             font-weight: 700;
-            background: rgba(0,0,0,0.8);
-            padding: 1.8rem 3.5rem;
+            background: rgba(107, 107, 107, 0.95);
+            padding: 1.2rem 3rem;
             border-radius: 9999px;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.6s ease;
+            transition: all 0.4s ease;
             z-index: 300;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -239,20 +248,22 @@
     </div>
 
     <div id="totalFooter" class="footer">
-        Total correct: <span id="totalCorrect">0</span>
+        Total: <span id="totalCorrect">0/0 (0%)</span>
     </div>
 
-    <div id="message" class="message">Flip your timer!</div>
+    <div id="message" class="message">Penalty: 0s</div>
 
    <script>
     let currentColor = '#1c1c1c';
-    let currentQuestions = [];
     let remainingQuestions = [];
     let currentIndex = 0;
     let setCorrect = 0;
     let totalCorrect = 0;
+    let totalAttempted = 0;
+    let totalWrong = 0;
     let selectedAnswer = null;
     let gameOverMode = false;
+    let isInPenalty = false;
 
     const body = document.body;
     const colorScreen = document.getElementById('colorScreen');
@@ -299,6 +310,8 @@
         
         refillQuestions();
         currentIndex = 0;
+        setCorrect = 0;
+        totalWrong = 0;
         loadQuestion();
         updateUIVisibility();
     }
@@ -307,12 +320,16 @@
         setScoreEl.textContent = `${setCorrect}/10`;
     }
 
-    // Helper function to extract the answer letter (A, B, C...)
+    function updateTotalFooter() {
+        const percent = totalAttempted === 0 ? 0 : Math.round((totalCorrect / totalAttempted) * 100);
+        totalCorrectEl.textContent = `${totalCorrect}/${totalAttempted} (${percent}%)`;
+    }
+
     function getAnswerLetter(optionText) {
         return optionText.trim().charAt(0).toUpperCase();
     }
 
-    function loadQuestion() {
+    function loadQuestion(isPenalty = false) {
         if (remainingQuestions.length === 0) refillQuestions();
         
         const q = remainingQuestions[currentIndex];
@@ -328,6 +345,14 @@
             div.onclick = () => selectAnswer(option, div, q.answer);
             optionsEl.appendChild(div);
         });
+
+        if (isPenalty) {
+            isInPenalty = true;
+            const options = optionsEl.children;
+            for (let opt of options) {
+                opt.classList.add('disabled');
+            }
+        }
     }
 
     function playSound(audio) {
@@ -336,51 +361,73 @@
         clone.play().catch(() => {});
     }
 
+    function startPenalty(seconds) {
+        isInPenalty = true;
+        let timeLeft = seconds;
+
+        messageEl.textContent = `Penalty: ${timeLeft}s`;
+        messageEl.style.opacity = '1';
+
+        const countdown = setInterval(() => {
+            timeLeft--;
+            if (timeLeft > 0) {
+                messageEl.textContent = `Penalty: ${timeLeft}s`;
+            } else {
+                clearInterval(countdown);
+                messageEl.style.opacity = '0';
+                isInPenalty = false;
+
+                // Re-enable buttons
+                const options = optionsEl.children;
+                for (let opt of options) {
+                    opt.classList.remove('disabled');
+                }
+            }
+        }, 1000);
+    }
+
     function selectAnswer(selectedOptionText, element, correctAnswer) {
-        if (selectedAnswer) return;
+        if (selectedAnswer || isInPenalty) return;
         selectedAnswer = selectedOptionText;
         
         const selectedLetter = getAnswerLetter(selectedOptionText);
         const isCorrect = selectedLetter === correctAnswer;
 
-        // Disable all options
         const options = optionsEl.children;
         for (let opt of options) {
             opt.style.pointerEvents = 'none';
-            
             const optLetter = getAnswerLetter(opt.textContent);
             
-            if (optLetter === correctAnswer) {
-                opt.classList.add('correct');
-            }
-            if (opt.textContent === selectedOptionText && !isCorrect) {
-                opt.classList.add('incorrect');
-            }
+            if (optLetter === correctAnswer) opt.classList.add('correct');
+            if (opt.textContent === selectedOptionText && !isCorrect) opt.classList.add('incorrect');
         }
         
+        totalAttempted++;
+
         if (isCorrect) {
             playSound(correctSound);
             setCorrect++;
             totalCorrect++;
             updateSetScore();
-            totalCorrectEl.textContent = totalCorrect;
-
-            if (setCorrect >= 10) {
-                triggerCelebration();
-                return;
-            }
+            
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion();
+            }, 800);
         } else {
             playSound(incorrectSound);
+            totalWrong++;
+            updateTotalFooter();
+
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion(true);           // Load new question with buttons disabled
+                startPenalty(totalWrong);     // Start penalty immediately
+            }, 900);
+            return;
         }
-        
-        setTimeout(() => {
-            currentIndex++;
-            if (currentIndex < remainingQuestions.length) {
-                loadQuestion();
-            } else {
-                startNewSet();
-            }
-        }, 800); // Slightly longer for better UX
+
+        updateTotalFooter();
     }
 
     function triggerCelebration() {
@@ -391,11 +438,13 @@
         setTimeout(() => confetti({ particleCount: 250, angle: 60, spread: 70 }), 250);
         
         messageEl.style.opacity = '1';
-        messageEl.style.transform = 'translate(-50%, -50%) scale(1)';
+        messageEl.style.transform = 'translateX(-50%) scale(1)';
+        messageEl.style.background = 'rgba(0,0,0,0.9)';
+        messageEl.textContent = "Great Job! 🎉";
         
         setTimeout(() => {
             messageEl.style.opacity = '0';
-            messageEl.style.transform = 'translate(-50%, -150%) scale(0.8)';
+            messageEl.style.background = 'rgba(234, 88, 12, 0.95)';
             
             setCorrect = 0;
             updateSetScore();
@@ -427,7 +476,9 @@
         if (confirm('Reset the game and return to color selection?')) {
             setCorrect = 0;
             totalCorrect = 0;
-            totalCorrectEl.textContent = '0';
+            totalAttempted = 0;
+            totalWrong = 0;
+            totalCorrectEl.textContent = '0/0 (0%)';
             menu.style.display = 'none';
             quizScreen.style.display = 'none';
             colorScreen.style.display = 'block';
@@ -453,6 +504,7 @@
 
     // Initialize
     updateSetScore();
+    updateTotalFooter();
     updateUIVisibility();
 </script>
 </body>

@@ -431,7 +431,7 @@ const allQuestions = [
         answer: "B"
     },
     {
-        question: "A long time ago there was a king who wanted nothing but golD.  ... What is the theme?",
+        question: "A long time ago there was a king who wanted nothing but gold.  ... What is the theme?",
         options: [
             "A.  Don't be greedy",
             "B.  Work together",
