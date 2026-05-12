@@ -261,16 +261,6 @@ const allQuestions = [
         answer: "A"
     },
     {
-        question: "Who is the Protagonist? [Grinch image]",
-        options: [
-            "A.  The Grinch",
-            "B.  The Mayor",
-            "C.  Max the dog",
-            "D.  Cindy Lou Who"
-        ],
-        answer: "A"
-    },
-    {
         question: "Who is Simba in the Lion King?",
         options: [
             "A.  Protagonist",
@@ -287,25 +277,6 @@ const allQuestions = [
             "D.  King Triton"
         ],
         answer: "C"
-    },
-    {
-        question: "These two characters are the same, but different. ... These characters are:",
-        options: [
-            "A.  static",
-            "B.  dynamic",
-            "C.  antagonists",
-            "D.  character foils"
-        ],
-        answer: "D"
-    },
-    {
-        question: "What type of character is used to help highlight the opposite character traits in another character? Think Cinderella and her step sisters as an example.",
-        options: [
-            "A.  Static",
-            "B.  Foil",
-            "C.  Stock"
-        ],
-        answer: "B"
     },
     {
         question: "Which of the following examples best demonstrates a character and his/her foil?",
@@ -361,15 +332,6 @@ const allQuestions = [
             "C.  Situational"
         ],
         answer: "A"
-    },
-    {
-        question: "What type of irony does this image display? [Procrastinator's Meeting image]",
-        options: [
-            "A.  Verbal",
-            "B.  Situational",
-            "C.  Dramatic"
-        ],
-        answer: "B"
     },
     {
         question: "Which form of irony is being used? John's parents are proud of the \"A\" he got on the test, but we know he cheateD.  Sam writes a love poem to Jenny but we know that Jenny loves Peter.",
@@ -591,14 +553,6 @@ const allQuestions = [
             "D.  When the bell rings, the moon turns blue."
         ],
         answer: "C"
-    },
-    {
-        question: "We usually travel during Christmas break, however this year will be different.",
-        options: [
-            "A.  The underlined clause is the independent clause.",
-            "B.  The underlined clause is the dependent clause."
-        ],
-        answer: "A"
     },
     {
         question: "Select the sentence that uses the semicolon correctly",
