@@ -721,7 +721,7 @@ const allQuestions = [
         answer: "D"
     },
     {
-        question: "Choose the phrase from the passage that appeals to your sense of sounD.  [Monkey's Paw]",
+        question: "Choose the phrase from the passage that appeals to your sense of sound.  [Monkey's Paw]",
         options: [
             "A.  he took the box of matches",
             "B.  the darkness was oppressive...",
