@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Tally</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="questions.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary: #1c1c1c;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--primary);
+            color: white;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background 0.6s ease;
+        }
+        
+        .header {
+            position: fixed;
+            background: rgba(0, 0, 0, 0);
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 2rem;
+            z-index: 100;
+        }
+        
+        .score {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: rgba(0,0,0,0.4);
+            padding: 0.4rem 1.8rem;
+            border-radius: 9999px;
+        }
+        
+        .menu-btn {
+            background: rgba(140, 140, 140, 0.069);
+            border: none;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s;
+        }
+
+        .menu-btn:hover {
+            background: rgba(140, 140, 140, 0.209);
+        }
+        
+        .container {
+            padding: 2rem;
+            margin-top: 90px;
+            max-width: 100%;
+            width: 100%;
+        }
+        
+        .menu {
+            position: absolute;
+            top: 67px;
+            right: 45px;
+            background: white;
+            color: #1f2937;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+            padding: 0.5rem 0;
+            display: none;
+            z-index: 200;
+            min-width: 190px;
+        }
+        
+        .menu button {
+            padding: 0.9rem 1.5rem;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            font-size: 1.05rem;
+            cursor: pointer;
+        }
+        
+        .menu button:hover { background: #f3f4f6; }
+        
+        /* Improved Color Picker */
+        .color-picker {
+            text-align: center;
+            margin-top: 100px;
+            padding: 2rem 1rem;
+            width: 100%;
+        }
+        
+        .color-picker h1 {
+            font-size: clamp(2.2rem, 5vw, 2.8rem);
+            margin-bottom: 2rem;
+        }
+        
+        .colors {
+            display: flex;
+            justify-content: center;
+            gap: clamp(0.1rem, 1.2vw, 0.8rem);
+            flex-wrap: nowrap;
+            padding: 1rem 2rem; 
+            scroll-padding: 2rem;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .colors::-webkit-scrollbar {
+            display: none;
+        }
+                
+        .color-btn {
+            width: clamp(68px, 13vw, 88px);
+            height: clamp(68px, 13vw, 88px);
+            border-radius: 9999px;
+            cursor: pointer;
+            border: 7px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .color-btn:hover {
+            transform: scale(1.15);
+            border-color: white;
+        }
+        
+        .quiz-container { 
+            margin-top: 100px;
+            display: none; 
+        }
+        
+        .question {
+            font-size: 1.85rem;
+            font-weight: 600;
+            margin-bottom: 2.5rem;
+            line-height: 1.35;
+        }
+        
+        .options {
+            display: grid;
+            gap: 1.1rem;
+        }
+        
+        .option {
+            background: rgba(255,255,255,0.16);
+            padding: 1.45rem 1.7rem;
+            border-radius: 16px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .option:hover {
+            background: rgba(255,255,255,0.26);
+            transform: translateY(-1px);
+        }
+        
+        .option.correct { background: #22c55e; color: white; }
+        .option.incorrect { background: #ef4444; }
+        
+        .footer {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0,0,0,0.35);
+            padding: 0.9rem 1.9rem;
+            border-radius: 9999px;
+            backdrop-filter: blur(12px);
+            font-size: 1.15rem;
+        }
+        
+        .message {
+            position: fixed;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: rgba(0,0,0,0.8);
+            padding: 1.8rem 3.5rem;
+            border-radius: 9999px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.6s ease;
+            z-index: 300;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Header -->
+    <div class="header">
+        <div id="setScore" class="score">0/10</div>
+        <button id="menuBtn" class="menu-btn">☰</button>
+    </div>
+
+    <div class="container">
+        <!-- Color Picker -->
+        <div id="colorScreen" class="color-picker">
+            <h1>Choose your color</h1>
+            <div class="colors">
+                <div class="color-btn" style="background: #1e40af;" data-color="#1e40af"></div>
+                <div class="color-btn" style="background: #9f1239;" data-color="#9f1239"></div>
+                <div class="color-btn" style="background: #6b21a8;" data-color="#6b21a8"></div>
+                <div class="color-btn" style="background: #b45309;" data-color="#b45309"></div>
+                <div class="color-btn" style="background: #166534;" data-color="#166534"></div>
+                <div class="color-btn" style="background: #991b1b;" data-color="#991b1b"></div>
+            </div>
+        </div>
+
+        <!-- Quiz -->
+        <div id="quizScreen" class="quiz-container">
+            <div id="questionText" class="question"></div>
+            <div id="options" class="options"></div>
+        </div>
+
+        <!-- Menu -->
+        <div id="menu" class="menu">
+            <button id="resetBtn">Reset the Game</button>
+            <button id="gameOverBtn">Game Over</button>
+        </div>
+    </div>
+
+    <div id="totalFooter" class="footer">
+        Total correct: <span id="totalCorrect">0</span>
+    </div>
+
+    <div id="message" class="message">Flip your timer!</div>
+
+   <script>
+    let currentColor = '#1c1c1c';
+    let currentQuestions = [];
+    let remainingQuestions = [];
+    let currentIndex = 0;
+    let setCorrect = 0;
+    let totalCorrect = 0;
+    let selectedAnswer = null;
+    let gameOverMode = false;
+
+    const body = document.body;
+    const colorScreen = document.getElementById('colorScreen');
+    const quizScreen = document.getElementById('quizScreen');
+    const setScoreEl = document.getElementById('setScore');
+    const totalCorrectEl = document.getElementById('totalCorrect');
+    const totalFooter = document.getElementById('totalFooter');
+    const questionText = document.getElementById('questionText');
+    const optionsEl = document.getElementById('options');
+    const messageEl = document.getElementById('message');
+    const menu = document.getElementById('menu');
+    const menuBtn = document.getElementById('menuBtn');
+
+    const correctSound = new Audio('correct.mp3');
+    const incorrectSound = new Audio('incorrect.mp3');
+    const gongSound = new Audio('gong.wav');
+    const gameOverSound = new Audio('gameover.mp3');
+
+    correctSound.volume = 0.1;
+    incorrectSound.volume = 0.1;
+    gongSound.volume = 0.1;
+    gameOverSound.volume = 0.1;
+
+    function shuffle(array) {
+        return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function refillQuestions() {
+        remainingQuestions = shuffle(allQuestions);
+    }
+
+    function updateUIVisibility() {
+        const isColorScreen = colorScreen.style.display !== 'none';
+        setScoreEl.style.display = isColorScreen ? 'none' : 'block';
+        totalFooter.style.display = isColorScreen ? 'none' : 'block';
+        menuBtn.style.display = isColorScreen ? 'none' : 'block';
+    }
+
+    function startQuiz() {
+        colorScreen.style.display = 'none';
+        quizScreen.style.display = 'block';
+        body.style.background = currentColor;
+        gameOverMode = false;
+        
+        refillQuestions();
+        currentIndex = 0;
+        loadQuestion();
+        updateUIVisibility();
+    }
+
+    function updateSetScore() {
+        setScoreEl.textContent = `${setCorrect}/10`;
+    }
+
+    // Helper function to extract the answer letter (A, B, C...)
+    function getAnswerLetter(optionText) {
+        return optionText.trim().charAt(0).toUpperCase();
+    }
+
+    function loadQuestion() {
+        if (remainingQuestions.length === 0) refillQuestions();
+        
+        const q = remainingQuestions[currentIndex];
+        questionText.textContent = q.question;
+        
+        optionsEl.innerHTML = '';
+        selectedAnswer = null;
+        
+        q.options.forEach(option => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.textContent = option;
+            div.onclick = () => selectAnswer(option, div, q.answer);
+            optionsEl.appendChild(div);
+        });
+    }
+
+    function playSound(audio) {
+        const clone = audio.cloneNode();
+        clone.volume = audio.volume;
+        clone.play().catch(() => {});
+    }
+
+    function selectAnswer(selectedOptionText, element, correctAnswer) {
+        if (selectedAnswer) return;
+        selectedAnswer = selectedOptionText;
+        
+        const selectedLetter = getAnswerLetter(selectedOptionText);
+        const isCorrect = selectedLetter === correctAnswer;
+
+        // Disable all options
+        const options = optionsEl.children;
+        for (let opt of options) {
+            opt.style.pointerEvents = 'none';
+            
+            const optLetter = getAnswerLetter(opt.textContent);
+            
+            if (optLetter === correctAnswer) {
+                opt.classList.add('correct');
+            }
+            if (opt.textContent === selectedOptionText && !isCorrect) {
+                opt.classList.add('incorrect');
+            }
+        }
+        
+        if (isCorrect) {
+            playSound(correctSound);
+            setCorrect++;
+            totalCorrect++;
+            updateSetScore();
+            totalCorrectEl.textContent = totalCorrect;
+
+            if (setCorrect >= 10) {
+                triggerCelebration();
+                return;
+            }
+        } else {
+            playSound(incorrectSound);
+        }
+        
+        setTimeout(() => {
+            currentIndex++;
+            if (currentIndex < remainingQuestions.length) {
+                loadQuestion();
+            } else {
+                startNewSet();
+            }
+        }, 800); // Slightly longer for better UX
+    }
+
+    function triggerCelebration() {
+        if (gameOverMode) return;
+        
+        playSound(gongSound);
+        confetti({ particleCount: 400, spread: 90, origin: { y: 0.6 } });
+        setTimeout(() => confetti({ particleCount: 250, angle: 60, spread: 70 }), 250);
+        
+        messageEl.style.opacity = '1';
+        messageEl.style.transform = 'translate(-50%, -50%) scale(1)';
+        
+        setTimeout(() => {
+            messageEl.style.opacity = '0';
+            messageEl.style.transform = 'translate(-50%, -150%) scale(0.8)';
+            
+            setCorrect = 0;
+            updateSetScore();
+            startNewSet();
+        }, 1400);
+    }
+
+    function startNewSet() {
+        currentIndex = 0;
+        loadQuestion();
+    }
+
+    // Color selection
+    document.querySelectorAll('.color-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentColor = btn.dataset.color;
+            startQuiz();
+        });
+    });
+
+    // Menu
+    document.getElementById('menuBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Reset Button
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        if (confirm('Reset the game and return to color selection?')) {
+            setCorrect = 0;
+            totalCorrect = 0;
+            totalCorrectEl.textContent = '0';
+            menu.style.display = 'none';
+            quizScreen.style.display = 'none';
+            colorScreen.style.display = 'block';
+            body.style.background = 'var(--primary)';
+            updateUIVisibility();
+        }
+    });
+
+    // Game Over Button
+    document.getElementById('gameOverBtn').addEventListener('click', () => {
+        if (confirm('End the current session? Background will turn black.')) {
+            playSound(gameOverSound);
+            menu.style.display = 'none';
+            body.style.background = '#000000';
+            gameOverMode = true;
+            setScoreEl.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', () => {
+        menu.style.display = 'none';
+    });
+
+    // Initialize
+    updateSetScore();
+    updateUIVisibility();
+</script>
+</body>
+</html>
