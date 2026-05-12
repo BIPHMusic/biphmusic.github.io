@@ -53,6 +53,12 @@
             z-index: -1;
         }
 
+        h2 { 
+            margin-top: 0px;
+            margin-bottom: 0px;
+            font-size: large; 
+        }
+
         .container {
             max-width: 800px;
             margin: 20px auto;
@@ -73,71 +79,6 @@
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.7);
         }
 
-        /* LOGIN OVERLAY */
-        #login-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.6s ease;
-        }
-
-        .login-box {
-            background: rgba(255,255,255,0.95);
-            padding: 40px 30px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 380px;
-            color: #344d87;
-        }
-
-        .login-box h1.Title {
-            margin: 0 0 8px 0;
-            font-size: 2.4em;
-        }
-
-        .login-box .Subtitle {
-            margin-bottom: 25px;
-            color: #344d87;
-        }
-
-        .login-box input {
-            width: 100%;
-            padding: 14px;
-            margin: 15px 0;
-            font-size: 1.1em;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        .login-box button {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.1em;
-            background: #3b6cac;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .login-box button:hover {
-            background: #3680ce;
-        }
-
-        .error {
-            color: #c00;
-            margin-top: 10px;
-            min-height: 1.2em;
-        }
-
-        /* Daily Exercises Button */
         #daily-btn {
             font-size: 1.5em;
             padding: 18px 40px;
@@ -154,7 +95,6 @@
             border-color: #3680ce;
         }
 
-        /* Fade-in animations */
         .fade-in {
             opacity: 0;
             transform: translateY(20px);
