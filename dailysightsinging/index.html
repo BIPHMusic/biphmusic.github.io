@@ -10,7 +10,6 @@
     
     <script src="../apstudents.js"></script>
     <script src="../login-screen.js"></script> 
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
     
     <style>
@@ -22,9 +21,10 @@
         }
 
         .container {
-            margin-top: 130px;
-            margin-bottom: -10px;
+            margin: 30px auto;
             max-width: 800px;
+            width: 90%;
+            text-align: center;
         }
 
         .reminders {
@@ -33,62 +33,58 @@
             margin: 30px auto;
             border: solid #6ec5d9a5;
             background-color: rgba(49, 129, 125, 0.543);
-            padding: 0 30px 20px;
+            padding: 18px 25px 20px;
+            text-align: left;      
         }
 
-        h1 { 
-            margin-top: -90px;
-            font-size: 1.5rem;
-            margin-bottom: 0px;
-            letter-spacing: 2px;
+        .reminders h2 {
+            font-size: 1.2rem;
+            text-align: center; 
         }
-        h2 { 
-            margin-top: 0px;
-            margin-bottom: 0px;
-            font-size: large; 
+
+        .reminders h3 {
+            font-size: 0.95rem;
+            font-weight: 300;
+            line-height: 1.45;
         }
-        h3 {
-            font-size: smaller;
-            margin-bottom: -10px;
-            font-weight: 100;
-            text-align: left;
+
+        .time-restriction {
+            font-size: 1.15rem;
+            margin: 15px 0 20px 0;
+            text-align: center;
         }
 
         .image-container {
             position: relative;
-            top: 20px;
             width: 90%;
-            margin: 20px auto;
-            margin-bottom: 5px;
+            max-width: 720px;
+            margin: 15px auto 10px;
         }
 
         #exerciseImage {
             width: 100%;
             height: auto;
-            margin-bottom: 50px;
+            margin-bottom: 25px;
             filter: blur(10px);
-            transition: filter 0.5s ease;
+            transition: filter 0.6s ease;
         }
 
         #exerciseImage.revealed { 
             filter: blur(0); 
         }
 
-        input, .action-btn {
-            margin: 10px auto;
-            padding: 10px;
-            background-color: #dedede;
-            color: #2f2f2f;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
+        .recording-notice {
+            color: #ff9800;
+            font-size: 15px;
+            margin-top: -8px;
+            margin-bottom: 22px;
+            display: none;
         }
 
         #recordButton {
             width: 60px;
             height: 60px;
-            margin-top: -12px;
-            margin-bottom: 30px;
+            margin: 8px auto 25px;
             border-radius: 50%;
             background-color: #888888;
             cursor: not-allowed;
@@ -118,7 +114,7 @@
 
         #visualizer {
             width: 100%;
-            height: 200px;
+            height: 180px;
             background-color: #3c3c3c;
             margin: 10px auto;
             display: none;
@@ -126,8 +122,7 @@
 
         #audioPlayback { 
             display: none; 
-            margin-top: -10px;
-            margin-bottom: 25px;
+            margin: 5px auto 20px;
             width: 100%;
         }
 
@@ -135,66 +130,23 @@
             display: none;
             background-color: #4c8baf;
             color: white;
-            margin-bottom: 50px;
-        }
-
-        .time-restriction {
-            font-size: 24px;
-            margin: 20px 0;
-        }
-
-        .recording-notice {
-            color: #ff9800;
-            font-size: 16px;
-            margin-top: -15px;
-            margin-bottom: 35px;
-            display: none;
-        }
-
-        /* Password Modal */
-        #passwordModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #submitPassword {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-            color: black;
+            margin-bottom: 30px;
         }
     </style>
     <base target="_blank">
 </head>
 <body>
 
-    <!-- MAIN CONTENT (hidden until login) -->
     <div id="main-content" style="display: none;">
 
         <div class="background"></div>
         <div class="overlay"></div>
         <div class="overlay2"></div>
 
-        <div class="container">
-            <h1>Daily Sight Singing Practice</h1>
-            <h2 id="dateSubtitle"></h2>
+        <h1 class="Title">BIPH Music</h1>
+        <h1 class="Subtitle">Daily Sight Singing</h1>
 
+        <div class="container">
             <div id="timeRestriction" class="time-restriction"></div>
 
             <div class="image-container">
@@ -215,21 +167,13 @@
         </div>
 
         <div class="reminders">
-            <h2><br>Some Reminders:</h2>
+            <h2>Some Reminders:</h2>
             <h3>
                 <p>• Observe the key signature, first and last notes</p>
                 <p>• Look for accidentals</p>
                 <p>• Sing the scale before you start</p>
                 <p>• Aim for accurate rhythms and consistency of tempo</p>
             </h3>
-        </div>
-
-        <div id="passwordModal">
-            <div class="modal-content">
-                <br>Enter Password
-                <input type="password" id="passwordInput" placeholder="Password" />
-                <button id="submitPassword" class="action-btn">Submit</button>
-            </div>
         </div>
 
         <div id="shared-menu"></div>
@@ -239,18 +183,14 @@
     <script src="../mymenu.js"></script>
 
     <script>
-        // ==================== LOGIN CALLBACK ====================
+        // (Script remains unchanged from previous version)
         window.onSuccessfulLogin = function(displayName) {
             document.getElementById('main-content').style.display = 'block';
-            
-            // Store name for this page
             localStorage.setItem('biph_student_name', displayName);
             localStorage.setItem('biph_name_timestamp', Date.now().toString());
-
             initPage();
         };
 
-        // ==================== CORE PAGE INIT ====================
         function initPage() {
             const startDate = new Date('2024-11-04');
             const today = new Date();
@@ -266,12 +206,12 @@
             const currentExample = (differenceInDays % 30) + 1;
             document.getElementById('exerciseImage').src = `examples/${currentExample}.jpg`;
 
-            const dateSubtitle = document.getElementById('dateSubtitle');
-            const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-            dateSubtitle.textContent = today.toLocaleDateString('en-US', options);
-
             checkTimeAndUnlock();
-            setInterval(updateCountdown, 1000);
+            setInterval(() => {
+                updateCountdown();
+                checkTimeAndUnlock();
+            }, 1000);
+            
             updateCountdown();
         }
 
@@ -289,7 +229,6 @@
             return (hour === 10 && minutes >= 45 && minutes < 48);
         }
 
-        // ==================== RECORDING ====================
         let mediaRecorder, audioChunks = [], isRecording = false, analyser, animationId;
 
         document.getElementById('recordButton').addEventListener('click', async () => {
@@ -338,8 +277,7 @@
             const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
             const url = URL.createObjectURL(audioBlob);
             const a = document.createElement('a');
-            const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0];
+            const formattedDate = new Date().toISOString().split('T')[0];
             const name = localStorage.getItem('biph_student_name') || "Student";
 
             a.href = url;
@@ -351,7 +289,7 @@
             const canvas = document.getElementById('visualizer');
             const ctx = canvas.getContext('2d');
             const width = canvas.width = 800;
-            const height = canvas.height = 200;
+            const height = canvas.height = 180;
             const bufferLength = analyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
 
@@ -374,21 +312,6 @@
             draw();
         }
 
-        // Password Modal (for teacher review)
-        document.getElementById('submitPassword').onclick = () => {
-            if (document.getElementById('passwordInput').value === "review") {
-                window.open(document.getElementById('exerciseImage').src, '_blank');
-                document.getElementById('recordButton').disabled = false;
-                document.getElementById('passwordModal').style.display = 'none';
-            } else {
-                alert("Incorrect password.");
-            }
-        };
-
-        document.getElementById('passwordInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') document.getElementById('submitPassword').click();
-        });
-
         function updateCountdown() {
             const now = new Date();
             const targetTime = new Date(now); targetTime.setHours(10, 45, 0);
@@ -404,6 +327,7 @@
                 const minutes = Math.floor(timeLeft / 60000);
                 const seconds = Math.floor((timeLeft % 60000) / 1000);
                 timeRestriction.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} remaining`;
+                exerciseImage.classList.add('revealed');
             } else if (now < targetTime) {
                 const timeLeft = targetTime - now;
                 const hours = Math.floor(timeLeft / 3600000);
@@ -424,10 +348,7 @@
             }
         }
 
-        // Initialize login (this must be the last thing)
-        window.onload = () => {
-            initLogin();
-        };
+        window.onload = () => initLogin();
     </script>
 </body>
 </html>
