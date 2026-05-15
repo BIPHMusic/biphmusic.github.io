@@ -329,7 +329,7 @@
         if (remainingQuestions.length === 0) refillQuestions();
         
         const q = remainingQuestions[currentIndex];
-        questionText.textContent = q.question;
+        questionText.innerHTML = q.question.replace(/\n/g, '<br><br>');
         
         optionsEl.innerHTML = '';
         selectedAnswer = null;
