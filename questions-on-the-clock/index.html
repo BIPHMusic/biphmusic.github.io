@@ -26,7 +26,7 @@
         }
         
         .header {
-            position: fixed;
+            position: absolute;
             background: rgba(0, 0, 0, 0);
             top: 0;
             left: 0;
@@ -73,7 +73,6 @@
         }
         
         .menu {
-            position: absolute;
             top: 67px;
             right: 45px;
             background: white;
@@ -141,13 +140,13 @@
         }
         
         .quiz-container { 
-            margin-top: 100px;
+            margin-top: 10px;
             display: none; 
         }
         
         .question {
-            font-size: 1.85rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 300;
             margin-bottom: 2.5rem;
             line-height: 1.35;
         }
@@ -155,6 +154,7 @@
         .options {
             display: grid;
             gap: 1.1rem;
+            margin-bottom: 100px;
         }
         
         .option {
@@ -326,28 +326,35 @@
     }
 
     function loadQuestion(isPenalty = false) {
-        if (remainingQuestions.length === 0) refillQuestions();
-        
-        const q = remainingQuestions[currentIndex];
-        questionText.innerHTML = q.question.replace(/\n/g, '<br><br>');
-        
-        optionsEl.innerHTML = '';
-        selectedAnswer = null;
-        
-        q.options.forEach(option => {
-            const div = document.createElement('div');
-            div.className = 'option';
-            div.textContent = option;
-            div.onclick = () => selectAnswer(option, div, q.answer);
-            optionsEl.appendChild(div);
-        });
+    if (remainingQuestions.length === 0) refillQuestions();
+    
+    const q = remainingQuestions[currentIndex];
+    
+    // FIXED: Support line breaks
+    questionText.innerHTML = q.question.replace(/\n/g, '<br><br>');
+    
+    optionsEl.innerHTML = '';
+    selectedAnswer = null;
+    
+    q.options.forEach(option => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.textContent = option;
+        div.onclick = () => selectAnswer(option, div, q.answer);
+        optionsEl.appendChild(div);
+    });
 
-        if (isPenalty) {
-            isInPenalty = true;
-            const options = optionsEl.children;
-            for (let opt of options) opt.classList.add('disabled');
-        }
+    if (isPenalty) {
+        isInPenalty = true;
+        const options = optionsEl.children;
+        for (let opt of options) opt.classList.add('disabled');
     }
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth' 
+    });
+}
 
     function playSound(audio) {
         const clone = audio.cloneNode();
