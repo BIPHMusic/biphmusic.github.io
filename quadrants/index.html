@@ -53,7 +53,7 @@
             height: 100px;
             cursor: pointer;
             transition: all 0.3s ease;
-            z-index: 200;           /* Increased */
+            z-index: 200;
             pointer-events: auto;
         }
         
@@ -84,29 +84,132 @@
             font-family: inherit;
         }
 
-        .quad-input:focus {
-            outline: none;
-        }
-
         .shuffle-btn:hover {
             background: rgba(255, 255, 255, 0.35);
             transform: translate(-50%, -50%) scale(1.15);
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
-        .shuffle-btn:active {
-            transform: translate(-50%, -50%) scale(0.95);
+        .edit-btn {
+            position: fixed;
+            top: 65px;
+            left: 20px;
+            font-size: 1.4em; 
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 45px;  
+            height: 45px; 
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .edit-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
         }
 
-        .shuffle-btn:hover {
-            background: rgba(255, 255, 255, 0.35);
-            transform: translate(-50%, -50%) scale(1.15);
+        #editPanel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            padding: 25px 30px;
+            width: 92%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        #editPanel h3 {
+            margin: 0 0 20px 0;
+            text-align: center;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .student-list {
+            max-height: 58vh;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .student-item span {
+            color: white;           /* Fixed - now white */
+            font-size: 1.05em;
+        }
+
+        .student-item:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .remove-btn {
+            background: rgba(255, 70, 70, 0.524);
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: rgba(255, 70, 70, 0.828);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 14px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            border: none;
+            background: rgba(255, 255, 255, 0.135);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-buttons button:hover {
+            background: rgba(255, 255, 255, 0.404);
         }
     </style>
 </head>
 <body>
     <div id="shared-menu"></div>
     <script src="../menu.js"></script> 
+
+    <!-- Edit Button -->
+    <button onclick="toggleEditPanel()" class="edit-btn">✏️</button>
 
     <div class="container">
         <div class="box"><input type="text" class="quad-input" placeholder=""></div>
@@ -116,47 +219,105 @@
         <button class="shuffle-btn">🔀</button>
     </div>
 
+    <!-- Edit Panel -->
+    <div id="editPanel">
+        <h3>Edit Roster</h3>
+        <div class="student-list" id="studentList"></div>
+        
+        <div class="modal-buttons">
+            <button onclick="toggleEditPanel()">Done</button>
+            <button onclick="resetToFullRoster()">Reset Full Roster</button>
+        </div>
+    </div>
+
     <script>
-        // Use students from apstudents.js
-        const students = apStudents.map(s => s.name || s.altName || "");
+        let currentStudents = [];
+        let studentElements = [];
 
         const container = document.querySelector('.container');
         const shuffleBtn = document.querySelector('.shuffle-btn');
         let isInputFocused = false;
 
-        // Create student elements
-        students.forEach(name => {
-            if (!name) return;
-            const div = document.createElement('div');
-            div.className = 'student';
-            div.textContent = name;
-            div.style.left = '50%';
-            div.style.top = '50%';
-            container.appendChild(div);
-        });
+        function initRoster() {
+            if (typeof apStudents !== 'undefined' && apStudents.length > 0) {
+                currentStudents = apStudents.slice();
+            } else {
+                console.error("apStudents not found!");
+                currentStudents = [];
+            }
+            createStudentElements();
+        }
 
-        const studentElements = document.querySelectorAll('.student');
-        const quadInputs = document.querySelectorAll('.quad-input');
+        function createStudentElements() {
+            studentElements.forEach(el => el.remove());
+            studentElements = [];
 
-        // Input event listeners
-        quadInputs.forEach(input => {
-            input.addEventListener('focus', () => {
-                isInputFocused = true;
+            currentStudents.forEach(student => {
+                const name = student.name || student.altName || "";
+                if (!name) return;
+
+                const div = document.createElement('div');
+                div.className = 'student';
+                div.textContent = name;
+                div.style.left = '50%';
+                div.style.top = '50%';
+                container.appendChild(div);
+                studentElements.push(div);
             });
+        }
 
-            input.addEventListener('blur', () => {
-                isInputFocused = false;
+        function toggleEditPanel() {
+            const panel = document.getElementById('editPanel');
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                refreshStudentList();
+                panel.style.display = 'block';
+            }
+        }
+
+        function refreshStudentList() {
+            const list = document.getElementById('studentList');
+            list.innerHTML = '';
+
+            currentStudents.forEach((student, index) => {
+                const div = document.createElement('div');
+                div.className = 'student-item';
+
+                const span = document.createElement('span');
+                span.textContent = student.name || student.altName || "";
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = 'Remove';
+
+                removeBtn.addEventListener('click', function(e) {
+                    e.stopImmediatePropagation();
+                    removeStudent(index);
+                });
+
+                div.appendChild(span);
+                div.appendChild(removeBtn);
+                list.appendChild(div);
             });
+        }
 
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    e.preventDefault();
-                    input.blur();
-                }
-            });
-        });
+        function removeStudent(index) {
+            if (index < 0 || index >= currentStudents.length) return;
+            currentStudents.splice(index, 1);
+            refreshStudentList();
+            createStudentElements();
+        }
 
-        function getRandomPositionInQuadrant(quadIndex, existingPositions, minDistance = 90) {
+        function resetToFullRoster() {
+            if (typeof apStudents !== 'undefined') {
+                currentStudents = apStudents.slice();
+                refreshStudentList();
+                createStudentElements();
+            }
+        }
+
+        function getRandomPositionInQuadrant(quadIndex, existingPositions, minDistance = 95) {
             const rect = container.getBoundingClientRect();
             const qWidth = rect.width / 2;
             const qHeight = rect.height / 2;
@@ -202,16 +363,16 @@
             studentElements.forEach(s => s.style.opacity = '1');
 
             const quadrants = [[], [], [], []];
-            const shuffled = [...studentElements].sort(() => Math.random() - 0.5);
+            const shuffledStudents = [...studentElements].sort(() => Math.random() - 0.5);
 
-            shuffled.forEach((student, i) => {
+            shuffledStudents.forEach((student, i) => {
                 quadrants[i % 4].push(student);
             });
 
             quadrants.forEach((quadStudents, qIndex) => {
                 const positions = [];
                 quadStudents.forEach(student => {
-                    const pos = getRandomPositionInQuadrant(qIndex, positions, 95);
+                    const pos = getRandomPositionInQuadrant(qIndex, positions);
                     positions.push(pos);
                     student.style.left = `${pos.x}px`;
                     student.style.top = `${pos.y}px`;
@@ -219,12 +380,30 @@
             });
         }
 
+        // Event Listeners
         shuffleBtn.addEventListener('click', shuffle);
 
-        // Initial shuffle
-        window.addEventListener('load', () => setTimeout(shuffle, 300));
+        document.querySelectorAll('.quad-input').forEach(input => {
+            input.addEventListener('focus', () => isInputFocused = true);
+            input.addEventListener('blur', () => isInputFocused = false);
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Escape') input.blur();
+            });
+        });
 
-        // Resize handling
+        document.addEventListener('keydown', e => {
+            if (isInputFocused) return;
+
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                shuffle();
+            }
+            if (e.key === 'Escape') {
+                const panel = document.getElementById('editPanel');
+                if (panel.style.display === 'block') toggleEditPanel();
+            }
+        });
+
         window.addEventListener('resize', () => {
             const rect = container.getBoundingClientRect();
             const centerX = rect.width / 2;
@@ -235,14 +414,20 @@
             });
         });
 
-        // Global keyboard
-        document.addEventListener('keydown', (e) => {
-            if (isInputFocused) return;
-            if (e.key === ' ' || e.key === 'Enter') {
-                e.preventDefault();
-                shuffle();
-            }
+        window.addEventListener('load', () => {
+            initRoster();
+            setTimeout(shuffle, 400);
         });
+
+        // Close modal when clicking outside (but not on the edit button)
+document.addEventListener('click', function(event) {
+    const panel = document.getElementById('editPanel');
+    if (panel.style.display === 'block' && 
+        !panel.contains(event.target) && 
+        event.target.closest('.edit-btn') === null) {
+        toggleEditPanel();
+    }
+});
     </script>
 </body>
 </html>
