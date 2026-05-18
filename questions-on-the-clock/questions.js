@@ -180,7 +180,7 @@ const allQuestions = [
         answer: "B"
     },
     {
-        question: "Read the passage below and answer the question.\nDr. Vigilante observed the creeping vanguard of Sneaky Snail’s army with a look of stoic resolve. To protect the students cramming for their finals, she deployed an ephemeral mist of lavender and salt-water vapor. While the students found the scent relaxing, the snails found the dehydrating atmosphere utterly deleterious to their progress, forcing them to halt their advance near the study room threshold.\nWhat does the word \"deleterious\" most closely mean in this passage?",
+        question: "Read the passage below and answer the question.\nDr. Vigilante observed the creeping vanguard of Sneaky Snail’s army with a look of stoic resolve. To protect the students cramming for their finals, he deployed an ephemeral mist of lavender and salt-water vapor. While the students found the scent relaxing, the snails found the dehydrating atmosphere utterly deleterious to their progress, forcing them to halt their advance near the study room threshold.\nWhat does the word \"deleterious\" most closely mean in this passage?",
         options: ["A. Causing harm or damage","B. Sweet and pleasant","C. Beneficial and energizing","D. Invisible and hard to detect"],
         answer: "A"
     },

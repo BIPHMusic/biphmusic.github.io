@@ -214,7 +214,7 @@
 </head>
 <body>
     <div class="header">
-        <div id="setScore" class="score">0/10</div>
+        <div id="setScore" class="score">0/3</div>
         <button id="menuBtn" class="menu-btn">☰</button>
     </div>
 
@@ -314,7 +314,7 @@
     }
 
     function updateSetScore() {
-        setScoreEl.textContent = `${setCorrect}/10`;
+        setScoreEl.textContent = `${setCorrect}/3`;
     }
 
     function updateTotalFooter() {
@@ -438,7 +438,7 @@
             updateSetScore();
             updateTotalFooter();
 
-            if (setCorrect >= 10) {
+            if (setCorrect >= 3) {
                 triggerCelebration();
                 return;
             }
