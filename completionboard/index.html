@@ -13,6 +13,10 @@
         /* Loaded from common-styles.css - Do not duplicate/edit: */
         /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
 
+        body {
+            user-select: none;
+        }
+
         .dropzone {
             position: fixed;
             inset: 0;
@@ -176,16 +180,135 @@
         }
 
         .student.highlight {
-    color: #154565;
-    background-color: #f0f8ff56;
-    border: 2px solid white;
-    transform: scale(1.03);
-}
+            color: #154565;
+            background-color: #f0f8ff56;
+            border: 2px solid white;
+            transform: scale(1.03);
+        }
+
+        /* ==================== EDIT BUTTON & MODAL ==================== */
+        .edit-btn {
+            position: fixed;
+            top: 65px;
+            left: 20px;
+            font-size: 1.35em;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
+        }
+
+        #editPanel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            padding: 25px 30px;
+            width: 92%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow-y: auto;
+            display: none;
+            z-index: 2000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        #editPanel h3 {
+            margin: 0 0 20px 0;
+            text-align: center;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .student-list {
+            max-height: 58vh;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .student-item span {
+            color: white;
+            font-size: 1.05em;
+        }
+
+        .student-item:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .remove-btn {
+            background: rgba(255, 70, 70, 0.524);
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: rgba(255, 70, 70, 0.828);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 14px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            border: none;
+            background: rgba(255, 255, 255, 0.135);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-buttons button:hover {
+            background: rgba(255, 255, 255, 0.404);
+        }
     </style>
 </head>
 <body>
     <div id="shared-menu"></div>
     <script src="../menu.js"></script>
+
+    <!-- Edit Button -->
+    <button onclick="toggleEditPanel()" class="edit-btn">✏️</button>
+
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
@@ -210,21 +333,36 @@
         <div class="context-item" id="markAbsent">Mark as Absent Today</div>
     </div>
 
+    <!-- Edit Panel -->
+    <div id="editPanel">
+        <h3>Edit Roster</h3>
+        <div class="student-list" id="studentList"></div>
+        
+        <div class="modal-buttons">
+            <button onclick="toggleEditPanel()">Done</button>
+            <button onclick="resetToFullRoster()">Reset Full Roster</button>
+        </div>
+    </div>
+
     <div class="logocontainer">        
         <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
 
     <script>
-        // Handle apStudents safely
+        // ==================== ROSTER MANAGEMENT ====================
+        let currentStudents = [];
         let allStudents = [];
-        if (typeof apStudents !== "undefined" && Array.isArray(apStudents)) {
-            allStudents = apStudents.map(s => typeof s === 'string' ? s : (s?.name || s?.student || String(s)));
-        } else {
-            allStudents = ["Student 1", "Student 2"];
-        }
-
         const foundFiles = new Set();
         const absentStudents = new Set();
+
+        function initRoster() {
+            if (typeof apStudents !== "undefined" && Array.isArray(apStudents)) {
+                currentStudents = apStudents.slice();
+            } else {
+                currentStudents = [];
+            }
+            allStudents = currentStudents.map(s => typeof s === 'string' ? s : (s?.name || s?.student || String(s)));
+        }
 
         function getStudentId(name) {
             return `student-${name.toLowerCase().replace(/\s+/g, '-')}`;
@@ -274,16 +412,75 @@
             });
         }
 
-        // Search
-const searchBar = document.getElementById('search-bar');
-searchBar.addEventListener('input', (e) => filterStudents(e.target.value));
-searchBar.addEventListener('keydown', handleKeyPress);
+        function refreshChecklist() {
+            initializeChecklist();
+        }
 
+        // ==================== EDIT PANEL ====================
+        function toggleEditPanel() {
+            const panel = document.getElementById('editPanel');
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                refreshStudentList();
+                panel.style.display = 'block';
+            }
+        }
 
-        // Context Menu
-        let currentName = null;
-        let currentEl = null;
+        function refreshStudentList() {
+            const list = document.getElementById('studentList');
+            list.innerHTML = '';
 
+            currentStudents.forEach((student, index) => {
+                const div = document.createElement('div');
+                div.className = 'student-item';
+
+                const span = document.createElement('span');
+                span.textContent = typeof student === 'string' ? student : (student.name || student.student || "");
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = 'Remove';
+
+                removeBtn.addEventListener('click', function(e) {
+                    e.stopImmediatePropagation();
+                    removeStudent(index);
+                });
+
+                div.appendChild(span);
+                div.appendChild(removeBtn);
+                list.appendChild(div);
+            });
+        }
+
+        function removeStudent(index) {
+            if (index < 0 || index >= currentStudents.length) return;
+            currentStudents.splice(index, 1);
+            allStudents = currentStudents.map(s => typeof s === 'string' ? s : (s?.name || s?.student || String(s)));
+            refreshStudentList();
+            refreshChecklist();
+        }
+
+        function resetToFullRoster() {
+            if (typeof apStudents !== "undefined") {
+                currentStudents = apStudents.slice();
+                allStudents = currentStudents.map(s => typeof s === 'string' ? s : (s?.name || s?.student || String(s)));
+                refreshStudentList();
+                refreshChecklist();
+            }
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('editPanel');
+            if (panel.style.display === 'block' && 
+                !panel.contains(event.target) && 
+                event.target.closest('.edit-btn') === null) {
+                toggleEditPanel();
+            }
+        });
+
+        // ==================== REST OF YOUR ORIGINAL CODE ====================
         function showContextMenu(e, name, el) {
             currentName = name;
             currentEl = el;
@@ -293,11 +490,14 @@ searchBar.addEventListener('keydown', handleKeyPress);
             menu.style.top = `${e.pageY}px`;
         }
 
+        let currentName = null;
+        let currentEl = null;
+
         document.getElementById('markAbsent').addEventListener('click', () => {
             if (!currentName || !currentEl) return;
             
             absentStudents.add(currentName);
-            currentEl.remove();                    // Completely remove from grid
+            currentEl.remove();
             foundFiles.delete(currentName.toLowerCase());
             
             checkAllFilesFound();
@@ -307,7 +507,6 @@ searchBar.addEventListener('keydown', handleKeyPress);
         function hideContextMenu() {
             document.getElementById('contextMenu').style.display = 'none';
         }
-        document.addEventListener('click', hideContextMenu);
 
         function checkAllFilesFound() {
             const visibleStudents = document.querySelectorAll('.student').length;
@@ -318,7 +517,6 @@ searchBar.addEventListener('keydown', handleKeyPress);
                 popup.classList.add('show');
                 playYesSound();
 
-                // Reset after showing "All complete!"
                 setTimeout(() => {
                     popup.classList.remove('show');
                     resetFoundMarks();
@@ -345,6 +543,13 @@ searchBar.addEventListener('keydown', handleKeyPress);
         function playResetSound() {
             const a = new Audio('audio/reset.mp3'); a.volume = 0.2; a.play().catch(() => {});
         }
+
+        // Search, Drag & Drop, Keyboard, etc. (unchanged)
+        const searchBar = document.getElementById('search-bar');
+        searchBar.addEventListener('input', (e) => filterStudents(e.target.value));
+        searchBar.addEventListener('keydown', handleKeyPress);
+
+        document.addEventListener('click', hideContextMenu);
 
         // Drag & Drop
         function handleFiles(files) {
@@ -377,7 +582,6 @@ searchBar.addEventListener('keydown', handleKeyPress);
             handleFiles(e.dataTransfer.files);
         });
 
-        // Keyboard
         document.addEventListener('keydown', e => {
             if (e.key === '/') {
                 e.preventDefault();
@@ -385,110 +589,100 @@ searchBar.addEventListener('keydown', handleKeyPress);
             }
         });
 
-        // Initialize
-        initializeChecklist();
+        // Enhanced Search + Keyboard Navigation
+        let currentHighlightIndex = -1;
+        let currentMatches = [];
 
-
-        // ==================== ENHANCED SEARCH + KEYBOARD NAVIGATION ====================
-
-let currentHighlightIndex = -1;
-let currentMatches = [];
-
-function getVisibleStudents() {
-    return Array.from(document.querySelectorAll('.student'));
-}
-
-function filterStudents(query) {
-    const items = getVisibleStudents();
-    currentMatches = [];
-    currentHighlightIndex = -1;
-
-    const lowerQuery = query.toLowerCase();
-
-    items.forEach(el => {
-        const name = el.textContent.toLowerCase();
-        if (name.includes(lowerQuery)) {
-            el.style.opacity = '1';
-            currentMatches.push(el);
-        } else {
-            el.style.opacity = '0.2';
+        function getVisibleStudents() {
+            return Array.from(document.querySelectorAll('.student'));
         }
-    });
 
-    // Auto-highlight the first match when typing
-    if (currentMatches.length > 0) {
-        currentHighlightIndex = 0;
-        updateHighlight();
-    } else {
-        removeAllHighlights();
-    }
-}
+        function filterStudents(query) {
+            const items = getVisibleStudents();
+            currentMatches = [];
+            currentHighlightIndex = -1;
 
-function updateHighlight() {
-    removeAllHighlights();
-    if (currentMatches[currentHighlightIndex]) {
-        currentMatches[currentHighlightIndex].classList.add('highlight');
-        // Optional: scroll into view
-        currentMatches[currentHighlightIndex].scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-}
+            const lowerQuery = query.toLowerCase();
 
-function removeAllHighlights() {
-    document.querySelectorAll('.student.highlight').forEach(el => el.classList.remove('highlight'));
-}
+            items.forEach(el => {
+                const name = el.textContent.toLowerCase();
+                if (name.includes(lowerQuery)) {
+                    el.style.opacity = '1';
+                    currentMatches.push(el);
+                } else {
+                    el.style.opacity = '0.2';
+                }
+            });
 
-function handleKeyPress(event) {
-    const searchBar = document.getElementById('search-bar');
-
-    if (event.key === 'Enter') {
-        const highlighted = document.querySelector('.student.highlight');
-        if (highlighted) {
-            const name = highlighted.dataset.name;
-
-            if (highlighted.classList.contains('found')) {
-                highlighted.classList.remove('found');
-                foundFiles.delete(name.toLowerCase());
+            if (currentMatches.length > 0) {
+                currentHighlightIndex = 0;
+                updateHighlight();
             } else {
-                highlighted.classList.add('found');
-                foundFiles.add(name.toLowerCase());
-                playChime();
+                removeAllHighlights();
             }
-
-            checkAllFilesFound();
-
-            // Clear search after selection
-            searchBar.value = '';
-            resetStudentOpacity();
-            searchBar.blur();
-        }
-    } 
-    else if (event.key === 'Escape') {
-        searchBar.value = '';
-        resetStudentOpacity();
-        searchBar.blur();
-    }
-    // Arrow key navigation
-    else if (['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(event.key) && currentMatches.length > 0) {
-        event.preventDefault();
-
-        if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-            currentHighlightIndex = (currentHighlightIndex + 1) % currentMatches.length;
-        } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-            currentHighlightIndex = (currentHighlightIndex - 1 + currentMatches.length) % currentMatches.length;
         }
 
-        updateHighlight();
-    }
-}
+        function updateHighlight() {
+            removeAllHighlights();
+            if (currentMatches[currentHighlightIndex]) {
+                currentMatches[currentHighlightIndex].classList.add('highlight');
+                currentMatches[currentHighlightIndex].scrollIntoView({ block: "nearest", behavior: "smooth" });
+            }
+        }
 
-function resetStudentOpacity() {
-    currentMatches = [];
-    currentHighlightIndex = -1;
-    document.querySelectorAll('.student').forEach(el => {
-        el.style.opacity = '1';
-        el.classList.remove('highlight');
-    });
-}
+        function removeAllHighlights() {
+            document.querySelectorAll('.student.highlight').forEach(el => el.classList.remove('highlight'));
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                const highlighted = document.querySelector('.student.highlight');
+                if (highlighted) {
+                    const name = highlighted.dataset.name;
+                    if (highlighted.classList.contains('found')) {
+                        highlighted.classList.remove('found');
+                        foundFiles.delete(name.toLowerCase());
+                    } else {
+                        highlighted.classList.add('found');
+                        foundFiles.add(name.toLowerCase());
+                        playChime();
+                    }
+                    checkAllFilesFound();
+                    searchBar.value = '';
+                    resetStudentOpacity();
+                    searchBar.blur();
+                }
+            } 
+            else if (event.key === 'Escape') {
+                searchBar.value = '';
+                resetStudentOpacity();
+                searchBar.blur();
+            }
+            else if (['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(event.key) && currentMatches.length > 0) {
+                event.preventDefault();
+                if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+                    currentHighlightIndex = (currentHighlightIndex + 1) % currentMatches.length;
+                } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+                    currentHighlightIndex = (currentHighlightIndex - 1 + currentMatches.length) % currentMatches.length;
+                }
+                updateHighlight();
+            }
+        }
+
+        function resetStudentOpacity() {
+            currentMatches = [];
+            currentHighlightIndex = -1;
+            document.querySelectorAll('.student').forEach(el => {
+                el.style.opacity = '1';
+                el.classList.remove('highlight');
+            });
+        }
+
+        // Initialize
+        window.onload = () => {
+            initRoster();
+            initializeChecklist();
+        };
     </script>
 </body>
 </html>
