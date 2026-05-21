@@ -251,7 +251,7 @@
    <script>
     let currentColor = '#1c1c1c';
     let remainingQuestions = [];
-    let currentIndex = 0;
+    let currentQuestionIndex = 0;
     let setCorrect = 0;
     let totalCorrect = 0;
     let totalAttempted = 0;
@@ -284,8 +284,14 @@
     gameOverSound.volume = 0.1;
     tickTockSound.volume = 0.2;
 
+    // Improved Fisher-Yates shuffle
     function shuffle(array) {
-        return [...array].sort(() => Math.random() - 0.5);
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
     }
 
     function refillQuestions() {
@@ -305,10 +311,11 @@
         body.style.background = currentColor;
         gameOverMode = false;
         
-        refillQuestions();
-        currentIndex = 0;
+        refillQuestions();           // Full shuffle at start
+        currentQuestionIndex = 0;
         setCorrect = 0;
         totalWrong = 0;
+        
         loadQuestion();
         updateUIVisibility();
     }
@@ -327,35 +334,43 @@
     }
 
     function loadQuestion(isPenalty = false) {
-    if (remainingQuestions.length === 0) refillQuestions();
-    
-    const q = remainingQuestions[currentIndex];
-    
-    // FIXED: Support line breaks
-    questionText.innerHTML = q.question.replace(/\n/g, '<br><br>');
-    
-    optionsEl.innerHTML = '';
-    selectedAnswer = null;
-    
-    q.options.forEach(option => {
-        const div = document.createElement('div');
-        div.className = 'option';
-        div.textContent = option;
-        div.onclick = () => selectAnswer(option, div, q.answer);
-        optionsEl.appendChild(div);
-    });
+        // Refill only when we've gone through the entire deck
+        if (remainingQuestions.length === 0) {
+            refillQuestions();
+        }
 
-    if (isPenalty) {
-        isInPenalty = true;
-        const options = optionsEl.children;
-        for (let opt of options) opt.classList.add('disabled');
+        // Safety check
+        if (currentQuestionIndex >= remainingQuestions.length) {
+            currentQuestionIndex = 0;
+        }
+
+        const q = remainingQuestions[currentQuestionIndex];
+        
+        // Support line breaks
+        questionText.innerHTML = q.question.replace(/\n/g, '<br><br>');
+        
+        optionsEl.innerHTML = '';
+        selectedAnswer = null;
+        
+        q.options.forEach(option => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.textContent = option;
+            div.onclick = () => selectAnswer(option, div, q.answer);
+            optionsEl.appendChild(div);
+        });
+
+        if (isPenalty) {
+            isInPenalty = true;
+            const options = optionsEl.children;
+            for (let opt of options) opt.classList.add('disabled');
+        }
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' 
+        });
     }
-
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth' 
-    });
-}
 
     function playSound(audio) {
         const clone = audio.cloneNode();
@@ -409,7 +424,8 @@
     }
 
     function startNewSet() {
-        currentIndex = 0;
+        // Just continue to the next question — do NOT reset index
+        currentQuestionIndex++;
         loadQuestion();
     }
 
@@ -444,7 +460,7 @@
             }
 
             setTimeout(() => {
-                currentIndex++;
+                currentQuestionIndex++;
                 loadQuestion();
             }, 800);
         } else {
@@ -453,7 +469,7 @@
             updateTotalFooter();
 
             setTimeout(() => {
-                currentIndex++;
+                currentQuestionIndex++;
                 loadQuestion(true);
                 startPenalty(totalWrong);
             }, 900);
