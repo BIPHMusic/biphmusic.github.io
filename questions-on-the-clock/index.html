@@ -11,9 +11,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         
-        :root {
-            --primary: #1c1c1c;
-        }
+        :root { --primary: #1c1c1c; }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -27,7 +25,6 @@
         
         .header {
             position: absolute;
-            background: rgba(0, 0, 0, 0);
             top: 0;
             left: 0;
             right: 0;
@@ -36,6 +33,30 @@
             align-items: center;
             padding: 1.2rem 2rem;
             z-index: 100;
+            transition: opacity 2s ease;
+        }
+        
+        .lives-container {
+            background: rgba(0,0,0,0.4);
+            padding: 8px 24px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            position: relative;         
+        }
+        
+        .heart {
+            font-size: 2.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .heart.lost {
+            opacity: 0.25;
+            transform: scale(0.75);
         }
         
         .score {
@@ -44,6 +65,9 @@
             background: rgba(0,0,0,0.4);
             padding: 0.4rem 1.8rem;
             border-radius: 9999px;
+            width: 130px;     
+            text-align: center;
+            display: inline-block;  
         }
         
         .menu-btn {
@@ -53,12 +77,13 @@
             height: 52px;
             border-radius: 50%;
             color: white;
-            font-size: 1.9rem;
+            font-size: 1.8rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.5s;
+            flex-shrink: 0;
         }
 
         .menu-btn:hover {
@@ -67,11 +92,56 @@
         
         .container {
             padding: 2rem;
-            margin-top: 90px;
+            margin-top: 110px;
             max-width: 100%;
             width: 100%;
         }
         
+        #readyScreen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            color: white;
+            text-align: center;
+            background: inherit;
+        }
+        
+        .ready-content {
+            padding: 2rem 2rem;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.45);
+            max-width: 90%;
+        }
+        
+        .ready-content h1 {
+            font-size: clamp(1.35rem, 4.5vw, 1.7rem);
+            font-weight: 600;
+            white-space: nowrap;
+            margin-bottom: 2.2rem;
+        }
+        
+        .start-game-btn {
+            padding: 1.1rem 3.8rem;
+            font-size: 1.55rem;
+            font-weight: 700;
+            background: rgba(255,255,255,0.15);
+            border: 3px solid rgba(255,255,255,0.65);
+            color: white;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .start-game-btn:hover {
+            background: white;
+            color: black;
+            transform: scale(1.05);
+        }
+
         .menu {
             position: fixed;  
             top: 75px;            
@@ -102,7 +172,6 @@
             text-align: center;
             margin-top: 100px;
             padding: 2rem 1rem;
-            width: 100%;
         }
         
         .color-picker h1 {
@@ -114,17 +183,8 @@
             display: flex;
             justify-content: center;
             gap: clamp(0.1rem, 1.2vw, 0.8rem);
-            flex-wrap: nowrap;
-            padding: 1rem 2rem; 
-            scroll-padding: 2rem;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
         }
-
-        .colors::-webkit-scrollbar {
-            display: none;
-        }
-                
+        
         .color-btn {
             width: clamp(68px, 13vw, 88px);
             height: clamp(68px, 13vw, 88px);
@@ -132,7 +192,6 @@
             cursor: pointer;
             border: 7px solid rgba(255,255,255,0.3);
             transition: all 0.3s ease;
-            flex-shrink: 0;
         }
         
         .color-btn:hover {
@@ -178,7 +237,6 @@
         .option.disabled {
             opacity: 0.45;
             cursor: not-allowed;
-            background: rgba(255,255,255,0.08);
         }
         
         .footer {
@@ -193,32 +251,40 @@
         }
         
         .message {
-            position: fixed;
-            top: 20px;
+            position: absolute;
+            top: 22px;
             left: 50%;
-            transform: translateX(-50%);
-            font-size: 2.4rem;
+            transform: translateX(calc(-50% + 38px));   /* Shifted 30px to the right */
+            font-size: 1.8rem;
             font-weight: 700;
-            background: rgba(107, 107, 107, 0.95);
-            padding: 1.2rem 3rem;
-            border-radius: 20px;
+            background: rgba(107, 107, 107, 1.0);
+            padding: 8px 24px;
+            border-radius: 9999px;
             opacity: 0;
             pointer-events: none;
             transition: all 0.4s ease;
-            z-index: 300;
+            z-index: 150;
             text-align: center;
             white-space: nowrap;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            width: 255px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
-    <div class="header">
+    <div class="header" id="header">
         <div id="setScore" class="score">0/3</div>
+        
+        <div id="livesContainer" class="lives-container">
+            <!-- Hearts populated by JS -->
+        </div>
+        
         <button id="menuBtn" class="menu-btn">☰</button>
     </div>
 
     <div class="container">
+        <!-- Color Picker -->
         <div id="colorScreen" class="color-picker">
             <h1>Choose your color</h1>
             <div class="colors">
@@ -231,14 +297,22 @@
             </div>
         </div>
 
+        <!-- Ready Screen -->
+        <div id="readyScreen">
+            <div class="ready-content">
+                <h1>Wait for all players to be ready</h1>
+                <button id="startGameBtn" class="start-game-btn">Start Game</button>
+            </div>
+        </div>
+
+        <!-- Quiz -->
         <div id="quizScreen" class="quiz-container">
             <div id="questionText" class="question"></div>
             <div id="options" class="options"></div>
         </div>
 
         <div id="menu" class="menu">
-            <button id="resetBtn">Reset the Game</button>
-            <button id="gameOverBtn">Game Over</button>
+            <button id="loseLifeBtn">Lose a Life</button>
         </div>
     </div>
 
@@ -248,279 +322,282 @@
 
     <div id="message" class="message">Penalty: 0s</div>
 
-   <script>
-    let currentColor = '#1c1c1c';
-    let remainingQuestions = [];
-    let currentQuestionIndex = 0;
-    let setCorrect = 0;
-    let totalCorrect = 0;
-    let totalAttempted = 0;
-    let totalWrong = 0;
-    let selectedAnswer = null;
-    let gameOverMode = false;
-    let isInPenalty = false;
+    <script>
+        let currentColor = '#1c1c1c';
+        let remainingQuestions = [];
+        let currentQuestionIndex = 0;
+        let setCorrect = 0;
+        let totalCorrect = 0;
+        let totalAttempted = 0;
+        let totalWrong = 0;
+        let selectedAnswer = null;
+        let gameOverMode = false;
+        let isInPenalty = false;
+        let lives = 5;
 
-    const body = document.body;
-    const colorScreen = document.getElementById('colorScreen');
-    const quizScreen = document.getElementById('quizScreen');
-    const setScoreEl = document.getElementById('setScore');
-    const totalCorrectEl = document.getElementById('totalCorrect');
-    const totalFooter = document.getElementById('totalFooter');
-    const questionText = document.getElementById('questionText');
-    const optionsEl = document.getElementById('options');
-    const messageEl = document.getElementById('message');
-    const menu = document.getElementById('menu');
-    const menuBtn = document.getElementById('menuBtn');
+        const body = document.body;
+        const colorScreen = document.getElementById('colorScreen');
+        const readyScreen = document.getElementById('readyScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const setScoreEl = document.getElementById('setScore');
+        const totalCorrectEl = document.getElementById('totalCorrect');
+        const livesContainer = document.getElementById('livesContainer');
+        const header = document.getElementById('header');
+        const messageEl = document.getElementById('message');
+        const menu = document.getElementById('menu');
+        const menuBtn = document.getElementById('menuBtn');
+        const optionsEl = document.getElementById('options');
+        const questionText = document.getElementById('questionText');
 
-    const correctSound = new Audio('correct.mp3');
-    const incorrectSound = new Audio('incorrect.mp3');
-    const gongSound = new Audio('gong.wav');
-    const gameOverSound = new Audio('gameover.mp3');
-    const tickTockSound = new Audio('ticktock.mp3');
+        const correctSound = new Audio('correct.mp3');
+        const incorrectSound = new Audio('incorrect.mp3');
+        const gongSound = new Audio('gong.wav');
+        const gameOverSound = new Audio('gameover.mp3');
+        const loseLifeSound = new Audio('lose-a-life.mp3');
+        const tickTockSound = new Audio('ticktock.mp3');
+        tickTockSound.preload = 'auto';
 
-    correctSound.volume = 0.1;
-    incorrectSound.volume = 0.1;
-    gongSound.volume = 0.1;
-    gameOverSound.volume = 0.1;
-    tickTockSound.volume = 0.2;
 
-    // Improved Fisher-Yates shuffle
-    function shuffle(array) {
-        const newArray = [...array];
-        for (let i = newArray.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-        }
-        return newArray;
-    }
-
-    function refillQuestions() {
-        remainingQuestions = shuffle(allQuestions);
-    }
-
-    function updateUIVisibility() {
-        const isColorScreen = colorScreen.style.display !== 'none';
-        setScoreEl.style.display = isColorScreen ? 'none' : 'block';
-        totalFooter.style.display = isColorScreen ? 'none' : 'block';
-        menuBtn.style.display = isColorScreen ? 'none' : 'block';
-    }
-
-    function startQuiz() {
-        colorScreen.style.display = 'none';
-        quizScreen.style.display = 'block';
-        body.style.background = currentColor;
-        gameOverMode = false;
-        
-        refillQuestions();           // Full shuffle at start
-        currentQuestionIndex = 0;
-        setCorrect = 0;
-        totalWrong = 0;
-        
-        loadQuestion();
-        updateUIVisibility();
-    }
-
-    function updateSetScore() {
-        setScoreEl.textContent = `${setCorrect}/3`;
-    }
-
-    function updateTotalFooter() {
-        const percent = totalAttempted === 0 ? 0 : Math.round((totalCorrect / totalAttempted) * 100);
-        totalCorrectEl.textContent = `${totalCorrect}/${totalAttempted} (${percent}%)`;
-    }
-
-    function getAnswerLetter(optionText) {
-        return optionText.trim().charAt(0).toUpperCase();
-    }
-
-    function loadQuestion(isPenalty = false) {
-        // Refill only when we've gone through the entire deck
-        if (remainingQuestions.length === 0) {
-            refillQuestions();
+        function playTick() {
+            tickTockSound.currentTime = 0;
+            tickTockSound.play().catch(() => {});
         }
 
-        // Safety check
-        if (currentQuestionIndex >= remainingQuestions.length) {
-            currentQuestionIndex = 0;
+        function createLives() {
+            livesContainer.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const heart = document.createElement('span');
+                heart.className = 'heart';
+                heart.textContent = '❤️';
+                livesContainer.appendChild(heart);
+            }
         }
 
-        const q = remainingQuestions[currentQuestionIndex];
-        
-        // Support line breaks
-        questionText.innerHTML = q.question.replace(/\n/g, '<br><br>');
-        
-        optionsEl.innerHTML = '';
-        selectedAnswer = null;
-        
-        q.options.forEach(option => {
-            const div = document.createElement('div');
-            div.className = 'option';
-            div.textContent = option;
-            div.onclick = () => selectAnswer(option, div, q.answer);
-            optionsEl.appendChild(div);
-        });
-
-        if (isPenalty) {
-            isInPenalty = true;
-            const options = optionsEl.children;
-            for (let opt of options) opt.classList.add('disabled');
+        function updateLivesDisplay() {
+            const hearts = livesContainer.querySelectorAll('.heart');
+            hearts.forEach((heart, i) => {
+                heart.classList.toggle('lost', i >= lives);
+            });
         }
 
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth' 
-        });
-    }
+        function loseLife() {
+            if (lives <= 0) return;
 
-    function playSound(audio) {
-        const clone = audio.cloneNode();
-        clone.volume = audio.volume;
-        clone.play().catch(() => {});
-    }
+            const wasLastLife = lives === 1;
+            lives--;
+            updateLivesDisplay();
 
-    function startPenalty(seconds) {
-        isInPenalty = true;
-        let timeLeft = seconds;
-
-        messageEl.textContent = `Penalty: ${timeLeft}s`;
-        messageEl.style.opacity = '1';
-        messageEl.style.background = 'rgba(107, 107, 107, 0.95)';
-        playSound(tickTockSound);
-
-        const countdown = setInterval(() => {
-            timeLeft--;
-            if (timeLeft > 0) {
-                playSound(tickTockSound);
-                messageEl.textContent = `Penalty: ${timeLeft}s`;
+            if (wasLastLife) {
+                playSound(gameOverSound);
+                body.style.background = '#000000';
+                gameOverMode = true;
+                setScoreEl.style.display = 'none';
+                
+                // Fade out header over 2 seconds
+                header.style.transition = 'opacity 2s ease';
+                header.style.opacity = '0';
             } else {
-                clearInterval(countdown);
-                messageEl.style.opacity = '0';
-                isInPenalty = false;
-
-                const options = optionsEl.children;
-                for (let opt of options) opt.classList.remove('disabled');
+                playSound(loseLifeSound);
             }
-        }, 1000);
-    }
-
-    function triggerCelebration() {
-        if (gameOverMode) return;
-        
-        playSound(gongSound);
-        confetti({ particleCount: 400, spread: 90, origin: { y: 0.6 } });
-        setTimeout(() => confetti({ particleCount: 250, angle: 60, spread: 70 }), 250);
-        
-        messageEl.textContent = "Flip your timer!";
-        messageEl.style.background = 'rgba(234, 88, 12, 0.95)';
-        messageEl.style.opacity = '1';
-        
-        setTimeout(() => {
-            messageEl.style.opacity = '0';
-            
-            setCorrect = 0;
-            updateSetScore();
-            startNewSet();
-        }, 1600);
-    }
-
-    function startNewSet() {
-        // Just continue to the next question — do NOT reset index
-        currentQuestionIndex++;
-        loadQuestion();
-    }
-
-    function selectAnswer(selectedOptionText, element, correctAnswer) {
-        if (selectedAnswer || isInPenalty) return;
-        selectedAnswer = selectedOptionText;
-        
-        const selectedLetter = getAnswerLetter(selectedOptionText);
-        const isCorrect = selectedLetter === correctAnswer;
-
-        const options = optionsEl.children;
-        for (let opt of options) {
-            opt.style.pointerEvents = 'none';
-            const optLetter = getAnswerLetter(opt.textContent);
-            
-            if (optLetter === correctAnswer) opt.classList.add('correct');
-            if (opt.textContent === selectedOptionText && !isCorrect) opt.classList.add('incorrect');
         }
-        
-        totalAttempted++;
 
-        if (isCorrect) {
-            playSound(correctSound);
-            setCorrect++;
-            totalCorrect++;
-            updateSetScore();
-            updateTotalFooter();
-
-            if (setCorrect >= 3) {
-                triggerCelebration();
-                return;
+        function shuffle(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
             }
+            return newArray;
+        }
 
+        function refillQuestions() {
+            remainingQuestions = shuffle(allQuestions);
+        }
+
+        function startQuiz() {
+            colorScreen.style.display = 'none';
+            readyScreen.style.display = 'flex';
+            readyScreen.style.background = currentColor;
+        }
+
+        function beginGame() {
+            readyScreen.style.display = 'none';
+            quizScreen.style.display = 'block';
+            body.style.background = currentColor;
+            gameOverMode = false;
+            
+            refillQuestions();
+            currentQuestionIndex = 0;
+            setCorrect = 0;
+            totalWrong = 0;
+            
+            loadQuestion();
+        }
+
+        function updateSetScore() {
+            setScoreEl.textContent = `${setCorrect}/3`;
+        }
+
+        function updateTotalFooter() {
+            const percent = totalAttempted === 0 ? 0 : Math.round((totalCorrect / totalAttempted) * 100);
+            totalCorrectEl.textContent = `${totalCorrect}/${totalAttempted} (${percent}%)`;
+        }
+
+        function loadQuestion(isPenalty = false) {
+            if (remainingQuestions.length === 0) refillQuestions();
+            if (currentQuestionIndex >= remainingQuestions.length) currentQuestionIndex = 0;
+
+            const q = remainingQuestions[currentQuestionIndex];
+            questionText.innerHTML = q.question.replace(/\n/g, '<br><br>');
+            
+            optionsEl.innerHTML = '';
+            selectedAnswer = null;
+            
+            q.options.forEach(option => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.textContent = option;
+                div.onclick = () => selectAnswer(option, div, q.answer);
+                optionsEl.appendChild(div);
+            });
+
+            if (isPenalty) {
+                isInPenalty = true;
+                Array.from(optionsEl.children).forEach(opt => opt.classList.add('disabled'));
+            }
+        }
+
+        function playSound(audio) {
+            const clone = audio.cloneNode();
+            clone.volume = audio.volume;
+            clone.play().catch(() => {});
+        }
+
+        function startPenalty(seconds) {
+            isInPenalty = true;
+            let timeLeft = seconds;
+            
+            messageEl.textContent = `Penalty: ${timeLeft}s`;
+            messageEl.style.opacity = '1';
+            
+            playTick();                    // Initial tick
+
+            const countdown = setInterval(() => {
+                timeLeft--;
+                
+                if (timeLeft > 0) {
+                    playTick();                    // Changed from playSound(tickTockSound)
+                    messageEl.textContent = `Penalty: ${timeLeft}s`;
+                } else {
+                    clearInterval(countdown);
+                    messageEl.style.opacity = '0';
+                    isInPenalty = false;
+                    Array.from(optionsEl.children).forEach(opt => opt.classList.remove('disabled'));
+                }
+            }, 1000);
+        }
+
+        function triggerCelebration() {
+            if (gameOverMode) return;
+            playSound(gongSound);
+            confetti({ particleCount: 400, spread: 90, origin: { y: 0.6 } });
+            setTimeout(() => confetti({ particleCount: 250, angle: 60, spread: 70 }), 250);
+            
+            messageEl.textContent = "Flip your timer!";
+            messageEl.style.opacity = '1';
+            
             setTimeout(() => {
+                messageEl.style.opacity = '0';
+                setCorrect = 0;
+                updateSetScore();
                 currentQuestionIndex++;
                 loadQuestion();
-            }, 800);
-        } else {
-            playSound(incorrectSound);
-            totalWrong++;
-            updateTotalFooter();
-
-            setTimeout(() => {
-                currentQuestionIndex++;
-                loadQuestion(true);
-                startPenalty(totalWrong);
-            }, 900);
+            }, 1600);
         }
-    }
 
-    // Color selection
-    document.querySelectorAll('.color-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            currentColor = btn.dataset.color;
-            startQuiz();
+        function selectAnswer(selectedOptionText, element, correctAnswer) {
+            if (selectedAnswer || isInPenalty) return;
+            selectedAnswer = selectedOptionText;
+            
+            const selectedLetter = selectedOptionText.trim().charAt(0).toUpperCase();
+            const isCorrect = selectedLetter === correctAnswer;
+
+            Array.from(optionsEl.children).forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                const optLetter = opt.textContent.trim().charAt(0).toUpperCase();
+                if (optLetter === correctAnswer) opt.classList.add('correct');
+                if (opt.textContent === selectedOptionText && !isCorrect) opt.classList.add('incorrect');
+            });
+            
+            totalAttempted++;
+
+            if (isCorrect) {
+                playSound(correctSound);
+                setCorrect++;
+                totalCorrect++;
+                updateSetScore();
+                updateTotalFooter();
+
+                if (setCorrect >= 3) {
+                    triggerCelebration();
+                    return;
+                }
+                setTimeout(() => { currentQuestionIndex++; loadQuestion(); }, 800);
+            } else {
+                playSound(incorrectSound);
+                totalWrong++;
+                updateTotalFooter();
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    loadQuestion(true);
+                    startPenalty(totalWrong);
+                }, 900);
+            }
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentColor = btn.dataset.color;
+                startQuiz();
+            });
         });
-    });
 
-    // Menu
-    document.getElementById('menuBtn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    });
+        document.getElementById('startGameBtn').addEventListener('click', beginGame);
 
-    document.getElementById('resetBtn').addEventListener('click', () => {
-        if (confirm('Reset the game and return to color selection?')) {
-            setCorrect = 0;
-            totalCorrect = 0;
-            totalAttempted = 0;
-            totalWrong = 0;
-            totalCorrectEl.textContent = '0/0 (0%)';
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.getElementById('loseLifeBtn').addEventListener('click', () => {
+            loseLife();
             menu.style.display = 'none';
-            quizScreen.style.display = 'none';
-            colorScreen.style.display = 'block';
-            body.style.background = 'var(--primary)';
-            updateUIVisibility();
+        });
+
+        document.addEventListener('click', () => menu.style.display = 'none');
+
+        window.addEventListener('beforeunload', (e) => {
+            const message = "Are you sure you want to quit or refresh? Your cumulative score will reset to 0.";
+            e.preventDefault();
+            e.returnValue = message;
+            return message;
+        });
+
+        function updateHeaderVisibility() {
+            const isColorScreen = colorScreen.style.display !== 'none';
+            header.style.display = isColorScreen ? 'none' : 'flex';
         }
-    });
 
-    document.getElementById('gameOverBtn').addEventListener('click', () => {
-        if (confirm('End the current session? Background will turn black.')) {
-            playSound(gameOverSound);
-            menu.style.display = 'none';
-            body.style.background = '#000000';
-            gameOverMode = true;
-            setScoreEl.style.display = 'none';
-        }
-    });
+        // Initialize
+        createLives();
+        updateLivesDisplay();
+        updateSetScore();
+        updateTotalFooter();
+        updateHeaderVisibility();
 
-    document.addEventListener('click', () => menu.style.display = 'none');
-
-    // Initialize
-    updateSetScore();
-    updateTotalFooter();
-    updateUIVisibility();
-</script>
+        const observer = new MutationObserver(updateHeaderVisibility);
+        observer.observe(colorScreen, { attributes: true, attributeFilter: ['style'] });
+    </script>
 </body>
 </html>
