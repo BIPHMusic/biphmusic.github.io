@@ -381,6 +381,19 @@
             });
         }
 
+        function darkenHex(hex, factor) {
+            const h = hex.replace('#', '');
+            const r = parseInt(h.slice(0, 2), 16);
+            const g = parseInt(h.slice(2, 4), 16);
+            const b = parseInt(h.slice(4, 6), 16);
+
+            const nr = Math.max(0, Math.round(r * factor));
+            const ng = Math.max(0, Math.round(g * factor));
+            const nb = Math.max(0, Math.round(b * factor));
+
+            return `#${nr.toString(16).padStart(2,'0')}${ng.toString(16).padStart(2,'0')}${nb.toString(16).padStart(2,'0')}`;
+        }
+
         function loseLife() {
             if (lives <= 0) return;
 
@@ -390,8 +403,8 @@
 
             if (wasLastLife) {
                 playSound(gameOverSound);
-                body.style.transition = 'background 10s ease';
-                body.style.background = '#000000';
+                body.style.transition = 'background-color 7s ease';
+                body.style.backgroundColor = darkenHex(currentColor, 0.5);
                 gameOverMode = true;
 
                 messageEl.textContent = "Game Over";
@@ -425,8 +438,8 @@
 
                 setTimeout(() => {
                     messageEl.style.transition = 'opacity 8s ease';   
-                    messageEl.style.opacity = '0';
-                }, 2700);
+                    messageEl.style.opacity = '0.35';
+                }, 3000);
 
             } else {
                 playSound(loseLifeSound);
