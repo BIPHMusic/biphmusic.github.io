@@ -248,6 +248,7 @@
             border-radius: 9999px;
             backdrop-filter: blur(12px);
             font-size: 1.15rem;
+            display: none;
         }
         
         .message {
@@ -389,13 +390,44 @@
 
             if (wasLastLife) {
                 playSound(gameOverSound);
+                body.style.transition = 'background 10s ease';
                 body.style.background = '#000000';
                 gameOverMode = true;
-                setScoreEl.style.display = 'none';
+
+                messageEl.textContent = "Game Over";
+                messageEl.style.opacity = '1';
                 
-                // Fade out header over 2 seconds
-                header.style.transition = 'opacity 2s ease';
-                header.style.opacity = '0';
+                setTimeout(() => {
+                    header.style.transition = 'opacity 8s ease';
+                    header.style.opacity = '0';
+                }, 1200);
+
+                setTimeout(() => {
+                    messageEl.style.transition = 'fontSize 0s ease';
+                    messageEl.textContent = "But keep going!";
+                    messageEl.style.fontSize = '1.3rem';
+                    messageEl.style.lineHeight = '1.7';
+                    messageEl.style.opacity = '1';
+                }, 1600);
+
+                setTimeout(() => {
+                    messageEl.style.transition = 'opacity 3s ease';   
+                    messageEl.style.opacity = '0.5';
+                }, 2600);
+
+                setTimeout(() => {
+                    messageEl.textContent = "(Improve your score)";
+                    messageEl.style.fontSize = '1rem';
+                    messageEl.style.lineHeight = '2.3';
+                    messageEl.style.fontStyle = 'italic';
+                    messageEl.style.fontWeight = '200';
+                }, 3400);
+
+                setTimeout(() => {
+                    messageEl.style.transition = 'opacity 8s ease';   
+                    messageEl.style.opacity = '0';
+                }, 2700);
+
             } else {
                 playSound(loseLifeSound);
             }
@@ -423,6 +455,7 @@
         function beginGame() {
             readyScreen.style.display = 'none';
             quizScreen.style.display = 'block';
+            totalFooter.style.display = 'block';
             body.style.background = currentColor;
             gameOverMode = false;
             
