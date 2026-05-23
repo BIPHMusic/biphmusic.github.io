@@ -460,23 +460,26 @@
         }
 
         function startQuiz() {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             colorScreen.style.display = 'none';
             readyScreen.style.display = 'flex';
             readyScreen.style.background = currentColor;
         }
 
+
         function beginGame() {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             readyScreen.style.display = 'none';
             quizScreen.style.display = 'block';
             totalFooter.style.display = 'block';
             body.style.background = currentColor;
             gameOverMode = false;
-            
+
             refillQuestions();
             currentQuestionIndex = 0;
             setCorrect = 0;
             totalWrong = 0;
-            
+
             loadQuestion();
         }
 
