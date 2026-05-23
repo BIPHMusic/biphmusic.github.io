@@ -185,7 +185,7 @@ const allQuestions = [
         answer: "A"
     },
     {
-        question: ".\nRead the passage below and answer the question.\nMr. Guo was known for his equanimity, even when hundreds of gastropods were scaling the dormitory walls. Rather than panicking, he calmly adjusted the copper stripping around the doorframes. He knew that the galvanic reaction between the copper and the snails' mucus would act as a powerful deterrent, ensuring that the sanctity of the quiet study zone remained uncompromised by the slimy invaders.\nWhat does the word \"equanimity\" most closely mean in this passage?",
+        question: "Read the passage below and answer the question.\nMr. Guo was known for his equanimity, even when hundreds of gastropods were scaling the dormitory walls. Rather than panicking, he calmly adjusted the copper stripping around the doorframes. He knew that the galvanic reaction between the copper and the snails' mucus would act as a powerful deterrent, ensuring that the sanctity of the quiet study zone remained uncompromised by the slimy invaders.\nWhat does the word \"equanimity\" most closely mean in this passage?",
         options: ["A. Extreme fear or anxiety","B. Loud and aggressive behavior","C. Mental calmness and composure","D. Physical strength and agility"],
         answer: "C"
     },
