@@ -57,6 +57,16 @@
             z-index: 1000;
         }
 
+        /* Leader highlight */
+        .student.leader {
+            background: rgba(255, 200, 50, 0.35);
+            border: 3px solid rgba(255, 215, 0, 0.9);
+            box-shadow: 0 0 18px rgba(255, 200, 50, 0.7),
+                        0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 50;
+            font-weight: 600;
+        }
+
         .shuffle-btn {
             position: absolute;
             left: 50%;
@@ -420,6 +430,9 @@
         }
 
         function shuffle() {
+            // Clear any existing leaders when reshuffling
+            clearLeaders();
+
             shuffleBtn.style.transform = 'translate(-50%, -50%) scale(1.2)';
             shuffleBtn.style.background = 'rgba(255, 255, 255, 0.35)';
             
@@ -448,6 +461,47 @@
             });
         }
 
+        // ===== Leader selection =====
+        function clearLeaders() {
+            studentElements.forEach(el => el.classList.remove('leader'));
+        }
+
+        function getStudentsByQuadrant() {
+            const rect = container.getBoundingClientRect();
+            const midX = rect.width / 2;
+            const midY = rect.height / 2;
+
+            const quads = [[], [], [], []]; // 0:TL, 1:TR, 2:BL, 3:BR
+
+            studentElements.forEach(el => {
+                // Use the current center position of the element
+                const left = parseFloat(el.style.left) || 0;
+                const top  = parseFloat(el.style.top)  || 0;
+
+                let q;
+                if (top < midY) {
+                    q = left < midX ? 0 : 1;   // top row
+                } else {
+                    q = left < midX ? 2 : 3;   // bottom row
+                }
+                quads[q].push(el);
+            });
+
+            return quads;
+        }
+
+        function selectLeaders() {
+            clearLeaders();
+
+            const quads = getStudentsByQuadrant();
+
+            quads.forEach(studentsInQuad => {
+                if (studentsInQuad.length === 0) return;
+                const leader = studentsInQuad[Math.floor(Math.random() * studentsInQuad.length)];
+                leader.classList.add('leader');
+            });
+        }
+
         // Event Listeners
         shuffleBtn.addEventListener('click', shuffle);
 
@@ -473,6 +527,11 @@
                 const panel = document.getElementById('editPanel');
                 if (panel.style.display === 'block') toggleEditPanel();
             }
+            // Press 'l' / 'L' to pick a random leader in each quadrant
+            if (e.key === 'l' || e.key === 'L') {
+                e.preventDefault();
+                selectLeaders();
+            }
         });
 
         window.addEventListener('resize', () => {
@@ -483,6 +542,7 @@
                 s.style.left = `${centerX}px`;
                 s.style.top = `${centerY}px`;
             });
+            clearLeaders();
         });
 
         window.addEventListener('load', () => {
