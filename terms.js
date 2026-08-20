@@ -56,7 +56,7 @@ const unit5 = [
 
 
 const cumulative = [
-        "Conjunct Motion",
+    "Conjunct Motion",
     "Disjunct Motion",
     "Scale",
     "Major Scale",
