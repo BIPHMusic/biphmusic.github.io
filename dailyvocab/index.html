@@ -322,12 +322,12 @@ function unscrambleTerms(scrambledArray) {
                 const base = char >= 'a' ? 97 : 65;
                 return String.fromCharCode((code - base - shift + 26) % 26 + base);
             }
-            return char;
+            return char;          // special characters are left untouched – good
         }).join('');
     }
     return scrambledArray.map(item => {
-        const decodedTerm = atob(item.Term);
-        const decodedDef = atob(item.Definition);
+        const decodedTerm = base64ToUnicode(item.Term);   // ← changed
+        const decodedDef  = base64ToUnicode(item.Definition); // ← changed
         return {
             Term: unshiftString(decodedTerm, 3),
             Definition: unshiftString(decodedDef, 3)
