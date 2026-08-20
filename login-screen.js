@@ -39,7 +39,7 @@ function injectLoginStyles() {
         .login-box input {
             width: 100%;
             padding: 14px;
-            margin: 15px 0;
+            margin: 2px 0;
             font-size: 1.1em;
             border: 2px solid #ccc;
             border-radius: 6px;
@@ -55,6 +55,7 @@ function injectLoginStyles() {
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            margin-top: 10px;
         }
 
         .login-box button:hover {
@@ -79,13 +80,23 @@ function createLoginScreen() {
         <div class="login-box">
             <h1 class="Title" style="margin-top:-10px; font-size: 2rem;">BIPH</h1>
             <h1 class="Subtitle" style="margin-top:-10px; font-size: 1.6rem; margin-bottom: 10px;">AP Music Theory</h1>
-            <h2>Enter your name to begin</h2>
+            <h2>Enter your login credentials</h2>
             
             <input 
                 type="text" 
                 id="name-input" 
-                placeholder="Your name" 
+                placeholder="Your name"
                 autofocus
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+            >
+            
+            <input 
+                type="password" 
+                id="password-input" 
+                placeholder="Password"
                 autocomplete="off"
                 autocorrect="off"
                 autocapitalize="off"
@@ -102,7 +113,7 @@ function createLoginScreen() {
     document.body.appendChild(temp.firstElementChild);
 }
 
-// Rest of the logic (unchanged)
+// Rest of the logic
 function normalizeName(name) {
     return name.trim().toLowerCase();
 }
@@ -140,11 +151,18 @@ function storeName(name) {
 
 function handleLogin() {
     const input = document.getElementById('name-input');
+    const passwordInput = document.getElementById('password-input');
     const error = document.getElementById('error-message');
     const rawName = input.value.trim();
+    const rawPassword = passwordInput.value.trim();
 
     if (!rawName) {
         error.textContent = "Please enter your first name";
+        return;
+    }
+
+    if (!rawPassword) {
+        error.textContent = "Please enter your password";
         return;
     }
 
@@ -152,6 +170,16 @@ function handleLogin() {
     if (!student) {
         error.innerHTML = "Name not recognized.<br>(First name only)";
         input.value = "";
+        passwordInput.value = "";
+        return;
+    }
+
+    // Password = name + name (all lowercase)
+    const expectedPassword = normalizeName(student.name) + normalizeName(student.name);
+    
+    if (normalizeName(rawPassword) !== expectedPassword) {
+        error.textContent = "Incorrect password";
+        passwordInput.value = "";
         return;
     }
 
@@ -172,9 +200,20 @@ function handleLogin() {
 }
 
 function addEnterKeyListener() {
-    const input = document.getElementById('name-input');
-    if (input) {
-        input.addEventListener('keypress', (e) => {
+    const nameInput = document.getElementById('name-input');
+    const passwordInput = document.getElementById('password-input');
+
+    if (nameInput) {
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                // Move focus to password field
+                passwordInput && passwordInput.focus();
+            }
+        });
+    }
+
+    if (passwordInput) {
+        passwordInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleLogin();
         });
     }
@@ -193,6 +232,11 @@ function initLogin() {
         const loginScreen = document.getElementById('login-screen');
         loginScreen.style.display = 'flex';
         addEnterKeyListener();
+        
+        // Show the simple "Back to Homepage" menu only while the login screen is visible
+        if (typeof showSimpleMenu === 'function') {
+            showSimpleMenu();
+        }
         
         if (typeof initMyMenu === 'function') {
             initMyMenu(true);   // hide profile menu while on login screen
