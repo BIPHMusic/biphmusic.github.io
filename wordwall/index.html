@@ -216,8 +216,12 @@
     <h1 class="Subtitle">Word Wall</h1>
 
     <select id="unitSelector" onchange="filterTerms()" style="margin-top: -20px;">
+        <option value="Cumulative">Cumulative</option>
         <option value="Unit1">Unit 1</option>
-        <!-- Add more units as needed -->
+        <!-- <option value="Unit2">Unit 2</option> -->
+        <!-- <option value="Unit3">Unit 3</option> -->
+        <!-- <option value="Unit4">Unit 4</option> -->
+        <!-- <option value="Unit5">Unit 5</option> -->
     </select>
 
     <button class="hidden-mode-toggle" onclick="toggleHiddenMode()">
@@ -271,8 +275,8 @@
             document.body.classList.toggle('hidden-mode', hiddenMode);
             
             setTimeout(() => {
-        renderCurrentCards();
-    }, 500);
+                renderCurrentCards();
+            }, 500);
         }
 
         function renderCurrentCards() {
@@ -291,11 +295,38 @@
         }
 
         function filterTerms() {
+            const selected = document.getElementById('unitSelector').value;
+            let termList;
+
+            switch (selected) {
+                case 'Unit1':
+                    termList = unit1;
+                    break;
+                case 'Unit2':
+                    termList = unit2;
+                    break;
+                case 'Unit3':
+                    termList = unit3;
+                    break;
+                case 'Unit4':
+                    termList = unit4;
+                    break;
+                case 'Unit5':
+                    termList = unit5;
+                    break;
+                case 'Cumulative':
+                    termList = cumulative;
+                    break;
+                default:
+                    termList = cumulative;
+            }
+
             const glossary = document.getElementById('glossary');
             glossary.innerHTML = '';
 
-            theglossary.forEach(term => glossary.appendChild(createTermCard(term)));
-            currentOrder = theglossary.map(t => t.Term);
+            const filtered = theglossary.filter(term => termList.includes(term.Term));
+            filtered.forEach(term => glossary.appendChild(createTermCard(term)));
+            currentOrder = filtered.map(t => t.Term);
         }
 
         function revealTerm(button) {
