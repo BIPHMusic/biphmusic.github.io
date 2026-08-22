@@ -1,394 +1,69 @@
 const records = [
   {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "04:23 PM",
-    "percentage": 20,
+    "student": "Jocelyn",
+    "date": "2026-08-21",
+    "time": "11:00 AM",
+    "percentage": 100,
     "exercise": "Vocab",
-    "termsToReview": [
-      "Conjunct Motion",
-      "Contour",
-      "Diatonic",
-      "Forte",
-      "Forte Piano",
-      "Monophonic",
-      "Slur",
-      "Tonic"
-    ]
+    "termsToReview": []
   },
   {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "05:34 PM",
-    "percentage": 20,
+    "student": "Calvin",
+    "date": "2026-08-21",
+    "time": "11:01 AM",
+    "percentage": 100,
     "exercise": "Vocab",
-    "termsToReview": [
-      "Anticipation",
-      "Appoggiatura",
-      "Cadence",
-      "Half Cadence",
-      "Parallel Period",
-      "Predominant",
-      "Second Inversion",
-      "Walking Bass"
-    ]
+    "termsToReview": []
   },
   {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "05:36 PM",
-    "percentage": 40,
+    "student": "William",
+    "date": "2026-08-21",
+    "time": "11:01 AM",
+    "percentage": 100,
     "exercise": "Vocab",
-    "termsToReview": [
-      "Compound Meter",
-      "Enharmonic",
-      "Legato",
-      "Piano",
-      "Tenor",
-      "Tie"
-    ]
+    "termsToReview": []
   },
   {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "05:38 PM",
+    "student": "Thomas",
+    "date": "2026-08-21",
+    "time": "11:01 AM",
     "percentage": 80,
     "exercise": "Vocab",
     "termsToReview": [
-      "Legato",
-      "Theme"
+      "Melodic Minor Scale",
+      "Natural Minor Scale"
     ]
   },
   {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "06:10 PM",
-    "percentage": 10,
-    "exercise": "Vocab Review",
-    "termsToReview": [
-      "Basso Continuo",
-      "Duet",
-      "Figured Bass",
-      "Forte Piano",
-      "Fragmentation",
-      "Legato",
-      "Moderato",
-      "Relative Minor",
-      "Sharp"
-    ]
-  },
-  {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "06:26 PM",
-    "percentage": 10,
-    "exercise": "Vocab",
-    "termsToReview": [
-      "Arpeggiating 64",
-      "Articulation",
-      "Cross Rhythm",
-      "Glissando",
-      "Key",
-      "Perfect 5",
-      "Quadruple Pulse",
-      "Quartet",
-      "Sharp"
-    ]
-  },
-  {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "07:32 PM",
-    "percentage": 10,
-    "exercise": "Vocab",
-    "termsToReview": [
-      "Conjunct Motion",
-      "Hemiola",
-      "Intonation",
-      "Monophonic",
-      "Ostinato",
-      "Pentatonic Scale",
-      "Perfect 4",
-      "Real Sequence",
-      "Ritardano"
-    ]
-  },
-  {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "08:40 PM",
-    "percentage": 0,
-    "exercise": "Vocab",
-    "termsToReview": [
-      "Accented (NCT)",
-      "Appoggiatura",
-      "Consonance",
-      "Harmonic Minor Scale",
-      "Italian Aug 6",
-      "Mixolydian",
-      "Phrygian Half Cadence",
-      "Rhythmic Diminution",
-      "Secondary Leading Tone",
-      "Tritone"
-    ]
-  },
-  {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "08:47 PM",
-    "percentage": 20,
-    "exercise": "Vocab",
-    "termsToReview": [
-      "Accidental",
-      "Countermelody",
-      "Disjunct Motion",
-      "Major 7",
-      "Natural",
-      "Natural Minor Scale",
-      "Octatonic Scale",
-      "Root"
-    ]
-  },
-  {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "08:50 PM",
+    "student": "Thomas",
+    "date": "2026-08-21",
+    "time": "11:07 AM",
     "percentage": 100,
     "exercise": "Vocab",
     "termsToReview": []
   },
   {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "08:59 PM",
-    "percentage": 30,
-    "exercise": "Vocab",
-    "termsToReview": [
-      "Contrary Motion",
-      "Melodic Retrograde",
-      "Mixolydian",
-      "Ornaments",
-      "Plagal Cadence",
-      "Rhythmic Diminution",
-      "Voice Leading"
-    ]
-  },
-  {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "09:19 PM",
+    "student": "Maggie",
+    "date": "2026-08-21",
+    "time": "11:02 AM",
     "percentage": 100,
     "exercise": "Vocab",
     "termsToReview": []
   },
   {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "09:47 PM",
-    "percentage": 0,
+    "student": "Teresa",
+    "date": "2026-08-21",
+    "time": "11:06 AM",
+    "percentage": 70,
     "exercise": "Vocab",
-    "termsToReview": [
-      "Chromatic",
-      "Compound Meter",
-      "Direct or Hidden 5ths",
-      "Leitmotif",
-      "Passing Tone",
-      "Pedal Point or Tone",
-      "Relative Minor",
-      "Subdominant",
-      "Tendency Tones",
-      "Whole Tone Scale"
-    ]
+    "termsToReview": []
   },
   {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "11:43 PM",
-    "percentage": 15,
-    "exercise": "Ear Training",
-    "termsToReview": [
-      "Major 2nd",
-      "Major 3rd",
-      "Major 6th",
-      "Minor 2nd",
-      "Major Triad",
-      "Major Triad",
-      "Major Triad",
-      "Augmented Triad",
-      "Augmented Triad",
-      "Dominant 7",
-      "Minor 7",
-      "Major 7",
-      "Half-Diminished 7",
-      "Phrygian",
-      "Mixolydian",
-      "Ionian",
-      "Locrian"
-    ]
-  },
-  {
-    "student": "Jim",
-    "date": "2026-05-08",
-    "time": "11:43 PM",
-    "percentage": 15,
-    "exercise": "Ear Training",
-    "termsToReview": [
-      "Major 2nd",
-      "Major 3rd",
-      "Major 6th",
-      "Minor 2nd",
-      "Major Triad",
-      "Major Triad",
-      "Major Triad",
-      "Augmented Triad",
-      "Augmented Triad",
-      "Dominant 7",
-      "Minor 7",
-      "Major 7",
-      "Half-Diminished 7",
-      "Phrygian",
-      "Mixolydian",
-      "Ionian",
-      "Locrian"
-    ]
-  },
-  {
-    "student": "Jimmy",
-    "date": "2026-05-08",
-    "time": "11:44 PM",
-    "percentage": 20,
-    "exercise": "Ear Training",
-    "termsToReview": [
-      "Perfect 5th",
-      "Major 3rd",
-      "Major 2nd",
-      "Major 6th",
-      "Major 6th",
-      "Minor Triad",
-      "Augmented Triad",
-      "Augmented Triad",
-      "Major Triad",
-      "Half-Diminished 7",
-      "Major 7",
-      "Half-Diminished 7",
-      "Mixolydian",
-      "Dorian",
-      "Aeolian",
-      "Phrygian"
-    ]
-  },
-  {
-    "student": "Jimmy",
-    "date": "2026-05-08",
-    "time": "11:48 PM",
-    "percentage": 15,
-    "exercise": "Ear Training",
-    "termsToReview": [
-      "Minor 7th",
-      "Major 2nd",
-      "Major 6th",
-      "Minor 2nd",
-      "Major Triad",
-      "Diminished Triad",
-      "Minor Triad",
-      "Augmented Triad",
-      "Augmented Triad",
-      "Dominant 7",
-      "Major 7",
-      "Diminished 7",
-      "Diminished 7",
-      "Aeolian",
-      "Aeolian",
-      "Lydian",
-      "Phrygian"
-    ]
-  },
-  {
-    "student": "Jimmy",
-    "date": "2026-05-09",
-    "time": "01:47 PM",
-    "percentage": 10,
+    "student": "Teresa",
+    "date": "2026-08-21",
+    "time": "11:10 AM",
+    "percentage": 100,
     "exercise": "Vocab",
-    "termsToReview": [
-      "Accelerando",
-      "Bass",
-      "Consonance",
-      "Hemiola",
-      "Locrian",
-      "Minor 2",
-      "Minor 3",
-      "Natural Minor Scale",
-      "Presto"
-    ]
-  },
-  {
-    "student": "Jimmy",
-    "date": "2026-05-09",
-    "time": "01:47 PM",
-    "percentage": 10,
-    "exercise": "Vocab",
-    "termsToReview": [
-      "Accelerando",
-      "Bass",
-      "Consonance",
-      "Hemiola",
-      "Locrian",
-      "Minor 2",
-      "Minor 3",
-      "Natural Minor Scale",
-      "Presto"
-    ]
-  },
-  {
-    "student": "Jimmy",
-    "date": "2026-05-09",
-    "time": "01:47 PM",
-    "percentage": 20,
-    "exercise": "Vocab",
-    "termsToReview": [
-      "Accelerando",
-      "Bass",
-      "Consonance",
-      "Hemiola",
-      "Locrian",
-      "Minor 2",
-      "Minor 3",
-      "Natural Minor Scale",
-      "Presto"
-    ]
-  },
-  {
-    "student": "Jimmy",
-    "date": "2026-05-09",
-    "time": "01:47 PM",
-    "percentage": 0,
-    "exercise": "Vocab",
-    "termsToReview": [
-      "Accelerando",
-      "Bass",
-      "Consonance",
-      "Hemiola",
-      "Locrian",
-      "Minor 2",
-      "Minor 3",
-      "Natural Minor Scale",
-      "Presto"
-    ]
-  },
-  {
-    "student": "Jimtastic",
-    "date": "2026-05-10",
-    "time": "09:51 AM",
-    "percentage": 0,
-    "exercise": "MCQs",
-    "correctCount": 0,
-    "total": 5,
-    "questionsToReview": [
-      1,
-      2,
-      3,
-      4,
-      5
-    ]
+    "termsToReview": []
   }
 ];
