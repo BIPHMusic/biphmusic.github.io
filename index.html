@@ -71,6 +71,14 @@
         }
         .greeting-text {
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.7);
+            white-space: nowrap;   /* keep "Today is …" on a single line */
+            font-size: 0.95em;     /* slightly smaller so it fits more easily */
+        }
+
+        .days-left {
+            font-size: 0.75em;
+            opacity: 0.3;
+            font-weight: normal;
         }
 
         #daily-btn {
@@ -129,8 +137,8 @@
         <div class="container" id="container-section">
             <div class="countdown" id="upcoming-dates">
                 <h2 class="fade-in" id="dates-title">Dates of Importance</h2>
-                <p class="fade-in" id="mock-exam"><strong>Mock Exam</strong>: February 18th, 2027</p>
-                <p class="fade-in" id="ap-exam"><strong>AP Exam</strong>: May 5–23, 2027 <span style="opacity: 0.6; font-size: 0.85em;">(date TBD)</span></p>
+                <p class="fade-in" id="mock-exam"><strong>Mock Exam</strong>: February 18th, 2027 <span class="days-left" id="mock-countdown"></span></p>
+                <p class="fade-in" id="ap-exam"><strong>AP Exam</strong>: May 10, 2027 <span class="days-left" id="ap-countdown"></span></p>
             </div>
             
             <div style="margin: 30px 0;">
@@ -256,6 +264,26 @@
                     <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
         }
 
+        // Days-until helper (whole days remaining)
+        function daysUntil(year, month, day) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const target = new Date(year, month - 1, day);
+            target.setHours(0, 0, 0, 0);
+            const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+            if (diff > 1) return `(${diff} days)`;
+            if (diff === 1) return `(1 day)`;
+            if (diff === 0) return `(today!)`;
+            return `(passed)`;
+        }
+
+        function updateCountdowns() {
+            const mockEl = document.getElementById('mock-countdown');
+            const apEl   = document.getElementById('ap-countdown');
+            if (mockEl) mockEl.textContent = daysUntil(2027, 2, 18);
+            if (apEl)   apEl.textContent   = daysUntil(2027, 5, 10);
+        }
+
         window.onSuccessfulLogin = function(displayName) {
             // Switch back to the full menu the moment the user is logged in
             restoreNormalMenu();
@@ -275,6 +303,7 @@
             setTimeout(() => { if (logoContainer) logoContainer.classList.add('visible'); }, 1400);
 
             document.getElementById('banner-text').innerHTML = getGreeting(displayName);
+            updateCountdowns();
 
             if (typeof initMyMenu === 'function') initMyMenu(false);
         };
