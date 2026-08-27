@@ -276,4 +276,20 @@ const records = [
     "exercise": "Sight Singing",
     "termsToReview": []
   },
+    {
+    "student": "Jocelyn",
+    "date": "2026-08-27",
+    "time": "7:36 PM",
+    "percentage": 80,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Teresa",
+    "date": "2026-08-27",
+    "time": "7:36 PM",
+    "percentage": 80,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
 ];
