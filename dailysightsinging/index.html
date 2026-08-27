@@ -236,6 +236,7 @@
         }
 
         let mediaRecorder, audioChunks = [], isRecording = false, analyser, animationId;
+        let mp3Blob = null;
 
         document.getElementById('recordButton').addEventListener('click', async () => {
             if (!isRecording) {
@@ -254,9 +255,34 @@
 
                     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
 
-                    mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                        const audioUrl = URL.createObjectURL(audioBlob);
+                    mediaRecorder.onstop = async () => {
+                        const webmBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                        const arrayBuffer = await webmBlob.arrayBuffer();
+                        const audioCtx = new AudioContext();
+                        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+                        // Convert to mono 16-bit PCM at the buffer’s sample rate
+                        const samples = audioBuffer.getChannelData(0);
+                        const sampleRate = audioBuffer.sampleRate;
+                        const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, 128);
+                        const sampleBlockSize = 1152;
+                        const mp3Data = [];
+
+                        for (let i = 0; i < samples.length; i += sampleBlockSize) {
+                            const sampleChunk = samples.subarray(i, i + sampleBlockSize);
+                            const int16 = new Int16Array(sampleChunk.length);
+                            for (let j = 0; j < sampleChunk.length; j++) {
+                                int16[j] = Math.max(-32768, Math.min(32767, sampleChunk[j] * 32768));
+                            }
+                            const mp3buf = mp3encoder.encodeBuffer(int16);
+                            if (mp3buf.length > 0) mp3Data.push(mp3buf);
+                        }
+                        const mp3buf = mp3encoder.flush();
+                        if (mp3buf.length > 0) mp3Data.push(mp3buf);
+
+                        mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+                        const audioUrl = URL.createObjectURL(mp3Blob);
+
                         document.getElementById('audioPlayback').src = audioUrl;
                         document.getElementById('audioPlayback').style.display = 'block';
                         document.getElementById('downloadButton').style.display = 'block';
@@ -280,14 +306,14 @@
         });
 
         document.getElementById('downloadButton').addEventListener('click', () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            const url = URL.createObjectURL(audioBlob);
+            if (!mp3Blob) return;
+            const url = URL.createObjectURL(mp3Blob);
             const a = document.createElement('a');
             const formattedDate = new Date().toISOString().split('T')[0];
             const name = localStorage.getItem('biph_student_name') || "Student";
 
             a.href = url;
-            a.download = `${formattedDate} Sight Singing - ${name}.wav`;
+            a.download = `${formattedDate} Sight Singing - ${name}.mp3`;
             a.click();
         });
 
