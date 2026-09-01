@@ -292,4 +292,335 @@ const records = [
     "exercise": "MCQs",
     "termsToReview": []
   },
+    {
+    "student": "Thomas",
+    "date": "2026-08-28",
+    "time": "11:16 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+    {
+    "student": "Calvin",
+    "date": "2026-08-28",
+    "time": "11:16 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+   {
+    "student": "William",
+    "date": "2026-08-28",
+    "time": "11:16 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "Maggie",
+    "date": "2026-08-28",
+    "time": "11:16 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "Teresa",
+    "date": "2026-08-28",
+    "time": "11:15 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "Jocelyn",
+    "date": "2026-08-28",
+    "time": "11:15 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "Alex",
+    "date": "2026-08-28",
+    "time": "11:15 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "Jocelyn",
+    "date": "2026-08-28",
+    "time": "2:58 PM",
+    "percentage": 98,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+  {
+    "student": "Thomas",
+    "date": "2026-08-28",
+    "time": "3:04 PM",
+    "percentage": 67,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+  {
+    "student": "William",
+    "date": "2026-08-28",
+    "time": "3:05 PM",
+    "percentage": 96,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+  {
+    "student": "Calvin",
+    "date": "2026-08-28",
+    "time": "3:06 PM",
+    "percentage": 100,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+  {
+    "student": "Teresa",
+    "date": "2026-08-28",
+    "time": "3:07 PM",
+    "percentage": 100,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+  {
+    "student": "Alex",
+    "date": "2026-08-28",
+    "time": "3:08 PM",
+    "percentage": 89,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+  {
+    "student": "Maggie",
+    "date": "2026-08-28",
+    "time": "3:09 PM",
+    "percentage": 98,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+    {
+    "student": "Teresa",
+    "date": "2026-09-01",
+    "time": "2:23 PM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+    {
+    "student": "Calvin",
+    "date": "2026-09-01",
+    "time": "2:23 PM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "William",
+    "date": "2026-09-01",
+    "time": "10:58 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "Alex",
+    "date": "2026-09-01",
+    "time": "10:58 am",
+    "percentage": 80,
+    "exercise": "Vocab",
+    "termsToReview": [
+      "Key",
+      "Key Signature"
+    ]
+  },
+  {
+    "student": "Jocelyn",
+    "date": "2026-09-01",
+    "time": "10:57 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "Thomas",
+    "date": "2026-09-01",
+    "time": "10:56 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "Maggie",
+    "date": "2026-09-01",
+    "time": "10:57 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+    {
+    "student": "Jocelyn",
+    "date": "2026-09-01",
+    "time": "2:33 PM",
+    "percentage": 93,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+    {
+    "student": "Maggie",
+    "date": "2026-09-01",
+    "time": "2:35 PM",
+    "percentage": 93,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+    {
+    "student": "Teresa",
+    "date": "2026-09-01",
+    "time": "2:37 PM",
+    "percentage": 64,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+    {
+    "student": "Alex",
+    "date": "2026-09-01",
+    "time": "2:40 PM",
+    "percentage": 100,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+    {
+    "student": "William",
+    "date": "2026-09-01",
+    "time": "2:48 PM",
+    "percentage": 64,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+    {
+    "student": "Calvin",
+    "date": "2026-09-01",
+    "time": "2:51 PM",
+    "percentage": 75,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+    {
+    "student": "Thomas",
+    "date": "2026-09-01",
+    "time": "2:55 PM",
+    "percentage": 90,
+    "exercise": "Sight Singing",
+    "termsToReview": []
+  },
+    {
+    "student": "Maggie",
+    "date": "2026-08-31",
+    "time": "9:43 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Alex",
+    "date": "2026-08-31",
+    "time": "9:43 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Teresa",
+    "date": "2026-08-31",
+    "time": "9:43 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Thomas",
+    "date": "2026-08-31",
+    "time": "9:43 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Calvin",
+    "date": "2026-08-31",
+    "time": "9:44 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "William",
+    "date": "2026-08-31",
+    "time": "9:45 PM",
+    "percentage": 67,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Jocelyn",
+    "date": "2026-09-01",
+    "time": "9:47 PM",
+    "percentage": 80,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Maggie",
+    "date": "2026-09-01",
+    "time": "9:47 PM",
+    "percentage": 80,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Alex",
+    "date": "2026-09-01",
+    "time": "9:47 PM",
+    "percentage": 80,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Teresa",
+    "date": "2026-09-01",
+    "time": "9:48 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Thomas",
+    "date": "2026-09-01",
+    "time": "9:48 PM",
+    "percentage": 40,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Calvin",
+    "date": "2026-09-01",
+    "time": "9:48 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "William",
+    "date": "2026-09-01",
+    "time": "9:48 PM",
+    "percentage": 80,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
 ];
