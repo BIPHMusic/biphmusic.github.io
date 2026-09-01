@@ -90,6 +90,12 @@
         if (typeof initMyMenu === 'function') initMyMenu(false);
     }
 
+    function formatDate(dateStr) {
+        // "2026-09-01" → "Sep 1"
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
     function getExerciseColor(exercise) {
         const map = {
             "Vocab": "#36A2EB",
@@ -127,6 +133,7 @@
             datasets.push({
                 label: ex,
                 data: dataPoints.map(item => item.percentage),
+                dates: dataPoints.map(item => item.date),   // ← add this
                 borderColor: getExerciseColor(ex),
                 borderWidth: 3,
                 tension: 0,
@@ -170,11 +177,13 @@
                     },
                     tooltip: {
                         callbacks: {
+                            title: function(context) {
+                                return context[0].label;          // "Attempt 1"
+                            },
                             label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) label += ': ';
-                                label += context.parsed.y + '%';
-                                return label;
+                                const dataset = context.dataset;
+                                const date = dataset.dates[context.dataIndex];
+                                return `${formatDate(date)} ${dataset.label}: ${context.parsed.y}%`;
                             }
                         }
                     }
