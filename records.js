@@ -623,4 +623,156 @@ const records = [
     "exercise": "MCQs",
     "termsToReview": []
   },
+    {
+    "student": "Thomas",
+    "date": "2026-09-02",
+    "time": "11:06 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+    {
+    "student": "Alex",
+    "date": "2026-09-02",
+    "time": "11:06 AM",
+    "percentage": 80,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+    {
+    "student": "Teresa",
+    "date": "2026-09-02",
+    "time": "11:06 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+    {
+    "student": "Thomas",
+    "date": "2026-09-02",
+    "time": "11:06 AM",
+    "percentage": 100,
+    "exercise": "Ear Training",
+    "termsToReview": []
+  },
+    {
+    "student": "William",
+    "date": "2026-09-02",
+    "time": "11:47 AM",
+    "percentage": 100,
+    "exercise": "Ear Training",
+    "termsToReview": []
+  },
+    {
+    "student": "Maggie",
+    "date": "2026-09-02",
+    "time": "11:47 AM",
+    "percentage": 90,
+    "exercise": "Ear Training",
+    "termsToReview": []
+  },
+    {
+    "student": "Calvin",
+    "date": "2026-09-02",
+    "time": "11:48 AM",
+    "percentage": 100,
+    "exercise": "Ear Training",
+    "termsToReview": []
+  },
+    {
+    "student": "Calvin",
+    "date": "2026-09-02",
+    "time": "11:48 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+    {
+    "student": "Jocelyn",
+    "date": "2026-09-02",
+    "time": "11:49 AM",
+    "percentage": 100,
+    "exercise": "Ear Training",
+    "termsToReview": []
+  },
+    {
+    "student": "Maggie",
+    "date": "2026-09-02",
+    "time": "11:10 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "Jocelyn",
+    "date": "2026-09-02",
+    "time": "11:10 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+  {
+    "student": "William",
+    "date": "2026-09-02",
+    "time": "11:04 AM",
+    "percentage": 100,
+    "exercise": "Vocab",
+    "termsToReview": []
+  },
+    {
+    "student": "Calvin",
+    "date": "2026-09-02",
+    "time": "12:03 PM",
+    "percentage": 80,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "William",
+    "date": "2026-09-02",
+    "time": "12:03 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Thomas",
+    "date": "2026-09-02",
+    "time": "12:03 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Teresa",
+    "date": "2026-09-02",
+    "time": "12:03 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Alex",
+    "date": "2026-09-02",
+    "time": "12:03 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Maggie",
+    "date": "2026-09-02",
+    "time": "12:03 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
+    {
+    "student": "Jocelyn",
+    "date": "2026-09-02",
+    "time": "12:03 PM",
+    "percentage": 100,
+    "exercise": "MCQs",
+    "termsToReview": []
+  },
 ];
