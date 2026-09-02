@@ -7,8 +7,6 @@
     <link rel="icon" href="icons/bg-icon.png">
     <link rel="stylesheet" href="common-styles.css">
     <link rel="preload" href="fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
-    <script src="apstudents.js"></script>
-    <script src="login-screen.js"></script>
     <style>
         /* SHARED STYLES */
         /* Loaded from common-styles.css - Do not duplicate/edit: */
@@ -119,10 +117,7 @@
     </style>
 </head>
 <body>
-    <!-- Menu lives OUTSIDE main-content so it can appear on the login screen -->
     <div id="shared-menu"></div>
-    <script src="menu.js"></script>          <!-- original full menu.js -->
-    <script src="mymenu.js"></script>
 
     <div id="main-content" style="display: none;">
         <div class="background"></div>
@@ -153,184 +148,93 @@
         </div>
     </div>
 
+    <script src="apstudents.js"></script>
+    <script src="login-screen.js"></script>
+    <script src="menu.js"></script>
+    <script src="mymenu.js"></script>
+
     <script>
-        // ===== Simple login-only menu =====
-        const simpleMenuHTML = `
-            <div class="hamburger-menu">
-                <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
-                    <span></span><span></span><span></span>
-                </button>
-                <div class="menu-items" id="simple-menu">
-                    <div class="menu-title">BIPH Music</div>
-                    <a href="https://biphband.github.io">Back to Homepage</a>
-                    <div class="menu-footer">© Garrison Tubbs 2026</div>
-                </div>
-            </div>
-        `;
+    function getGreeting(displayName = "") {
+        const now = new Date();
+        const hours = now.getHours();
+        let greeting = hours < 12 ? "Good morning" : hours < 18 ? "Good afternoon" : "Good evening";
 
-        // Exact student menu from the real menu.js
-        const studentMenuHTML = `
-            <div class="hamburger-menu">
-                <button class="menu-toggle" id="menu-toggle" aria-label="Toggle student menu">
-                    <span></span><span></span><span></span>
-                </button>
-                <div class="menu-items student-menu" id="student-menu">
-                    <div class="menu-title">BIPH Music</div>
-                    <a href="https://biphmusic.github.io/">Home</a>
-                    <a href="https://biphmusic.github.io/dailysightsinging/">     • Sight Singing</a>
-                    <a href="https://biphmusic.github.io/dailyvocab/">     • Vocab</a>
-                    <a href="https://biphmusic.github.io/dailymcqs/">     • MCQs</a>
-                    <a href="https://biphmusic.github.io/dailyeartraining/">     • Ear Training</a>
-                    <a href="https://biphmusic.github.io/toolbox/">Toolbox</a>
-                    <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-                    <div class="menu-footer">© Garrison Tubbs 2026</div>
-                </div>
-            </div>
-        `;
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-        function showSimpleMenu() {
-    const container = document.getElementById('shared-menu');
-    if (!container) return;
+        const dayOfWeek = daysOfWeek[now.getDay()];
+        const month = months[now.getMonth()];
+        const day = now.getDate();
 
-    // Inject a small style override so the simple menu sits ABOVE the login overlay
-    if (!document.getElementById('simple-menu-zfix')) {
-        const style = document.createElement('style');
-        style.id = 'simple-menu-zfix';
-        style.textContent = `
-            #shared-menu .hamburger-menu {
-                position: fixed !important;   /* fixed so it stays visible */
-                top: 20px !important;
-                left: 20px !important;
-                z-index: 10000 !important;   /* higher than login-screen (9999) */
-            }
-        `;
-        document.head.appendChild(style);
+        return `<span class="zapfino">${greeting}, ${displayName}!</span><br>
+                <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
     }
 
-    container.innerHTML = simpleMenuHTML;
-
-    const menuToggle = document.getElementById('menu-toggle');
-    const menuItems = document.getElementById('simple-menu');
-
-    function closeMenu() {
-        menuToggle.classList.remove('open');
-        menuItems.classList.remove('show');
+    // Days-until helper (whole days remaining)
+    function daysUntil(year, month, day) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const target = new Date(year, month - 1, day);
+        target.setHours(0, 0, 0, 0);
+        const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+        if (diff > 1) return `(${diff} days)`;
+        if (diff === 1) return `(1 day)`;
+        if (diff === 0) return `(today!)`;
+        return `(passed)`;
     }
 
-    menuToggle.onclick = function(e) {
-        e.stopPropagation();
-        const isOpen = menuItems.classList.contains('show');
-        if (isOpen) {
-            closeMenu();
-        } else {
-            menuToggle.classList.add('open');
-            menuItems.classList.add('show');
-        }
+    function updateCountdowns() {
+        const mockEl = document.getElementById('mock-countdown');
+        const apEl   = document.getElementById('ap-countdown');
+        if (mockEl) mockEl.textContent = daysUntil(2027, 2, 18);
+        if (apEl)   apEl.textContent   = daysUntil(2027, 5, 10);
+    }
+
+    window.onSuccessfulLogin = function(displayName) {
+        // The shared login-screen.js already called restoreNormalMenu() and initMyMenu(false)
+        // so we only need the page-specific greeting / fade-in logic here.
+
+        const banner = document.getElementById('banner-section');
+        const datesTitle = document.getElementById('dates-title');
+        const mockExam = document.getElementById('mock-exam');
+        const apExam = document.getElementById('ap-exam');
+        const dailyBtn = document.getElementById('daily-btn');
+        const logoContainer = document.querySelector('.logo-container');
+
+        setTimeout(() => { if (banner) banner.classList.add('visible'); }, 100);
+        setTimeout(() => { if (datesTitle) datesTitle.classList.add('visible'); }, 600);
+        setTimeout(() => { if (mockExam) mockExam.classList.add('visible'); }, 900);
+        setTimeout(() => { if (apExam) apExam.classList.add('visible'); }, 1200);
+        setTimeout(() => { if (dailyBtn) dailyBtn.classList.add('visible'); }, 1600);
+        setTimeout(() => { if (logoContainer) logoContainer.classList.add('visible'); }, 1400);
+
+        document.getElementById('banner-text').innerHTML = getGreeting(displayName);
+        updateCountdowns();
     };
 
-    // Close on outside click / Escape
-    document.addEventListener('click', function outside(e) {
-        if (!menuToggle.contains(e.target) && !menuItems.contains(e.target)) {
-            closeMenu();
-        }
-    });
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeMenu();
-    });
-}
+    function startDailyExercises() {
+        const urls = [
+            "https://biphmusic.github.io/dailysightsinging/",
+            "https://biphmusic.github.io/dailyeartraining/",
+            "https://biphmusic.github.io/dailyvocab/"
+        ];
 
-        function restoreNormalMenu() {
-            const container = document.getElementById('shared-menu');
-            if (!container) return;
-            container.innerHTML = studentMenuHTML;
-            // The original menu.js click listener is still attached to the container,
-            // so the full student/teacher menu works again.
-        }
+        window.location.href = urls[0];
 
-        // ===== Your original functions =====
-        function getGreeting(displayName = "") {
-            const now = new Date();
-            const hours = now.getHours();
-            let greeting = hours < 12 ? "Good morning" : hours < 18 ? "Good afternoon" : "Good evening";
+        setTimeout(() => {
+            urls.slice(1).forEach(url => {
+                const win = window.open(url, '_blank', 'noopener,noreferrer');
+                if (win) {
+                    win.blur();
+                    setTimeout(() => window.focus(), 50);
+                }
+            });
+        }, 150);
+    }
 
-            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-            const dayOfWeek = daysOfWeek[now.getDay()];
-            const month = months[now.getMonth()];
-            const day = now.getDate();
-
-            return `<span class="zapfino">${greeting}, ${displayName}!</span><br>
-                    <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
-        }
-
-        // Days-until helper (whole days remaining)
-        function daysUntil(year, month, day) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const target = new Date(year, month - 1, day);
-            target.setHours(0, 0, 0, 0);
-            const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
-            if (diff > 1) return `(${diff} days)`;
-            if (diff === 1) return `(1 day)`;
-            if (diff === 0) return `(today!)`;
-            return `(passed)`;
-        }
-
-        function updateCountdowns() {
-            const mockEl = document.getElementById('mock-countdown');
-            const apEl   = document.getElementById('ap-countdown');
-            if (mockEl) mockEl.textContent = daysUntil(2027, 2, 18);
-            if (apEl)   apEl.textContent   = daysUntil(2027, 5, 10);
-        }
-
-        window.onSuccessfulLogin = function(displayName) {
-            // Switch back to the full menu the moment the user is logged in
-            restoreNormalMenu();
-
-            const banner = document.getElementById('banner-section');
-            const datesTitle = document.getElementById('dates-title');
-            const mockExam = document.getElementById('mock-exam');
-            const apExam = document.getElementById('ap-exam');
-            const dailyBtn = document.getElementById('daily-btn');
-            const logoContainer = document.querySelector('.logo-container');
-
-            setTimeout(() => { if (banner) banner.classList.add('visible'); }, 100);
-            setTimeout(() => { if (datesTitle) datesTitle.classList.add('visible'); }, 600);
-            setTimeout(() => { if (mockExam) mockExam.classList.add('visible'); }, 900);
-            setTimeout(() => { if (apExam) apExam.classList.add('visible'); }, 1200);
-            setTimeout(() => { if (dailyBtn) dailyBtn.classList.add('visible'); }, 1600);
-            setTimeout(() => { if (logoContainer) logoContainer.classList.add('visible'); }, 1400);
-
-            document.getElementById('banner-text').innerHTML = getGreeting(displayName);
-            updateCountdowns();
-
-            if (typeof initMyMenu === 'function') initMyMenu(false);
-        };
-
-        function startDailyExercises() {
-            const urls = [
-                "https://biphmusic.github.io/dailysightsinging/",
-                "https://biphmusic.github.io/dailyeartraining/",
-                "https://biphmusic.github.io/dailyvocab/"
-            ];
-
-            window.location.href = urls[0];
-
-            setTimeout(() => {
-                urls.slice(1).forEach(url => {
-                    const win = window.open(url, '_blank', 'noopener,noreferrer');
-                    if (win) {
-                        win.blur();
-                        setTimeout(() => window.focus(), 50);
-                    }
-                });
-            }, 150);
-        }
-
-        window.onload = () => {
-            initLogin();
-        };
-    </script>
+    window.onload = () => {
+        initLogin();
+    };
+</script>
 </body>
 </html>
