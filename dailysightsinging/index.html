@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     
+    <script src="../apstudents.js"></script>
+    <script src="../login-screen.js"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
     
     <style>
@@ -130,17 +132,25 @@
             width: 100%;
         }
 
-        #downloadButton {
+        #downloadButton,
+        #shareButton {
             display: none;
-            background-color: #4c8baf;
             color: white;
-            margin-bottom: 30px;
+            margin: 8px 6px 30px;
+        }
+
+        #downloadButton {
+            background-color: #4c8baf;
+        }
+
+        #shareButton {
+            background-color: #34c759;
         }
     </style>
     <base target="_blank">
 </head>
 <body>
-<div id="shared-menu"></div>
+
     <div id="main-content" style="display: none;">
 
         <div class="background"></div>
@@ -168,6 +178,7 @@
             <canvas id="visualizer"></canvas>
             <audio id="audioPlayback" controls></audio>
             <button id="downloadButton" class="action-btn">Download Recording</button>
+            <button id="shareButton" class="action-btn">Share Recording</button>
         </div>
 
         <div class="reminders">
@@ -180,10 +191,9 @@
             </h3>
         </div>
 
+        <div id="shared-menu"></div>
     </div>
 
-    <script src="../apstudents.js"></script>
-    <script src="../login-screen.js"></script>
     <script src="../menu.js"></script>
     <script src="../mymenu.js"></script>
 
@@ -290,7 +300,8 @@
 
                         document.getElementById('audioPlayback').src = audioUrl;
                         document.getElementById('audioPlayback').style.display = 'block';
-                        document.getElementById('downloadButton').style.display = 'block';
+                        document.getElementById('downloadButton').style.display = 'inline-block';
+                        document.getElementById('shareButton').style.display = 'inline-block';
                         document.getElementById('visualizer').style.display = 'none';
                         cancelAnimationFrame(animationId);
                     };
@@ -322,6 +333,33 @@
             a.href = url;
             a.download = `${formattedDate} Sight Singing - ${name}.mp3`;
             a.click();
+        });
+
+        document.getElementById('shareButton').addEventListener('click', async () => {
+            if (!mp3Blob) return;
+
+            const formattedDate = new Date().toISOString().split('T')[0];
+            const name = localStorage.getItem('biph_student_name') || "Student";
+            const filename = `${formattedDate} Sight Singing - ${name}.mp3`;
+            const file = new File([mp3Blob], filename, { type: 'audio/mp3' });
+
+            // Use the native share sheet (AirDrop, Messages, etc.) on supported browsers (Safari on iOS/macOS)
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Sight Singing Recording',
+                        text: `Daily sight singing – ${name}`
+                    });
+                } catch (err) {
+                    // User cancelled the share sheet or an error occurred – silently ignore
+                    if (err.name !== 'AbortError') {
+                        console.error('Share failed:', err);
+                    }
+                }
+            } else {
+                alert('Sharing is not supported on this device or browser. You can still download the recording.');
+            }
         });
 
         function drawVisualization() {
