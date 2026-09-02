@@ -222,9 +222,13 @@
         }
 
         function checkTimeAndUnlock() {
-            if (checkTime()) {
-                document.getElementById('exerciseImage').classList.add('revealed');
-                document.getElementById('recordButton').disabled = false;
+            const btn = document.getElementById('recordButton');
+            // Enable only while in the time window AND the user has not yet recorded once.
+            // While actively recording we leave the button enabled so the user can stop.
+            if (checkTime() && !hasRecorded && !isRecording) {
+                btn.disabled = false;
+            } else if (!isRecording) {
+                btn.disabled = true;
             }
         }
 
@@ -232,11 +236,13 @@
             const now = new Date();
             const hour = now.getHours();
             const minutes = now.getMinutes();
-            return (hour === 10 && minutes >= 45 && minutes < 48);
+            // Original: return (hour === 10 && minutes >= 45 && minutes < 48);
+            return (hour === 10 && minutes >= 45 && minutes < 50);
         }
 
         let mediaRecorder, audioChunks = [], isRecording = false, analyser, animationId;
         let mp3Blob = null;
+        let hasRecorded = false;
 
         document.getElementById('recordButton').addEventListener('click', async () => {
             if (!isRecording) {
@@ -300,6 +306,8 @@
             } else {
                 mediaRecorder.stop();
                 isRecording = false;
+                hasRecorded = true;
+                document.getElementById('recordButton').disabled = true;
                 document.getElementById('recordIcon').classList.remove('recording');
                 document.getElementById('recordingNotice').style.display = 'none';
             }
@@ -347,7 +355,8 @@
         function updateCountdown() {
             const now = new Date();
             const targetTime = new Date(now); targetTime.setHours(10, 45, 0);
-            const endTime = new Date(now); endTime.setHours(10, 48, 0);
+            // Original: const endTime = new Date(now); endTime.setHours(10, 48, 0);
+            const endTime = new Date(now); endTime.setHours(10, 50, 0);
             const peerReviewEnd = new Date(now); peerReviewEnd.setHours(10, 50, 0);
             const nextDay = new Date(now); nextDay.setDate(nextDay.getDate() + 1); nextDay.setHours(10, 45, 0);
 
