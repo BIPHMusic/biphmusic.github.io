@@ -30,6 +30,54 @@
             margin: 20px auto 12px;
             width: 90%;
             max-width: 600px;
+            transition: all 0.25s ease;
+        }
+
+        /* Invisible by default; becomes the large drop zone only while dragging files */
+        .search-container.drop-active {
+            min-height: 140px;
+            border: 3px dashed #36A2EB;
+            border-radius: 16px;
+            background: rgba(54, 162, 235, 0.18);
+            box-shadow: 0 0 0 4px rgba(54, 162, 235, 0.25),
+                        0 12px 32px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+        }
+
+        .search-container.drop-active #search-bar,
+        .search-container.drop-active .clear-button,
+        .search-container.drop-active .predictions {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .drop-message {
+            display: none;
+            position: absolute;
+            inset: 0;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            color: #a8d4ff;
+            font-size: 1.15em;
+            font-weight: 500;
+            text-align: center;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .search-container.drop-active .drop-message {
+            display: flex;
+        }
+
+        .drop-message span {
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.65);
+            font-weight: 400;
         }
 
         #search-bar {
@@ -39,7 +87,7 @@
             border: 2px dotted rgba(104, 169, 255, 0.543);
             border-radius: 8px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, opacity 0.2s;
             background-color: rgba(255, 255, 255, 0.079);
             color: #fbfbfbde;
             box-sizing: border-box;
@@ -65,6 +113,7 @@
             border: none;
             padding: 4px 8px;
             line-height: 1;
+            transition: opacity 0.2s;
         }
 
         .clear-button:hover {
@@ -86,6 +135,7 @@
             z-index: 100;
             display: none;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.2s;
         }
 
         .predictions.show {
@@ -460,10 +510,14 @@
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Score Entry</h1>
 
-    <div class="search-container">
+    <div class="search-container" id="search-container">
         <input type="text" id="search-bar" placeholder="Type student name…" autocomplete="off" spellcheck="false">
         <button type="button" class="clear-button" id="clear-btn" aria-label="Clear">×</button>
         <div class="predictions" id="predictions"></div>
+        <div class="drop-message" id="drop-message">
+            Drop .txt files here
+            <span>Each file should contain a score URL</span>
+        </div>
     </div>
     <p class="hint-bar">Press <kbd>/</kbd> to focus search · <kbd>Esc</kbd> to clear · arrows + Enter to select</p>
 
@@ -504,7 +558,7 @@
 
     <div id="previewOverlay">
         <div class="preview-box">
-            <h3>Record Preview</h3>
+            <h3 id="preview-title">Record Preview</h3>
             <pre id="preview-code"></pre>
             <div class="preview-actions">
                 <button type="button" class="btn-copy" id="btn-copy">Copy to Clipboard</button>
@@ -548,8 +602,10 @@
         let highlightIndex = -1;
         let computedPercentage = null;
         let importedTermsToReview = [];   // NEW – for URL import
+        let dragCounter = 0;              // prevents flicker on nested dragenter/leave
 
         // ---------- DOM ----------
+        const searchContainer = document.getElementById('search-container');
         const searchBar = document.getElementById('search-bar');
         const clearBtn = document.getElementById('clear-btn');
         const predictionsEl = document.getElementById('predictions');
@@ -563,6 +619,7 @@
         const btnSubmit = document.getElementById('btn-submit');
         const btnReset = document.getElementById('btn-reset');
         const previewOverlay = document.getElementById('previewOverlay');
+        const previewTitle = document.getElementById('preview-title');
         const previewCode = document.getElementById('preview-code');
         const btnCopy = document.getElementById('btn-copy');
         const btnClosePreview = document.getElementById('btn-close-preview');
@@ -841,9 +898,22 @@
             return lines.join('\n');
         }
 
-        function showPreview() {
-            const record = buildRecord();
-            const text = formatRecordsSnippet(record);
+        function formatMultipleRecords(records) {
+            return records.map(r => formatRecordsSnippet(r)).join('\n');
+        }
+
+        function showPreview(records = null) {
+            let text;
+            if (Array.isArray(records) && records.length > 0) {
+                text = formatMultipleRecords(records);
+                previewTitle.textContent = records.length === 1
+                    ? 'Record Preview'
+                    : `Records Preview (${records.length})`;
+            } else {
+                const record = buildRecord();
+                text = formatRecordsSnippet(record);
+                previewTitle.textContent = 'Record Preview';
+            }
             previewCode.textContent = text;
             previewOverlay.classList.add('show');
             // Focus the Copy button so the next Enter is clearly handled
@@ -874,7 +944,8 @@
             }
         }
 
-        function showToast() {
+        function showToast(msg = 'Copied!') {
+            copyToast.textContent = msg;
             copyToast.classList.add('show');
             setTimeout(() => copyToast.classList.remove('show'), 1800);
         }
@@ -906,6 +977,57 @@
             searchBar.focus();
         }
 
+        // ---------- Parse a single data payload (shared by URL import + file drop) ----------
+        function parseScoreData(data) {
+            if (!data || typeof data !== 'object') return null;
+            if (!data.student || data.percentage === undefined || !data.exercise) return null;
+
+            return {
+                student: String(data.student),
+                date: data.date || todayISO(),
+                time: data.time || nowTime(),
+                percentage: Number(data.percentage),
+                exercise: String(data.exercise),
+                termsToReview: Array.isArray(data.termsToReview) ? data.termsToReview : []
+            };
+        }
+
+        function extractDataFromURLString(urlStr) {
+            const trimmed = urlStr.trim();
+            if (!trimmed) return null;
+
+            let raw = null;
+
+            // Try hash first: #data=...
+            const hashMatch = trimmed.match(/#data=([^&\s]+)/);
+            if (hashMatch) {
+                raw = hashMatch[1];
+            } else {
+                // Query param: ?data=... or &data=...
+                try {
+                    const u = new URL(trimmed, window.location.origin);
+                    if (u.searchParams.has('data')) {
+                        raw = u.searchParams.get('data');
+                    }
+                } catch (_) {
+                    // Fallback: simple regex for ?data= or &data=
+                    const qMatch = trimmed.match(/[?&]data=([^&\s]+)/);
+                    if (qMatch) raw = qMatch[1];
+                }
+            }
+
+            if (!raw) return null;
+
+            try {
+                const jsonStr = decodeURIComponent(escape(atob(raw)));
+                const data = JSON.parse(jsonStr);
+                return parseScoreData(data);
+            } catch (err) {
+                console.error('Failed to decode data from URL string:', err);
+                return null;
+            }
+        }
+
         // ---------- NEW: Import from URL ----------
         function tryImportFromURL() {
             // Support both hash (#data=...) and query (?data=...)
@@ -925,27 +1047,27 @@
                 const jsonStr = decodeURIComponent(escape(atob(raw)));
                 const data = JSON.parse(jsonStr);
 
-                // Required fields
-                if (!data.student || data.percentage === undefined || !data.exercise) {
+                const record = parseScoreData(data);
+                if (!record) {
                     console.warn('Incomplete import data');
                     return false;
                 }
 
                 // Populate state
-                selectedStudent = data.student;
-                selectedNameEl.textContent = data.student;
+                selectedStudent = record.student;
+                selectedNameEl.textContent = record.student;
                 formCard.classList.add('visible');
                 rosterEl.classList.add('hidden');
-                searchBar.value = data.student;
+                searchBar.value = record.student;
 
-                dateInput.value = data.date || todayISO();
-                computedPercentage = Number(data.percentage);
+                dateInput.value = record.date;
+                computedPercentage = record.percentage;
                 scoreInput.value = String(computedPercentage);
                 pctPreview.textContent = `${computedPercentage}%`;
                 pctPreview.classList.remove('error');
 
-                selectedExercise = data.exercise;
-                importedTermsToReview = Array.isArray(data.termsToReview) ? data.termsToReview : [];
+                selectedExercise = record.exercise;
+                importedTermsToReview = record.termsToReview;
 
                 // Visual selection of exercise button
                 document.querySelectorAll('.exercise-btn').forEach(b => {
@@ -965,6 +1087,84 @@
                 return false;
             }
         }
+
+        // ---------- Drag & Drop for multiple .txt files ----------
+        function isFileDrag(e) {
+            return e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+        }
+
+        function setDropActive(active) {
+            searchContainer.classList.toggle('drop-active', active);
+        }
+
+        // Use the whole page for detection so the zone appears as soon as files are dragged over the page,
+        // but the visual highlight is only on the search-container (the "one large drop zone").
+        document.addEventListener('dragenter', (e) => {
+            if (!isFileDrag(e)) return;
+            e.preventDefault();
+            dragCounter++;
+            setDropActive(true);
+        });
+
+        document.addEventListener('dragleave', (e) => {
+            if (!isFileDrag(e)) return;
+            e.preventDefault();
+            dragCounter = Math.max(0, dragCounter - 1);
+            if (dragCounter === 0) setDropActive(false);
+        });
+
+        document.addEventListener('dragover', (e) => {
+            if (!isFileDrag(e)) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        });
+
+        document.addEventListener('drop', async (e) => {
+            if (!isFileDrag(e)) return;
+            e.preventDefault();
+            dragCounter = 0;
+            setDropActive(false);
+
+            const files = Array.from(e.dataTransfer.files || []).filter(f =>
+                f.name.toLowerCase().endsWith('.txt') || f.type === 'text/plain'
+            );
+
+            if (files.length === 0) {
+                showToast('No .txt files found');
+                return;
+            }
+
+            const records = [];
+            const errors = [];
+
+            for (const file of files) {
+                try {
+                    const text = await file.text();
+                    const record = extractDataFromURLString(text);
+                    if (record) {
+                        records.push(record);
+                    } else {
+                        errors.push(file.name);
+                    }
+                } catch (err) {
+                    console.error('Failed reading file', file.name, err);
+                    errors.push(file.name);
+                }
+            }
+
+            if (records.length === 0) {
+                showToast(errors.length ? `Could not parse ${errors.length} file(s)` : 'No valid scores found');
+                return;
+            }
+
+            // Show multi-record (or single) preview
+            showPreview(records);
+
+            if (errors.length > 0) {
+                // Brief secondary notice
+                setTimeout(() => showToast(`${errors.length} file(s) skipped`), 2000);
+            }
+        });
 
         // ---------- Events ----------
         searchBar.addEventListener('input', (e) => filterStudents(e.target.value));
