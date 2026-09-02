@@ -261,6 +261,19 @@
                 transform: translateY(0);
             }
         }
+
+        /* NEW – link action buttons */
+        .link-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .link-actions .copy-button {
+            margin-top: 0;
+            min-width: 200px;
+        }
     </style>
 </head>
 <body>
@@ -297,8 +310,7 @@
 
     <script src="../menu.js"></script>
     <script src="vocab.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- kjua & html2canvas no longer needed -->
 
 <script>
 // Unicode-safe base64 encoding and decoding functions
@@ -322,12 +334,12 @@ function unscrambleTerms(scrambledArray) {
                 const base = char >= 'a' ? 97 : 65;
                 return String.fromCharCode((code - base - shift + 26) % 26 + base);
             }
-            return char;          // special characters are left untouched – good
+            return char;
         }).join('');
     }
     return scrambledArray.map(item => {
-        const decodedTerm = base64ToUnicode(item.Term);   // ← changed
-        const decodedDef  = base64ToUnicode(item.Definition); // ← changed
+        const decodedTerm = base64ToUnicode(item.Term);
+        const decodedDef  = base64ToUnicode(item.Definition);
         return {
             Term: unshiftString(decodedTerm, 3),
             Definition: unshiftString(decodedDef, 3)
@@ -463,7 +475,7 @@ function makeMatch(qIndex, wIndex) {
     if (buttons[wIndex]) buttons[wIndex].classList.remove('selected');
     selectedWord = null;
     
-    selectQuestion(qIndex);   // This also ensures it scrolls into view
+    selectQuestion(qIndex);
 }
 
 function clearAnswer(index) {
@@ -523,7 +535,7 @@ function initializeQuiz() {
         const button = document.createElement('button');
         button.textContent = `${String.fromCharCode(65 + index)}. ${term}`;
         button.dataset.index = index;
-        button.tabIndex = -1;                         // Disable tab navigation
+        button.tabIndex = -1;
 
         button.addEventListener('click', () => {
             if (selectedQuestion !== null) {
@@ -593,14 +605,12 @@ document.addEventListener('keydown', (e) => {
         }
 
         if (currentIndex >= 0) {
-            // Normal navigation between inputs
             if (e.shiftKey) {
                 targetIndex = currentIndex > 0 ? currentIndex - 1 : 0;
             } else {
                 targetIndex = currentIndex < inputs.length - 1 ? currentIndex + 1 : null;
             }
         } else {
-            // FIRST LOAD or nothing focused → ALWAYS go to first question
             targetIndex = 0;
         }
 
@@ -875,120 +885,70 @@ function displayResults(resultData, isUrlView = false) {
         termsToReview.appendChild(termsList);
         resultsSection.appendChild(termsToReview);
 
-        // Share Button (JSON)
-        const shareButton = document.createElement('button');
-        shareButton.className = 'copy-button';
-        shareButton.style.marginTop = '18px';
-        shareButton.style.marginLeft = 'auto';
-        shareButton.style.marginRight = 'auto';
-        shareButton.style.display = 'block';
-        shareButton.innerHTML = '📤 Share Results (Airdrop)';
-        shareButton.onclick = () => shareResultsAsText(resultData);
-        resultsSection.appendChild(shareButton);
+        // ========== NEW: Score-Entry deep-link section ==========
+        const linkActions = document.createElement('div');
+        linkActions.className = 'link-actions';
 
-        // QR Code (kept)
-        if (resultData.questionSet && resultData.answers) {
-            const correctCount = resultData.answers.filter((ans, idx) => 
-                ans && ans.toLowerCase() === resultData.questionSet.answers[idx].toLowerCase()
-            ).length;
-            const percentageForUrl = Math.round(correctCount / resultData.questionSet.answers.length * 100);
-            const simplifiedResultData = { s: resultData.student, d: resultData.date, t: resultData.time, p: percentageForUrl };
-            const jsonString = JSON.stringify(simplifiedResultData);
-            const base64Data = unicodeToBase64(jsonString);
-            const baseUrl = window.location.origin + window.location.pathname;
-            const resultUrl = `${baseUrl}?results=${encodeURIComponent(base64Data)}`;
-
-            const qrContainer = document.createElement('div');
-            qrContainer.id = 'qr-code';
-            qrContainer.style.marginTop = '30px';
-            qrContainer.style.width = '200px';
-            qrContainer.style.height = '200px';
-            qrContainer.style.marginLeft = 'auto';
-            qrContainer.style.marginRight = 'auto';
-            resultsSection.appendChild(qrContainer);
-
-            if (typeof kjua !== 'undefined') {
-                const qr = kjua({
-                    text: resultUrl,
-                    size: 200,
-                    fill: '#303f6c',
-                    back: '#FFFFFF',
-                    quiet: 0,
-                    ecLevel: 'M',
-                    render: 'canvas'
-                });
-                qrContainer.appendChild(qr);
-            }
-        }
-    }
-}
-
-function getHiddenKey() {
-    const parts = ["B1PH", "MU51C", "_V0C4B", "2026", "X7K9"];
-    let key = parts.join("_");
-    key = key.split('').map((char, i) => {
-        return String.fromCharCode(char.charCodeAt(0) ^ (i + 7));
-    }).join('');
-    
-    return key;
-}
-
-const SECRET_KEY = getHiddenKey();
-
-function encryptData(data) {
-    const jsonStr = JSON.stringify(data);
-    let encrypted = '';
-    
-    for (let i = 0; i < jsonStr.length; i++) {
-        encrypted += String.fromCharCode(
-            jsonStr.charCodeAt(i) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length)
-        );
-    }
-    
-    return btoa(encrypted) + "==v2";
-}
-
-async function shareResultsAsText(resultData) {
-    try {
-        let percentage = resultData.percentage;
-        if (typeof percentage !== 'number' && resultData.questionSet && resultData.answers) {
-            const correctCount = resultData.answers.filter((ans, i) => 
-                ans && ans.toLowerCase() === (resultData.questionSet.answers[i] || "").toLowerCase()
-            ).length;
-            percentage = Math.round(correctCount / resultData.questionSet.answers.length * 100);
-        }
-
-        const exportData = {
-            student: resultData.student || resultData.s || "Unknown",
-            date: resultData.date || resultData.d,
-            time: resultData.time || resultData.t,
-            percentage: typeof percentage === 'number' ? percentage : "N/A",
-            exercise: "Vocab",                    // ← Changed here
-            termsToReview: resultData.termsToReview ? 
-                resultData.termsToReview.map(item => item.term) : []
+        // Build the payload that score-entry understands
+        const exportPayload = {
+            student: resultData.student,
+            date: resultData.date,
+            time: resultData.time,
+            percentage: percentage,
+            exercise: "Vocab",
+            termsToReview: resultData.termsToReview.map(t => t.term)
         };
 
-        const encryptedContent = encryptData(exportData);
-        
-        const blob = new Blob([encryptedContent], { type: 'text/plain' });
-        const safeName = (exportData.student || "Student").replace(/[^a-zA-Z0-9]/g, '_');
-        const fileName = `Vocab_${safeName}_${exportData.date || 'unknown'}.txt`;
+        // Encode → base64 (URL-safe enough for hash)
+        const jsonStr = JSON.stringify(exportPayload);
+        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
-        const file = new File([blob], fileName, { type: 'text/plain' });
+        // IMPORTANT: change this path if your score-entry lives elsewhere
+        // e.g. https://biphmusic.github.io/score-entry/
+        const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
+        const deepLink = `${scoreEntryBase}#data=${base64}`;
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file] });
-        } else {
+        // 1. Copy link button
+        const copyLinkBtn = document.createElement('button');
+        copyLinkBtn.className = 'copy-button';
+        copyLinkBtn.textContent = '📋 Copy Score Entry Link';
+        copyLinkBtn.onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(deepLink);
+                copyLinkBtn.textContent = '√ Link Copied!';
+                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
+            } catch {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = deepLink;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                copyLinkBtn.textContent = '√ Link Copied!';
+                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
+            }
+        };
+        linkActions.appendChild(copyLinkBtn);
+
+        // 2. Download .txt that contains only the hyperlink
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'copy-button';
+        downloadBtn.textContent = '⬇ Download Link (.txt)';
+        downloadBtn.onclick = () => {
+            const safeName = (resultData.student || 'Student').replace(/[^a-zA-Z0-9]/g, '_');
+            const fileName = `ScoreEntry_${safeName}_${resultData.date}.txt`;
+            const blob = new Blob([deepLink + '\n'], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = fileName;
             a.click();
             URL.revokeObjectURL(url);
-        }
-    } catch (err) {
-        console.error(err);
-        alert('Failed to export results.');
+        };
+        linkActions.appendChild(downloadBtn);
+
+        resultsSection.appendChild(linkActions);
     }
 }
 
