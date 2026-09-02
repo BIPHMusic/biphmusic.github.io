@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
 
+    <!-- Confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
     <style>
         /* SHARED STYLES */
         /* Loaded from common-styles.css - Do not duplicate/edit: */
@@ -203,6 +206,126 @@
             width: 100%;
             height: 100%;
         }
+
+        /* Celebration overlay */
+        #celebration {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.45s ease;
+            padding: 20px;
+        }
+
+        #celebration.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #celebration .congrats-text {
+            font-family: 'Zapfino', cursive;
+            font-size: clamp(1.9rem, 5.2vw, 3.1rem);   /* smaller */
+            font-weight: normal;
+            margin: 0 0 6px 0;
+            line-height: 1.1;
+            text-shadow: 0 4px 22px rgba(0,0,0,0.55);
+        }
+
+        #celebration .cleared-text {
+            font-size: clamp(1.15rem, 3.2vw, 1.55rem);
+            margin: 0 0 14px 0;
+            opacity: 0.95;
+            line-height: 1.25;
+        }
+
+        #celebration .datetime-text {
+            font-size: 0.78rem;
+            opacity: 0.55;
+            letter-spacing: 0.3px;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        /* Hotkey modal */
+        #hotkey-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2500;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        #hotkey-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .hotkey-box {
+            background: rgba(255, 255, 255, 0.97);
+            color: #2c3e50;
+            border-radius: 14px;
+            padding: 28px 32px;
+            max-width: 340px;
+            width: 90%;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+            font-family: Arial, sans-serif;
+        }
+
+        .hotkey-box h2 {
+            margin: 0 0 18px 0;
+            font-size: 1.35rem;
+            text-align: center;
+            color: #1a2a4a;
+        }
+
+        .hotkey-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid #e8eef5;
+            font-size: 0.98rem;
+        }
+
+        .hotkey-row:last-child {
+            border-bottom: none;
+        }
+
+        .hotkey-key {
+            background: #e8eef5;
+            border: 1px solid #c5d0e0;
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-family: monospace;
+            font-size: 0.95rem;
+            font-weight: 600;
+            min-width: 28px;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .hotkey-desc {
+            color: #445;
+        }
+
+        .hotkey-hint {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 0.82rem;
+            color: #789;
+        }
     </style>
 </head>
 <body>
@@ -250,6 +373,7 @@
 
         let hiddenMode = false;
         let currentOrder = [];
+        let initialWordCount = 0;
 
         function createTermCard(term) {
             const card = document.createElement('div');
@@ -332,6 +456,7 @@
             const filtered = theglossary.filter(term => termList.includes(term.Term));
             filtered.forEach(term => glossary.appendChild(createTermCard(term)));
             currentOrder = filtered.map(t => t.Term);
+            initialWordCount = filtered.length;
         }
 
         function revealTerm(button) {
@@ -361,6 +486,10 @@
             setTimeout(() => {
                 card.remove();
                 currentOrder = currentOrder.filter(t => t !== card.dataset.term);
+
+                if (currentOrder.length === 0) {
+                    showCelebration();
+                }
             }, 400);
         }
 
@@ -377,7 +506,6 @@
             glossary.innerHTML = '';
             cards.forEach(card => glossary.appendChild(card));
 
-            // Improved shuffle animation (similar to old version)
             const positions = cards.map(card => {
                 const rect = card.getBoundingClientRect();
                 return {
@@ -403,7 +531,162 @@
             currentOrder = cards.map(card => card.dataset.term);
         }
 
+        // ---------- Celebration ----------
+        function getUserName() {
+            return localStorage.getItem('biph_student_name') || null;
+        }
 
+        function showCelebration() {
+            const defaults = {
+                startVelocity: 42,
+                decay: 0.92,
+                ticks: 140,
+                gravity: 0.85,
+                zIndex: 3000
+            };
+
+            confetti({
+                ...defaults,
+                particleCount: 160,
+                spread: 110,
+                origin: { y: 0.55 }
+            });
+
+            setTimeout(() => {
+                confetti({
+                    ...defaults,
+                    particleCount: 110,
+                    angle: 60,
+                    spread: 75,
+                    origin: { x: 0, y: 0.65 }
+                });
+            }, 200);
+
+            setTimeout(() => {
+                confetti({
+                    ...defaults,
+                    particleCount: 110,
+                    angle: 120,
+                    spread: 75,
+                    origin: { x: 1, y: 0.65 }
+                });
+            }, 380);
+
+            setTimeout(() => {
+                confetti({
+                    ...defaults,
+                    particleCount: 100,
+                    spread: 160,
+                    origin: { y: 0.48 }
+                });
+            }, 650);
+
+            setTimeout(() => {
+                confetti({
+                    ...defaults,
+                    particleCount: 70,
+                    spread: 180,
+                    startVelocity: 28,
+                    origin: { y: 0.3 }
+                });
+            }, 1100);
+
+            let celeb = document.getElementById('celebration');
+            if (!celeb) {
+                celeb = document.createElement('div');
+                celeb.id = 'celebration';
+                document.body.appendChild(celeb);
+            }
+
+            const name = getUserName();
+            // Comma only when a name is present
+            const title = name ? `Congratulations, ${name}!` : 'Congratulations!';
+            const now = new Date();
+            const dateTimeStr = now.toLocaleString(undefined, {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+
+            celeb.innerHTML = `
+                <div class="congrats-text">${title}</div>
+                <div class="cleared-text">You just cleared ${initialWordCount} words!</div>
+                <div class="datetime-text">${dateTimeStr}</div>
+            `;
+
+            requestAnimationFrame(() => {
+                celeb.classList.add('show');
+            });
+
+            celeb.onclick = () => {
+                celeb.classList.remove('show');
+            };
+        }
+
+        // ---------- Hotkeys ----------
+        function showHotkeyModal() {
+            let modal = document.getElementById('hotkey-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'hotkey-modal';
+                modal.innerHTML = `
+                    <div class="hotkey-box">
+                        <h2>Keyboard Shortcuts</h2>
+                        <div class="hotkey-row">
+                            <span class="hotkey-desc">Shuffle cards</span>
+                            <span class="hotkey-key">S</span>
+                        </div>
+                        <div class="hotkey-row">
+                            <span class="hotkey-desc">Toggle Hidden Mode</span>
+                            <span class="hotkey-key">H</span>
+                        </div>
+
+                        <div class="hotkey-hint">Click anywhere outside or press Esc to close</div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                // Click outside the box closes it
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) hideHotkeyModal();
+                });
+            }
+
+            modal.classList.add('show');
+        }
+
+        function hideHotkeyModal() {
+            const modal = document.getElementById('hotkey-modal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            // Ignore if user is typing in an input / select
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                return;
+            }
+
+            const key = e.key.toLowerCase();
+
+            if (key === 's') {
+                e.preventDefault();
+                shuffleCards();
+            } else if (key === 'h') {
+                e.preventDefault();
+                toggleHiddenMode();
+            } else if (key === '?' || (e.shiftKey && key === '/')) {
+                e.preventDefault();
+                showHotkeyModal();
+            } else if (key === 'escape') {
+                hideHotkeyModal();
+                // also close celebration if open
+                const celeb = document.getElementById('celebration');
+                if (celeb) celeb.classList.remove('show');
+            }
+        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
