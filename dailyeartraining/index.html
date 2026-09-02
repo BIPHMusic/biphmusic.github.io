@@ -741,85 +741,112 @@
 
         // ====================== DISPLAY RESULTS ======================
         function displayResults(data) {
-            const container = document.getElementById('results-section');
-            container.innerHTML = '';
+    const container = document.getElementById('results-section');
+    container.innerHTML = '';
 
-            const title = document.createElement('h2');
-            title.textContent = `Results for ${data.student}`;
-            container.appendChild(title);
+    const title = document.createElement('h2');
+    title.textContent = `Results for ${data.student}`;
+    container.appendChild(title);
 
-            const dateTime = document.createElement('p');
-            dateTime.textContent = `Date: ${data.date} | Time: ${data.time}`;
-            container.appendChild(dateTime);
+    const dateTime = document.createElement('p');
+    dateTime.textContent = `Date: ${data.date} | Time: ${data.time}`;
+    container.appendChild(dateTime);
 
-            const score = document.createElement('p');
-            score.innerHTML = `<strong>Score: ${data.percentage}%</strong>`;
-            container.appendChild(score);
+    const score = document.createElement('p');
+    score.innerHTML = `<strong>Score: ${data.percentage}%</strong>`;
+    container.appendChild(score);
 
-            // Results Table
-            let html = `<table class="results-table"><tr><th>#</th><th>Your Answer</th><th>Correct Answer</th></tr>`;
-            data.answers.forEach((ans, i) => {
-                const correct = data.questionSet.correctAnswers[i];
-                const isCorrect = ans.toLowerCase() === correct.toLowerCase();
-                html += `<tr>
-                    <td>${i+1}</td>
-                    <td class="${isCorrect ? '' : 'incorrect'}">${ans} ${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
-                    <td>${correct}</td>
-                </tr>`;
-            });
-            html += `</table>`;
-            container.insertAdjacentHTML('beforeend', html);
+    // Results Table
+    let html = `<table class="results-table"><tr><th>#</th><th>Your Answer</th><th>Correct Answer</th></tr>`;
+    data.answers.forEach((ans, i) => {
+        const correct = data.questionSet.correctAnswers[i];
+        const isCorrect = ans.toLowerCase() === correct.toLowerCase();
+        html += `<tr>
+            <td>${i+1}</td>
+            <td class="${isCorrect ? '' : 'incorrect'}">${ans} ${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
+            <td>${correct}</td>
+        </tr>`;
+    });
+    html += `</table>`;
+    container.insertAdjacentHTML('beforeend', html);
 
-            // Items to Review
-            if (data.termsToReview && data.termsToReview.length) {
-                let reviewHTML = `<div class="terms-to-review"><h3>Items to Review</h3><ul>`;
-                data.termsToReview.forEach(item => {
-                    reviewHTML += `<li><strong>${item.item}:</strong> ${item.correct}</li>`;
-                });
-                reviewHTML += `</ul></div>`;
-                container.insertAdjacentHTML('beforeend', reviewHTML);
-            }
+    // Items to Review
+    if (data.termsToReview && data.termsToReview.length) {
+        let reviewHTML = `<div class="terms-to-review"><h3>Items to Review</h3><ul>`;
+        data.termsToReview.forEach(item => {
+            reviewHTML += `<li><strong>${item.item}:</strong> ${item.correct}</li>`;
+        });
+        reviewHTML += `</ul></div>`;
+        container.insertAdjacentHTML('beforeend', reviewHTML);
+    }
 
-            // Share Button
-            const shareBtn = document.createElement('button');
-            shareBtn.className = 'copy-button';
-            shareBtn.textContent = '📤 Share Results (Airdrop)';
-            shareBtn.onclick = () => shareResultsAsText(data);
-            container.appendChild(shareBtn);
+    // ========== Score-Entry deep-link section (replaces old Share + QR) ==========
+    const linkActions = document.createElement('div');
+    linkActions.className = 'link-actions';
+    linkActions.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:24px;';
 
-            // QR Code
-            const qrContainer = document.createElement('div');
-            qrContainer.id = 'qr-code';
-            qrContainer.style.marginTop = '30px';
-            qrContainer.style.width = '200px';
-            qrContainer.style.height = '200px';
-            qrContainer.style.marginLeft = 'auto';
-            qrContainer.style.marginRight = 'auto';
-            container.appendChild(qrContainer);
+    // Payload that score-entry understands
+    const exportPayload = {
+        student: data.student,
+        date: data.date,
+        time: data.time,
+        percentage: data.percentage,
+        exercise: data.exercise || "Ear Training",
+        termsToReview: data.termsToReview
+            ? data.termsToReview.map(t => t.correct || t.item)
+            : []
+    };
 
-            const simplified = { 
-                s: data.student, 
-                d: data.date, 
-                t: data.time, 
-                p: data.percentage,
-                e: "Ear" 
-            };
+    const jsonStr = JSON.stringify(exportPayload);
+    const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
-            const resultUrl = `${window.location.origin}${window.location.pathname}?results=${encodeURIComponent(unicodeToBase64(JSON.stringify(simplified)))}`;
+    // Change this if your score-entry lives elsewhere
+    const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
+    const deepLink = `${scoreEntryBase}#data=${base64}`;
 
-            if (typeof kjua !== 'undefined') {
-                const qr = kjua({
-                    text: resultUrl,
-                    size: 200,
-                    fill: '#303f6c',
-                    back: '#FFFFFF',
-                    quiet: 0,
-                    ecLevel: 'M',
-                    render: 'canvas'
-                });
-                qrContainer.appendChild(qr);
-            }
+    // 1. Copy link
+    const copyLinkBtn = document.createElement('button');
+    copyLinkBtn.className = 'copy-button';
+    copyLinkBtn.style.marginTop = '0';
+    copyLinkBtn.textContent = '📋 Copy Score Entry Link';
+    copyLinkBtn.onclick = async () => {
+        try {
+            await navigator.clipboard.writeText(deepLink);
+            copyLinkBtn.textContent = '√ Link Copied!';
+            setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
+        } catch {
+            const ta = document.createElement('textarea');
+            ta.value = deepLink;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            copyLinkBtn.textContent = '√ Link Copied!';
+            setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
         }
+    };
+    linkActions.appendChild(copyLinkBtn);
+
+    // 2. Download .txt containing the link
+    const downloadBtn = document.createElement('button');
+    downloadBtn.className = 'copy-button';
+    downloadBtn.style.marginTop = '0';
+    downloadBtn.textContent = '⬇ Download Link (.txt)';
+    downloadBtn.onclick = () => {
+        const safeName = (data.student || 'Student').replace(/[^a-zA-Z0-9]/g, '_');
+        const fileName = `ScoreEntry_${safeName}_${data.date}.txt`;
+        const blob = new Blob([deepLink + '\n'], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+    linkActions.appendChild(downloadBtn);
+
+    container.appendChild(linkActions);
+}
 
         // ====================== KEYBOARD SHORTCUTS ======================
         document.addEventListener('keydown', function(e) {
