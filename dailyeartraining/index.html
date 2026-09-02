@@ -13,9 +13,7 @@
     <link rel="icon" href="../icons/BGicon.png">
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
-    <script src="../apstudents.js"></script>
-    <script src="../login-screen.js"></script>
-    <script src="../mymenu.js"></script>
+
     <style>
     /* SHARED STYLES - Do not duplicate core styles from common-styles.css */
     
@@ -207,8 +205,8 @@
 </style>
 </head>
 <body>
+<div id="shared-menu"></div>
 
-    <!-- MAIN CONTENT - Hidden until successful login -->
     <div id="main-content" style="display: none;">
 
         <div class="background"></div>
@@ -232,12 +230,14 @@
         <div class="logocontainer">        
             <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
         </div>
-
-        <div id="shared-menu"></div>
     </div>
 
+    <script src="../apstudents.js"></script>
+    <script src="../login-screen.js"></script>
     <script src="../menu.js"></script>
+    <script src="../mymenu.js"></script>
 
+    
     <script src="quiz-intervals-2nds.js"></script>
     <!-- <script src="quiz-intervals-2nds-3rds.js"></script> -->
     <!-- <script src="quiz-intervals-2nds-to-5ths.js"></script> -->
