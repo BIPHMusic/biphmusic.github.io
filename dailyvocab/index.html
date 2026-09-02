@@ -816,7 +816,7 @@ async function shareScoreEntryLink(resultData, percentage) {
             await navigator.share({
                 files: [file],
                 title: fileName,
-                text: 'Score Entry link for ' + resultData.student
+                text: 'Score for ' + resultData.student
             });
         } else {
             // Fallback download
@@ -955,12 +955,12 @@ function displayResults(resultData, isUrlView = false) {
         // 1. Copy link button
         const copyLinkBtn = document.createElement('button');
         copyLinkBtn.className = 'copy-button';
-        copyLinkBtn.textContent = '📋 Copy Score Entry Link';
+        copyLinkBtn.textContent = '📋 Copy Score';
         copyLinkBtn.onclick = async () => {
             try {
                 await navigator.clipboard.writeText(deepLink);
                 copyLinkBtn.textContent = '√ Link Copied!';
-                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
+                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score', 2200);
             } catch {
                 const ta = document.createElement('textarea');
                 ta.value = deepLink;
@@ -969,7 +969,7 @@ function displayResults(resultData, isUrlView = false) {
                 document.execCommand('copy');
                 document.body.removeChild(ta);
                 copyLinkBtn.textContent = '√ Link Copied!';
-                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
+                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score', 2200);
             }
         };
         linkActions.appendChild(copyLinkBtn);
