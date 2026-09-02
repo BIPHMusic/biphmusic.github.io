@@ -310,7 +310,6 @@
 
     <script src="../menu.js"></script>
     <script src="vocab.js"></script>
-    <!-- kjua & html2canvas no longer needed -->
 
 <script>
 // Unicode-safe base64 encoding and decoding functions
@@ -787,6 +786,55 @@ function submitQuiz() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ==================== SHARE / AIRDROP ====================
+async function shareScoreEntryLink(resultData, percentage) {
+    try {
+        const exportPayload = {
+            student: resultData.student,
+            date: resultData.date,
+            time: resultData.time,
+            percentage: percentage,
+            exercise: "Vocab",
+            termsToReview: resultData.termsToReview.map(t => t.term)
+        };
+
+        const jsonStr = JSON.stringify(exportPayload);
+        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+
+        // Change this if your score-entry lives elsewhere
+        const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
+        const deepLink = `${scoreEntryBase}#data=${base64}`;
+
+        // Filename: "[Name] - Vocab, [Date].txt"
+        const safeName = (resultData.student || 'Student').replace(/[\/\\?%*:|"<>]/g, '').trim();
+        const fileName = `${safeName} - Vocab, ${resultData.date}.txt`;
+
+        const blob = new Blob([deepLink + '\n'], { type: 'text/plain' });
+        const file = new File([blob], fileName, { type: 'text/plain' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: fileName,
+                text: 'Score Entry link for ' + resultData.student
+            });
+        } else {
+            // Fallback download
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    } catch (err) {
+        if (err.name !== 'AbortError') {
+            console.error(err);
+            alert('Could not share the file.');
+        }
+    }
+}
+
 // ==================== DISPLAY RESULTS ====================
 function displayResults(resultData, isUrlView = false) {
     const resultsSection = document.getElementById('results-section');
@@ -885,11 +933,11 @@ function displayResults(resultData, isUrlView = false) {
         termsToReview.appendChild(termsList);
         resultsSection.appendChild(termsToReview);
 
-        // ========== NEW: Score-Entry deep-link section ==========
+        // ========== Score-Entry deep-link actions ==========
         const linkActions = document.createElement('div');
         linkActions.className = 'link-actions';
 
-        // Build the payload that score-entry understands
+        // Build the payload once
         const exportPayload = {
             student: resultData.student,
             date: resultData.date,
@@ -899,12 +947,8 @@ function displayResults(resultData, isUrlView = false) {
             termsToReview: resultData.termsToReview.map(t => t.term)
         };
 
-        // Encode → base64 (URL-safe enough for hash)
         const jsonStr = JSON.stringify(exportPayload);
         const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
-
-        // IMPORTANT: change this path if your score-entry lives elsewhere
-        // e.g. https://biphmusic.github.io/score-entry/
         const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
         const deepLink = `${scoreEntryBase}#data=${base64}`;
 
@@ -918,7 +962,6 @@ function displayResults(resultData, isUrlView = false) {
                 copyLinkBtn.textContent = '√ Link Copied!';
                 setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
             } catch {
-                // Fallback
                 const ta = document.createElement('textarea');
                 ta.value = deepLink;
                 document.body.appendChild(ta);
@@ -931,22 +974,12 @@ function displayResults(resultData, isUrlView = false) {
         };
         linkActions.appendChild(copyLinkBtn);
 
-        // 2. Download .txt that contains only the hyperlink
-        const downloadBtn = document.createElement('button');
-        downloadBtn.className = 'copy-button';
-        downloadBtn.textContent = '⬇ Download Link (.txt)';
-        downloadBtn.onclick = () => {
-            const safeName = (resultData.student || 'Student').replace(/[^a-zA-Z0-9]/g, '_');
-            const fileName = `ScoreEntry_${safeName}_${resultData.date}.txt`;
-            const blob = new Blob([deepLink + '\n'], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.click();
-            URL.revokeObjectURL(url);
-        };
-        linkActions.appendChild(downloadBtn);
+        // 2. Share / AirDrop button
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'copy-button';
+        shareBtn.textContent = '📤 Share / AirDrop';
+        shareBtn.onclick = () => shareScoreEntryLink(resultData, percentage);
+        linkActions.appendChild(shareBtn);
 
         resultsSection.appendChild(linkActions);
     }
