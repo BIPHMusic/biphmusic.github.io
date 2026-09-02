@@ -192,6 +192,18 @@
         color: #ff6666;
         margin-top: 10px;
     }
+
+    .link-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 24px;
+    }
+    .link-actions .copy-button {
+        margin-top: 0;
+        min-width: 200px;
+    }
 </style>
 </head>
 <body>
@@ -225,7 +237,6 @@
     </div>
 
     <script src="../menu.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js"></script>
 
     <script src="quiz-intervals-2nds.js"></script>
     <!-- <script src="quiz-intervals-2nds-3rds.js"></script> -->
@@ -259,7 +270,7 @@
             localStorage.setItem('biph_student_name', displayName);
             localStorage.setItem('biph_name_timestamp', Date.now().toString());
 
-            currentStudent = displayName;   // <-- fixed: was missing in original
+            currentStudent = displayName;
 
             if (typeof initMyMenu === 'function') initMyMenu();
             
@@ -678,54 +689,42 @@
             initLogin();
         };
 
-        // ====================== SHARING & ENCRYPTION ======================
-        function getHiddenKey() {
-            const parts = ["B1PH", "MU51C", "_V0C4B", "2026", "X7K9"];
-            let key = parts.join("_");
-            key = key.split('').map((char, i) => {
-                return String.fromCharCode(char.charCodeAt(0) ^ (i + 7));
-            }).join('');
-            return key;
-        }
-
-        const SECRET_KEY = getHiddenKey();
-
-        function encryptData(data) {
-            const jsonStr = JSON.stringify(data);
-            let encrypted = '';
-            
-            for (let i = 0; i < jsonStr.length; i++) {
-                encrypted += String.fromCharCode(
-                    jsonStr.charCodeAt(i) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length)
-                );
-            }
-            
-            return btoa(encrypted) + "==v2";
-        }
-
-        async function shareResultsAsText(resultData) {
+        // ====================== NEW SHARE / AIRDROP ======================
+        async function shareScoreEntryLink(data) {
             try {
-                const exportData = {
-                    student: resultData.student || "Unknown",
-                    date: resultData.date,
-                    time: resultData.time,
-                    percentage: resultData.percentage,
-                    exercise: resultData.exercise || "Ear Training",
-                    termsToReview: resultData.termsToReview ? 
-                        resultData.termsToReview.map(item => item.correct || item.item) : []
+                const exportPayload = {
+                    student: data.student,
+                    date: data.date,
+                    time: data.time,
+                    percentage: data.percentage,
+                    exercise: data.exercise || "Ear Training",
+                    termsToReview: data.termsToReview
+                        ? data.termsToReview.map(t => t.correct || t.item)
+                        : []
                 };
 
-                const encryptedContent = encryptData(exportData);
-                
-                const blob = new Blob([encryptedContent], { type: 'text/plain' });
-                const safeName = (exportData.student || "Student").replace(/[^a-zA-Z0-9]/g, '_');
-                const fileName = `EarTraining_${safeName}_${exportData.date || 'unknown'}.txt`;
+                const jsonStr = JSON.stringify(exportPayload);
+                const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
+                // Change this base if your score-entry lives elsewhere
+                const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
+                const deepLink = `${scoreEntryBase}#data=${base64}`;
+
+                // Filename format requested: "[Name] - [TestType], [Date].txt"
+                const safeName = (data.student || 'Student').replace(/[\/\\?%*:|"<>]/g, '').trim();
+                const fileName = `${safeName} - ${data.exercise || 'Ear Training'}, ${data.date}.txt`;
+
+                const blob = new Blob([deepLink + '\n'], { type: 'text/plain' });
                 const file = new File([blob], fileName, { type: 'text/plain' });
 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file] });
+                    await navigator.share({
+                        files: [file],
+                        title: fileName,
+                        text: 'Score Entry link for ' + data.student
+                    });
                 } else {
+                    // Fallback: classic download
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
@@ -734,119 +733,106 @@
                     URL.revokeObjectURL(url);
                 }
             } catch (err) {
-                console.error(err);
-                alert('Failed to export results.');
+                // User cancelled the share sheet – do nothing
+                if (err.name !== 'AbortError') {
+                    console.error(err);
+                    alert('Could not share the file.');
+                }
             }
         }
 
         // ====================== DISPLAY RESULTS ======================
         function displayResults(data) {
-    const container = document.getElementById('results-section');
-    container.innerHTML = '';
+            const container = document.getElementById('results-section');
+            container.innerHTML = '';
 
-    const title = document.createElement('h2');
-    title.textContent = `Results for ${data.student}`;
-    container.appendChild(title);
+            const title = document.createElement('h2');
+            title.textContent = `Results for ${data.student}`;
+            container.appendChild(title);
 
-    const dateTime = document.createElement('p');
-    dateTime.textContent = `Date: ${data.date} | Time: ${data.time}`;
-    container.appendChild(dateTime);
+            const dateTime = document.createElement('p');
+            dateTime.textContent = `Date: ${data.date} | Time: ${data.time}`;
+            container.appendChild(dateTime);
 
-    const score = document.createElement('p');
-    score.innerHTML = `<strong>Score: ${data.percentage}%</strong>`;
-    container.appendChild(score);
+            const score = document.createElement('p');
+            score.innerHTML = `<strong>Score: ${data.percentage}%</strong>`;
+            container.appendChild(score);
 
-    // Results Table
-    let html = `<table class="results-table"><tr><th>#</th><th>Your Answer</th><th>Correct Answer</th></tr>`;
-    data.answers.forEach((ans, i) => {
-        const correct = data.questionSet.correctAnswers[i];
-        const isCorrect = ans.toLowerCase() === correct.toLowerCase();
-        html += `<tr>
-            <td>${i+1}</td>
-            <td class="${isCorrect ? '' : 'incorrect'}">${ans} ${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
-            <td>${correct}</td>
-        </tr>`;
-    });
-    html += `</table>`;
-    container.insertAdjacentHTML('beforeend', html);
+            // Results Table
+            let html = `<table class="results-table"><tr><th>#</th><th>Your Answer</th><th>Correct Answer</th></tr>`;
+            data.answers.forEach((ans, i) => {
+                const correct = data.questionSet.correctAnswers[i];
+                const isCorrect = ans.toLowerCase() === correct.toLowerCase();
+                html += `<tr>
+                    <td>${i+1}</td>
+                    <td class="${isCorrect ? '' : 'incorrect'}">${ans} ${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
+                    <td>${correct}</td>
+                </tr>`;
+            });
+            html += `</table>`;
+            container.insertAdjacentHTML('beforeend', html);
 
-    // Items to Review
-    if (data.termsToReview && data.termsToReview.length) {
-        let reviewHTML = `<div class="terms-to-review"><h3>Items to Review</h3><ul>`;
-        data.termsToReview.forEach(item => {
-            reviewHTML += `<li><strong>${item.item}:</strong> ${item.correct}</li>`;
-        });
-        reviewHTML += `</ul></div>`;
-        container.insertAdjacentHTML('beforeend', reviewHTML);
-    }
+            // Items to Review
+            if (data.termsToReview && data.termsToReview.length) {
+                let reviewHTML = `<div class="terms-to-review"><h3>Items to Review</h3><ul>`;
+                data.termsToReview.forEach(item => {
+                    reviewHTML += `<li><strong>${item.item}:</strong> ${item.correct}</li>`;
+                });
+                reviewHTML += `</ul></div>`;
+                container.insertAdjacentHTML('beforeend', reviewHTML);
+            }
 
-    // ========== Score-Entry deep-link section (replaces old Share + QR) ==========
-    const linkActions = document.createElement('div');
-    linkActions.className = 'link-actions';
-    linkActions.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:24px;';
+            // ========== Score-Entry deep-link actions ==========
+            const linkActions = document.createElement('div');
+            linkActions.className = 'link-actions';
 
-    // Payload that score-entry understands
-    const exportPayload = {
-        student: data.student,
-        date: data.date,
-        time: data.time,
-        percentage: data.percentage,
-        exercise: data.exercise || "Ear Training",
-        termsToReview: data.termsToReview
-            ? data.termsToReview.map(t => t.correct || t.item)
-            : []
-    };
+            // Build deep link once
+            const exportPayload = {
+                student: data.student,
+                date: data.date,
+                time: data.time,
+                percentage: data.percentage,
+                exercise: data.exercise || "Ear Training",
+                termsToReview: data.termsToReview
+                    ? data.termsToReview.map(t => t.correct || t.item)
+                    : []
+            };
+            const jsonStr = JSON.stringify(exportPayload);
+            const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+            const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
+            const deepLink = `${scoreEntryBase}#data=${base64}`;
 
-    const jsonStr = JSON.stringify(exportPayload);
-    const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+            // 1. Copy link button
+            const copyLinkBtn = document.createElement('button');
+            copyLinkBtn.className = 'copy-button';
+            copyLinkBtn.textContent = '📋 Copy Score Entry Link';
+            copyLinkBtn.onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(deepLink);
+                    copyLinkBtn.textContent = '√ Link Copied!';
+                    setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
+                } catch {
+                    const ta = document.createElement('textarea');
+                    ta.value = deepLink;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    copyLinkBtn.textContent = '√ Link Copied!';
+                    setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
+                }
+            };
+            linkActions.appendChild(copyLinkBtn);
 
-    // Change this if your score-entry lives elsewhere
-    const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
-    const deepLink = `${scoreEntryBase}#data=${base64}`;
+            // 2. Share / AirDrop button
+            const shareBtn = document.createElement('button');
+            shareBtn.className = 'copy-button';
+            shareBtn.textContent = '📤 Share / AirDrop';
+            shareBtn.onclick = () => shareScoreEntryLink(data);
+            linkActions.appendChild(shareBtn);
 
-    // 1. Copy link
-    const copyLinkBtn = document.createElement('button');
-    copyLinkBtn.className = 'copy-button';
-    copyLinkBtn.style.marginTop = '0';
-    copyLinkBtn.textContent = '📋 Copy Score Entry Link';
-    copyLinkBtn.onclick = async () => {
-        try {
-            await navigator.clipboard.writeText(deepLink);
-            copyLinkBtn.textContent = '√ Link Copied!';
-            setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
-        } catch {
-            const ta = document.createElement('textarea');
-            ta.value = deepLink;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            copyLinkBtn.textContent = '√ Link Copied!';
-            setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score Entry Link', 2200);
+            container.appendChild(linkActions);
         }
-    };
-    linkActions.appendChild(copyLinkBtn);
-
-    // 2. Download .txt containing the link
-    const downloadBtn = document.createElement('button');
-    downloadBtn.className = 'copy-button';
-    downloadBtn.style.marginTop = '0';
-    downloadBtn.textContent = '⬇ Download Link (.txt)';
-    downloadBtn.onclick = () => {
-        const safeName = (data.student || 'Student').replace(/[^a-zA-Z0-9]/g, '_');
-        const fileName = `ScoreEntry_${safeName}_${data.date}.txt`;
-        const blob = new Blob([deepLink + '\n'], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(url);
-    };
-    linkActions.appendChild(downloadBtn);
-
-    container.appendChild(linkActions);
-}
 
         // ====================== KEYBOARD SHORTCUTS ======================
         document.addEventListener('keydown', function(e) {
