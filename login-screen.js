@@ -193,6 +193,16 @@ function handleLogin() {
         loginScreen.style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
         
+        // Switch to the full student menu
+        if (typeof restoreNormalMenu === 'function') {
+            restoreNormalMenu();
+        }
+        
+        // Re-init the profile menu (now logged in)
+        if (typeof initMyMenu === 'function') {
+            initMyMenu(false);
+        }
+        
         if (typeof window.onSuccessfulLogin === 'function') {
             window.onSuccessfulLogin(displayName);
         }
@@ -224,20 +234,31 @@ function initLogin() {
     
     if (storedName) {
         document.getElementById('main-content').style.display = 'block';
+        
+        // Make sure the full menu is showing
+        if (typeof restoreNormalMenu === 'function') {
+            restoreNormalMenu();
+        }
+        
         if (typeof window.onSuccessfulLogin === 'function') {
             window.onSuccessfulLogin(storedName);
+        }
+        
+        // Ensure profile menu is visible
+        if (typeof initMyMenu === 'function') {
+            initMyMenu(false);
         }
     } else {
         createLoginScreen();
         const loginScreen = document.getElementById('login-screen');
         loginScreen.style.display = 'flex';
         addEnterKeyListener();
-        
-        // Show the simple "Back to Homepage" menu only while the login screen is visible
+
+        // Show the simple “Back to Homepage” menu while the login screen is visible
         if (typeof showSimpleMenu === 'function') {
             showSimpleMenu();
         }
-        
+
         if (typeof initMyMenu === 'function') {
             initMyMenu(true);   // hide profile menu while on login screen
         }

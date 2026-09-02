@@ -167,7 +167,7 @@ function handleSignOutClick(e) {
     } else {
         localStorage.removeItem('biph_student_name');
         localStorage.removeItem('biph_name_timestamp');
-        location.reload();
+        location.reload();   // simplest and most reliable
     }
 }
 
