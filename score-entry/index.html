@@ -902,21 +902,122 @@
             return records.map(r => formatRecordsSnippet(r)).join('\n');
         }
 
+        // ---------- MIDI OUT (Polyphonic Key Pressure / Aftertouch 0xA0) ----------
+        // Channel 1 (index 0) → first student, Channel 2 → second, …
+        // Note 1 = Sight Singing, Note 2 = Vocab, Note 3 = Ear Training
+        // MCQs is not mapped to the completion board and is skipped.
+        let midiOutput = null;
+
+        const EXERCISE_TO_NOTE = {
+            "Sight Singing": 1,
+            "Vocab": 2,
+            "Ear Training": 3
+        };
+
+        async function initMIDI() {
+            if (!navigator.requestMIDIAccess) return;
+            try {
+                const access = await navigator.requestMIDIAccess({ sysex: false });
+                const pickOutput = () => {
+                    let preferred = null;
+                    for (const output of access.outputs.values()) {
+                        if (!preferred) preferred = output;
+                        if (output.name && output.name.toLowerCase().includes('iac')) {
+                            preferred = output;
+                            break;
+                        }
+                    }
+                    midiOutput = preferred;
+                };
+                pickOutput();
+                access.onstatechange = pickOutput;
+            } catch (err) {
+                console.warn('MIDI access failed', err);
+            }
+        }
+
+        function sendKeyPressure(channelIndex, note, pressure = 127) {
+            if (!midiOutput) return;
+            if (channelIndex < 0 || channelIndex > 15) return;
+            // Polyphonic Aftertouch: [0xA0 | channel, note, pressure]
+            midiOutput.send([0xA0 | (channelIndex & 0x0F), note & 0x7F, pressure & 0x7F]);
+        }
+
+        function noteForExercise(exercise) {
+    if (!exercise) return null;
+    const e = String(exercise).toLowerCase();
+    if (e.includes('sight singing') || e.includes('sightsinging')) return 1;
+    if (e.includes('vocab')) return 2;
+    if (e.includes('ear training') || e.includes('eartraining')) return 3;
+    return null;
+}
+
+function sendAftertouchForRecords(records) {
+    if (!midiOutput || !Array.isArray(records) || records.length === 0) return;
+
+    let t = performance.now();
+    const gapMs = 20;
+
+    records.forEach((record) => {
+        const note = noteForExercise(record.exercise);
+        if (note == null) return;
+
+        const idx = allStudents.findIndex(
+            n => n.toLowerCase() === String(record.student).toLowerCase()
+        );
+        if (idx < 0) return;
+
+        midiOutput.send([0xA0 | (idx & 0x0F), note & 0x7F, 127], t);
+        t += gapMs;
+    });
+}
+
+        function exerciseFromFilename(name) {
+            const lower = name.toLowerCase();
+            if (lower.includes('sight singing') || lower.includes('sightsinging')) return 'Sight Singing';
+            if (lower.includes('ear training') || lower.includes('eartraining')) return 'Ear Training';
+            if (lower.includes('vocab')) return 'Vocab';
+            if (lower.includes('mcq')) return 'MCQs';
+            return null;
+        }
+
+        function studentFromFilename(filename) {
+            // Strip extension and match longest student name found in the title
+            const base = filename.replace(/\.[^.]+$/, '').toLowerCase();
+            let best = null;
+            let bestLen = 0;
+            allStudents.forEach(name => {
+                const n = name.toLowerCase();
+                if (base.includes(n) && n.length > bestLen) {
+                    best = name;
+                    bestLen = n.length;
+                }
+            });
+            return best;
+        }
+
         function showPreview(records = null) {
             let text;
+            let toSend = [];
+
             if (Array.isArray(records) && records.length > 0) {
                 text = formatMultipleRecords(records);
                 previewTitle.textContent = records.length === 1
                     ? 'Record Preview'
                     : `Records Preview (${records.length})`;
+                toSend = records;
             } else {
                 const record = buildRecord();
                 text = formatRecordsSnippet(record);
                 previewTitle.textContent = 'Record Preview';
+                toSend = [record];
             }
             previewCode.textContent = text;
             previewOverlay.classList.add('show');
-            // Focus the Copy button so the next Enter is clearly handled
+
+            // Send Key Pressure for each graded record (one or many)
+            sendAftertouchForRecords(toSend);
+
             setTimeout(() => btnCopy.focus(), 30);
         }
 
@@ -1125,19 +1226,49 @@
             dragCounter = 0;
             setDropActive(false);
 
-            const files = Array.from(e.dataTransfer.files || []).filter(f =>
+            const files = Array.from(e.dataTransfer.files || []);
+            if (files.length === 0) return;
+
+            const txtFiles = files.filter(f =>
                 f.name.toLowerCase().endsWith('.txt') || f.type === 'text/plain'
             );
+            const audioFiles = files.filter(f => {
+                const n = f.name.toLowerCase();
+                return n.endsWith('.mp3') || n.endsWith('.wav') || n.endsWith('.m4a') ||
+                    n.endsWith('.aac') || n.endsWith('.ogg') ||
+                    (f.type && f.type.startsWith('audio/'));
+            });
 
-            if (files.length === 0) {
-                showToast('No .txt files found');
+            // --- Audio drops: send MIDI only (no grading) ---
+            const audioSignals = [];
+            audioFiles.forEach(file => {
+                const exercise = exerciseFromFilename(file.name);
+                const student = studentFromFilename(file.name);
+                if (exercise && student && EXERCISE_TO_NOTE[exercise] != null) {
+                    audioSignals.push({ student, exercise });
+                }
+            });
+            if (audioSignals.length > 0) {
+                sendAftertouchForRecords(audioSignals);
+                showToast(
+                    audioSignals.length === 1
+                        ? `Sent: ${audioSignals[0].student} · ${audioSignals[0].exercise}`
+                        : `Sent ${audioSignals.length} MIDI signals`
+                );
+            }
+
+            // --- .txt score files: parse + preview (also sends MIDI via showPreview) ---
+            if (txtFiles.length === 0) {
+                if (audioSignals.length === 0) {
+                    showToast('No .txt or recognized audio files found');
+                }
                 return;
             }
 
             const records = [];
             const errors = [];
 
-            for (const file of files) {
+            for (const file of txtFiles) {
                 try {
                     const text = await file.text();
                     const record = extractDataFromURLString(text);
@@ -1153,15 +1284,15 @@
             }
 
             if (records.length === 0) {
-                showToast(errors.length ? `Could not parse ${errors.length} file(s)` : 'No valid scores found');
+                if (audioSignals.length === 0) {
+                    showToast(errors.length ? `Could not parse ${errors.length} file(s)` : 'No valid scores found');
+                }
                 return;
             }
 
-            // Show multi-record (or single) preview
             showPreview(records);
 
             if (errors.length > 0) {
-                // Brief secondary notice
                 setTimeout(() => showToast(`${errors.length} file(s) skipped`), 2000);
             }
         });
@@ -1347,11 +1478,10 @@
             buildRoster();
             buildExerciseButtons();
             dateInput.value = todayISO();
+            initMIDI();
 
-            // Try deep-link import first
             const imported = tryImportFromURL();
             if (!imported) {
-                // Normal homepage behaviour
                 // searchBar.focus();
             }
         };
