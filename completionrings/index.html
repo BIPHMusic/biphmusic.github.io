@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completion Rings</title>
+       
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BIPH Band">
+    <link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+    
+    <link rel="icon" href="../icons/BGicon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <script src="../apstudents.js"></script>
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <style>
+        body { user-select: none; }
+        .dropzone {
+            position: fixed; inset: 0;
+            background: rgba(0, 150, 136, 0.2);
+            display: none; justify-content: center; align-items: center;
+            font-size: 24px; color: #009688; z-index: 1000;
+        }
+        .dropzone.active { display: flex; }
+        .checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px 14px;
+            padding: 20px;
+        }
+        .student {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid rgba(255, 255, 255, 0);
+            padding: 16px 12px 14px;
+            opacity: 1;
+            transition: opacity 0.3s, transform 0.25s, background 0.25s, box-shadow 0.25s;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            background: rgba(255,255,255,0.04);
+        }
+        .student:hover { background: rgba(255,255,255,0.09); }
+        .student.highlight {
+            color: #154565;
+            background-color: #f0f8ff56;
+            border: 2px solid white;
+            transform: scale(1.04);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+        .student.found-all {
+            background: rgba(255,255,255,0.92);
+            color: #154565;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+        }
+        .student.absent {
+            opacity: 0.4;
+            text-decoration: line-through;
+            color: #888;
+            pointer-events: none;
+        }
+        .student-name {
+            font-size: 0.95em;
+            text-align: center;
+            line-height: 1.25;
+            max-width: 100%;
+            word-break: break-word;
+        }
+        /* Triple progress rings */
+        .rings-wrap {
+            position: relative;
+            width: 64px;
+            height: 64px;
+        }
+        .ring-svg {
+            width: 64px;
+            height: 64px;
+            transform: rotate(-90deg);
+        }
+        .ring-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.15);
+            stroke-width: 5;
+        }
+        .ring-progress {
+            fill: none;
+            stroke-width: 5.5;
+            stroke-linecap: round;
+            stroke-dasharray: 157;
+            stroke-dashoffset: 157;
+            transition: stroke-dashoffset 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
+        }
+        .ring-s { stroke: #FF6384; }   /* Sight Singing */
+        .ring-v { stroke: #36A2EB; }   /* Vocab */
+        .ring-e { stroke: #4BC0C0; }   /* Ear Training */
+
+        .ring-done .ring-progress {
+            stroke-dashoffset: 0;
+        }
+        .center-check {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #4CAF50;
+            opacity: 0;
+            transform: scale(0.4);
+            transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+        .student.found-all .center-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+        /* Task legend under rings — three rows */
+        .task-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+            margin-top: 2px;
+        }
+        .task-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 3px 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.72em;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.2;
+        }
+        .student.highlight .task-row,
+        .student.found-all .task-row {
+            color: #154565;
+        }
+        .task-row:hover {
+            background: rgba(255,255,255,0.12);
+        }
+        .student.found-all .task-row:hover {
+            background: rgba(21, 69, 101, 0.1);
+        }
+        .task-dot {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            flex-shrink: 0;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .task-dot.on-s { background: #FF6384; transform: scale(1.2); }   /* Sight Singing */
+        .task-dot.on-v { background: #36A2EB; transform: scale(1.2); }   /* Vocab */
+        .task-dot.on-e { background: #4BC0C0; transform: scale(1.2); }   /* Ear Training */
+        .task-label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* Popup & search & edit — kept consistent */
+        .popup {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: #009688; color: white;
+            padding: 20px 40px; border-radius: 50px;
+            display: flex; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1001;
+        }
+        .popup.show { transform: translateX(-50%) scale(1); }
+        .popup .check-circle {
+            width: 30px; height: 30px; background: white; border-radius: 50%;
+            margin-left: 15px; display: flex; align-items: center; justify-content: center;
+        }
+        .popup .check-mark { color: #009688; font-size: 18px; }
+        .search-container { position: relative; margin: 20px auto; width: 90%; max-width: 600px; }
+        #search-bar {
+            width: 100%; padding: 15px; font-size: 16px;
+            border: 2px dotted rgba(104, 169, 255, 0.543); border-radius: 8px;
+            outline: none; transition: border-color 0.3s;
+            background-color: rgba(255, 255, 255, 0.079); color: #fbfbfbde;
+        }
+        #search-bar:focus { border-color: #ffffff; }
+        #search-bar::placeholder { color: rgba(255, 255, 255, 0.85); }
+        .clear-button {
+            position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: rgba(255, 255, 255, 0.637); font-size: 18px;
+            background: none; border: none;
+        }
+        #contextMenu {
+            position: fixed; background: white; border: 1px solid #ccc;
+            border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 6px 0; z-index: 2000; display: none;
+        }
+        .context-item { padding: 8px 20px; cursor: pointer; color: #154565; }
+        .context-item:hover { background: #f0f0f0; }
+        .edit-btn {
+            position: fixed; top: 65px; left: 20px; font-size: 1.35em;
+            background: rgba(255, 255, 255, 0.1); border: none; color: white;
+            border-radius: 50%; width: 45px; height: 45px; cursor: pointer; z-index: 999;
+            transition: all 0.3s; display: flex; align-items: center; justify-content: center;
+        }
+        .edit-btn:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.1); }
+        #editPanel {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.09); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 20px;
+            padding: 25px 30px; width: 92%; max-width: 420px; max-height: 85vh;
+            overflow-y: auto; display: none; z-index: 2000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        #editPanel h3 { margin: 0 0 20px 0; text-align: center; font-size: 1.5em; color: white; }
+        .student-list { max-height: 58vh; overflow-y: auto; padding-right: 6px; }
+        .student-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 16px; margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.08); border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s ease;
+        }
+        .student-item span { color: white; font-size: 1.05em; }
+        .student-item:hover { background: rgba(255, 255, 255, 0.16); }
+        .remove-btn {
+            background: rgba(255, 70, 70, 0.524); color: white; border: none;
+            padding: 7px 16px; border-radius: 30px; cursor: pointer; font-size: 0.95em;
+            transition: all 0.2s;
+        }
+        .remove-btn:hover { background: rgba(255, 70, 70, 0.828); }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 25px; }
+        .modal-buttons button {
+            flex: 1; padding: 14px; font-size: 1.1em; border-radius: 50px; border: none;
+            background: rgba(255, 255, 255, 0.135); color: white; cursor: pointer; transition: all 0.3s;
+        }
+        .modal-buttons button:hover { background: rgba(255, 255, 255, 0.404); }
+
+        #startOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+}
+#startOverlay.hidden {
+    display: none;
+}
+.start-card {
+    background: rgba(113, 180, 248, 0.202);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    padding: 36px 40px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    max-width: 360px;
+    width: 90%;
+}
+
+.start-btn {
+    padding: 14px 36px;
+    font-size: 1.15em;
+    border-radius: 50px;
+    border: none;
+    background: rgba(0, 95, 150, 0.75);
+    color: white;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-weight: 500;
+}
+.start-btn:hover {
+    background: rgba(0, 77, 150, 0.95);
+    transform: scale(1.03);
+}
+
+    </style>
+</head>
+<body>
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
+    <button onclick="toggleEditPanel()" class="edit-btn">✏️</button>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">Completion Rings</h1>
+    <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Search..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button class="clear-button" onclick="clearSearch()">×</button>
+    </div>
+    <div class="dropzone" id="dropzone">Drop files here</div>
+    <div class="checklist" id="checklist"></div>
+    <div class="popup" id="popup">
+        All complete!
+        <div class="check-circle"><div class="check-mark">✓</div></div>
+    </div>
+    <div id="contextMenu">
+        <div class="context-item" id="markAbsent">Mark as Absent Today</div>
+    </div>
+    <div id="editPanel">
+        <h3>Edit Roster</h3>
+        <div class="student-list" id="studentList"></div>
+        <div class="modal-buttons">
+            <button onclick="toggleEditPanel()">Done</button>
+            <button onclick="resetToFullRoster()">Reset Full Roster</button>
+        </div>
+    </div>
+    <div id="startOverlay">
+    <div class="start-card">
+        <button type="button" class="start-btn" id="startBtn">Start</button>
+    </div>
+</div>
+    <div class="logocontainer">        
+        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+    </div>
+    <script>
+       // ==================== STATE ====================
+let currentStudents = [];
+let allStudents = [];
+let sessionStarted = false;
+
+function unlockAudio() {
+    // Silent play to satisfy browser autoplay policy
+    try {
+        const a = new Audio('audio/chime.mp3');
+        a.volume = 0.001;
+        a.play().then(() => {
+            a.pause();
+            a.currentTime = 0;
+        }).catch(() => {});
+    } catch (e) {}
+}
+
+function startSession() {
+    if (sessionStarted) return;
+    sessionStarted = true;
+    unlockAudio();
+    const overlay = document.getElementById('startOverlay');
+    if (overlay) overlay.classList.add('hidden');
+}
+
+document.getElementById('startBtn').addEventListener('click', startSession);
+
+// Enter starts only while the overlay is visible
+document.addEventListener('keydown', (e) => {
+    if (!sessionStarted && e.key === 'Enter') {
+        e.preventDefault();
+        startSession();
+    }
+});
+
+
+
+const completion = new Map();
+const absentStudents = new Set();
+const TASKS = ['s', 'v', 'e'];
+const TASK_LABEL = { s: 'Sight Singing', v: 'Vocab', e: 'Ear Training' };
+
+function initRoster() {
+    if (typeof apStudents !== "undefined" && Array.isArray(apStudents)) {
+        currentStudents = apStudents.slice();
+    } else {
+        currentStudents = ["Alex Kim","Jordan Lee","Sam Rivera","Taylor Chen","Morgan Patel","Casey Brooks"];
+    }
+    allStudents = currentStudents.map(s => typeof s === 'string' ? s : (s?.name || s?.student || String(s)));
+    allStudents.forEach(n => {
+        if (!completion.has(n)) completion.set(n, { s: false, v: false, e: false });
+    });
+}
+
+function getStudentId(name) {
+    return `student-${name.toLowerCase().replace(/\s+/g, '-')}`;
+}
+
+function isComplete(name) {
+    const c = completion.get(name);
+    return c && c.s && c.v && c.e;
+}
+
+function createStudentElement(name) {
+    const div = document.createElement('div');
+    div.className = 'student';
+    div.id = getStudentId(name);
+    div.dataset.name = name;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'rings-wrap';
+    wrap.innerHTML = `
+        <svg class="ring-svg" viewBox="0 0 64 64">
+            <circle class="ring-bg" cx="32" cy="32" r="28"/>
+            <circle class="ring-progress ring-s" cx="32" cy="32" r="28" data-task="s"/>
+            <circle class="ring-bg" cx="32" cy="32" r="20"/>
+            <circle class="ring-progress ring-v" cx="32" cy="32" r="20" data-task="v"/>
+            <circle class="ring-bg" cx="32" cy="32" r="12"/>
+            <circle class="ring-progress ring-e" cx="32" cy="32" r="12" data-task="e"/>
+        </svg>
+        <div class="center-check">✓</div>
+    `;
+    div.appendChild(wrap);
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'student-name';
+    nameEl.textContent = name;
+    div.appendChild(nameEl);
+
+    const legend = document.createElement('div');
+    legend.className = 'task-legend';
+    legend.innerHTML = `
+        <div class="task-row" data-task="s" title="Toggle Sight Singing">
+            <div class="task-dot" data-task="s"></div>
+            <span class="task-label">Sight Singing</span>
+        </div>
+        <div class="task-row" data-task="v" title="Toggle Vocab">
+            <div class="task-dot" data-task="v"></div>
+            <span class="task-label">Vocab</span>
+        </div>
+        <div class="task-row" data-task="e" title="Toggle Ear Training">
+            <div class="task-dot" data-task="e"></div>
+            <span class="task-label">Ear Training</span>
+        </div>
+    `;
+    legend.querySelectorAll('.task-row').forEach(row => {
+        row.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (absentStudents.has(name)) return;
+            const task = row.dataset.task;
+            const c = completion.get(name);
+            if (!c) return;
+            setTask(name, task, !c[task]);
+        });
+    });
+    div.appendChild(legend);
+
+    div.addEventListener('click', (e) => {
+        if (absentStudents.has(name)) return;
+        if (div.classList.contains('highlight')) {
+            cycleNextTask(name);
+        } else {
+            removeAllHighlights();
+            div.classList.add('highlight');
+            currentMatches = getVisibleStudents();
+            currentHighlightIndex = currentMatches.indexOf(div);
+            if (currentHighlightIndex < 0) {
+                currentMatches = [div];
+                currentHighlightIndex = 0;
+            }
+        }
+    });
+    div.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showContextMenu(e, name, div);
+    });
+    updateVisual(div, name);
+    return div;
+}
+
+function updateVisual(el, name) {
+    const c = completion.get(name) || { s:false, v:false, e:false };
+    const svg = el.querySelector('.ring-svg');
+    TASKS.forEach(t => {
+        const circle = svg.querySelector(`.ring-progress[data-task="${t}"]`);
+        const r = parseFloat(circle.getAttribute('r'));
+        const circ = 2 * Math.PI * r;
+        circle.style.strokeDasharray = circ;
+        circle.style.strokeDashoffset = c[t] ? 0 : circ;
+    });
+    el.querySelectorAll('.task-dot').forEach(d => {
+        const t = d.dataset.task;
+        d.className = 'task-dot' + (c[t] ? ` on-${t}` : '');
+    });
+    if (isComplete(name)) el.classList.add('found-all');
+    else el.classList.remove('found-all');
+}
+
+function setTask(name, task, on = true) {
+    if (absentStudents.has(name)) return;
+    const c = completion.get(name);
+    if (!c) return;
+    if (c[task] === on) return;
+    const wasComplete = c.s && c.v && c.e;
+    c[task] = on;
+    const el = document.getElementById(getStudentId(name));
+    if (el) {
+        updateVisual(el, name);
+        if (on) {
+            if (!wasComplete && c.s && c.v && c.e) playMultiChime();
+            else playChime();
+        }
+    }
+    checkAllComplete();
+}
+
+function cycleNextTask(name) {
+    const c = completion.get(name);
+    if (!c) return;
+    for (const t of TASKS) {
+        if (!c[t]) {
+            setTask(name, t, true);
+            return;
+        }
+    }
+}
+
+function initializeChecklist() {
+    const checklist = document.getElementById('checklist');
+    checklist.innerHTML = '';
+    allStudents.forEach(name => {
+        if (!absentStudents.has(name)) {
+            checklist.appendChild(createStudentElement(name));
+        }
+    });
+}
+
+function refreshChecklist() {
+    initializeChecklist();
+}
+
+// ==================== EDIT PANEL ====================
+function toggleEditPanel() {
+    const panel = document.getElementById('editPanel');
+    if (panel.style.display === 'block') {
+        panel.style.display = 'none';
+    } else {
+        refreshStudentList();
+        panel.style.display = 'block';
+    }
+}
+
+function refreshStudentList() {
+    const list = document.getElementById('studentList');
+    list.innerHTML = '';
+    currentStudents.forEach((student, index) => {
+        const div = document.createElement('div');
+        div.className = 'student-item';
+        const span = document.createElement('span');
+        span.textContent = typeof student === 'string' ? student : (student.name || student.student || "");
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', function(e) {
+            e.stopImmediatePropagation();
+            removeStudent(index);
+        });
+        div.appendChild(span);
+        div.appendChild(removeBtn);
+        list.appendChild(div);
+    });
+}
+
+function removeStudent(index) {
+    if (index < 0 || index >= currentStudents.length) return;
+    const name = typeof currentStudents[index] === 'string' ? currentStudents[index] : (currentStudents[index].name || currentStudents[index].student);
+    currentStudents.splice(index, 1);
+    allStudents = currentStudents.map(s => typeof s === 'string' ? s : (s?.name || s?.student || String(s)));
+    completion.delete(name);
+    refreshStudentList();
+    refreshChecklist();
+}
+
+function resetToFullRoster() {
+    if (typeof apStudents !== "undefined") {
+        currentStudents = apStudents.slice();
+    } else {
+        currentStudents = ["Alex Kim","Jordan Lee","Sam Rivera","Taylor Chen","Morgan Patel","Casey Brooks"];
+    }
+    allStudents = currentStudents.map(s => typeof s === 'string' ? s : (s?.name || s?.student || String(s)));
+    allStudents.forEach(n => {
+        if (!completion.has(n)) completion.set(n, { s: false, v: false, e: false });
+    });
+    refreshStudentList();
+    refreshChecklist();
+}
+
+document.addEventListener('click', function(event) {
+    const panel = document.getElementById('editPanel');
+    if (panel.style.display === 'block' &&
+        !panel.contains(event.target) &&
+        event.target.closest('.edit-btn') === null) {
+        toggleEditPanel();
+    }
+});
+
+// ==================== CONTEXT / ABSENT ====================
+let currentName = null, currentEl = null;
+
+function showContextMenu(e, name, el) {
+    currentName = name; currentEl = el;
+    const menu = document.getElementById('contextMenu');
+    menu.style.display = 'block';
+    menu.style.left = `${e.pageX}px`;
+    menu.style.top = `${e.pageY}px`;
+}
+
+function hideContextMenu() {
+    document.getElementById('contextMenu').style.display = 'none';
+}
+
+document.getElementById('markAbsent').addEventListener('click', () => {
+    if (!currentName || !currentEl) return;
+    absentStudents.add(currentName);
+    currentEl.remove();
+    checkAllComplete();
+    hideContextMenu();
+});
+document.addEventListener('click', hideContextMenu);
+
+// ==================== ALL COMPLETE ====================
+function checkAllComplete() {
+    const visible = Array.from(document.querySelectorAll('.student:not(.absent)'));
+    const allDone = visible.length > 0 && visible.every(el => isComplete(el.dataset.name));
+    const popup = document.getElementById('popup');
+    if (allDone) {
+        popup.classList.add('show');
+        playYesSound();
+        setTimeout(() => {
+            popup.classList.remove('show');
+            resetAll();
+        }, 2200);
+    } else {
+        popup.classList.remove('show');
+    }
+}
+
+function resetAll() {
+    allStudents.forEach(n => {
+        completion.set(n, { s: false, v: false, e: false });
+    });
+    document.querySelectorAll('.student').forEach(el => {
+        updateVisual(el, el.dataset.name);
+    });
+    // Clear selection and search on board reset
+    searchBar.value = '';
+    getVisibleStudents().forEach(el => { el.style.opacity = '1'; });
+    deselectStudent();
+    currentMatches = [];
+    playResetSound();
+}
+
+function playChime() {
+    try { const a = new Audio('audio/chime.mp3'); a.volume = 0.1; a.play().catch(()=>{}); } catch(e){}
+}
+function playMultiChime() {
+    try { const a = new Audio('audio/multichime.mp3'); a.volume = 0.15; a.play().catch(()=>{}); } catch(e){}
+}
+function playYesSound() {
+    try { const a = new Audio('audio/yes.mp3'); a.volume = 0.5; a.play().catch(()=>{}); } catch(e){}
+}
+function playResetSound() {
+    try { const a = new Audio('audio/reset.mp3'); a.volume = 0.2; a.play().catch(()=>{}); } catch(e){}
+}
+
+// ==================== SEARCH + KEYBOARD ====================
+const searchBar = document.getElementById('search-bar');
+searchBar.addEventListener('input', (e) => filterStudents(e.target.value));
+let currentHighlightIndex = -1;
+let currentMatches = [];
+
+function getVisibleStudents() {
+    return Array.from(document.querySelectorAll('.student:not(.absent)'));
+}
+
+function isSearchFocused() {
+    return document.activeElement === searchBar;
+}
+
+function filterStudents(query) {
+    const items = getVisibleStudents();
+    const lowerQuery = query.toLowerCase().trim();
+    const prefixMatches = [];
+    const otherMatches = [];
+
+    items.forEach(el => {
+        const name = el.dataset.name.toLowerCase();
+        if (!lowerQuery) {
+            el.style.opacity = '1';
+            prefixMatches.push(el);
+        } else if (name.startsWith(lowerQuery)) {
+            el.style.opacity = '1';
+            prefixMatches.push(el);
+        } else if (name.includes(lowerQuery)) {
+            el.style.opacity = '1';
+            otherMatches.push(el);
+        } else {
+            el.style.opacity = '0.18';
+        }
+    });
+
+    // Prefix matches first (names that begin with the typed text)
+    currentMatches = prefixMatches.concat(otherMatches);
+    currentHighlightIndex = -1;
+
+    if (currentMatches.length > 0) {
+        currentHighlightIndex = 0;
+        updateHighlight();
+    } else {
+        removeAllHighlights();
+    }
+}
+
+function updateHighlight() {
+    removeAllHighlights();
+    if (currentHighlightIndex >= 0 && currentMatches[currentHighlightIndex]) {
+        currentMatches[currentHighlightIndex].classList.add('highlight');
+        currentMatches[currentHighlightIndex].scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+}
+
+function removeAllHighlights() {
+    document.querySelectorAll('.student.highlight').forEach(el => el.classList.remove('highlight'));
+}
+
+function deselectStudent() {
+    removeAllHighlights();
+    currentHighlightIndex = -1;
+    if (!searchBar.value.trim()) {
+        currentMatches = [];
+    }
+}
+
+function clearSearchText() {
+    if (!searchBar.value) return false;
+    searchBar.value = '';
+    getVisibleStudents().forEach(el => { el.style.opacity = '1'; });
+    const highlighted = document.querySelector('.student.highlight');
+    currentMatches = getVisibleStudents();
+    if (highlighted) {
+        currentHighlightIndex = currentMatches.indexOf(highlighted);
+        if (currentHighlightIndex < 0) currentHighlightIndex = 0;
+    } else {
+        currentHighlightIndex = -1;
+    }
+    return true;
+}
+
+function navigateStudents(direction) {
+    const pool = currentMatches.length > 0 ? currentMatches : getVisibleStudents();
+    if (pool.length === 0) return;
+
+    const hasSelection = document.querySelector('.student.highlight');
+
+    if (!hasSelection || currentHighlightIndex < 0) {
+        // No selection: right/down → first, left/up → last
+        currentMatches = pool;
+        currentHighlightIndex = direction > 0 ? 0 : pool.length - 1;
+        updateHighlight();
+        return;
+    }
+
+    // No looping: clamp at ends
+    const next = currentHighlightIndex + direction;
+    if (next < 0 || next >= pool.length) return;
+    currentMatches = pool;
+    currentHighlightIndex = next;
+    updateHighlight();
+}
+
+// Search-bar key handling: while focused, S/V/E are just typing — no task toggles
+searchBar.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        event.preventDefault();
+        searchBar.value = '';
+        getVisibleStudents().forEach(el => { el.style.opacity = '1'; });
+        const highlighted = document.querySelector('.student.highlight');
+        currentMatches = getVisibleStudents();
+        if (highlighted) {
+            currentHighlightIndex = currentMatches.indexOf(highlighted);
+            if (currentHighlightIndex < 0) currentHighlightIndex = 0;
+        } else {
+            currentHighlightIndex = -1;
+            currentMatches = [];
+        }
+        searchBar.blur();
+        return;
+    }
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        // Select only — do NOT mark assignments complete
+        const highlighted = document.querySelector('.student.highlight');
+        if (highlighted) {
+            const selected = highlighted;
+            searchBar.value = '';
+            getVisibleStudents().forEach(el => { el.style.opacity = '1'; });
+            currentMatches = getVisibleStudents();
+            currentHighlightIndex = currentMatches.indexOf(selected);
+            if (currentHighlightIndex < 0) currentHighlightIndex = 0;
+            removeAllHighlights();
+            selected.classList.add('highlight');
+            selected.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else if (currentMatches.length > 0) {
+            currentHighlightIndex = 0;
+            updateHighlight();
+            const sel = document.querySelector('.student.highlight');
+            searchBar.value = '';
+            getVisibleStudents().forEach(el => { el.style.opacity = '1'; });
+            currentMatches = getVisibleStudents();
+            if (sel) {
+                currentHighlightIndex = currentMatches.indexOf(sel);
+                if (currentHighlightIndex < 0) currentHighlightIndex = 0;
+            }
+        }
+        searchBar.blur();
+        return;
+    }
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+        event.preventDefault();
+        const dir = (event.key === 'ArrowRight' || event.key === 'ArrowDown') ? 1 : -1;
+        navigateStudents(dir);
+        return;
+    }
+});
+
+function handleEscape() {
+    if (searchBar.value.trim()) {
+        clearSearchText();
+        return;
+    }
+    if (document.querySelector('.student.highlight')) {
+        deselectStudent();
+        return;
+    }
+    if (isSearchFocused()) {
+        searchBar.blur();
+    }
+}
+
+// Global keyboard (when search is NOT focused)
+document.addEventListener('keydown', e => {
+    if (isSearchFocused()) return;
+
+    if (e.key === '/') {
+        e.preventDefault();
+        searchBar.focus();
+        return;
+    }
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        handleEscape();
+        return;
+    }
+    // Arrows always work: no selection → left=last, right=first; then no wrap
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+        e.preventDefault();
+        const dir = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1 : -1;
+        navigateStudents(dir);
+        return;
+    }
+    if (['s', 'v', 'e'].includes(e.key.toLowerCase())) {
+        const highlighted = document.querySelector('.student.highlight');
+        if (highlighted) {
+            e.preventDefault();
+            const name = highlighted.dataset.name;
+            const key = e.key.toLowerCase();
+            const c = completion.get(name);
+            if (c) setTask(name, key, !c[key]);
+        }
+    }
+});
+
+// Click outside
+document.addEventListener('mousedown', (e) => {
+    const onSearch = searchBar.contains(e.target) || e.target.closest('.clear-button');
+    const onStudent = e.target.closest('.student');
+    const onEdit = e.target.closest('#editPanel') || e.target.closest('.edit-btn');
+    const onContext = e.target.closest('#contextMenu');
+
+    if (!onSearch && searchBar.value) {
+        clearSearchText();
+    }
+    if (!onStudent && !onEdit && !onContext) {
+        deselectStudent();
+    }
+});
+
+function clearSearch() {
+    searchBar.value = '';
+    getVisibleStudents().forEach(el => { el.style.opacity = '1'; });
+    deselectStudent();
+    currentMatches = [];
+    searchBar.blur();
+}
+
+// ==================== DRAG & DROP ====================
+function handleFiles(files) {
+    let hasMatch = false;
+    Array.from(files).forEach(file => {
+        const fn = file.name.toLowerCase();
+        allStudents.forEach(name => {
+            if (absentStudents.has(name)) return;
+            if (fn.includes(name.toLowerCase())) {
+                const c = completion.get(name);
+                if (c && !(c.s && c.v && c.e)) {
+                    c.s = c.v = c.e = true;
+                    const el = document.getElementById(getStudentId(name));
+                    if (el) updateVisual(el, name);
+                    hasMatch = true;
+                }
+            }
+        });
+    });
+    if (hasMatch) { playChime(); checkAllComplete(); }
+}
+const dropzone = document.getElementById('dropzone');
+document.addEventListener('dragenter', () => dropzone.classList.add('active'));
+document.addEventListener('dragleave', () => dropzone.classList.remove('active'));
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('active');
+    handleFiles(e.dataTransfer.files);
+});
+
+// ==================== WEB MIDI ====================
+// Polyphonic Key Pressure (Aftertouch) only — status 0xA0
+// Channel 1 (MIDI ch index 0) → student index 0, Channel 2 → index 1, …
+// Note number 1 (or 60) = Sight Singing, 2 (or 61) = Vocab, 3 (or 62) = Ear Training
+// Pressure value > 0 turns the task ON (never off)
+async function initMIDI() {
+    if (!navigator.requestMIDIAccess) return;
+    try {
+        const access = await navigator.requestMIDIAccess({ sysex: false });
+
+        const onMessage = (msg) => {
+            const [status, data1, data2] = msg.data;
+            const cmd = status & 0xF0;
+            const channel = status & 0x0F; // 0-based (ch 1 → 0)
+
+            // Polyphonic Key Pressure / Aftertouch only
+            if (cmd === 0xA0 && data2 > 0) {
+                const note = data1;
+                let task = null;
+                if (note === 1 || note === 60) task = 's';
+                else if (note === 2 || note === 61) task = 'v';
+                else if (note === 3 || note === 62) task = 'e';
+
+                if (task && channel < allStudents.length) {
+                    const name = allStudents[channel];
+                    if (name && !absentStudents.has(name)) {
+                        setTask(name, task, true); // ON only
+                    }
+                }
+            }
+        };
+
+        const attach = () => {
+            for (let input of access.inputs.values()) {
+                input.onmidimessage = onMessage;
+            }
+        };
+        attach();
+        access.onstatechange = attach;
+    } catch (err) {
+        console.warn(err);
+    }
+}
+
+// ==================== INIT ====================
+window.onload = () => {
+    initRoster();
+    initializeChecklist();
+    initMIDI();
+};
+    </script>
+</body>
+</html>
