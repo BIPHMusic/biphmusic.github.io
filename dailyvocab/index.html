@@ -801,7 +801,7 @@ async function shareScoreEntryLink(resultData, percentage) {
         const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
         // Change this if your score-entry lives elsewhere
-        const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
+        const scoreEntryBase = 'https://biphmusic.github.io/grades/';
         const deepLink = `${scoreEntryBase}#data=${base64}`;
 
         // Filename: "[Name] - Vocab, [Date].txt"
@@ -948,7 +948,7 @@ function displayResults(resultData, isUrlView = false) {
 
         const jsonStr = JSON.stringify(exportPayload);
         const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
-        const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
+        const scoreEntryBase = 'https://biphmusic.github.io/grades/';
         const deepLink = `${scoreEntryBase}#data=${base64}`;
 
         // 1. Copy link button
