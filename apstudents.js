@@ -8,3 +8,7 @@ const apStudents = [
     {"name": "Calvin", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "2010-04-21", "altName": "Calvin", "class": "AP Music Theory", "addable": "no"},
     {"name": "William", "liveschoolName": "William Zhiwen Zheng", "house": "Yellow", "birthdate": "2010-11-21", "altName": "William", "class": "AP Music Theory", "addable": "no"},
 ]
+
+const teacherName = "Mr. Tubbs";
+const teacherPasswordSalt = "7593bbe90ce919ec412462bb7e81269d";
+const teacherPasswordHash = "ea6556af8fab18ad7bd2ef5797bec3cb3616977d9d9ebb2eaff7abab92f4a164";

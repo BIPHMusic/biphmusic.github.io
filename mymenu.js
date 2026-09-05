@@ -4,6 +4,9 @@ function initMyMenu(forceHideIfNotLoggedIn = false) {
 
     const storedName = localStorage.getItem('biph_student_name');
     const isLoggedIn = !!storedName;
+    const isTeacher = isLoggedIn && localStorage.getItem('biph_user_role') === 'teacher';
+
+    window.biphIsTeacher = isTeacher;
 
     if (forceHideIfNotLoggedIn && !isLoggedIn) return;
 
@@ -21,7 +24,17 @@ function initMyMenu(forceHideIfNotLoggedIn = false) {
     const icon = document.createElement('div');
     icon.id = 'profile-icon';
 
-    if (isLoggedIn) {
+    if (isTeacher) {
+        icon.style.cssText = `
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #3b6cac; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+            transition: transform 0.2s;
+        `;
+        icon.textContent = "🎹";
+    } else if (isLoggedIn) {
         const firstLetter = storedName.charAt(0).toUpperCase();
         icon.style.cssText = `
             width: 36px; height: 36px; border-radius: 50%;
@@ -67,7 +80,7 @@ function initMyMenu(forceHideIfNotLoggedIn = false) {
             <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                 <input type="text" id="dropdown-name-input" placeholder="Your name"
                        style="width: 100%; height: 30px; margin-top: 3px; font-size: 13px; border: 1.5px solid #ccc; border-radius: 5px; box-sizing: border-box;"
-                       autocomplete="off">
+                       autocomplete="username">
                 <button id="dropdown-signin-btn" class="menu-btn" onclick="handleDropdownLogin()"
                         style="width: 100%; height: 30px; margin-top: -10px; margin-bottom: 0px; background: #3b6cac; color: white; border: none; border-radius: 5px; font-size: 13px; cursor: pointer; text-align: center;">
                     Sign In
@@ -85,6 +98,7 @@ function initMyMenu(forceHideIfNotLoggedIn = false) {
         e.stopImmediatePropagation();
         const isOpen = dropdown.style.display === 'block';
         dropdown.style.display = isOpen ? 'none' : 'block';
+
         if (!isOpen && !isLoggedIn) {
             setTimeout(() => {
                 const input = document.getElementById('dropdown-name-input');
@@ -97,7 +111,6 @@ function initMyMenu(forceHideIfNotLoggedIn = false) {
         if (!menuContainer.contains(e.target)) dropdown.style.display = 'none';
     });
 
-    // Hover styles
     const style = document.createElement('style');
     style.textContent = `
         .menu-btn {
@@ -110,7 +123,6 @@ function initMyMenu(forceHideIfNotLoggedIn = false) {
     `;
     document.head.appendChild(style);
 
-    // Attach delegated event listeners for dropdown form
     if (!isLoggedIn) {
         dropdown.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -129,7 +141,12 @@ function handleDropdownLogin() {
     const rawName = input.value.trim();
 
     if (!rawName) {
-       errorDiv.innerHTML = "<br>Please enter your name.";        
+        errorDiv.innerHTML = "<br>Please enter your name.";
+        return;
+    }
+
+    if (typeof teacherName !== 'undefined' && rawName.toLowerCase() === teacherName.toLowerCase()) {
+        errorDiv.innerHTML = "<br>Please use the main sign-in screen for teacher login.";
         return;
     }
 
@@ -142,6 +159,8 @@ function handleDropdownLogin() {
         const displayName = capitalizeName(student.name);
         localStorage.setItem('biph_student_name', displayName);
         localStorage.setItem('biph_name_timestamp', Date.now().toString());
+        localStorage.setItem('biph_user_role', 'student');
+        window.biphIsTeacher = false;
         location.reload();
     } else {
         errorDiv.innerHTML = "<br>Name not recognized.";
@@ -152,8 +171,8 @@ function capitalizeName(name) {
     return name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
 }
 
-// Sign Out
 let signOutConfirm = false;
+
 function handleSignOutClick(e) {
     e.stopImmediatePropagation();
     const btn = document.getElementById('signout-btn');
@@ -167,13 +186,16 @@ function handleSignOutClick(e) {
     } else {
         localStorage.removeItem('biph_student_name');
         localStorage.removeItem('biph_name_timestamp');
-        location.reload();   // simplest and most reliable
+        localStorage.removeItem('biph_user_role');
+        window.biphIsTeacher = false;
+        location.reload();
     }
 }
 
-function goToMyRecords() { window.location.href = "http://biphmusic.github.io/my-records"; }
+function goToMyRecords() {
+    window.location.href = "http://biphmusic.github.io/my-records";
+}
 
-// Escape key closes the menu
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const dropdown = document.getElementById('profile-dropdown');
@@ -181,7 +203,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Auto init
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => initMyMenu());
 } else {
