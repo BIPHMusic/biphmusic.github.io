@@ -2108,74 +2108,114 @@
         }
 
         function renderStudentDashboard(studentName) {
-            const welcome = document.getElementById("student-welcome");
-            const chartContainer = document.getElementById("student-chart-container");
-            const weeklyContainer = document.getElementById("student-weekly-container");
-            const myRecords = getStudentRecords(studentName);
+    const chartContainer =
+        document.getElementById(
+            "student-chart-container"
+        );
 
-            welcome.innerHTML = `
-                <h2>Hi ${escapeHTML(studentName)}</h2>
-                <p>Your music grades and progress are shown below.</p>
-            `;
+    const weeklyContainer =
+        document.getElementById(
+            "student-weekly-container"
+        );
 
-            if (myRecords.length === 0) {
-                chartContainer.classList.add("hidden");
+    const myRecords =
+        getStudentRecords(studentName);
 
-                weeklyContainer.innerHTML = `
-                    <div class="no-records">
-                        No records found for
-                        <strong>${escapeHTML(studentName)}</strong>.
-                    </div>
-                `;
+    if (myRecords.length === 0) {
+        chartContainer.classList.add("hidden");
 
-                return;
+        weeklyContainer.innerHTML = `
+            <div class="no-records">
+                No records found for
+                <strong>${escapeHTML(studentName)}</strong>.
+            </div>
+        `;
+
+        return;
+    }
+
+    chartContainer.classList.remove("hidden");
+
+    // Remove any previously displayed imported-grade greeting
+    const existingGreeting =
+        document.getElementById("imported-grade-greeting");
+
+    if (existingGreeting) {
+        existingGreeting.remove();
+    }
+
+    // Add the congratulations message without replacing
+    // any of the existing chart HTML.
+    if (importedRecord) {
+        const sameStudent =
+            String(importedRecord.student).trim().toLowerCase() ===
+            String(studentName).trim().toLowerCase();
+
+        if (sameStudent) {
+            const percentage =
+                Number(importedRecord.percentage);
+
+            let greeting;
+
+            if (percentage >= 96) {
+                greeting = "Congrats,";
+            } else if (percentage >= 90) {
+                greeting = "Great job,";
+            } else {
+                greeting = "Hey,";
             }
 
-            chartContainer.classList.remove("hidden");
+            const greetingElement =
+                document.createElement("div");
 
-            let importedGreeting = "";
+            greetingElement.id =
+                "imported-grade-greeting";
 
-            if (importedRecord) {
-                const sameStudent =
-                    String(importedRecord.student).trim().toLowerCase() ===
-                    String(studentName).trim().toLowerCase();
+            greetingElement.className =
+                "imported-grade-greeting";
 
-                if (sameStudent) {
-                    const percentage = Number(importedRecord.percentage);
-
-                    let greeting;
-
-                    if (percentage >= 96) {
-                        greeting = "Congrats,";
-                    } else if (percentage >= 90) {
-                        greeting = "Great job,";
-                    } else {
-                        greeting = "Hey,";
-                    }
-
-                    importedGreeting = `
-                        <div class="imported-grade-greeting">
-                            <strong>${greeting} ${escapeHTML(studentName)}!</strong><br>
-                            you just scored
-                            <strong>${escapeHTML(percentage)}%</strong>
-                            on your
-                            <strong>${escapeHTML(importedRecord.exercise)}</strong>!
-                        </div>
-                    `;
-                }
-            }
-
-            chartContainer.innerHTML = `
-                ${importedGreeting}
-                <div id="student-chart-title">My Progress</div>
-                <div style="position:relative; height: calc(100% - 60px);">
-                    <canvas id="studentProgressChart"></canvas>
-                </div>
+            greetingElement.innerHTML = `
+                <strong>
+                    ${greeting}
+                    ${escapeHTML(studentName)}!
+                </strong><br>
+                you just scored
+                <strong>${escapeHTML(percentage)}%</strong>
+                on your
+                <strong>
+                    ${escapeHTML(importedRecord.exercise)}
+                </strong>!
             `;
 
-            createStudentChart(myRecords, studentName);
-            renderStudentCurrentQuarter(studentName);
+            // Put the greeting immediately before the
+            // existing "My Progress" heading.
+            const progressTitle =
+                document.getElementById(
+                    "student-chart-title"
+                );
+
+            if (progressTitle) {
+                progressTitle.parentNode.insertBefore(
+                    greetingElement,
+                    progressTitle
+                );
+            } else {
+                chartContainer.prepend(
+                    greetingElement
+                );
+            }
         }
+    }
+
+    createStudentChart(
+        myRecords,
+        studentName
+    );
+
+    renderStudentCurrentQuarter(
+        studentName
+    );
+}
 
         function groupStudentRecords(recordsSource) {
             const grouped = {};
