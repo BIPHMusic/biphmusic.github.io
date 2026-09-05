@@ -6659,15 +6659,14 @@
                         }
                     );
 
+
                     if (imported.length) {
                         importedRecord =
                             imported.length === 1
                                 ? imported[0]
-                                : imported[imported.length - 1];
-
-                        renderTeacherAssignments();
-                        renderTeacherWeekly();
-                        renderCachePanel();
+                                : imported[
+                                    imported.length - 1
+                                ];
 
                         showTeacherTab("cache");
 
@@ -6677,6 +6676,7 @@
                                 : `${imported.length} grades imported into cache`
                         );
                     }
+
 
                     if (errors > 0) {
                         setTimeout(
