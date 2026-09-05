@@ -1853,7 +1853,8 @@
         }
 
         function formatRecordDescription(record) {
-            return `${record.student} · ${formatDate(record.date)} ${record.time || ""} · ${record.exercise} · ${record.percentage}%`;
+            const exercise = normalizeExercise(record.exercise);
+            return `${record.student} · ${exercise} · ${record.percentage}% (${formatDate(record.date)})`;
         }
 
         function formatRecordsJS(recordsSource) {
@@ -2042,11 +2043,44 @@
 
             initStudents();
 
+            const imported =
+                getURLImportedRecord();
+
             if (isTeacher()) {
                 showTeacherInterface();
-            } else {
-                showStudentInterface(displayName);
+
+                if (imported) {
+                    processImportedRecord(
+                        imported
+                    );
+
+                    history.replaceState(
+                        null,
+                        "",
+                        window.location.pathname
+                    );
+
+                    showTeacherTab("cache");
+                }
+
+                return;
             }
+
+            if (imported) {
+                processImportedRecord(
+                    imported
+                );
+
+                history.replaceState(
+                    null,
+                    "",
+                    window.location.pathname
+                );
+            }
+
+            showStudentInterface(
+                displayName
+            );
         }
 
         function showTeacherInterface() {
@@ -6625,24 +6659,20 @@
                         }
                     );
 
-                    if (
-                        imported.length
-                    ) {
+                    if (imported.length) {
                         importedRecord =
-                            imported.length ===
-                            1
+                            imported.length === 1
                                 ? imported[0]
-                                : imported[
-                                    imported.length - 1
-                                ];
+                                : imported[imported.length - 1];
 
                         renderTeacherAssignments();
                         renderTeacherWeekly();
                         renderCachePanel();
 
+                        showTeacherTab("cache");
+
                         showToast(
-                            imported.length ===
-                                1
+                            imported.length === 1
                                 ? "Grade imported into cache"
                                 : `${imported.length} grades imported into cache`
                         );
@@ -7198,16 +7228,12 @@
         );
 
         async function initializePage() {
-
             if (
-                typeof records !==
-                    "undefined" &&
+                typeof records !== "undefined" &&
                 Array.isArray(records)
             ) {
                 actualRecords =
-                    cloneRecords(
-                        records
-                    );
+                    cloneRecords(records);
             }
 
             await refreshActualRecords();
@@ -7227,35 +7253,25 @@
 
             setupTeacherStudentSearch();
 
-            const imported =
-                tryImportFromURL();
+            const student =
+                getCurrentStudentName();
 
-            if (!imported) {
+            if (isTeacher()) {
+                document.getElementById(
+                    "main-content"
+                ).style.display =
+                    "block";
 
-                const student =
-                    getCurrentStudentName();
+                showTeacherInterface();
+            } else if (student) {
+                document.getElementById(
+                    "main-content"
+                ).style.display =
+                    "block";
 
-                if (
-                    isTeacher()
-                ) {
-                    document.getElementById(
-                        "main-content"
-                    ).style.display =
-                        "block";
-
-                    showTeacherInterface();
-                } else if (
+                showStudentInterface(
                     student
-                ) {
-                    document.getElementById(
-                        "main-content"
-                    ).style.display =
-                        "block";
-
-                    showStudentInterface(
-                        student
-                    );
-                }
+                );
             }
         }
 
