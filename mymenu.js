@@ -193,7 +193,7 @@ function handleSignOutClick(e) {
 }
 
 function goToMyRecords() {
-    window.location.href = "http://biphmusic.github.io/my-records";
+    window.location.href = "http://biphmusic.github.io/grades";
 }
 
 document.addEventListener('keydown', (e) => {
