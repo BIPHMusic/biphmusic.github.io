@@ -690,6 +690,7 @@
         };
 
         // ====================== NEW SHARE / AIRDROP ======================
+
         async function shareScoreEntryLink(data) {
             try {
                 const exportPayload = {
@@ -705,12 +706,9 @@
 
                 const jsonStr = JSON.stringify(exportPayload);
                 const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
-
-                // Change this base if your score-entry lives elsewhere
-                const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
+                const scoreEntryBase = 'https://biphmusic.github.io/grades/';
                 const deepLink = `${scoreEntryBase}#data=${base64}`;
 
-                // Filename format requested: "[Name] - [TestType], [Date].txt"
                 const safeName = (data.student || 'Student').replace(/[\/\\?%*:|"<>]/g, '').trim();
                 const fileName = `${safeName} - ${data.exercise || 'Ear Training'}, ${data.date}.txt`;
 
@@ -724,7 +722,6 @@
                         text: 'Score for ' + data.student
                     });
                 } else {
-                    // Fallback: classic download
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
@@ -733,7 +730,6 @@
                     URL.revokeObjectURL(url);
                 }
             } catch (err) {
-                // User cancelled the share sheet – do nothing
                 if (err.name !== 'AbortError') {
                     console.error(err);
                     alert('Could not share the file.');
@@ -741,7 +737,9 @@
             }
         }
 
+
         // ====================== DISPLAY RESULTS ======================
+
         function displayResults(data) {
             const container = document.getElementById('results-section');
             container.innerHTML = '';
@@ -758,35 +756,36 @@
             score.innerHTML = `<strong>Score: ${data.percentage}%</strong>`;
             container.appendChild(score);
 
-            // Results Table
             let html = `<table class="results-table"><tr><th>#</th><th>Your Answer</th><th>Correct Answer</th></tr>`;
+
             data.answers.forEach((ans, i) => {
                 const correct = data.questionSet.correctAnswers[i];
                 const isCorrect = ans.toLowerCase() === correct.toLowerCase();
+
                 html += `<tr>
-                    <td>${i+1}</td>
+                    <td>${i + 1}</td>
                     <td class="${isCorrect ? '' : 'incorrect'}">${ans} ${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
                     <td>${correct}</td>
                 </tr>`;
             });
+
             html += `</table>`;
             container.insertAdjacentHTML('beforeend', html);
 
-            // Items to Review
             if (data.termsToReview && data.termsToReview.length) {
                 let reviewHTML = `<div class="terms-to-review"><h3>Items to Review</h3><ul>`;
+
                 data.termsToReview.forEach(item => {
                     reviewHTML += `<li><strong>${item.item}:</strong> ${item.correct}</li>`;
                 });
+
                 reviewHTML += `</ul></div>`;
                 container.insertAdjacentHTML('beforeend', reviewHTML);
             }
 
-            // ========== Score-Entry deep-link actions ==========
             const linkActions = document.createElement('div');
             linkActions.className = 'link-actions';
 
-            // Build deep link once
             const exportPayload = {
                 student: data.student,
                 date: data.date,
@@ -797,15 +796,16 @@
                     ? data.termsToReview.map(t => t.correct || t.item)
                     : []
             };
+
             const jsonStr = JSON.stringify(exportPayload);
             const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
-            const scoreEntryBase = 'https://biphmusic.github.io/score-entry/';
+            const scoreEntryBase = 'https://biphmusic.github.io/grades/';
             const deepLink = `${scoreEntryBase}#data=${base64}`;
 
-            // 1. Copy link button
             const copyLinkBtn = document.createElement('button');
             copyLinkBtn.className = 'copy-button';
             copyLinkBtn.textContent = '📋 Copy Score';
+
             copyLinkBtn.onclick = async () => {
                 try {
                     await navigator.clipboard.writeText(deepLink);
@@ -822,9 +822,9 @@
                     setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score', 2200);
                 }
             };
+
             linkActions.appendChild(copyLinkBtn);
 
-            // 2. Share / AirDrop button
             const shareBtn = document.createElement('button');
             shareBtn.className = 'copy-button';
             shareBtn.textContent = '📤 Share / AirDrop';
@@ -833,6 +833,7 @@
 
             container.appendChild(linkActions);
         }
+
 
         // ====================== KEYBOARD SHORTCUTS ======================
         document.addEventListener('keydown', function(e) {
