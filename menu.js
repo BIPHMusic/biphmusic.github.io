@@ -43,6 +43,7 @@
                 <a href="https://biphmusic.github.io/groups">Groups</a>
                 <a href="https://biphmusic.github.io/quadrants">Quadrants</a>
                 <a href="https://biphmusic.github.io/completionboard">Completion Board</a>
+                <a href="https://biphmusic.github.io/completionrings">Completion Rings</a>
                 <a href="https://biphmusic.github.io/authenticator">Authenticator</a>
                 <a href="http://biphmusic.github.io/sightreadingresults">Sight Reading Results</a>
                 <a href="https://biphmusic.github.io/studentprogress">Student Progress</a>
