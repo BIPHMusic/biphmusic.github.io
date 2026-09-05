@@ -2142,6 +2142,11 @@
         }
 
         function renderStudentDashboard(studentName) {
+    const studentView =
+        document.getElementById(
+            "student-view"
+        );
+
     const chartContainer =
         document.getElementById(
             "student-chart-container"
@@ -2152,42 +2157,59 @@
             "student-weekly-container"
         );
 
+    // Remove any previously displayed imported-grade greeting
+    const existingGreeting =
+        document.getElementById(
+            "imported-grade-greeting"
+        );
+
+    if (existingGreeting) {
+        existingGreeting.remove();
+    }
+
     const myRecords =
         getStudentRecords(studentName);
 
     if (myRecords.length === 0) {
-        chartContainer.classList.add("hidden");
+        chartContainer.classList.add(
+            "hidden"
+        );
 
         weeklyContainer.innerHTML = `
             <div class="no-records">
                 No records found for
-                <strong>${escapeHTML(studentName)}</strong>.
+                <strong>
+                    ${escapeHTML(studentName)}
+                </strong>.
             </div>
         `;
 
         return;
     }
 
-    chartContainer.classList.remove("hidden");
+    chartContainer.classList.remove(
+        "hidden"
+    );
 
-    // Remove any previously displayed imported-grade greeting
-    const existingGreeting =
-        document.getElementById("imported-grade-greeting");
-
-    if (existingGreeting) {
-        existingGreeting.remove();
-    }
-
-    // Add the congratulations message without replacing
-    // any of the existing chart HTML.
+    // Add the congratulations message ABOVE
+    // the graph container, directly inside
+    // the student dashboard.
     if (importedRecord) {
         const sameStudent =
-            String(importedRecord.student).trim().toLowerCase() ===
-            String(studentName).trim().toLowerCase();
+            String(
+                importedRecord.student
+            )
+                .trim()
+                .toLowerCase() ===
+            String(studentName)
+                .trim()
+                .toLowerCase();
 
         if (sameStudent) {
             const percentage =
-                Number(importedRecord.percentage);
+                Number(
+                    importedRecord.percentage
+                );
 
             let greeting;
 
@@ -2200,7 +2222,9 @@
             }
 
             const greetingElement =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             greetingElement.id =
                 "imported-grade-greeting";
@@ -2208,34 +2232,34 @@
             greetingElement.className =
                 "imported-grade-greeting";
 
+            // Explicitly make the text white so
+            // it remains readable on the blue background.
+            greetingElement.style.color =
+                "#fff";
+
             greetingElement.innerHTML = `
                 <strong>
                     ${greeting}
                     ${escapeHTML(studentName)}!
                 </strong><br>
                 you just scored
-                <strong>${escapeHTML(percentage)}%</strong>
+                <strong>
+                    ${escapeHTML(percentage)}%
+                </strong>
                 on your
                 <strong>
-                    ${escapeHTML(importedRecord.exercise)}
+                    ${escapeHTML(
+                        importedRecord.exercise
+                    )}
                 </strong>!
             `;
 
-            // Put the greeting immediately before the
-            // existing "My Progress" heading.
-            const progressTitle =
-                document.getElementById(
-                    "student-chart-title"
-                );
-
-            if (progressTitle) {
-                progressTitle.parentNode.insertBefore(
+            // Put the greeting BEFORE the entire
+            // graph container, rather than inside it.
+            if (studentView && chartContainer) {
+                studentView.insertBefore(
                     greetingElement,
-                    progressTitle
-                );
-            } else {
-                chartContainer.prepend(
-                    greetingElement
+                    chartContainer
                 );
             }
         }
@@ -2245,6 +2269,8 @@
         myRecords,
         studentName
     );
+
+    ///////mayyybe this next part is unnecessary
 
     renderStudentCurrentQuarter(
         studentName
@@ -5156,17 +5182,27 @@
         }
 
         function renderCachePanel() {
-            const container = document.getElementById("cache-panel");
+            const container =
+                document.getElementById(
+                    "cache-panel"
+                );
 
             if (!container) return;
 
-            const missingFromCache = getRecordsMissingFromCache();
-            const missingFromActual = getRecordsMissingFromActual();
+            const missingFromCache =
+                getRecordsMissingFromCache();
+
+            const missingFromActual =
+                getRecordsMissingFromActual();
 
             const recordWord = count =>
-                count === 1 ? "record" : "records";
+                count === 1
+                    ? "record"
+                    : "records";
 
-            let statusClass = "current";
+            let statusClass =
+                "current";
+
             let statusText =
                 "The cache is completely up-to-date with records.js.";
 
@@ -5178,24 +5214,32 @@
 
                 statusText =
                     `The cache and records.js differ in both directions. ` +
-                    `${missingFromCache.length} ${recordWord(missingFromCache.length)} ` +
+                    `${missingFromCache.length} ` +
+                    `${recordWord(missingFromCache.length)} ` +
                     `are in records.js but not in the cache, ` +
-                    `and ${missingFromActual.length} ${recordWord(missingFromActual.length)} ` +
+                    `and ${missingFromActual.length} ` +
+                    `${recordWord(missingFromActual.length)} ` +
                     `are in the cache but not in records.js.`;
-            } else if (missingFromCache.length > 0) {
+            } else if (
+                missingFromCache.length > 0
+            ) {
                 statusClass = "behind";
 
                 statusText =
                     `The cache is missing ${missingFromCache.length} ` +
                     `${recordWord(missingFromCache.length)} ` +
-                    `that ${missingFromCache.length === 1 ? "exists" : "exist"} in records.js.`;
-            } else if (missingFromActual.length > 0) {
+                    `${missingFromCache.length === 1 ? "that exists" : "that exist"} ` +
+                    `in records.js.`;
+            } else if (
+                missingFromActual.length > 0
+            ) {
                 statusClass = "ahead";
 
                 statusText =
                     `The cache contains ${missingFromActual.length} additional ` +
                     `${recordWord(missingFromActual.length)} ` +
-                    `that ${missingFromActual.length === 1 ? "is" : "are"} not currently in records.js.`;
+                    `${missingFromActual.length === 1 ? "that is" : "that are"} ` +
+                    `not currently in records.js.`;
             }
 
             let html = `
@@ -5233,12 +5277,48 @@
                             cached version but not in records.js:
                         </p>
 
-                        <ul class="cache-list">
+                        <ul
+                            class="cache-list"
+                            style="list-style: none; padding-left: 0;"
+                        >
                             ${missingFromActual.map(record => `
-                                <li>
-                                    ${escapeHTML(
-                                        formatRecordDescription(record)
-                                    )}
+                                <li
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 8px;
+                                        margin-bottom: 8px;
+                                    "
+                                >
+                                    <button
+                                        type="button"
+                                        class="cache-delete-btn"
+                                        data-record-identity="${escapeHTML(
+                                            encodeURIComponent(
+                                                getRecordIdentity(record)
+                                            )
+                                        )}"
+                                        title="Remove this record from the cache"
+                                        aria-label="Remove this record from the cache"
+                                        style="
+                                            border: none;
+                                            background: none;
+                                            color: #ff4d4d;
+                                            font-size: 18px;
+                                            font-weight: 700;
+                                            line-height: 1;
+                                            padding: 0;
+                                            margin: 0;
+                                            cursor: pointer;
+                                            flex: 0 0 auto;
+                                        "
+                                    >×</button>
+
+                                    <span>
+                                        ${escapeHTML(
+                                            formatRecordDescription(record)
+                                        )}
+                                    </span>
                                 </li>
                             `).join("")}
                         </ul>
@@ -5307,20 +5387,74 @@
 
             container.innerHTML = html;
 
+            // Delete individual cache entries
+            container
+                .querySelectorAll(
+                    ".cache-delete-btn"
+                )
+                .forEach(button => {
+                    button.addEventListener(
+                        "click",
+                        () => {
+                            const encodedIdentity =
+                                button.dataset
+                                    .recordIdentity;
+
+                            if (
+                                !encodedIdentity
+                            ) {
+                                return;
+                            }
+
+                            const identity =
+                                decodeURIComponent(
+                                    encodedIdentity
+                                );
+
+                            const index =
+                                cachedRecords.findIndex(
+                                    record =>
+                                        getRecordIdentity(
+                                            record
+                                        ) === identity
+                                );
+
+                            if (index === -1) {
+                                return;
+                            }
+
+                            cachedRecords.splice(
+                                index,
+                                1
+                            );
+
+                            saveCachedRecords();
+
+                            renderCachePanel();
+                        }
+                    );
+                });
+
             document
-                .getElementById("cache-export-btn")
+                .getElementById(
+                    "cache-export-btn"
+                )
                 .addEventListener(
                     "click",
                     exportCachedRecords
                 );
 
             document
-                .getElementById("cache-copy-btn")
+                .getElementById(
+                    "cache-copy-btn"
+                )
                 .addEventListener(
                     "click",
                     async () => {
                         await copyText(
-                            formatRecordsJS(cachedRecords)
+                            formatRecordsJS(
+                                cachedRecords
+                            )
                         );
 
                         showToast(
@@ -5330,13 +5464,16 @@
                 );
 
             document
-                .getElementById("cache-overwrite-btn")
+                .getElementById(
+                    "cache-overwrite-btn"
+                )
                 .addEventListener(
                     "click",
                     () => {
-                        const confirmed = window.confirm(
-                            "Overwrite the browser cache with the current records.js? Any cached entries that are not in records.js will be removed."
-                        );
+                        const confirmed =
+                            window.confirm(
+                                "Overwrite the browser cache with the current records.js? Any cached entries that are not in records.js will be removed."
+                            );
 
                         if (confirmed) {
                             overwriteCacheWithActualRecords();
@@ -5348,6 +5485,7 @@
                     }
                 );
         }
+
 
         function exportCachedRecords() {
             const contents = formatRecordsJS(cachedRecords);
