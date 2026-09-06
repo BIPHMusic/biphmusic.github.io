@@ -24,6 +24,7 @@
                 <a href="https://biphmusic.github.io/">Home</a>
                 <a href="https://biphmusic.github.io/dailysightsinging/">     • Sight Singing</a>
                 <a href="https://biphmusic.github.io/dailyvocab/">     • Vocab</a>
+
                 <a href="https://biphmusic.github.io/dailyeartraining/">     • Ear Training</a>
                 <a href="https://biphmusic.github.io/toolbox/">Toolbox</a>
                 <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
@@ -31,6 +32,8 @@
             </div>
         </div>
     `;
+
+    // <a href="https://biphmusic.github.io/vocabquiz/">     • Vocab Quiz</a>
 
     // ── Teacher menu (Alt/Cmd-click) ──
     const teacherMenuHTML = `
