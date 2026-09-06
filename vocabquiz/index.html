@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vocabulary Quiz</title>
+    <title>Daily Vocab</title>
        
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,34 +13,20 @@
     <link rel="icon" href="../icons/BGicon.png">
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
-    <script src="../apstudents.js"></script>
-    <script src="../mymenu.js"></script>
+
     <style>
         /* SHARED STYLES */
         /* Loaded from common-styles.css - Do not duplicate/edit: */
         /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
 
-        .container {
-            text-align: left;
-            width: 90%;
-            max-width: 1200px;
-            display: flex;
-            gap: 20px;
-        }
-
-        .login-section, .quiz-section {
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        .login-section {
-            text-align: center;
-        }
-
         .quiz-container {
-            text-align: left;
             display: flex;
             gap: 20px;
+            text-align: left;
+            width: 90vw;
+            max-width: 1150px;
+            margin: 0 auto;
+            align-items: flex-start;
         }
 
         .questions-container {
@@ -50,73 +36,150 @@
             gap: 10px;
         }
 
+        .word-bank-container {
+            flex: 0.65;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+            overflow: hidden;
+        }
+
+        /* ====================== QUESTION BOXES ====================== */
         .question-box {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             padding: 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -ms-user-select: none; 
+            user-select: none; 
         }
 
-        .question-box p {
-            margin: 0;
-            font-size: 1rem;
+        .question-box:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .question-box.selected {
+            background: rgba(255, 215, 0, 0.25);
+            border: 1.5px solid #ffd700;
+        }
+
+        .question-box:focus-visible,
+        .word-bank button:focus-visible {
+            outline: none;
+        }
+
+        .question-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .question-label strong {
+            min-width: 1.5em;
+        }
+
+        .question-text {
             flex-grow: 1;
+            line-height: 1.45;
         }
 
         .question-box input {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 4px;
-            padding: 5px;
+            padding: 4px 8px;
             color: white;
-            font-size: 1rem;
-            width: 20px;
+            font-size: 0.85rem;
+            height: 20px;
+            width: 13px;
             text-align: center;
             text-transform: uppercase;
+            flex-shrink: 0;
         }
 
-        .word-bank-container {
-            flex: 0.65; 
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            position: -webkit-sticky; 
-            position: sticky;
-            top: 20px; 
-            align-self: flex-start;
-            overflow: hidden
-        }
-
+        /* ====================== WORD BANK ====================== */
         .word-bank {
             display: flex;
             flex-direction: column;
-            gap: 1px;
+            gap: 3px;
         }
 
         .word-bank button {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
             border-radius: 4px;
-            padding: 5px 10px;
-            cursor: default;
-            transition: background-color 0.3s, color 0.3s, opacity 0.3s;
-            font-size: 0.9rem;
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
             color: white;
             text-align: left;
-            pointer-events: none;
         }
 
-        .word-bank button.used {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.4);
-            opacity: 0.4;
+        .word-bank button:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
         }
 
-        .submit-button {
-            align-self: center;
+        .word-bank button.selected {
+            background: rgba(255, 215, 0, 0.3) !important;
+            border: 1.5px solid #ffd700;
+        }
+
+        .word-bank button.duplicate {
+            background: rgb(255, 255, 0);
+            border: 1.5px dotted rgb(237, 255, 77);
+            color: black;
+            position: relative;
+        }
+
+        .word-bank button.duplicate:hover::after {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* ====================== ACTIONS ====================== */
+        .quiz-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-left: 10px;
+            justify-content: flex-start;
+        }
+
+        .action-button {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            color: white;
+            font-size: 1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .copy-button {
+            margin-top: 20px;
             padding: 10px 20px;
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -125,754 +188,839 @@
             font-size: 1rem;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-top: 10px; /* Added margin to create space above the button */
-        }
-
-        .submit-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .error {
-            color: red;
-            text-align: center;
-        }
-
-        /* Teacher Mode */
-        .teacher-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .teacher-section.hidden {
-            display: none;
-        }
-
-        .results-table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 1rem 0;
-        }
-
-        .results-table th,
-        .results-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .results-table th {
-            background-color: #f5f5f5;
-            color: black;
-        }
-
-        .incorrect {
-            color: #dc2626;
-        }
-
-        .correct-mark {
-            color: #16a34a;
-            margin-left: 4px;
-        }
-
-        .copy-button {
-            margin-top: 10px;
-            padding: 5px 10px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
-            color: white;
-            font-size: 0.9rem;
-            cursor: pointer;
-            width: 60px; /* Set a fixed width to prevent size change */
-            text-align: center; /* Center the text */
-            opacity: 1; /* Ensure the button is fully visible */
-        }
-
-        .copy-text {
-            transition: opacity 1.0s; /* Fade transition for text */
-        }
-
-        .copy-text.fade {
-            opacity: 0; /* Start fading out */
         }
 
         .copy-button:hover {
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Duplicate Highlighting */
-        .word-bank button.duplicate {
-            background: rgba(255, 255, 0, 0.236);
-            border: 2px dotted rgb(237, 255, 77);
-            color: black;
-            position: relative;
+        /* ====================== RESULTS ====================== */
+    .results-section {
+        width: 100%;
+        max-width: 850px;
+        margin: 30px auto;
+        padding: 0 15px;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+        .results-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .word-bank button.duplicate::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px;
-            border-radius: 4px;
-            white-space: nowrap;
-            font-size: 0.8rem;
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.3s, visibility 0.3s;
+        .results-table th,
+        .results-table td {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px;
+            text-align: left;
         }
 
-        .word-bank button.duplicate:hover::after {
-            visibility: visible;
-            opacity: 1;
+        .results-table th {
+            background: rgba(255, 255, 255, 0.2);
         }
 
+        .incorrect { color: #dc2626; }
+        .correct-mark { color: #16a34a; margin-left: 4px; }
+
+        .terms-to-review {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .terms-to-review ul {
+            padding-left: 20px;
+        }
+
+        /* ====================== STATE CLASSES ====================== */
         .duplicate-input {
             background-color: rgba(255, 255, 0, 0.2) !important;
         }
 
         .invalid-input {
-            outline: 2px solid rgba(255, 0, 0, 0.589);
+            outline: 2px solid rgba(255, 0, 0, 0.6);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes checkFadeIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes textFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* NEW – link action buttons */
+        .link-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .link-actions .copy-button {
+            margin-top: 0;
+            min-width: 200px;
         }
     </style>
 </head>
 <body>
-    <div id="shared-menu"></div>
-    <script src="../menu.js"></script>
-    <div class="background"></div>
-    <div class="overlay"></div>
-    <div class="overlay2"></div>
+<div id="shared-menu"></div>
+    <!-- MAIN CONTENT - Hidden until login -->
+    <div id="main-content" style="display: none;">
 
-    <h1 class="Title">BIPH Music</h1>
-    <h1 class="Subtitle">Vocabulary Quiz</h1>
+        <div class="background"></div>
+        <div class="overlay"></div>
+        <div class="overlay2"></div>
 
-    <div class="logincontainer">
-        <div id="login-section" class="login-section">
-            <h2>Enter your name to begin</h2>
-            <input type="text" id="name-input" placeholder="Your name" autofocus>
-            <button onclick="checkName()">Begin</button>
-            <div id="error-message" class="error"></div>
-        </div>
+        <h1 class="Title">BIPH Music</h1>
+        <h1 class="Subtitle">Daily Vocab</h1>
 
-        <div id="password-section" class="hidden">
-            <h2>Teacher Mode</h2>
-            <input type="password" id="password-input" placeholder="Enter password" autofocus>
-            <button onclick="checkPassword()">Login</button>
-        </div>
-
-        <div id="quiz-section" class="quiz-section hidden">
-            <div class="quiz-container">
-                <div class="questions-container" id="quiz-questions"></div>
-                <div class="word-bank-container">
-                    <div class="word-bank" id="word-bank"></div>
-                </div>
+        <div class="quiz-container">
+            <div class="questions-container" id="quiz-questions"></div>
+            <div class="word-bank-container">
+                <div class="word-bank" id="word-bank"></div>
             </div>
-            <button class="submit-button" onclick="submitQuiz()">Submit Quiz</button>
         </div>
 
-        <div id="teacher-section" class="teacher-section hidden">
-            <h2 id="teacher-mode-title">Teacher Mode</h2>
-            <input type="file" id="json-input" multiple accept=".json" style="display: none;" onchange="checkAnswers()">
-            <div id="results-container"></div>
+        <div class="quiz-actions hidden">
+            <button class="action-button" onclick="submitQuiz()" tabindex="0">Submit</button>
+        </div>
+
+        <div id="results-section" class="results-section hidden"></div>
+
+        <div class="logocontainer">        
+            <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
         </div>
     </div>
 
-    <div class="logocontainer">        
-        <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
-    </div>
-
+    <script src="../apstudents.js"></script>
+    <script src="../login-screen.js"></script>
+    <script src="../menu.js"></script>
+    <script src="../mymenu.js"></script>
     <script src="vocab.js"></script>
-    <script>
-        const approvedNames = [
-            "ben chen", "howard ding", "terry he", "alice li", "vincent mu",
-            "tiger pan", "chris peng", "lucy sheng", "diego su", "hailey wang",
-            "eileen xu", "angelina yan", "serena zeng", "catherine zhang",
-            "andrew zhao", "jennifer zhou", "ben", "howard", "terry", "alice",
-            "vincent", "tiger", "chris", "lucy", "diego", "hailey", "eileen",
-            "angelina", "serena", "catherine", "andrew", "jennifer", "mr. tubbs"
-        ];
 
-        const TEACHER_PASSWORD = '18721958';
+<script>
+// Unicode-safe base64 encoding and decoding functions
+function unicodeToBase64(str) {
+    const utf8Bytes = new TextEncoder().encode(str);
+    const binary = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('');
+    return btoa(binary);
+}
 
-        let currentStudent = '';
-        let questionBank = {};
-        let answers = [];
-        let usedTerms = {};
+function base64ToUnicode(base64) {
+    const binary = atob(base64);
+    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+}
 
-        function checkName() {
-            const nameInput = document.getElementById('name-input').value.toLowerCase();
-            const errorElement = document.getElementById('error-message');
+function unscrambleTerms(scrambledArray) {
+    function unshiftString(str, shift) {
+        return str.split('').map(char => {
+            if (char.match(/[a-zA-Z]/)) {
+                const code = char.charCodeAt(0);
+                const base = char >= 'a' ? 97 : 65;
+                return String.fromCharCode((code - base - shift + 26) % 26 + base);
+            }
+            return char;
+        }).join('');
+    }
+    return scrambledArray.map(item => {
+        const decodedTerm = base64ToUnicode(item.Term);
+        const decodedDef  = base64ToUnicode(item.Definition);
+        return {
+            Term: unshiftString(decodedTerm, 3),
+            Definition: unshiftString(decodedDef, 3)
+        };
+    });
+}
 
-            if (nameInput === 'mr. tubbs') {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('password-section').classList.remove('hidden');
-                return;
+const vocabularyTerms = unscrambleTerms(scrambledVocabularyTerms);
+
+// Use apStudents from apstudents.js
+let approvedStudents = typeof apStudents !== 'undefined' ? apStudents : [];
+
+let currentStudent = '';
+let questionBank = {};
+let answers = [];
+let usedTerms = {};
+
+let selectedQuestion = null;
+let selectedWord = null;     
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const resultsParam = urlParams.get('results');
+    
+    if (resultsParam) {
+        try {
+            const decodedData = base64ToUnicode(decodeURIComponent(resultsParam));
+            const resultData = JSON.parse(decodedData);
+
+            if (resultData.questions) {
+                resultData.questionSet = {
+                    questions: resultData.questions.map(q => ({ Definition: q.definition })),
+                    answers: resultData.questions.map(q => q.correctAnswer)
+                };
+                resultData.answers = resultData.questions.map(q => q.studentAnswer);
+                resultData.student = resultData.student || "Unknown";
+                resultData.date = resultData.date || "N/A";
+                resultData.time = resultData.time || "N/A";
+            } else if (resultData.s) {
+                resultData.student = resultData.s;
+                resultData.date = resultData.d;
+                resultData.time = resultData.t;
+                resultData.p = resultData.p;
             }
 
-            if (approvedNames.includes(nameInput)) {
-                currentStudent = nameInput;
-                questionBank[currentStudent] = generateQuestionSet(nameInput);
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('quiz-section').classList.remove('hidden');
-                initializeQuiz();
-            } else {
-                errorElement.textContent = 'Name not found in approved list';
-            }
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.remove('hidden');
+            document.querySelector('.quiz-actions').classList.add('hidden');
+            document.getElementById('results-section').classList.remove('hidden');
+            displayResults(resultData, true);
+            window.scrollTo({ top: 10 });
+        } catch (err) {
+            console.error('Failed to decode results from URL:', err);
+            alert('Invalid results URL');
         }
+        return;
+    }
 
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.target.id === 'password-section' &&
-                    !mutation.target.classList.contains('hidden')) {
-                    document.getElementById('password-input').focus();
-                }
-            });
-        });
+});
 
-        observer.observe(document.getElementById('password-section'), {
-            attributes: true,
-            attributeFilter: ['class']
-        });
 
-        function checkPassword() {
-            const password = document.getElementById('password-input').value;
-            if (password === TEACHER_PASSWORD) {
-                document.getElementById('password-section').classList.add('hidden');
-                document.getElementById('teacher-section').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('json-input').click();
-                }, 100);
-            } else {
-                alert('Incorrect password');
-            }
-        }
+function capitalizeName(name) {
+    return name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+}
 
-        function generateQuestionSet(student) {
-            const shuffledQuestions = [...vocabularyTerms].sort(() => Math.random() - 0.5).slice(0, 26);
-            const sortedTerms = [...shuffledQuestions.map(q => q.Term)].sort((a, b) => a.localeCompare(b));
-            return {
-                questions: shuffledQuestions,
-                terms: sortedTerms,
-                answers: shuffledQuestions.map(q => q.Term)
-            };
-        }
-
-        function initializeQuiz() {
-            const quizQuestionsDiv = document.getElementById('quiz-questions');
-            const wordBankDiv = document.getElementById('word-bank');
-            quizQuestionsDiv.innerHTML = '';
-            wordBankDiv.innerHTML = '';
-            answers = [];
-            usedTerms = {};
-            const studentQuestions = questionBank[currentStudent];
-
-            studentQuestions.questions.forEach((question, index) => {
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'question-box';
-                questionDiv.innerHTML = `
-                    <p><strong>${index + 1}. <input type="text" id="answer-${index}" class="answer-input" oninput="handleInput(this, '${index}')" autocomplete="off"></strong> ${question.Definition}</p>
-                `;
-                quizQuestionsDiv.appendChild(questionDiv);
-            });
-
-            studentQuestions.terms.forEach((term, index) => {
-                const button = document.createElement('button');
-                button.textContent = `${String.fromCharCode(65 + index)}. ${term}`;
-                button.dataset.term = term;
-                button.style.color = 'white';
-                wordBankDiv.appendChild(button);
-            });
-        }
-
-        function handleInput(input, index) {
-            const value = input.value.toUpperCase();
-            const currentLetter = value.charAt(0);
-
-            // Reset all inputs and buttons to their initial state first
-            const allInputs = document.querySelectorAll('.answer-input');
-            const buttons = document.querySelectorAll('.word-bank button');
-            
-            allInputs.forEach(input => {
-                input.classList.remove('duplicate-input');
-                input.classList.remove('invalid-input'); // Reset invalid input class
-            });
-            
-            buttons.forEach(button => {
-                button.classList.remove('used');
-                button.classList.remove('duplicate');
-                button.removeAttribute('data-tooltip');
-                button.style.opacity = '1';
-                button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                button.style.color = 'white';
-            });
-
-            // Find duplicate letters in inputs and check for invalid letters
-            const letterCounts = {};
-            const letterPositions = {};
-
-            allInputs.forEach((input, idx) => {
-                const letter = input.value.toUpperCase().charAt(0);
-                if (letter) {
-                    // Check if letter is valid (within A-Z and within the range of available terms)
-                    const letterIndex = letter.charCodeAt(0) - 65;
-                    const isValidLetter = letterIndex >= 0 && letterIndex < questionBank[currentStudent].terms.length;
-                    
-                    if (!isValidLetter) {
-                        input.classList.add('invalid-input');
-                    }
-                    
-                    if (isValidLetter) {
-                        if (!letterCounts[letter]) {
-                            letterCounts[letter] = 0;
-                            letterPositions[letter] = [];
-                        }
-                        letterCounts[letter]++;
-                        letterPositions[letter].push(idx);
-                    }
-                }
-            });
-
-            // Handle duplicates and used letters
-            Object.entries(letterCounts).forEach(([letter, count]) => {
-                const letterIndex = letter.charCodeAt(0) - 65;
-                if (letterIndex >= 0 && letterIndex < buttons.length) {
-                    const button = buttons[letterIndex];
-                    
-                    if (count > 1) {
-                        // Handle duplicates
-                        letterPositions[letter].forEach(position => {
-                            const duplicateInput = document.querySelector(`#answer-${position}`);
-                            duplicateInput.classList.add('duplicate-input');
-                        });
-
-                        button.classList.add('duplicate');
-                        button.setAttribute('data-tooltip', 
-                            `Duplicate response in questions: ${letterPositions[letter].map(pos => pos + 1).join(', ')}`
-                        );
-                    } else {
-                        // Gray out single-use letters
-                        button.classList.add('used');
-                        button.style.opacity = '0.4';
-                        button.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-                        button.style.color = 'rgba(255, 255, 255, 0.4)';
-                    }
-                }
-            });
-
-            // Update answers array
-            if (currentLetter) {
-                const letterIndex = currentLetter.charCodeAt(0) - 65;
-                if (letterIndex >= 0 && letterIndex < questionBank[currentStudent].terms.length) {
-                    answers[index] = questionBank[currentStudent].terms[letterIndex];
-                } else {
-                    answers[index] = '';
-                    // Add invalid input highlighting for current input
-                    input.classList.add('invalid-input');
-                }
-            } else {
-                answers[index] = '';
-            }
-
-            // Update used terms count for submit validation
-            usedTerms = {};
-            allInputs.forEach((input, idx) => {
-                const letter = input.value.toUpperCase().charAt(0);
-                if (letter) {
-                    const letterIndex = letter.charCodeAt(0) - 65;
-                    if (letterIndex >= 0 && letterIndex < questionBank[currentStudent].terms.length) {
-                        const term = questionBank[currentStudent].terms[letterIndex];
-                        if (!usedTerms[term]) {
-                            usedTerms[term] = [];
-                        }
-                        usedTerms[term].push(idx + 1);
-                    }
-                }
-            });
-        }
-
-        function submitQuiz() {
-            const hasBlankAnswers = [...document.querySelectorAll('.answer-input')].some(input => input.value.trim() === '');
-            const duplicateAnswers = Object.keys(usedTerms).filter(term => usedTerms[term].length > 1);
-
-            if (hasBlankAnswers && duplicateAnswers.length > 0) {
-                if (!confirm('There are blank answers and duplicate responses.\nWould you still like to submit?')) {
-                    return; // User chose not to submit, exit the function
-                }
-            } else if (hasBlankAnswers) {
-                if (!confirm('There are some questions left blank.\nWould you still like to submit?')) {
-                    return; // User chose not to submit, exit the function
-                }
-            } else if (duplicateAnswers.length > 0) {
-                if (!confirm('There are duplicate responses \n(each word should only be used once).\n\nWould you still like to submit?')) {
-                    return; // User chose not to submit, exit the function
-                }
-            }
-
-            finishQuiz();
-        }
-
-        function finishQuiz() {
-    const resultData = {
-        student: capitalizeFirstLetter(currentStudent),
-        date: new Date().toISOString().split('T')[0],
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
-        exercise: "Vocab Review",
-        answers: Array.from({ length: 15 }, (_, index) => answers[index] || ""),
-        questionSet: questionBank[currentStudent],
-        termsToReview: []
+function generateQuestionSet(student) {
+    const shuffledQuestions = [...vocabularyTerms].sort(() => Math.random() - 0.5).slice(0, 26);
+    const sortedTerms = [...shuffledQuestions.map(q => q.Term)].sort((a, b) => a.localeCompare(b));
+    return {
+        questions: shuffledQuestions,
+        terms: sortedTerms,
+        answers: shuffledQuestions.map(q => q.Term)
     };
+}
 
+function selectQuestion(index) {
+    clearSelections();
+    selectedQuestion = index;
+    
+    const questions = document.querySelectorAll('.question-box');
+    const qBox = questions[index];
+    
+    if (qBox) {
+        qBox.classList.add('selected');
+        
+        const rect = qBox.getBoundingClientRect();
+        const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+        if (!isVisible) {
+            qBox.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+    }
+}
+
+function setupInputFocusListeners() {
+    document.querySelectorAll('.answer-input').forEach((input, index) => {
+        input.addEventListener('focus', () => {
+            selectQuestion(index);
+            updateLastSelected(index);
+        });
+    });
+}
+
+function selectWord(index) {
+    clearSelections();
+    selectedWord = index;
+    const buttons = document.querySelectorAll('.word-bank button');
+    if (buttons[index]) buttons[index].classList.add('selected');
+}
+
+function clearSelections() {
+    document.querySelectorAll('.question-box').forEach(q => q.classList.remove('selected'));
+    document.querySelectorAll('.word-bank button').forEach(b => b.classList.remove('selected'));
+    selectedQuestion = null;
+    selectedWord = null;
+}
+
+function makeMatch(qIndex, wIndex) {
+    const input = document.getElementById(`answer-${qIndex}`);
+    if (!input) return;
+
+    const letter = String.fromCharCode(65 + wIndex);
+    input.value = letter;
+
+    handleInput(input, qIndex);
+
+    // Keep question selected after match + scroll to it
+    const buttons = document.querySelectorAll('.word-bank button');
+    if (buttons[wIndex]) buttons[wIndex].classList.remove('selected');
+    selectedWord = null;
+    
+    selectQuestion(qIndex);
+}
+
+function clearAnswer(index) {
+    const input = document.getElementById(`answer-${index}`);
+    if (input) {
+        input.value = '';
+        handleInput(input, index);
+    }
+}
+
+// ==================== INITIALIZE QUIZ ====================
+
+function initializeQuiz() {
+    const quizQuestionsDiv = document.getElementById('quiz-questions');
+    const wordBankDiv = document.getElementById('word-bank');
+    quizQuestionsDiv.innerHTML = '';
+    wordBankDiv.innerHTML = '';
+    answers = [];
+    usedTerms = {};
+    selectedQuestion = null;
+    selectedWord = null;
+
+    const studentQuestions = questionBank[currentStudent];
+
+    // Questions
+    studentQuestions.questions.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-box';
+        questionDiv.tabIndex = -1;
+        
+        questionDiv.innerHTML = `
+            <div class="question-label">
+                <strong>${index + 1}.</strong>
+                <input type="text" id="answer-${index}" class="answer-input" 
+                       oninput="handleInput(this, '${index}')" 
+                       autocomplete="off" maxlength="1">
+            </div>
+            <div class="question-text">
+                ${question.Definition}
+            </div>
+        `;
+
+        questionDiv.addEventListener('click', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            if (selectedWord !== null) {
+                makeMatch(index, selectedWord);
+            } else {
+                selectQuestion(index);
+            }
+        });
+
+        quizQuestionsDiv.appendChild(questionDiv);
+    });
+
+    // Word Bank
+    studentQuestions.terms.forEach((term, index) => {
+        const button = document.createElement('button');
+        button.textContent = `${String.fromCharCode(65 + index)}. ${term}`;
+        button.dataset.index = index;
+        button.tabIndex = -1;
+
+        button.addEventListener('click', () => {
+            if (selectedQuestion !== null) {
+                makeMatch(selectedQuestion, index);
+            } else {
+                selectWord(index);
+            }
+        });
+
+        wordBankDiv.appendChild(button);
+    });
+
+    setupInputFocusListeners();
+}
+
+// ==================== KEYBOARD SUPPORT ====================
+
+let lastSelectedIndex = -1;
+
+function updateLastSelected(index) {
+    lastSelectedIndex = index;
+}
+
+function focusQuestion(index) {
+    const input = document.getElementById(`answer-${index}`);
+    if (input) {
+        selectQuestion(index);
+        input.focus();
+        updateLastSelected(index);
+    }
+}
+
+function focusSubmitButton() {
+    const submitBtn = document.querySelector('.quiz-actions .action-button');
+    if (submitBtn) {
+        clearSelections();
+        submitBtn.focus();
+    }
+}
+
+// Main keyboard handler
+document.addEventListener('keydown', (e) => {
+    const inputs = Array.from(document.querySelectorAll('.answer-input'));
+    if (inputs.length === 0) return;
+
+    const currentInput = document.activeElement;
+    const currentIndex = inputs.indexOf(currentInput);
+    const isSubmitFocused = document.querySelector('.quiz-actions .action-button') === currentInput;
+
+    // ESCAPE
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        clearSelections();
+        if (currentInput?.classList.contains('answer-input')) currentInput.blur();
+        return;
+    }
+
+    // ==================== TAB ====================
+    if (e.key === 'Tab') {
+        e.preventDefault();
+
+        let targetIndex = 0;
+
+        if (isSubmitFocused) {
+            if (e.shiftKey) focusQuestion(inputs.length - 1);
+            return;
+        }
+
+        if (currentIndex >= 0) {
+            if (e.shiftKey) {
+                targetIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+            } else {
+                targetIndex = currentIndex < inputs.length - 1 ? currentIndex + 1 : null;
+            }
+        } else {
+            targetIndex = 0;
+        }
+
+        if (targetIndex !== null) {
+            focusQuestion(targetIndex);
+        } else {
+            focusSubmitButton();
+        }
+        return;
+    }
+
+    // ==================== ARROW KEYS ====================
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (isSubmitFocused) return;
+
+        const current = selectedQuestion ?? lastSelectedIndex ?? -1;
+        const nextIndex = current + 1;
+
+        if (nextIndex >= inputs.length) {
+            focusSubmitButton();
+        } else {
+            focusQuestion(nextIndex);
+        }
+        return;
+    }
+
+    if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (isSubmitFocused) {
+            focusQuestion(inputs.length - 1);
+            return;
+        }
+
+        const current = selectedQuestion ?? lastSelectedIndex ?? 0;
+        focusQuestion(Math.max(0, current - 1));
+        return;
+    }
+
+    // Letter typing
+    if (/^[a-zA-Z]$/.test(e.key) && selectedQuestion !== null) {
+        const input = document.getElementById(`answer-${selectedQuestion}`);
+        if (input) {
+            input.value = e.key.toUpperCase();
+            handleInput(input, selectedQuestion);
+            updateLastSelected(selectedQuestion);
+        }
+    }
+});
+
+// Click outside handler
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.question-box') && !e.target.closest('.word-bank button')) {
+        clearSelections();
+    }
+});
+
+function setupInputFocusListeners() {
+    document.querySelectorAll('.answer-input').forEach((input, index) => {
+        input.addEventListener('focus', () => {
+            selectQuestion(index);
+            updateLastSelected(index);
+        });
+    });
+}
+
+function handleInput(input, index) {
+    const value = input.value.toUpperCase();
+    const currentLetter = value.charAt(0);
+
+    const allInputs = document.querySelectorAll('.answer-input');
+    const buttons = document.querySelectorAll('.word-bank button');
+    
+    allInputs.forEach(input => {
+        input.classList.remove('duplicate-input');
+        input.classList.remove('invalid-input');
+    });
+    
+    buttons.forEach(button => {
+        button.classList.remove('used');
+        button.classList.remove('duplicate');
+        button.style.opacity = '1';
+        button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        button.style.color = 'white';
+    });
+
+    const letterCounts = {};
+    const letterPositions = {};
+
+    allInputs.forEach((input, idx) => {
+        const letter = input.value.toUpperCase().charAt(0);
+        if (letter) {
+            const letterIndex = letter.charCodeAt(0) - 65;
+            const isValidLetter = letterIndex >= 0 && letterIndex < questionBank[currentStudent].terms.length;
+            
+            if (!isValidLetter) input.classList.add('invalid-input');
+            
+            if (isValidLetter) {
+                if (!letterCounts[letter]) {
+                    letterCounts[letter] = 0;
+                    letterPositions[letter] = [];
+                }
+                letterCounts[letter]++;
+                letterPositions[letter].push(idx);
+            }
+        }
+    });
+
+    Object.entries(letterCounts).forEach(([letter, count]) => {
+        const letterIndex = letter.charCodeAt(0) - 65;
+        if (letterIndex >= 0 && letterIndex < buttons.length) {
+            const button = buttons[letterIndex];
+            
+            if (count > 1) {
+                letterPositions[letter].forEach(position => {
+                    const duplicateInput = document.querySelector(`#answer-${position}`);
+                    duplicateInput.classList.add('duplicate-input');
+                });
+                button.classList.add('duplicate');
+            } else {
+                button.classList.add('used');
+                button.style.opacity = '0.4';
+                button.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                button.style.color = 'rgba(255, 255, 255, 0.4)';
+            }
+        }
+    });
+
+    if (currentLetter) {
+        const letterIndex = currentLetter.charCodeAt(0) - 65;
+        if (letterIndex >= 0 && letterIndex < questionBank[currentStudent].terms.length) {
+            answers[index] = questionBank[currentStudent].terms[letterIndex];
+        } else {
+            answers[index] = '';
+            input.classList.add('invalid-input');
+        }
+    } else {
+        answers[index] = '';
+    }
+
+    usedTerms = {};
+    allInputs.forEach((input, idx) => {
+        const letter = input.value.toUpperCase().charAt(0);
+        if (letter) {
+            const letterIndex = letter.charCodeAt(0) - 65;
+            if (letterIndex >= 0 && letterIndex < questionBank[currentStudent].terms.length) {
+                const term = questionBank[currentStudent].terms[letterIndex];
+                if (!usedTerms[term]) usedTerms[term] = [];
+                usedTerms[term].push(idx + 1);
+            }
+        }
+    });
+}
+
+function submitQuiz() {
+    const hasBlankAnswers = [...document.querySelectorAll('.answer-input')].some(input => input.value.trim() === '');
+    const duplicateAnswers = Object.keys(usedTerms).filter(term => usedTerms[term].length > 1);
+
+    if (hasBlankAnswers && duplicateAnswers.length > 0) {
+        if (!confirm('There are blank answers and duplicate responses.\nWould you still like to proceed?')) return;
+    } else if (hasBlankAnswers) {
+        if (!confirm('There are some questions left blank.\nWould you still like to proceed?')) return;
+    } else if (duplicateAnswers.length > 0) {
+        if (!confirm('There are duplicate responses (each word should only be used once).\n\nWould you still like to proceed?')) return;
+    }
+
+    const resultData = prepareResultData();
+    displayResults(resultData, false);
+
+    document.querySelector('.quiz-container').classList.add('hidden');
+    document.querySelector('.quiz-actions').classList.add('hidden');
+    document.getElementById('results-section').classList.remove('hidden');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ==================== SHARE / AIRDROP ====================
+async function shareScoreEntryLink(resultData, percentage) {
+    try {
+        const exportPayload = {
+            student: resultData.student,
+            date: resultData.date,
+            time: resultData.time,
+            percentage: percentage,
+            exercise: "Vocab",
+            termsToReview: resultData.termsToReview.map(t => t.term)
+        };
+
+        const jsonStr = JSON.stringify(exportPayload);
+        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+
+        // Change this if your score-entry lives elsewhere
+        const scoreEntryBase = 'https://biphmusic.github.io/grades/';
+        const deepLink = `${scoreEntryBase}#data=${base64}`;
+
+        // Filename: "[Name] - Vocab, [Date].txt"
+        const safeName = (resultData.student || 'Student').replace(/[\/\\?%*:|"<>]/g, '').trim();
+        const fileName = `${safeName} - Vocab, ${resultData.date}.txt`;
+
+        const blob = new Blob([deepLink + '\n'], { type: 'text/plain' });
+        const file = new File([blob], fileName, { type: 'text/plain' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: fileName,
+                text: 'Score for ' + resultData.student
+            });
+        } else {
+            // Fallback download
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    } catch (err) {
+        if (err.name !== 'AbortError') {
+            console.error(err);
+            alert('Could not share the file.');
+        }
+    }
+}
+
+// ==================== DISPLAY RESULTS ====================
+function displayResults(resultData, isUrlView = false) {
+    const resultsSection = document.getElementById('results-section');
+    resultsSection.innerHTML = '';
+
+    const title = document.createElement('h2');
+    title.textContent = `Results for ${resultData.student || resultData.s}`;
+    resultsSection.appendChild(title);
+
+    const dateTime = document.createElement('p');
+    dateTime.textContent = `Date: ${resultData.date || resultData.d} | Time: ${resultData.time || resultData.t}`;
+    resultsSection.appendChild(dateTime);
+
+    let percentage;
+    if (isUrlView && resultData.p !== undefined) {
+        percentage = resultData.p;
+    } else if (resultData.questionSet && resultData.answers) {
+        const correctCount = resultData.answers.filter((ans, idx) => 
+            ans && ans.toLowerCase() === resultData.questionSet.answers[idx].toLowerCase()
+        ).length;
+        percentage = Math.round(correctCount / resultData.questionSet.answers.length * 100);
+    } else {
+        percentage = 'N/A';
+    }
+
+    const score = document.createElement('p');
+    score.textContent = `Score: ${percentage}%`;
+    resultsSection.appendChild(score);
+
+    if (!isUrlView && resultData.questionSet) {
+        const table = document.createElement('table');
+        table.className = 'results-table';
+        table.innerHTML = `
+            <tr>
+                <th>#</th>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Correct Answer</th>
+            </tr>
+            ${resultData.questionSet.questions.map((question, index) => {
+                const studentAnswer = resultData.answers[index] || "";
+                const correctAnswer = resultData.questionSet.answers[index];
+                const isCorrect = studentAnswer.toLowerCase() === correctAnswer.toLowerCase();
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${question.Definition}</td>
+                        <td class="${isCorrect ? '' : 'incorrect'}">${studentAnswer}${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
+                        <td>${correctAnswer}</td>
+                    </tr>
+                `;
+            }).join('')}
+        `;
+        resultsSection.appendChild(table);
+    }
+
+    if (isUrlView) {
+        const authContainer = document.createElement('div');
+        authContainer.className = 'auth-container';
+        authContainer.innerHTML = `<span class="auth-check">✔</span><span class="auth-text">Authentication successful</span>`;
+        resultsSection.appendChild(authContainer);
+
+        const copyScoreButton = document.createElement('button');
+        copyScoreButton.className = 'copy-button';
+        copyScoreButton.textContent = 'Copy Score';
+        copyScoreButton.onclick = () => {
+            navigator.clipboard.writeText(`${percentage}%`).then(() => {
+                copyScoreButton.textContent = '√ Copied';
+                setTimeout(() => copyScoreButton.textContent = 'Copy Score', 2000);
+            });
+        };
+        resultsSection.appendChild(copyScoreButton);
+    }
+
+    if (!isUrlView) {
+        const termsToReview = document.createElement('div');
+        termsToReview.className = 'terms-to-review';
+        
+        const heading = document.createElement('h3');
+        heading.textContent = (percentage === 100) ? 'Great job!' : 'Terms to Review';
+        termsToReview.appendChild(heading);
+
+        const termsList = document.createElement('div');
+        termsList.style.marginTop = '12px';
+        termsList.style.textAlign = 'left';
+        termsList.style.lineHeight = '1.8';
+        termsList.style.paddingLeft = '10px';
+
+        resultData.termsToReview.forEach(item => {
+            const termLine = document.createElement('div');
+            termLine.style.marginBottom = '14px';
+            termLine.innerHTML = `<strong>${item.term}:</strong> ${item.definition}`;
+            termsList.appendChild(termLine);
+        });
+
+        termsToReview.appendChild(termsList);
+        resultsSection.appendChild(termsToReview);
+
+        // ========== Score-Entry deep-link actions ==========
+        const linkActions = document.createElement('div');
+        linkActions.className = 'link-actions';
+
+        // Build the payload once
+        const exportPayload = {
+            student: resultData.student,
+            date: resultData.date,
+            time: resultData.time,
+            percentage: percentage,
+            exercise: "Vocab",
+            termsToReview: resultData.termsToReview.map(t => t.term)
+        };
+
+        const jsonStr = JSON.stringify(exportPayload);
+        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+        const scoreEntryBase = 'https://biphmusic.github.io/grades/';
+        const deepLink = `${scoreEntryBase}#data=${base64}`;
+
+        // 1. Copy link button
+        const copyLinkBtn = document.createElement('button');
+        copyLinkBtn.className = 'copy-button';
+        copyLinkBtn.textContent = '📋 Copy Score';
+        copyLinkBtn.onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(deepLink);
+                copyLinkBtn.textContent = '√ Link Copied!';
+                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score', 2200);
+            } catch {
+                const ta = document.createElement('textarea');
+                ta.value = deepLink;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                copyLinkBtn.textContent = '√ Link Copied!';
+                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score', 2200);
+            }
+        };
+        linkActions.appendChild(copyLinkBtn);
+
+        // 2. Share / AirDrop button
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'copy-button';
+        shareBtn.textContent = '📤 Share / AirDrop';
+        shareBtn.onclick = () => shareScoreEntryLink(resultData, percentage);
+        linkActions.appendChild(shareBtn);
+
+        resultsSection.appendChild(linkActions);
+    }
+}
+
+function prepareResultData() {
     const correctAnswers = questionBank[currentStudent].answers;
-
     const allTerms = [...correctAnswers];
     const correctTerms = answers
-        .map((answer, index) => answer.toLowerCase() === correctAnswers[index].toLowerCase() ? correctAnswers[index] : null)
+        .map((answer, index) => answer && answer.toLowerCase() === correctAnswers[index].toLowerCase() ? correctAnswers[index] : null)
         .filter(term => term);
     const termsToReview = allTerms.filter(term => !correctTerms.includes(term));
 
-    resultData.termsToReview = termsToReview.map(term => ({
-        term,
-        definition: vocabularyTerms.find(v => v.Term === term)?.Definition || "Definition not found"
-    })).sort((a, b) => a.term.localeCompare(b.term));
-
-    const jsonString = JSON.stringify(resultData, null, 2);
-    const encodedData = btoa(jsonString); // Encrypt the JSON data using Base64 encoding
-    const blob = new Blob([encodedData], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const fileName = `${capitalizeFirstLetter(currentStudent)} - Vocab Review - ${formattedDate} - ${resultData.time.replace(/:/g, '_')}.json`;
-
-    // Prompt user to download or share the file
-    if (navigator.share) {
-        navigator.share({
-            title: fileName,
-            files: [new File([blob], fileName, { type: 'application/json' })],
-        }).catch((error) => {
-            console.error('Sharing failed:', error);
-            alert('Download your results?');
-            triggerDownload(url, fileName);
-        });
-    } else {
-        triggerDownload(url, fileName);
-    }
-
-    document.getElementById('quiz-section').classList.add('hidden');
-    document.getElementById('login-section').classList.remove('hidden');
-    document.getElementById('name-input').value = '';
+    return {
+        student: capitalizeName(currentStudent),
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+        exercise: "Vocab",  
+        answers: Array.from({ length: 26 }, (_, index) => answers[index] || ""),
+        questionSet: questionBank[currentStudent],
+        termsToReview: termsToReview.map(term => ({
+            term,
+            definition: vocabularyTerms.find(v => v.Term === term)?.Definition || "Definition not found"
+        })).sort((a, b) => a.term.localeCompare(b.term))
+    };
 }
 
-    function triggerDownload(url, fileName) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
-        function checkAnswers() {
-            const fileInput = document.getElementById('json-input');
-            const resultsContainer = document.getElementById('results-container');
-            resultsContainer.innerHTML = '';
-
-            if (fileInput.files.length === 0) {
-                alert('Please select at least one JSON file to check.');
-                return;
+// ==================== LOGIN CALLBACK ====================
+        window.onSuccessfulLogin = function(displayName) {
+            currentStudent = displayName.toLowerCase();
+            questionBank[currentStudent] = generateQuestionSet(currentStudent);
+            initializeQuiz();
+            document.querySelector('.quiz-actions').classList.remove('hidden');
+            if (typeof initMyMenu === 'function') {
+                initMyMenu();
             }
+        };
 
-            const studentOrder = [
-                'Ben', 'Howard', 'Terry', 'Alice', 'Vincent', 'Tiger',
-                'Chris', 'Lucy', 'Diego', 'Hailey', 'Eileen', 'Angelina',
-                'Serena', 'Catherine', 'Andrew', 'Jennifer'
-            ];
-
-            const files = Array.from(fileInput.files);
-            const results = [];
-
-            let filesProcessed = 0;
-
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const decodedData = atob(e.target.result);
-                        const submission = JSON.parse(decodedData);
-                        results.push(submission);
-
-                        filesProcessed++;
-                        if (filesProcessed === files.length) {
-                            displaySortedResults(results);
-                        }
-                    } catch (error) {
-                        console.error('Error parsing JSON:', error);
-                        alert(`Error parsing file: ${file.name}`);
-                        filesProcessed++;
-                    }
-                };
-                reader.readAsText(file);
-            });
-
-            function displaySortedResults(results) {
-                results.sort((a, b) => {
-                    const indexA = studentOrder.indexOf(a.student);
-                    const indexB = studentOrder.indexOf(b.student);
-                    return indexA - indexB;
-                });
-
-                resultsContainer.innerHTML = '';
-                document.getElementById('teacher-mode-title').textContent = 'Student Results';
-
-                results.forEach(submission => {
-                    const correctAnswers = submission.questionSet.answers;
-                    let score = 0;
-
-                    const resultDiv = document.createElement('div');
-                    resultDiv.className = 'student-result';
-                    resultDiv.innerHTML = `
-                        <h4>${submission.student} - ${submission.exercise}</h4>
-                        <p>Date: ${submission.date} at ${submission.time}</p>
-                        <table class="results-table">
-                            <tr>
-                                <th>#</th>
-                                <th>Student Answer</th>
-                                <th>Correct Answer</th>
-                            </tr>
-                            ${submission.answers.map((answer, index) => {
-                                const studentAnswer = answer === null ? "" : answer;
-                                const isCorrect = studentAnswer.toLowerCase() === correctAnswers[index].toLowerCase();
-                                if (isCorrect) score++;
-                                return `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td class="${isCorrect ? '' : 'incorrect'}">${studentAnswer} ${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
-                                        <td>${correctAnswers[index]}</td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </table>
-                        <p>Score: ${score}/26 (${(score / 26 * 100).toFixed(1)}%)</p>
-                        <p>Terms to review:</p>
-                        <ul>
-                            ${submission.termsToReview.map(item => `<li>${item.term} - ${item.definition}</li>`).join('')}
-                        </ul>
-                        <button class="copy-button" onclick="copyToClipboard(this)">
-                            <span class="copy-text">Copy</span>
-                        </button>
-                    `;
-                    resultsContainer.appendChild(resultDiv);
-                });
-
-                if (results.length > 1) {
-                    const summaryDiv = document.createElement('div');
-                    summaryDiv.className = 'summary-table';
-                    summaryDiv.style.marginTop = '2rem';
-                    summaryDiv.style.overflowX = 'auto';
-
-                    const scoreMap = new Map(results.map(r => {
-                        const score = r.answers.reduce((acc, ans, idx) =>
-                            acc + (ans.toLowerCase() === r.questionSet.answers[idx].toLowerCase() ? 1 : 0), 0);
-                        return [r.student, (score / 26 * 100).toFixed(1)];
-                    }));
-
-                    const table = document.createElement('table');
-                    table.style.borderCollapse = 'collapse';
-                    table.style.width = '100%';
-                    table.style.minWidth = 'max-content';
-
-                    const nameRow = document.createElement('tr');
-                    studentOrder.forEach(student => {
-                        const th = document.createElement('th');
-                        th.style.border = '1px solid #ccc';
-                        th.style.padding = '8px';
-                        th.textContent = student;
-                        nameRow.appendChild(th);
-                    });
-
-                    const scoreRow = document.createElement('tr');
-                    studentOrder.forEach(student => {
-                        const td = document.createElement('td');
-                        td.style.border = '1px solid #ccc';
-                        td.style.padding = '8px';
-                        td.style.textAlign = 'center';
-                        const score = scoreMap.get(student);
-                        td.textContent = score ? `${score}%` : 'N/A';
-                        scoreRow.appendChild(td);
-                    });
-
-                    table.appendChild(nameRow);
-                    table.appendChild(scoreRow);
-
-                    const copyButton = document.createElement('button');
-                    copyButton.className = 'copy-button';
-                    copyButton.textContent = 'Copy';
-                    copyButton.onclick = () => copyTableToClipboard(table);
-
-                    summaryDiv.appendChild(table);
-                    summaryDiv.appendChild(copyButton);
-                    resultsContainer.appendChild(summaryDiv);
-                }
-            }
-        }
-
-        function copyToClipboard(button) {
-            const studentResultDiv = button.parentElement;
-
-            const tempDiv = document.createElement('div');
-            Array.from(studentResultDiv.childNodes).forEach(node => {
-                if (node.nodeType === Node.ELEMENT_NODE && !node.classList?.contains('copy-button')) {
-                    const clone = node.cloneNode(true);
-                    tempDiv.appendChild(clone);
-                }
-            });
-
-            // Add terms to review to the copied content
-            const termsToReview = Array.from(studentResultDiv.querySelectorAll('ul')).map(ul => ul.innerHTML).join('<br>');
-
-            const blob = new Blob([`                <html>
-                <head>
-                    <style>
-                        body { font-family: Arial, sans-serif; }
-                        .student-result { margin: 1rem; }
-                        .results-table {
-                            border-collapse: collapse;
-                            width: 100%;
-                            margin: 1rem 0;
-                        }
-                        .results-table th,
-                        .results-table td {
-                            border: 1px solid #ccc;
-                            padding: 8px;
-                            text-align: left;
-                        }
-                        .results-table th {
-                            background-color: #f5f5f5;
-                        }
-                        .incorrect {
-                            color: #dc2626;
-                        }
-                        .correct-mark {
-                            color: #16a34a;
-                            margin-left: 4px;
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${tempDiv.innerHTML}
-                </body>
-                </html>
-            `], { type: 'text/html' });
-
-            const clipboardItem = new ClipboardItem({
-                'text/html': blob
-            });
-
-            navigator.clipboard.write([clipboardItem]).then(() => {
-                const textSpan = button.querySelector('.copy-text');
-                textSpan.textContent = '√';
-                textSpan.classList.add('fade'); // Add fade class to start fading
-                setTimeout(() => {
-                    textSpan.classList.remove('fade'); // Remove fade class after 2 seconds
-                    textSpan.textContent = 'Copy'; // Change text back to "Copy"
-                }, 1500); // Wait for 2 seconds before changing back
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-                // Fallback to plain text
-                const plainText = Array.from(studentResultDiv.childNodes)
-                    .filter(node => node.nodeType === Node.ELEMENT_NODE && !node.classList?.contains('copy-button'))
-                    .map(node => node.textContent.trim())
-                    .join('\n');
-
-                navigator.clipboard.writeText(plainText).then(() => {
-                    const textSpan = button.querySelector('.copy-text');
-                    textSpan.textContent = '√';
-                }).catch(err => {
-                    console.error('Failed to copy plain text: ', err);
-                });
-            });
-        }
-
-        function copyTableToClipboard(table) {
-            let textToCopy = '';
-            Array.from(table.rows).forEach(row => {
-                const rowData = Array.from(row.cells).map(cell => cell.textContent.trim());
-                textToCopy += rowData.join('\t') + '\n';
-            });
-
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                alert('Summary table copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy table: ', err);
-            });
-        }
-
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
-
-        document.addEventListener('keydown', (event) => {
-            const activeElement = document.activeElement;
-            if (activeElement.classList.contains('answer-input')) {
-                const currentIndex = parseInt(activeElement.id.split('-')[1]);
-                if (event.key === 'Tab') {
-                    event.preventDefault(); // Prevent default tab behavior
-                    if (event.shiftKey) {
-                        // Shift + Tab functionality
-                        const previousInput = document.getElementById(`answer-${currentIndex - 1}`);
-                        if (previousInput) {
-                            previousInput.focus(); // Move focus to the previous input
-                        }
-                    } else {
-                        // Regular Tab functionality
-                        const nextInput = document.getElementById(`answer-${currentIndex + 1}`);
-                        if (nextInput) {
-                            nextInput.focus(); // Move focus to the next input
-                        }
-                    }
-                }
-            }
-        });
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Tab' && document.activeElement.tagName !== 'INPUT') {
-                event.preventDefault();
-                document.getElementById('name-input').focus();
-            }
-        });
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Tab') {
-                const firstBlankInput = document.querySelector('.answer-input:not([value])');
-                if (!document.activeElement.classList.contains('answer-input') && firstBlankInput) {
-                    event.preventDefault();
-                    firstBlankInput.focus();
-                }
-            }
-        });
-
-        document.getElementById('name-input').addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                checkName();
-            }
-        });
-
-        document.getElementById('password-input').addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                checkPassword();
-            }
-        });
-    </script>
+        window.onload = function() {
+            initLogin();
+        };
+</script>
 </body>
 </html>
