@@ -13,8 +13,18 @@ const teacherName = "Mr. Tubbs";
 const teacherPasswordSalt = "7593bbe90ce919ec412462bb7e81269d";
 const teacherPasswordHash = "ea6556af8fab18ad7bd2ef5797bec3cb3616977d9d9ebb2eaff7abab92f4a164";
 
-// globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
-// globalThis.studentPasswordCredentials["calvin"] = {
-//     salt: "3e47d1972ac1000cd3d50364d2014ef2",
-//     hash: "dc978aee070dd134d884e18808b35683f1f016eefe1d9c07213f3d9bc8d0f5f7"
-// };
+globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
+globalThis.studentPasswordCredentials["calvin"] = {
+    salt: "2357e6c50bc37983b209b733ab0abd12",
+    hash: "a7473841ac0187bf57fe1dd0a1dfa97d5d9e0a8e9d3bf4f0be8ea2091051d894"
+};
+globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
+globalThis.studentPasswordCredentials["maggie"] = {
+    salt: "86837b9097d3059f3d60b1927bfa107c",
+    hash: "8002d71d16c5b3f66a5808a748cfd4ba72bef98d2e5c684b4fb626111a7fbefa"
+};
+globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
+globalThis.studentPasswordCredentials["alex"] = {
+    salt: "687cbabe6d2dfe70613b4beac6d8aa4b",
+    hash: "d7457813c94e1a5df8a2f1e220086b1b203c70f97f5c0800b7a26dc6fe82bce4"
+};
