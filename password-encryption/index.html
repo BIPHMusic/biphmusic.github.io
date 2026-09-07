@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>BIPH Music — Password</title>
+<link rel="stylesheet" href="../common-styles.css">
+<style>
+    #password-generator-screen{display:none;min-height:100vh;padding:28px 18px 40px;box-sizing:border-box}
+    .password-generator-container{width:min(100%,560px);margin:auto}
+    .password-generator-card{background:rgba(255,255,255,.94);border-radius:14px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.35);color:#344d87}
+    .password-generator-card h2{text-align:center;margin:0 0 22px}
+    .password-generator-card input{width:100%;box-sizing:border-box;padding:14px;margin:0 0 12px;font-size:1.05rem;border:2px solid #ccc;border-radius:7px;background:#fff;color:#222}
+    .password-generator-card input:focus{outline:none;border-color:#3b6cac}
+    .password-generator-button{width:100%;padding:14px;font-size:1.05rem;font-weight:700;background:#3b6cac;color:#fff;border:0;border-radius:7px;cursor:pointer;margin-top:4px}
+    .password-generator-button:hover{background:#3680ce}
+    .password-generator-button.copied{background:#4d8f63}
+    #password-generator-result{display:none;margin-top:12px;padding:8px;border-radius:5px;background:#f7f8fa;color:#667;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.72rem;line-height:1.35;white-space:pre-wrap;word-break:break-all;text-align:left}
+    #password-generator-result.show{display:block}
+    #password-generator-error{min-height:1.25em;text-align:center;color:#b00020;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="shared-menu"></div>
+<div class="background"></div>
+<div class="overlay"></div>
+<div class="overlay2"></div>
+
+<div id="password-generator-screen">
+    <div class="password-generator-container">
+        <h1 class="Title">BIPH Music</h1>
+        <h1 class="Subtitle">Password</h1>
+        <div class="password-generator-card">
+            <h2>Choose a new password</h2>
+            <input id="new-password" type="password" autocomplete="new-password" placeholder="New password">
+            <input id="confirm-password" type="password" autocomplete="new-password" placeholder="Confirm password">
+            <button id="password-action" class="password-generator-button" type="button">Copy Encrypted Password</button>
+            <div id="password-generator-error"></div>
+            <div id="password-generator-result"></div>
+        </div>
+    </div>
+</div>
+
+<script src="../apstudents.js"></script>
+<script>
+const PBKDF2_ITERATIONS = 250000;
+const HASH_ALGORITHM = 'SHA-256';
+const CREDENTIALS_KEY = 'studentPasswordCredentials';
+let authenticatedStudent = null;
+let generatedResult = '';
+
+function normalizeName(name){return String(name||'').trim().toLowerCase()}
+function capitalizeName(name){return String(name||'').trim().split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ')}
+function findStudent(name){
+    const target=normalizeName(name);
+    return Array.isArray(apStudents)?apStudents.find(student=>
+        normalizeName(student.name)===target||normalizeName(student.altName)===target
+    ):null;
+}
+function hexToBytes(hex){
+    const bytes=new Uint8Array(hex.length/2);
+    for(let i=0;i<bytes.length;i++)bytes[i]=parseInt(hex.substr(i*2,2),16);
+    return bytes;
+}
+function bytesToHex(bytes){return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('')}
+async function hashPassword(password,salt){
+    const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);
+    const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:hexToBytes(salt),iterations:PBKDF2_ITERATIONS,hash:HASH_ALGORITHM},key,256);
+    return bytesToHex(new Uint8Array(bits));
+}
+function randomSalt(){
+    const bytes=new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return bytesToHex(bytes);
+}
+async function verifyInitialPassword(student,password){
+    const expected=normalizeName(student.name)+normalizeName(student.name);
+    return normalizeName(password)===expected;
+}
+function showGenerator(student){
+    authenticatedStudent=student;
+
+    const loginScreen=document.getElementById('generator-login');
+    if(loginScreen){
+        loginScreen.style.display='none';
+        loginScreen.remove();
+    }
+
+    const generatorScreen=document.getElementById('password-generator-screen');
+    generatorScreen.style.display='block';
+
+    requestAnimationFrame(()=>{
+        document.getElementById('new-password').focus();
+    });
+}
+function injectLogin(){
+    const style=document.createElement('style');
+    style.textContent=`
+        #generator-login{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999}
+        .generator-login-box{background:rgba(255,255,255,.95);padding:40px 30px;border-radius:12px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:380px;width:calc(100% - 36px);box-sizing:border-box;color:#344d87}
+        .generator-login-box h1{margin:0 0 8px}.generator-login-box h2{margin:0 0 18px;font-size:1.15rem}
+        .generator-login-box input{width:100%;padding:14px;margin:2px 0;font-size:1.1em;border:2px solid #ccc;border-radius:6px;box-sizing:border-box}
+        .generator-login-box button{width:100%;padding:14px;font-size:1.1em;background:#3b6cac;color:#fff;border:0;border-radius:6px;cursor:pointer;margin-top:10px}
+        .generator-login-error{color:#c00;margin-top:10px;min-height:1.2em}
+    `;
+    document.head.appendChild(style);
+    const wrap=document.createElement('div');
+    wrap.id='generator-login';
+    wrap.innerHTML=`<div class="generator-login-box"><h1 class="Title" style="font-size:2rem">BIPH</h1><h1 class="Subtitle" style="color:#3f4c80;font-size:1.6rem;margin:0 0 10px">AP Music Theory</h1><h2>Enter your login credentials</h2><input id="generator-name" type="text" placeholder="Your name" autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false"><input id="generator-password" type="password" placeholder="Password" autocomplete="current-password"><button id="generator-login-button" type="button">Begin</button><div id="generator-login-error" class="generator-login-error"></div></div>`;
+    document.body.appendChild(wrap);
+    const name=document.getElementById('generator-name');
+    const password=document.getElementById('generator-password');
+    const error=document.getElementById('generator-login-error');
+    async function login(){
+        const student=findStudent(name.value);
+        if(!student){error.textContent='Name not recognized.';return}
+        if(!(await verifyInitialPassword(student,password.value))){error.textContent='Incorrect password';password.value='';return}
+        showGenerator(student);
+    }
+    document.getElementById('generator-login-button').addEventListener('click',login);
+    name.addEventListener('keydown',e=>{if(e.key==='Enter')password.focus()});
+    password.addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+    name.focus();
+}
+
+async function encryptPassword(){
+    const newPassword=document.getElementById('new-password');
+    const confirmPassword=document.getElementById('confirm-password');
+    const button=document.getElementById('password-action');
+    const error=document.getElementById('password-generator-error');
+    const result=document.getElementById('password-generator-result');
+
+    error.textContent='';
+
+    if(!newPassword.value){
+        error.textContent='Please enter a password.';
+        return;
+    }
+
+    if(newPassword.value!==confirmPassword.value){
+        error.textContent='Passwords do not match.';
+        return;
+    }
+
+    if(!authenticatedStudent)return;
+
+    button.disabled=true;
+
+    try{
+        const salt=randomSalt();
+        const hash=await hashPassword(newPassword.value,salt);
+        const key=normalizeName(authenticatedStudent.name);
+
+        generatedResult=`globalThis.${CREDENTIALS_KEY} = globalThis.${CREDENTIALS_KEY} || {};
+globalThis.${CREDENTIALS_KEY}[${JSON.stringify(key)}] = {
+    salt: ${JSON.stringify(salt)},
+    hash: ${JSON.stringify(hash)}
+};`;
+
+        await navigator.clipboard.writeText(generatedResult);
+
+        result.textContent=`Your encrypted password is
+${hash}`;
+        result.classList.add('show');
+
+        button.textContent='Copied!';
+        button.classList.add('copied');
+
+    }catch(err){
+        console.error(err);
+        error.textContent='Could not encrypt the password in this browser.';
+    }finally{
+        button.disabled=false;
+    }
+}
+
+async function copyResult(){
+    const button=document.getElementById('password-action');
+    if(!generatedResult)return;
+
+    try{
+        await navigator.clipboard.writeText(generatedResult);
+        button.textContent='Copied!';
+        button.classList.add('copied');
+    }catch(err){
+        const area=document.createElement('textarea');
+        area.value=generatedResult;
+        area.style.position='fixed';
+        area.style.opacity='0';
+        document.body.appendChild(area);
+        area.select();
+
+        try{
+            document.execCommand('copy');
+            button.textContent='Copied!';
+            button.classList.add('copied');
+        }finally{
+            area.remove();
+        }
+    }
+}
+
+document.getElementById('password-action').addEventListener('click',()=>{
+    if(generatedResult)copyResult();
+    else encryptPassword();
+});
+
+document.getElementById('confirm-password').addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+        e.preventDefault();
+        document.getElementById('password-action').click();
+    }
+});
+
+injectLogin();
+</script>
+</body>
+</html>
