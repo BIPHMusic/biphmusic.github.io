@@ -3397,14 +3397,11 @@
                 )}
 
                 <div class="weekly-grade-area minors-area">
-                    <div
-                        class="weekly-area-title"
-                        style="display:flex;align-items:center;justify-content:space-between;gap:12px;"
-                    >
+                    <div class="weekly-area-title minors-area-title">
                         <span>Minors</span>
                         ${showCopy ? `
                             <button
-                                class="copy-btn"
+                                class="copy-btn minors-copy-btn"
                                 type="button"
                                 data-q="${safeQuarter}"
                             >
@@ -4911,6 +4908,7 @@ function setupTeacherStudentSearch() {
                                         <th>Assignment</th>
                                         <th>Date</th>
                                         <th>Score</th>
+                                        ${showCopy ? `<th class="major-copy-column"></th>` : ""}
                                     </tr>
                                 </thead>
 
@@ -4933,6 +4931,18 @@ function setupTeacherStudentSearch() {
                                             <td>
                                                 ${escapeHTML(record.percentage)}%
                                             </td>
+                                            ${showCopy ? `
+                                                <td class="major-copy-cell">
+                                                    <button
+                                                        type="button"
+                                                        class="copy-btn major-copy-btn"
+                                                        data-major="${escapeHTML(encodedName)}"
+                                                        data-quarter="${quarter || ""}"
+                                                    >
+                                                        Copy
+                                                    </button>
+                                                </td>
+                                            ` : ""}
                                         </tr>
 
                                         <tr
@@ -4945,23 +4955,11 @@ function setupTeacherStudentSearch() {
                                             <td>
                                                 ${buildMajorRecordDetailsHTML(record)}
                                             </td>
+                                            ${showCopy ? `<td></td>` : ""}
                                         </tr>
                                     `).join("")}
                                 </tbody>
                             </table>
-
-                            ${showCopy ? `
-                                <div style="text-align:right;margin-top:6px;">
-                                    <button
-                                        type="button"
-                                        class="copy-btn major-copy-btn"
-                                        data-major="${escapeHTML(encodedName)}"
-                                        data-quarter="${quarter || ""}"
-                                    >
-                                        Copy
-                                    </button>
-                                </div>
-                            ` : ""}
                         </div>
                     `;
                 }
