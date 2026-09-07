@@ -16,6 +16,38 @@
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+
+<style id="major-grade-view-adjustments">
+.major-assessment-table .major-assessment-toggle {
+    text-align: left;
+    transition: background .15s ease;
+}
+.major-assessment-table .major-assessment-toggle:hover {
+    background: rgba(255,255,255,0.08);
+}
+.major-assessment-table .major-assessment-toggle .major-expand-icon {
+    display: inline-block;
+    width: 1.1em;
+    transition: transform .15s ease;
+}
+.major-assessment-table .major-assessment-toggle[aria-expanded="true"] .major-expand-icon {
+    transform: rotate(90deg);
+}
+.major-detail-row > td {
+    text-align: right;
+}
+.major-detail-row .major-detail-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    text-align: right;
+}
+.assignment-table .exercise-row {
+    --exercise-bg: rgba(255,255,255,0.08);
+    --exercise-bg-hover: rgba(255,255,255,0.16);
+}
+</style>
 </head>
 
 <body>
@@ -44,10 +76,10 @@
 
             <div class="grades-tabs" id="teacher-tabs">
                 <button type="button" class="grades-tab active" data-tab="assignments" tabindex="-1">
-                    Individual Assignments
+                    Assignments
                 </button>
                 <button type="button" class="grades-tab" data-tab="weekly" tabindex="-1">
-                    Weekly Averages
+                    Students
                 </button>
                 <button type="button" class="grades-tab" data-tab="manual" tabindex="-1">
                     + Minor
@@ -56,7 +88,7 @@
                     + Major
                 </button>
                 <button type="button" class="grades-tab" data-tab="cache" tabindex="-1">
-                    Records Cache
+                    Records
                 </button>
             </div>
 
@@ -435,10 +467,10 @@
         const EXPANDABLE_METRICS = new Set(CATEGORIES);
 
         const QUARTER_NAMES = {
-            1: "Q1 (through Oct 23)",
-            2: "Q2 (Oct 26 – Jan 15)",
-            3: "Q3 (Jan 18 – Apr 2)",
-            4: "Q4 (Apr 7 – Jun 10)"
+            1: "Q1",
+            2: "Q2",
+            3: "Q3",
+            4: "Q4"
         };
 
         const QUARTER_RANGES = {
@@ -459,15 +491,22 @@
         let importedRecord = null;
         let studentChart = null;
         let studentFocusedIndex = null;
+        let studentSelectedQuarter = getCurrentQuarter();
+
+        let teacherStudentChart = null;
+        let teacherStudentFocusedIndex = null;
+        let teacherStudentSelectedQuarter = getCurrentQuarter();
 
         let teacherSelectedStudent = "";
         let currentlyExpanded = null;
+        let currentlyExpandedMajor = null;
 
         let scoreSelectedStudent = null;
         let scoreRememberedDate = "";
         let majorSelectedStudent = null;
         let majorRememberedDate = "";
         let majorAssessmentDefinition = null;
+        let majorCriteriaLocked = false;
         let scoreSelectedExercise = null;
         let scoreComputedPercentage = null;
         let importedTermsToReview = [];
@@ -568,6 +607,68 @@
             return EXERCISES[normalized] || "#9966FF";
         }
 
+                function getMajorCriteriaEntriesFromRecord(record) {
+            if (!record || typeof record !== "object") {
+                return [];
+            }
+
+            const entries = [];
+
+            if (
+                record.criteria &&
+                typeof record.criteria === "object" &&
+                !Array.isArray(record.criteria)
+            ) {
+                Object.entries(record.criteria).forEach(([name, value]) => {
+                    const cleanName = String(name || "").trim();
+                    if (!cleanName) return;
+                    entries.push({
+                        name: cleanName,
+                        score:
+                            value &&
+                            typeof value === "object" &&
+                            !Array.isArray(value)
+                                ? String(value.score ?? "").trim()
+                                : String(value ?? "").trim()
+                    });
+                });
+            }
+
+            Object.keys(record)
+                .filter(key => /^criteria\d+$/.test(key))
+                .sort(
+                    (a, b) =>
+                        Number(a.replace("criteria", "")) -
+                        Number(b.replace("criteria", ""))
+                )
+                .forEach(key => {
+                    const value = record[key];
+
+                    if (
+                        value &&
+                        typeof value === "object" &&
+                        !Array.isArray(value)
+                    ) {
+                        const name = String(value.name || "").trim();
+                        if (name) {
+                            entries.push({
+                                name,
+                                score: String(value.score ?? "").trim()
+                            });
+                        }
+                    }
+                });
+
+            const seen = new Set();
+
+            return entries.filter(entry => {
+                const key = `${entry.name}\u0000${entry.score}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        }
+
         function getRecordIdentity(record) {
             if (!record) return "";
 
@@ -578,7 +679,8 @@
                 String(record.percentage ?? "").trim(),
                 normalizeExercise(record.exercise),
                 String(record.assessment || "").trim(),
-                JSON.stringify(record.termsToReview || [])
+                JSON.stringify(record.termsToReview || []),
+                JSON.stringify(getMajorCriteriaEntriesFromRecord(record))
             ].join("|");
         }
 
@@ -779,7 +881,7 @@
             return `${record.student} · ${exercise}${assessment} · ${record.percentage}% (${formatDate(record.date)})`;
         }
 
-        function formatRecordsJS(recordsSource) {
+                function formatRecordsJS(recordsSource) {
             const lines = [
                 "const records = ["
             ];
@@ -802,15 +904,28 @@
                     `        exercise: ${JSON.stringify(record.exercise)},`
                 );
 
-                /*
-                 * Major assessments need a human-readable assessment
-                 * identifier in addition to exercise: "Major Assessment".
-                 * Keep this field when exporting/copying records.js.
-                 */
                 if (record.assessment) {
                     lines.push(
                         `        assessment: ${JSON.stringify(record.assessment)},`
                     );
+                }
+
+                const majorCriteria =
+                    getMajorCriteriaEntriesFromRecord(record);
+
+                if (
+                    normalizeExercise(record.exercise) ===
+                        "Major Assessment" &&
+                    majorCriteria.length
+                ) {
+                    majorCriteria.forEach((entry, index) => {
+                        lines.push(
+                            `        criteria${index + 1}: ${JSON.stringify({
+                                name: entry.name,
+                                score: entry.score
+                            })},`
+                        );
+                    });
                 }
 
                 lines.push(
@@ -1030,6 +1145,9 @@
                 "page-subtitle"
             ).textContent = "Grades";
 
+            teacherStudentSelectedQuarter =
+                getCurrentQuarter();
+
             renderTeacherAssignments();
             renderTeacherWeekly();
             renderCachePanel();
@@ -1051,6 +1169,9 @@
             document.getElementById(
                 "page-subtitle"
             ).textContent = "My Grades";
+
+            studentSelectedQuarter =
+                getCurrentQuarter();
 
             const currentStudent =
                 getCurrentStudentName() ||
@@ -1110,14 +1231,13 @@
             "hidden"
         );
 
-        weeklyContainer.innerHTML = `
-            <div class="no-records">
-                No records found for
-                <strong>
-                    ${escapeHTML(studentName)}
-                </strong>.
-            </div>
-        `;
+        renderQuarterDashboard(
+            studentName,
+            studentSelectedQuarter,
+            weeklyContainer,
+            false,
+            "student"
+        );
 
         return;
     }
@@ -1244,29 +1364,28 @@
             return grouped;
         }
 
-        function createStudentChart(recordsSource, studentName) {
-            const grouped =
-                groupStudentRecords(recordsSource);
+                function createProgressChart(recordsSource, studentName, canvasId, titleId, mode = "student") {
+            const grouped = groupStudentRecords(recordsSource);
+            const canvas = document.getElementById(canvasId);
+            const title = document.getElementById(titleId);
+            if (!canvas) return null;
 
-            const canvas =
-                document.getElementById(
-                    "studentProgressChart"
-                );
+            const ctx = canvas.getContext("2d");
+            const oldChart =
+                mode === "teacher"
+                    ? teacherStudentChart
+                    : studentChart;
 
-            const ctx =
-                canvas.getContext("2d");
-
-            if (studentChart) {
-                studentChart.destroy();
+            if (oldChart) {
+                oldChart.destroy();
             }
 
             const datasets = [];
 
             Object.keys(grouped).forEach(exercise => {
-                const dataPoints =
-                    grouped[exercise];
+                const dataPoints = grouped[exercise];
 
-                const dataset = {
+                datasets.push({
                     label: exercise,
                     data: dataPoints.map(
                         item => Number(item.percentage)
@@ -1289,7 +1408,9 @@
                         dataPoints.map(item =>
                             importedRecord &&
                             getRecordIdentity(item) ===
-                            getRecordIdentity(importedRecord)
+                                getRecordIdentity(
+                                    importedRecord
+                                )
                                 ? 8
                                 : 4
                         ),
@@ -1298,39 +1419,43 @@
                         dataPoints.map(item =>
                             importedRecord &&
                             getRecordIdentity(item) ===
-                            getRecordIdentity(importedRecord)
+                                getRecordIdentity(
+                                    importedRecord
+                                )
                                 ? "#fff"
-                                : getExerciseColor(exercise)
+                                : getExerciseColor(
+                                      exercise
+                                  )
                         ),
                     pointBorderWidth:
                         dataPoints.map(item =>
                             importedRecord &&
                             getRecordIdentity(item) ===
-                            getRecordIdentity(importedRecord)
+                                getRecordIdentity(
+                                    importedRecord
+                                )
                                 ? 3
                                 : 1
                         ),
                     hidden: false
-                };
-
-                datasets.push(dataset);
+                });
             });
 
             const maxAttempts =
                 Math.max(
-                    ...Object.values(grouped)
-                        .map(arr => arr.length),
+                    ...Object.values(grouped).map(
+                        arr => arr.length
+                    ),
                     1
                 );
 
-            document.getElementById(
-                "student-chart-title"
-            ).textContent =
-                `My Progress — ${studentName}`;
+            if (title) {
+                title.textContent =
+                    `My Progress — ${studentName}`;
+            }
 
-            studentChart = new Chart(ctx, {
+            const chart = new Chart(ctx, {
                 type: "line",
-
                 data: {
                     labels: Array.from(
                         { length: maxAttempts },
@@ -1339,7 +1464,6 @@
                     ),
                     datasets
                 },
-
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -1367,7 +1491,8 @@
                                 event,
                                 legendItem
                             ) => {
-                                toggleStudentFocus(
+                                toggleProgressFocus(
+                                    mode,
                                     legendItem.datasetIndex
                                 );
                             }
@@ -1375,9 +1500,8 @@
 
                         tooltip: {
                             callbacks: {
-                                title: context => {
-                                    return context[0].label;
-                                },
+                                title: context =>
+                                    context[0].label,
 
                                 label: context => {
                                     const dataset =
@@ -1393,7 +1517,9 @@
                                             context.dataIndex
                                         ];
 
-                                    return `${formatDate(date)} ${time} ${dataset.label}: ${context.parsed.y}%`;
+                                    return `${formatDate(
+                                        date
+                                    )} ${time} ${dataset.label}: ${context.parsed.y}%`;
                                 }
                             }
                         }
@@ -1404,15 +1530,227 @@
                         elements
                     ) => {
                         if (elements.length) {
-                            toggleStudentFocus(
+                            toggleProgressFocus(
+                                mode,
                                 elements[0].datasetIndex
                             );
                         } else {
-                            resetStudentFocus();
+                            resetProgressFocus(mode);
                         }
                     }
                 }
             });
+
+            if (mode === "teacher") {
+                teacherStudentChart = chart;
+                teacherStudentFocusedIndex = null;
+            } else {
+                studentChart = chart;
+                studentFocusedIndex = null;
+            }
+
+            return chart;
+        }
+
+        function createStudentChart(
+            recordsSource,
+            studentName
+        ) {
+            return createProgressChart(
+                recordsSource,
+                studentName,
+                "studentProgressChart",
+                "student-chart-title",
+                "student"
+            );
+        }
+
+        function createTeacherStudentChart(
+            recordsSource,
+            studentName
+        ) {
+            return createProgressChart(
+                recordsSource,
+                studentName,
+                "teacherStudentProgressChart",
+                "teacher-student-chart-title",
+                "teacher"
+            );
+        }
+
+        function getProgressChartState(mode) {
+            return mode === "teacher"
+                ? {
+                      chart: teacherStudentChart,
+                      index:
+                          teacherStudentFocusedIndex
+                  }
+                : {
+                      chart: studentChart,
+                      index:
+                          studentFocusedIndex
+                  };
+        }
+
+        function setProgressChartFocusIndex(
+            mode,
+            index
+        ) {
+            if (mode === "teacher") {
+                teacherStudentFocusedIndex =
+                    index;
+            } else {
+                studentFocusedIndex = index;
+            }
+        }
+
+        function toggleProgressFocus(
+            mode,
+            index
+        ) {
+            const state =
+                getProgressChartState(mode);
+
+            if (!state.chart) {
+                return;
+            }
+
+            if (state.index === index) {
+                resetProgressFocus(mode);
+                return;
+            }
+
+            setProgressChartFocusIndex(
+                mode,
+                index
+            );
+
+            state.chart.data.datasets.forEach(
+                (dataset, i) => {
+                    const original =
+                        getExerciseColor(
+                            dataset.label
+                        );
+
+                    if (i === index) {
+                        dataset.borderColor =
+                            original;
+                        dataset.borderWidth = 5;
+                        dataset.pointRadius =
+                            dataset.data.map(
+                                (_, pointIndex) =>
+                                    importedRecord &&
+                                    dataset.recordIdentities[
+                                        pointIndex
+                                    ] ===
+                                        getRecordIdentity(
+                                            importedRecord
+                                        )
+                                        ? 9
+                                        : 6
+                            );
+                    } else {
+                        dataset.borderColor =
+                            original + "33";
+                        dataset.borderWidth =
+                            1.5;
+                        dataset.pointRadius =
+                            dataset.data.map(
+                                () => 2
+                            );
+                    }
+                }
+            );
+
+            const titleId =
+                mode === "teacher"
+                    ? "teacher-student-chart-title"
+                    : "student-chart-title";
+
+            const title =
+                document.getElementById(
+                    titleId
+                );
+
+            if (title) {
+                title.textContent =
+                    state.chart.data.datasets[
+                        index
+                    ]?.label ||
+                    "My Progress";
+            }
+
+            state.chart.update();
+        }
+
+        function resetProgressFocus(mode) {
+            const state =
+                getProgressChartState(mode);
+
+            if (!state.chart) {
+                return;
+            }
+
+            setProgressChartFocusIndex(
+                mode,
+                null
+            );
+
+            state.chart.data.datasets.forEach(
+                dataset => {
+                    const original =
+                        getExerciseColor(
+                            dataset.label
+                        );
+
+                    dataset.borderColor =
+                        original;
+                    dataset.borderWidth = 3;
+                    dataset.pointRadius =
+                        dataset.data.map(
+                            (_, pointIndex) =>
+                                importedRecord &&
+                                dataset.recordIdentities[
+                                    pointIndex
+                                ] ===
+                                    getRecordIdentity(
+                                        importedRecord
+                                    )
+                                    ? 8
+                                    : 4
+                        );
+                }
+            );
+
+            const titleId =
+                mode === "teacher"
+                    ? "teacher-student-chart-title"
+                    : "student-chart-title";
+
+            const title =
+                document.getElementById(
+                    titleId
+                );
+
+            const studentName =
+                mode === "teacher"
+                    ? teacherSelectedStudent
+                    : getCurrentStudentName();
+
+            if (title) {
+                title.textContent =
+                    `My Progress — ${studentName}`;
+            }
+
+            state.chart.update();
+        }
+
+                function toggleStudentFocus(index) {
+            toggleProgressFocus("student", index);
+        }
+
+                function resetStudentFocus() {
+            resetProgressFocus("student");
         }
 
         function toggleStudentFocus(index) {
@@ -2680,24 +3018,289 @@
             `;
         }
 
-        function renderStudentCurrentQuarter(studentName) {
-            const container =
-                document.getElementById(
-                    "student-weekly-container"
+                function buildQuarterNavigationHTML(
+            quarter,
+            prefix
+        ) {
+            return `
+                <div
+                    class="quarter-navigation"
+                    style="
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        gap:12px;
+                        margin:0 0 14px;
+                    "
+                >
+                    <button
+                        type="button"
+                        class="score-student-stepper"
+                        id="${prefix}-quarter-prev"
+                        aria-label="Previous quarter"
+                        title="Previous quarter"
+                        tabindex="-1"
+                    >‹</button>
+
+                    <div
+                        id="${prefix}-quarter-label"
+                        style="
+                            min-width:110px;
+                            text-align:center;
+                            color:#fff;
+                            font-weight:800;
+                            font-size:2rem;
+                            line-height:1;
+                        "
+                    >
+                        ${escapeHTML(
+                            QUARTER_NAMES[quarter]
+                        )}
+                    </div>
+
+                    <button
+                        type="button"
+                        class="score-student-stepper"
+                        id="${prefix}-quarter-next"
+                        aria-label="Next quarter"
+                        title="Next quarter"
+                        tabindex="-1"
+                    >›</button>
+                </div>
+            `;
+        }
+
+        function getQuarterRecords(
+            studentName,
+            quarter
+        ) {
+            const range =
+                QUARTER_RANGES[quarter];
+
+            if (!range) {
+                return [];
+            }
+
+            return getStudentRecords(
+                studentName
+            ).filter(record =>
+                record.date >= range[0] &&
+                record.date <= range[1]
+            );
+        }
+
+        function computeQuarterSummary(
+            studentName,
+            quarter
+        ) {
+            const records =
+                getQuarterRecords(
+                    studentName,
+                    quarter
                 );
 
-            const currentQuarter =
-                getCurrentQuarter();
-
-            let weeks =
+            const weeks =
                 WEEKS.filter(
                     week =>
-                        week.q === currentQuarter &&
+                        week.q === quarter &&
+                        !isFutureWeek(week)
+                );
+
+            const weeklyGrades =
+                weeks
+                    .map(week =>
+                        computeWeekGrades(
+                            studentName,
+                            week
+                        )
+                    )
+                    .filter(
+                        grade =>
+                            grade["Weekly Avg"] !== null &&
+                            grade["Weekly Avg"] !== undefined
+                    );
+
+            const minorAverage =
+                average(
+                    weeklyGrades.map(
+                        grade =>
+                            Number(
+                                grade["Weekly Avg"]
+                            )
+                    )
+                );
+
+            const majorAverage =
+                average(
+                    records
+                        .filter(
+                            record =>
+                                normalizeExercise(
+                                    record.exercise
+                                ) ===
+                                "Major Assessment"
+                        )
+                        .map(
+                            record =>
+                                Number(
+                                    record.percentage
+                                )
+                        )
+                        .filter(
+                            value =>
+                                !Number.isNaN(value)
+                        )
+                );
+
+            let projected = null;
+
+            if (
+                minorAverage !== null &&
+                majorAverage !== null
+            ) {
+                projected =
+                    minorAverage * 0.40 +
+                    majorAverage * 0.60;
+            } else if (
+                minorAverage !== null
+            ) {
+                projected =
+                    minorAverage;
+            } else if (
+                majorAverage !== null
+            ) {
+                projected =
+                    majorAverage;
+            }
+
+            return {
+                minorAverage,
+                majorAverage,
+                projected
+            };
+        }
+
+        function buildQuarterSummaryHTML(
+            studentName,
+            quarter
+        ) {
+            const summary =
+                computeQuarterSummary(
+                    studentName,
+                    quarter
+                );
+
+            const fmtScore = value =>
+                value === null
+                    ? "N/A"
+                    : `${Math.round(value * 10) / 10}%`;
+
+            return `
+                <div
+                    class="quarter-score-summary"
+                    style="
+                        display:grid;
+                        grid-template-columns:repeat(3,minmax(0,1fr));
+                        gap:10px;
+                        margin:16px 0 0;
+                    "
+                >
+                    <div
+                        style="
+                            background:rgba(255,255,255,0.08);
+                            border-radius:10px;
+                            padding:10px;
+                            text-align:center;
+                            color:#fff;
+                        "
+                    >
+                        <div style="font-size:.78rem;opacity:.72;">
+                            Minors
+                        </div>
+                        <strong>
+                            ${fmtScore(
+                                summary.minorAverage
+                            )}
+                        </strong>
+                    </div>
+
+                    <div
+                        style="
+                            background:rgba(255,255,255,0.08);
+                            border-radius:10px;
+                            padding:10px;
+                            text-align:center;
+                            color:#fff;
+                        "
+                    >
+                        <div style="font-size:.78rem;opacity:.72;">
+                            Majors
+                        </div>
+                        <strong>
+                            ${fmtScore(
+                                summary.majorAverage
+                            )}
+                        </strong>
+                    </div>
+
+                    <div
+                        style="
+                            background:rgba(255,255,255,0.14);
+                            border-radius:10px;
+                            padding:10px;
+                            text-align:center;
+                            color:#fff;
+                        "
+                    >
+                        <div style="font-size:.78rem;opacity:.72;">
+                            Projected Cumulative
+                        </div>
+                        <strong style="font-size:1.12rem;">
+                            ${fmtScore(
+                                summary.projected
+                            )}
+                        </strong>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderQuarterDashboard(
+            studentName,
+            quarter,
+            container,
+            showCopy = false,
+            prefix = "student"
+        ) {
+            if (!container) {
+                return;
+            }
+
+            const safeQuarter =
+                Math.max(
+                    1,
+                    Math.min(
+                        4,
+                        Number(quarter) || 1
+                    )
+                );
+
+            const allQuarterWeeks =
+                WEEKS.filter(
+                    week =>
+                        week.q === safeQuarter
+                );
+
+            const visibleWeeks =
+                allQuarterWeeks.filter(
+                    week =>
                         !isFutureWeek(week)
                 );
 
             const studentRecords =
-                getStudentRecords(studentName);
+                getStudentRecords(
+                    studentName
+                );
 
             const datesWithRecords =
                 new Set(
@@ -2706,23 +3309,26 @@
                     )
                 );
 
-            weeks = weeks.filter(
-                week =>
-                    week.days.some(
-                        day =>
-                            datesWithRecords.has(
-                                day.date
-                            )
-                    )
-            );
+            const weeks =
+                visibleWeeks.filter(
+                    week =>
+                        week.days.some(
+                            day =>
+                                datesWithRecords.has(
+                                    day.date
+                                )
+                        )
+                );
 
             let minorsHTML = "";
 
-            if (weeks.length === 0) {
+            if (!weeks.length) {
                 minorsHTML = `
                     <div class="no-records">
                         No Weekly Grades have been recorded
-                        for the current quarter yet.
+                        for ${escapeHTML(
+                            QUARTER_NAMES[safeQuarter]
+                        )} yet.
                     </div>
                 `;
             } else {
@@ -2735,176 +3341,191 @@
                             )
                     );
 
-                let html = `
-                    <div class="quarter-section">
-                        <div class="quarter-header">
-                            <h2 class="quarter-title">
-                                ${QUARTER_NAMES[currentQuarter]}
-                            </h2>
-                        </div>
-
-                        <div class="table-wrapper">
-                            <table class="transposed">
-                                <thead>
-                                    <tr>
-                                        <th class="student-name">
-                                            ${escapeHTML(studentName)}
-                                        </th>
-                `;
-
-                weeks.forEach(week => {
-                    html += `
-                        <th>
-                            ${weekHeader(week)}
-                        </th>
-                    `;
-                });
-
-                html += `
-                                    </tr>
-                                </thead>
-                                <tbody>
-                `;
-
-                ALL_METRICS.forEach(metric => {
-                    const isAverage =
-                        metric === "Weekly Avg";
-
-                    const expandable =
-                        EXPANDABLE_METRICS.has(
-                            metric
-                        );
-
-                    const headerClass =
-                        expandable
-                            ? "row-header expandable"
-                            : "row-header non-expandable";
-
-                    const rowColor =
-                        EXERCISES[metric] || null;
-
-                    const rowStyle =
-                        rowColor
-                            ? `
-                                style="
-                                    --exercise-color: ${rowColor};
-                                    --exercise-bg: ${rowColor}18;
-                                    --exercise-bg-hover: ${rowColor}28;
-                                "
-                            `
-                            : "";
-
-                    html += `
-                        <tr
-                            ${rowStyle}
-                            class="${rowColor ? "exercise-row" : ""}"
-                        >
-                            <th
-                                class="${headerClass}"
-                                data-q="${currentQuarter}"
-                                data-metric="${escapeHTML(metric)}"
-                            >
-                                ${escapeHTML(metric)}
-                            </th>
-                    `;
-
-                    grades.forEach(grade => {
-                        const value = grade[metric];
-                        const className =
-                            isAverage
-                                ? "avg-cell"
-                                : "";
-
-                        html += `
-                            <td class="${className}">
-                                ${fmt(value)}
-                            </td>
-                        `;
-                    });
-
-                    html += `</tr>`;
-
-                    if (expandable) {
-                        html += `
-                            <tr
-                                class="detail-row ${
-                                    rowColor
-                                        ? "exercise-detail-row"
-                                        : ""
-                                }"
-                                data-q="${currentQuarter}"
-                                data-metric="${escapeHTML(metric)}"
-                                ${
-                                    rowColor
-                                        ? `style="
-                                            --exercise-color: ${rowColor};
-                                            --exercise-bg: ${rowColor}0F;
-                                        "`
-                                        : ""
-                                }
-                            >
-                                <th class="row-header"></th>
-                        `;
-
-                        grades.forEach(grade => {
-                            const items =
-                                grade._details &&
-                                grade._details[metric]
-                                    ? grade._details[metric]
-                                    : [];
-
-                            let content =
-                                '<span class="detail-empty">—</span>';
-
-                            if (items.length > 0) {
-                                content = `
-                                    <div class="detail-list">
-                                        ${items.map(item => `
-                                            <span class="detail-item">
-                                                ${escapeHTML(item.label)}:
-                                                ${escapeHTML(item.pct)}%
-                                            </span>
-                                        `).join("")}
-                                    </div>
-                                `;
-                            }
-
-                            html += `<td>${content}</td>`;
-                        });
-
-                        html += `</tr>`;
-                    }
-                });
-
-                html += `
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-
-                minorsHTML = html;
+                minorsHTML =
+                    buildWeeklyQuarterHTML(
+                        studentName,
+                        safeQuarter,
+                        weeks,
+                        grades,
+                        showCopy
+                    );
             }
 
             const majorsHTML =
                 buildMajorAssessmentsHTML(
                     studentName,
-                    false
+                    showCopy,
+                    safeQuarter
                 );
 
             container.innerHTML = `
+                ${buildQuarterNavigationHTML(
+                    safeQuarter,
+                    prefix
+                )}
+
                 <div class="weekly-grade-area minors-area">
-                    <div class="weekly-area-title">Minors</div>
+                    <div class="weekly-area-title">
+                        Minors
+                    </div>
                     ${minorsHTML}
                 </div>
 
                 <div class="weekly-grade-area majors-area">
-                    <div class="weekly-area-title">Majors</div>
+                    <div class="weekly-area-title">
+                        Majors
+                    </div>
                     ${majorsHTML}
                 </div>
+
+                ${buildQuarterSummaryHTML(
+                    studentName,
+                    safeQuarter
+                )}
             `;
 
-            attachExpandableHandlers(container);
+            if (showCopy) {
+                attachWeeklyControls(
+                    container
+                );
+            } else {
+                attachExpandableHandlers(
+                    container
+                );
+            }
+
+            attachMajorAssessmentControls(
+                container
+            );
+
+            const previous =
+                document.getElementById(
+                    `${prefix}-quarter-prev`
+                );
+
+            const next =
+                document.getElementById(
+                    `${prefix}-quarter-next`
+                );
+
+            if (previous) {
+                previous.disabled =
+                    safeQuarter <= 1;
+            }
+
+            if (next) {
+                next.disabled =
+                    safeQuarter >= 4;
+            }
+
+            if (prefix === "student") {
+                if (previous) {
+                    previous.addEventListener(
+                        "click",
+                        () =>
+                            cycleStudentQuarter(-1)
+                    );
+                }
+
+                if (next) {
+                    next.addEventListener(
+                        "click",
+                        () =>
+                            cycleStudentQuarter(1)
+                    );
+                }
+            } else {
+                if (previous) {
+                    previous.addEventListener(
+                        "click",
+                        () =>
+                            cycleTeacherStudentQuarter(-1)
+                    );
+                }
+
+                if (next) {
+                    next.addEventListener(
+                        "click",
+                        () =>
+                            cycleTeacherStudentQuarter(1)
+                    );
+                }
+            }
+        }
+
+        function cycleStudentQuarter(
+            direction
+        ) {
+            const nextQuarter =
+                Math.max(
+                    1,
+                    Math.min(
+                        4,
+                        studentSelectedQuarter +
+                            direction
+                    )
+                );
+
+            if (
+                nextQuarter ===
+                studentSelectedQuarter
+            ) {
+                return;
+            }
+
+            studentSelectedQuarter =
+                nextQuarter;
+
+            collapseAll();
+
+            renderStudentCurrentQuarter(
+                getCurrentStudentName()
+            );
+        }
+
+        function cycleTeacherStudentQuarter(
+            direction
+        ) {
+            const nextQuarter =
+                Math.max(
+                    1,
+                    Math.min(
+                        4,
+                        teacherStudentSelectedQuarter +
+                            direction
+                    )
+                );
+
+            if (
+                nextQuarter ===
+                teacherStudentSelectedQuarter
+            ) {
+                return;
+            }
+
+            teacherStudentSelectedQuarter =
+                nextQuarter;
+
+            collapseAll();
+
+            renderTeacherWeekly();
+        }
+
+        function renderStudentCurrentQuarter(
+            studentName
+        ) {
+            const container =
+                document.getElementById(
+                    "student-weekly-container"
+                );
+
+            renderQuarterDashboard(
+                studentName,
+                studentSelectedQuarter,
+                container,
+                false,
+                "student"
+            );
         }
 
         function showTeacherTab(tabName) {
@@ -3015,16 +3636,16 @@
             const types = new Set();
 
             cachedRecords
-                .filter(
-                    record =>
-                        record.date === date
-                )
+                .filter(record => record.date === date)
                 .forEach(record => {
-                    types.add(
-                        normalizeExercise(
-                            record.exercise
-                        )
-                    );
+                    if (
+                        normalizeExercise(record.exercise) ===
+                        "Major Assessment"
+                    ) {
+                        types.add(getMajorAssessmentName(record));
+                    } else {
+                        types.add(normalizeExercise(record.exercise));
+                    }
                 });
 
             return Array.from(types);
@@ -3036,18 +3657,24 @@
             exercise
         ) {
             const matches =
-                cachedRecords.filter(
-                    record =>
-                        record.student &&
-                        record.student.trim()
-                            .toLowerCase() ===
-                        student.trim()
-                            .toLowerCase() &&
-                        record.date === date &&
-                        normalizeExercise(
-                            record.exercise
-                        ) === exercise
-                );
+                cachedRecords.filter(record => {
+                    if (
+                        !record.student ||
+                        record.student.trim().toLowerCase() !==
+                            student.trim().toLowerCase() ||
+                        record.date !== date
+                    ) {
+                        return false;
+                    }
+
+                    const normalized = normalizeExercise(record.exercise);
+
+                    if (normalized === "Major Assessment") {
+                        return getMajorAssessmentName(record) === exercise;
+                    }
+
+                    return normalized === exercise;
+                });
 
             if (matches.length === 0) {
                 return null;
@@ -3130,14 +3757,25 @@
                 `;
 
                 exercises.forEach(exercise => {
+                    const isMajorAssignment =
+                        cachedRecords.some(record =>
+                            record.date === date &&
+                            normalizeExercise(record.exercise) ===
+                                "Major Assessment" &&
+                            getMajorAssessmentName(record) === exercise
+                        );
+
                     const exerciseColor =
-                    EXERCISES[exercise] || "#ffffff";
+                        isMajorAssignment ? "#ffffff" :
+                        EXERCISES[exercise] || "#ffffff";
 
-                const exerciseBg =
-                    exerciseColor + "18";
+                    const exerciseBg =
+                        isMajorAssignment ? "rgba(255,255,255,0.16)" :
+                        exerciseColor + "18";
 
-                const exerciseBgHover =
-                    exerciseColor + "28";
+                    const exerciseBgHover =
+                        isMajorAssignment ? "rgba(255,255,255,0.26)" :
+                        exerciseColor + "28";
 
                 html += `
                     <tr
@@ -3210,16 +3848,25 @@
             container.innerHTML = html;
         }
 
-        function renderTeacherWeekly() {
+                function renderTeacherWeekly() {
             const container =
                 document.getElementById(
                     "teacher-weekly-results"
                 );
 
+            if (!container) {
+                return;
+            }
+
             if (!teacherSelectedStudent) {
+                if (teacherStudentChart) {
+                    teacherStudentChart.destroy();
+                    teacherStudentChart = null;
+                }
+
                 container.innerHTML = `
                     <div class="no-data">
-                        Select a student to view Weekly Grades.
+                        Select a student to view Grades.
                     </div>
                 `;
 
@@ -3229,86 +3876,78 @@
 
             buildTeacherRoster();
 
-            const byQuarter = {};
-
-            WEEKS.forEach(week => {
-                if (!byQuarter[week.q]) {
-                    byQuarter[week.q] = [];
-                }
-
-                byQuarter[week.q].push(week);
-            });
-
-            let minorsHTML = "";
-
-            [1, 2, 3, 4].forEach(q => {
-                const quarterWeeks =
-                    byQuarter[q] || [];
-
-                if (quarterWeeks.length === 0) {
-                    return;
-                }
-
-                const visibleWeeks =
-                    quarterWeeks.filter(
-                        week =>
-                            !isFutureWeek(week)
-                    );
-
-                if (visibleWeeks.length === 0) {
-                    return;
-                }
-
-                const grades =
-                    visibleWeeks.map(
-                        week =>
-                            computeWeekGrades(
-                                teacherSelectedStudent,
-                                week
-                            )
-                    );
-
-                minorsHTML += buildWeeklyQuarterHTML(
-                    teacherSelectedStudent,
-                    q,
-                    visibleWeeks,
-                    grades,
-                    true
-                );
-            });
-
-            if (!minorsHTML) {
-                minorsHTML = `
-                    <div class="no-data">
-                        No Weekly Grades are available yet.
-                    </div>
-                `;
-            }
-
-            const majorsHTML =
-                buildMajorAssessmentsHTML(
-                    teacherSelectedStudent,
-                    true
+            const studentRecords =
+                getStudentRecords(
+                    teacherSelectedStudent
                 );
 
-            container.innerHTML = `
-                <div class="weekly-grade-area minors-area">
-                    <div class="weekly-area-title">
-                        Minors
+            const chartHTML = `
+                <div
+                    class="teacher-student-chart-container"
+                    style="
+                        position:relative;
+                        width:100%;
+                        height:380px;
+                        margin:0 0 18px;
+                        background:#fff;
+                        border-radius:10px;
+                        padding:14px;
+                        box-sizing:border-box;
+                    "
+                >
+                    <div
+                        id="teacher-student-chart-title"
+                        style="
+                            text-align:center;
+                            color:#222;
+                            font-weight:700;
+                            margin:0 0 8px;
+                        "
+                    >
+                        My Progress —
+                        ${escapeHTML(
+                            teacherSelectedStudent
+                        )}
                     </div>
-                    ${minorsHTML}
-                </div>
 
-                <div class="weekly-grade-area majors-area">
-                    <div class="weekly-area-title">
-                        Majors
+                    <div
+                        style="
+                            position:relative;
+                            height:calc(100% - 34px);
+                        "
+                    >
+                        <canvas id="teacherStudentProgressChart"></canvas>
                     </div>
-                    ${majorsHTML}
                 </div>
             `;
 
-            attachWeeklyControls(container);
-            attachMajorAssessmentControls(container);
+            const quarterHTML = `
+                <div
+                    id="teacher-student-quarter-container"
+                    class="quarter-display"
+                ></div>
+            `;
+
+            container.innerHTML =
+                chartHTML +
+                quarterHTML;
+
+            if (studentRecords.length) {
+                createTeacherStudentChart(
+                    studentRecords,
+                    teacherSelectedStudent
+                );
+            }
+
+            renderQuarterDashboard(
+                teacherSelectedStudent,
+                teacherStudentSelectedQuarter,
+                document.getElementById(
+                    "teacher-student-quarter-container"
+                ),
+                true,
+                "teacher-student"
+            );
         }
 
 
@@ -3321,27 +3960,23 @@
         ) {
             let html = `
                 <div class="quarter-section">
-                    <div class="quarter-header">
-                        <h2 class="quarter-title">
-                            ${QUARTER_NAMES[q]}
-                        </h2>
             `;
 
             if (showCopy) {
                 html += `
-                    <button
-                        class="copy-btn"
-                        type="button"
-                        data-q="${q}"
-                    >
-                        Copy
-                    </button>
+                    <div style="text-align:right;margin:0 0 6px;">
+                        <button
+                            class="copy-btn"
+                            type="button"
+                            data-q="${q}"
+                        >
+                            Copy
+                        </button>
+                    </div>
                 `;
             }
 
             html += `
-                    </div>
-
                     <div class="table-wrapper">
                         <table class="transposed">
                             <thead>
@@ -3972,6 +4607,7 @@ function setupTeacherStudentSearch() {
                 });
 
             currentlyExpanded = null;
+            currentlyExpandedMajor = null;
         }
 
         function toggleExpand(
@@ -4053,12 +4689,17 @@ function setupTeacherStudentSearch() {
                 });
         }
 
-        function getMajorAssessmentRecords(
-            studentName
+                function getMajorAssessmentRecords(
+            studentName,
+            quarter = null
         ) {
             if (!studentName) {
                 return [];
             }
+
+            const range =
+                quarter &&
+                QUARTER_RANGES[quarter];
 
             return cachedRecords
                 .filter(record => {
@@ -4066,6 +4707,16 @@ function setupTeacherStudentSearch() {
                         !record.student ||
                         record.student.trim().toLowerCase() !==
                             studentName.trim().toLowerCase()
+                    ) {
+                        return false;
+                    }
+
+                    if (
+                        range &&
+                        (
+                            record.date < range[0] ||
+                            record.date > range[1]
+                        )
                     ) {
                         return false;
                     }
@@ -4150,20 +4801,23 @@ function setupTeacherStudentSearch() {
             return lines.join("\n");
         }
 
-        function buildMajorAssessmentsHTML(
+                function buildMajorAssessmentsHTML(
             studentName,
-            showCopy = false
+            showCopy = false,
+            quarter = null
         ) {
             const records =
                 getMajorAssessmentRecords(
-                    studentName
+                    studentName,
+                    quarter
                 );
 
             if (!records.length) {
                 return `
                     <div class="majors-empty">
                         No Major Assessments have been recorded for
-                        ${escapeHTML(studentName)} yet.
+                        ${escapeHTML(studentName)} in
+                        ${quarter ? escapeHTML(QUARTER_NAMES[quarter]) : "this quarter"} yet.
                     </div>
                 `;
             }
@@ -4194,44 +4848,68 @@ function setupTeacherStudentSearch() {
                             assessmentName
                         );
 
+                    const detailId =
+                        `major-details-${Math.random()
+                            .toString(36)
+                            .slice(2, 10)}`;
+
                     html += `
                         <div class="major-assessment-section">
-                            <div class="major-assessment-header">
-                                <h3 class="major-assessment-title">
-                                    ${escapeHTML(assessmentName)}
-                                </h3>
+                            <table class="major-assessment-table">
+                                <thead>
+                                    <tr>
+                                        <th>Assignment</th>
+                                        <th>Date</th>
+                                        <th>Score</th>
+                                    </tr>
+                                </thead>
 
-                                ${showCopy ? `
+                                <tbody>
+                                    ${assessmentRecords.map(record => `
+                                        <tr>
+                                            <td
+                                                class="major-assessment-toggle"
+                                                data-major="${escapeHTML(encodedName)}"
+                                                data-detail-id="${detailId}-${encodeURIComponent(String(record.time || ""))}"
+                                                aria-expanded="false"
+                                                style="cursor:pointer;"
+                                            >
+                                                <span class="major-expand-icon">▸</span>
+                                                ${escapeHTML(assessmentName)}
+                                            </td>
+                                            <td>
+                                                ${escapeHTML(formatDate(record.date))}
+                                            </td>
+                                            <td>
+                                                ${escapeHTML(record.percentage)}%
+                                            </td>
+                                        </tr>
+
+                                        <tr
+                                            id="${detailId}-${encodeURIComponent(String(record.time || ""))}"
+                                            class="detail-row major-detail-row"
+                                            data-major="${escapeHTML(encodedName)}"
+                                        >
+                                            <td colspan="3">
+                                                ${buildMajorRecordDetailsHTML(record)}
+                                            </td>
+                                        </tr>
+                                    `).join("")}
+                                </tbody>
+                            </table>
+
+                            ${showCopy ? `
+                                <div style="text-align:right;margin-top:6px;">
                                     <button
                                         type="button"
                                         class="copy-btn major-copy-btn"
                                         data-major="${escapeHTML(encodedName)}"
+                                        data-quarter="${quarter || ""}"
                                     >
                                         Copy
                                     </button>
-                                ` : ""}
-                            </div>
-
-                            <div class="table-wrapper">
-                                <table class="major-assessment-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Assessment</th>
-                                            <th>Date</th>
-                                            <th>Score</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${assessmentRecords.map(record => `
-                                            <tr>
-                                                <td>${escapeHTML(assessmentName)}</td>
-                                                <td>${escapeHTML(formatDate(record.date))}</td>
-                                                <td>${escapeHTML(record.percentage)}%</td>
-                                            </tr>
-                                        `).join("")}
-                                    </tbody>
-                                </table>
-                            </div>
+                                </div>
+                            ` : ""}
                         </div>
                     `;
                 }
@@ -4240,9 +4918,142 @@ function setupTeacherStudentSearch() {
             return html;
         }
 
-        function attachMajorAssessmentControls(
+        function buildMajorRecordDetailsHTML(
+            record
+        ) {
+            const entries =
+                getMajorCriteriaEntriesFromRecord(
+                    record
+                );
+
+            if (!entries.length) {
+                return `
+                    <span class="detail-empty">
+                        No criterion details were saved for this grade.
+                    </span>
+                `;
+            }
+
+            return `
+                <div class="detail-list major-detail-list">
+                    ${entries.map(entry => {
+                        const parsed =
+                            entry.score
+                                ? parseScore(entry.score)
+                                : { ok: false };
+
+                        const percentageText =
+                            parsed.ok
+                                ? `${parsed.percentage}%`
+                                : "—";
+
+                        return `
+                            <span class="detail-item">
+                                <strong>${escapeHTML(entry.name)}</strong>: ${percentageText}
+                            </span>
+                        `;
+                    }).join("")}
+                </div>
+            `;
+        }
+
+                function attachMajorAssessmentControls(
             root
         ) {
+            root
+                .querySelectorAll(
+                    ".major-assessment-toggle"
+                )
+                .forEach(header => {
+                    header.addEventListener(
+                        "click",
+                        event => {
+                            event.stopPropagation();
+
+                            const encodedName =
+                                header.dataset.major ||
+                                "";
+
+                            const detailId =
+                                header.dataset.detailId;
+
+                            const alreadyExpanded =
+                                currentlyExpandedMajor &&
+                                currentlyExpandedMajor ===
+                                    detailId;
+
+                            root
+                                .querySelectorAll(
+                                    ".major-detail-row.visible"
+                                )
+                                .forEach(row =>
+                                    row.classList.remove(
+                                        "visible"
+                                    )
+                                );
+
+                            root
+                                .querySelectorAll(
+                                    ".major-assessment-toggle"
+                                )
+                                .forEach(item => {
+                                    item.setAttribute(
+                                        "aria-expanded",
+                                        "false"
+                                    );
+
+                                    const icon =
+                                        item.querySelector(
+                                            ".major-expand-icon"
+                                        );
+
+                                    if (icon) {
+                                        icon.textContent =
+                                            "▸";
+                                    }
+                                });
+
+                            currentlyExpandedMajor =
+                                null;
+
+                            if (alreadyExpanded) {
+                                return;
+                            }
+
+                            const details =
+                                root.querySelector(
+                                    `#${CSS.escape(
+                                        detailId
+                                    )}`
+                                );
+
+                            if (details) {
+                                details.classList.add(
+                                    "visible"
+                                );
+
+                                header.setAttribute(
+                                    "aria-expanded",
+                                    "true"
+                                );
+
+                                const icon =
+                                    header.querySelector(
+                                        ".major-expand-icon"
+                                    );
+
+                                if (icon) {
+                                    icon.textContent =
+                                        "▾";
+                                }
+
+                                currentlyExpandedMajor =
+                                    detailId;
+                            }
+                        }
+                    );
+                });
+
             root
                 .querySelectorAll(
                     ".major-copy-btn"
@@ -4250,7 +5061,9 @@ function setupTeacherStudentSearch() {
                 .forEach(button => {
                     button.addEventListener(
                         "click",
-                        async () => {
+                        async event => {
+                            event.stopPropagation();
+
                             const assessmentName =
                                 decodeURIComponent(
                                     button.dataset.major ||
@@ -4259,12 +5072,16 @@ function setupTeacherStudentSearch() {
 
                             const records =
                                 getMajorAssessmentRecords(
-                                    teacherSelectedStudent
+                                    teacherSelectedStudent,
+                                    Number(
+                                        button.dataset.quarter
+                                    ) || null
                                 ).filter(
                                     record =>
                                         getMajorAssessmentName(
                                             record
-                                        ) === assessmentName
+                                        ) ===
+                                        assessmentName
                                 );
 
                             const tsv =
@@ -6030,7 +6847,7 @@ function setupTeacherStudentSearch() {
             );
         }
 
-        function getMajorAssessmentDefinition(
+                function getMajorAssessmentDefinition(
             assessmentName
         ) {
             const key =
@@ -6045,7 +6862,39 @@ function setupTeacherStudentSearch() {
             const definitions =
                 getMajorAssessmentDefinitions();
 
-            return definitions[key] || null;
+            if (definitions[key]) {
+                return definitions[key];
+            }
+
+            const matchingRecord =
+                cachedRecords.find(record =>
+                    normalizeExercise(
+                        record.exercise
+                    ) === "Major Assessment" &&
+                    normalizeMajorDefinitionKey(
+                        getMajorAssessmentName(record)
+                    ) === key &&
+                    getMajorCriteriaEntriesFromRecord(
+                        record
+                    ).length > 0
+                );
+
+            if (!matchingRecord) {
+                return null;
+            }
+
+            return {
+                name:
+                    getMajorAssessmentName(
+                        matchingRecord
+                    ),
+                criteria:
+                    getMajorCriteriaEntriesFromRecord(
+                        matchingRecord
+                    ).map(
+                        entry => entry.name
+                    )
+            };
         }
 
         function saveMajorAssessmentDefinition(
@@ -6175,7 +7024,7 @@ function setupTeacherStudentSearch() {
             );
         }
 
-        function selectMajorAssessment(
+                function selectMajorAssessment(
             assessmentName
         ) {
             const cleanName =
@@ -6206,14 +7055,15 @@ function setupTeacherStudentSearch() {
 
             renderMajorCriteria(
                 majorAssessmentDefinition?.criteria ||
-                    [""]
+                    [""],
+                !!majorAssessmentDefinition
             );
 
             updateMajorCompositeScore();
             updateMajorSubmitState();
         }
 
-        function createMajorCriterionRow(
+                function createMajorCriterionRow(
             criterionName = ""
         ) {
             const row =
@@ -6234,6 +7084,10 @@ function setupTeacherStudentSearch() {
                 criterionName;
             nameInput.autocomplete = "off";
             nameInput.spellcheck = false;
+            nameInput.disabled =
+                majorCriteriaLocked;
+            nameInput.tabIndex =
+                majorCriteriaLocked ? -1 : 0;
 
             const scoreInputElement =
                 document.createElement("input");
@@ -6259,46 +7113,52 @@ function setupTeacherStudentSearch() {
                 "major-remove-criterion";
             removeButton.textContent = "×";
             removeButton.title =
-                "Remove criterion";
+                majorCriteriaLocked
+                    ? "Criterion is locked for this assessment"
+                    : "Remove criterion";
             removeButton.setAttribute(
                 "aria-label",
                 "Remove criterion"
             );
             removeButton.tabIndex = -1;
+            removeButton.disabled =
+                majorCriteriaLocked;
 
             row.appendChild(nameInput);
             row.appendChild(scoreInputElement);
             row.appendChild(percentage);
             row.appendChild(removeButton);
 
-            nameInput.addEventListener(
-                "focus",
-                () => {
-                    updateMajorCriterionPredictions(
-                        nameInput
-                    );
-                }
-            );
-
-            nameInput.addEventListener(
-                "input",
-                () => {
-                    updateMajorCriterionPredictions(
-                        nameInput
-                    );
-                    updateMajorSubmitState();
-                }
-            );
-
-            nameInput.addEventListener(
-                "keydown",
-                event => {
-                    if (event.key === "Enter") {
-                        event.preventDefault();
-                        scoreInputElement.focus();
+            if (!majorCriteriaLocked) {
+                nameInput.addEventListener(
+                    "focus",
+                    () => {
+                        updateMajorCriterionPredictions(
+                            nameInput
+                        );
                     }
-                }
-            );
+                );
+
+                nameInput.addEventListener(
+                    "input",
+                    () => {
+                        updateMajorCriterionPredictions(
+                            nameInput
+                        );
+                        updateMajorSubmitState();
+                    }
+                );
+
+                nameInput.addEventListener(
+                    "keydown",
+                    event => {
+                        if (event.key === "Enter") {
+                            event.preventDefault();
+                            scoreInputElement.focus();
+                        }
+                    }
+                );
+            }
 
             scoreInputElement.addEventListener(
                 "input",
@@ -6353,6 +7213,10 @@ function setupTeacherStudentSearch() {
             removeButton.addEventListener(
                 "click",
                 () => {
+                    if (majorCriteriaLocked) {
+                        return;
+                    }
+
                     const rows =
                         majorCriteriaList.querySelectorAll(
                             ".major-criterion-row"
@@ -6476,10 +7340,15 @@ function setupTeacherStudentSearch() {
             );
         }
 
-        function renderMajorCriteria(
-            criteria
+                function renderMajorCriteria(
+            criteria,
+            locked = false
         ) {
-            majorCriteriaList.innerHTML = "";
+            majorCriteriaLocked =
+                !!locked;
+
+            majorCriteriaList.innerHTML =
+                "";
 
             const cleanCriteria =
                 Array.isArray(criteria) &&
@@ -6490,9 +7359,14 @@ function setupTeacherStudentSearch() {
             cleanCriteria.forEach(
                 criterion =>
                     createMajorCriterionRow(
-                        criterion
+                        typeof criterion === "string"
+                            ? criterion
+                            : criterion?.name || ""
                     )
             );
+
+            majorAddCriterionButton.disabled =
+                majorCriteriaLocked;
 
             updateMajorCompositeScore();
             updateMajorSubmitState();
@@ -6609,7 +7483,7 @@ function setupTeacherStudentSearch() {
             });
         }
 
-        function selectMajorStudent(
+                function selectMajorStudent(
             student
         ) {
             majorSelectedStudent =
@@ -6634,6 +7508,26 @@ function setupTeacherStudentSearch() {
             majorDateInput.value =
                 majorRememberedDate;
 
+            majorCriteriaList
+                .querySelectorAll(
+                    ".major-criterion-score"
+                )
+                .forEach(score => {
+                    score.value = "";
+                });
+
+            majorCriteriaList
+                .querySelectorAll(
+                    ".major-criterion-percentage"
+                )
+                .forEach(preview => {
+                    preview.textContent = "";
+                    preview.classList.remove(
+                        "error"
+                    );
+                });
+
+            updateMajorCompositeScore();
             updateMajorStudentSteppers();
             updateMajorSubmitState();
         }
@@ -6758,6 +7652,15 @@ function setupTeacherStudentSearch() {
                     "Major Assessment",
                 assessment:
                     assessmentName,
+                ...Object.fromEntries(
+                    entries.map((entry, index) => [
+                        `criteria${index + 1}`,
+                        {
+                            name: entry.name,
+                            score: entry.score
+                        }
+                    ])
+                ),
                 termsToReview: []
             };
 
@@ -6773,7 +7676,9 @@ function setupTeacherStudentSearch() {
 
             saveMajorAssessmentDefinition(
                 assessmentName,
-                entries.map(entry => entry.name)
+                entries.map(
+                    entry => entry.name
+                )
             );
 
             majorAssessmentDefinition = {
@@ -6782,6 +7687,12 @@ function setupTeacherStudentSearch() {
                     entry => entry.name
                 )
             };
+
+            majorCriteriaLocked = true;
+            renderMajorCriteria(
+                entries.map(entry => entry.name),
+                true
+            );
 
             importedRecord = record;
 
@@ -6797,45 +7708,72 @@ function setupTeacherStudentSearch() {
             renderTeacherWeekly();
             renderCachePanel();
 
-            /*
-             * Keep the selected student, date, assessment name,
-             * and criteria in place. Only the criterion scores
-             * are cleared so the teacher can use the same
-             * assessment for the next student.
-             */
-            getMajorCriterionEntries().forEach((entry, index) => {
-                const row =
-                    majorCriteriaList.querySelectorAll(
-                        ".major-criterion-row"
-                    )[index];
+            const students =
+                getStudentsForTeacher();
 
-                const score =
-                    row?.querySelector(
-                        ".major-criterion-score"
-                    );
+            const currentIndex =
+                students.findIndex(
+                    student =>
+                        student ===
+                        majorSelectedStudent
+                );
 
-                if (score) {
-                    score.value = "";
+            getMajorCriterionEntries().forEach(
+                (entry, index) => {
+                    const row =
+                        majorCriteriaList.querySelectorAll(
+                            ".major-criterion-row"
+                        )[index];
+
+                    const score =
+                        row?.querySelector(
+                            ".major-criterion-score"
+                        );
+
+                    if (score) {
+                        score.value = "";
+                    }
+
+                    const preview =
+                        row?.querySelector(
+                            ".major-criterion-percentage"
+                        );
+
+                    if (preview) {
+                        preview.textContent = "";
+                        preview.classList.remove(
+                            "error"
+                        );
+                    }
                 }
-
-                const preview =
-                    row?.querySelector(
-                        ".major-criterion-percentage"
-                    );
-
-                if (preview) {
-                    preview.textContent = "";
-                    preview.classList.remove("error");
-                }
-            });
+            );
 
             updateMajorCompositeScore();
             updateMajorSubmitState();
 
-            majorCriteriaList
-                .querySelector(
-                    ".major-criterion-score"
-                )?.blur();
+            if (
+                currentIndex >= 0 &&
+                students.length > 1
+            ) {
+                const nextIndex =
+                    (currentIndex + 1) %
+                    students.length;
+
+                selectMajorStudent(
+                    students[nextIndex]
+                );
+
+                majorCriteriaList
+                    .querySelector(
+                        ".major-criterion-score"
+                    )
+                    ?.focus();
+            } else {
+                majorCriteriaList
+                    .querySelector(
+                        ".major-criterion-score"
+                    )?.focus();
+            }
         }
 
         function resetMajorForm(
@@ -7015,9 +7953,12 @@ function setupTeacherStudentSearch() {
             majorAssessmentNameInput.addEventListener(
                 "input",
                 () => {
+                    const enteredName =
+                        majorAssessmentNameInput.value.trim();
+
                     const definition =
                         getMajorAssessmentDefinition(
-                            majorAssessmentNameInput.value
+                            enteredName
                         );
 
                     if (
@@ -7026,15 +7967,29 @@ function setupTeacherStudentSearch() {
                             definition.name
                         ) ===
                             normalizeMajorDefinitionKey(
-                                majorAssessmentNameInput.value
+                                enteredName
                             )
                     ) {
-                        majorAssessmentDefinition =
-                            definition;
+                        majorAssessmentDefinition = {
+                            name: definition.name,
+                            criteria: [
+                                ...(definition.criteria || [])
+                            ]
+                        };
 
                         renderMajorCriteria(
-                            definition.criteria || [""]
+                            majorAssessmentDefinition.criteria,
+                            true
                         );
+                    } else {
+                        majorAssessmentDefinition = null;
+
+                        if (majorCriteriaLocked) {
+                            renderMajorCriteria(
+                                [""],
+                                false
+                            );
+                        }
                     }
 
                     updateMajorAssessmentPredictions();
@@ -7072,6 +8027,10 @@ function setupTeacherStudentSearch() {
             majorAddCriterionButton.addEventListener(
                 "click",
                 () => {
+                    if (majorCriteriaLocked) {
+                        return;
+                    }
+
                     createMajorCriterionRow();
                     majorCriteriaList
                         .lastElementChild
@@ -7149,13 +8108,12 @@ function setupTeacherStudentSearch() {
             }
         }
 
-        function parseScoreData(
+                function parseScoreData(
             data
         ) {
             if (
                 !data ||
-                typeof data !==
-                    "object"
+                typeof data !== "object"
             ) {
                 return null;
             }
@@ -7182,7 +8140,7 @@ function setupTeacherStudentSearch() {
                 return null;
             }
 
-            return {
+            const parsed = {
                 student:
                     String(
                         data.student
@@ -7204,7 +8162,12 @@ function setupTeacherStudentSearch() {
                     ),
 
                 ...(data.assessment
-                    ? { assessment: String(data.assessment) }
+                    ? {
+                          assessment:
+                              String(
+                                  data.assessment
+                              )
+                      }
                     : {}),
 
                 termsToReview:
@@ -7214,6 +8177,53 @@ function setupTeacherStudentSearch() {
                         ? data.termsToReview
                         : []
             };
+
+            Object.keys(data)
+                .filter(
+                    key =>
+                        /^criteria\d+$/.test(
+                            key
+                        )
+                )
+                .sort(
+                    (a, b) =>
+                        Number(
+                            a.replace(
+                                "criteria",
+                                ""
+                            )
+                        ) -
+                        Number(
+                            b.replace(
+                                "criteria",
+                                ""
+                            )
+                        )
+                )
+                .forEach(key => {
+                    const value =
+                        data[key];
+
+                    if (
+                        value &&
+                        typeof value ===
+                            "object" &&
+                        !Array.isArray(value)
+                    ) {
+                        parsed[key] = {
+                            name: String(
+                                value.name ||
+                                    ""
+                            ).trim(),
+                            score: String(
+                                value.score ??
+                                    ""
+                            ).trim()
+                        };
+                    }
+                });
+
+            return parsed;
         }
 
         function extractDataFromURLString(
@@ -8191,11 +9201,11 @@ function setupTeacherStudentSearch() {
 
         /*
          * -------------------------------------------------
-         * Weekly Averages student navigation
+         * Students tab student navigation
          *
          * Left / Right = previous / next student.
-         * Do not steal these keys while typing in the
-         * weekly search box or another text input.
+         * Quarter navigation remains on the visible
+         * quarter stepper buttons.
          * -------------------------------------------------
          */
 
@@ -8220,6 +9230,54 @@ function setupTeacherStudentSearch() {
             event.preventDefault();
 
             cycleTeacherStudent(
+                event.key === "ArrowRight"
+                    ? 1
+                    : -1
+            );
+
+            return;
+        }
+
+        /*
+         * -------------------------------------------------
+         * Student quarter navigation
+         *
+         * Left / Right = previous / next quarter.
+         * Do not steal these keys while typing in an input.
+         * -------------------------------------------------
+         */
+
+        const studentView =
+            document.getElementById(
+                "student-view"
+            );
+
+        const studentInterfaceVisible =
+            document.getElementById(
+                "main-content"
+            )?.style.display !== "none" &&
+            studentView &&
+            !studentView.classList.contains(
+                "hidden"
+            );
+
+        if (
+            studentInterfaceVisible &&
+            (
+                event.key === "ArrowLeft" ||
+                event.key === "ArrowRight"
+            ) &&
+            ![
+                "INPUT",
+                "TEXTAREA",
+                "SELECT"
+            ].includes(
+                document.activeElement?.tagName
+            )
+        ) {
+            event.preventDefault();
+
+            cycleStudentQuarter(
                 event.key === "ArrowRight"
                     ? 1
                     : -1
@@ -8368,14 +9426,51 @@ function setupTeacherStudentSearch() {
                 [
                     majorStudentSearchBar,
                     majorDateInput,
-                    majorAssessmentNameInput,
-                    majorAddCriterionButton,
-                    majorBtnSubmit
+                    majorAssessmentNameInput
                 ].forEach(element => {
-                    if (element && !element.disabled) {
-                        focusables.push(element);
+                    if (
+                        element &&
+                        !element.disabled
+                    ) {
+                        focusables.push(
+                            element
+                        );
                     }
                 });
+
+                major
+                    .querySelectorAll(
+                        majorCriteriaLocked
+                            ? ".major-criterion-score"
+                            : ".major-criterion-name, .major-criterion-score"
+                    )
+                    .forEach(element => {
+                        if (
+                            !element.disabled
+                        ) {
+                            focusables.push(
+                                element
+                            );
+                        }
+                    });
+
+                if (
+                    majorAddCriterionButton &&
+                    !majorAddCriterionButton.disabled
+                ) {
+                    focusables.push(
+                        majorAddCriterionButton
+                    );
+                }
+
+                if (
+                    majorBtnSubmit &&
+                    !majorBtnSubmit.disabled
+                ) {
+                    focusables.push(
+                        majorBtnSubmit
+                    );
+                }
 
                 major
                     .querySelectorAll(
@@ -8383,16 +9478,6 @@ function setupTeacherStudentSearch() {
                     )
                     .forEach(element => {
                         element.tabIndex = -1;
-                    });
-
-                major
-                    .querySelectorAll(
-                        ".major-criterion-name, .major-criterion-score"
-                    )
-                    .forEach(element => {
-                        if (!element.disabled) {
-                            focusables.push(element);
-                        }
                     });
             } else if (
                 cache &&
