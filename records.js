@@ -1198,4 +1198,12 @@ const records = [
         assessment: "Unit 1 Progress Check",
         termsToReview: []
     },
+    {
+        student: "Jocelyn",
+        date: "2026-09-07",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
 ];
