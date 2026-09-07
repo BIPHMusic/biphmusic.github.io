@@ -1047,4 +1047,155 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "Jocelyn",
+        date: "2026-09-07",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-07",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-07",
+        time: "上午10:52",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-07",
+        time: "10:54 AM",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-07",
+        time: "10:55 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-07",
+        time: "上午10:55",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-07",
+        time: "10:56 AM",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-07",
+        time: "上午10:56",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-07",
+        time: "10:56 am",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-07",
+        time: "上午10:57",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-07",
+        time: "10:58 am",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-04",
+        time: "11:46 AM",
+        percentage: 97.2,
+        exercise: "Major Assessment",
+        assessment: "Unit 1 Progress Check",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-04",
+        time: "11:49 AM",
+        percentage: 99.2,
+        exercise: "Major Assessment",
+        assessment: "Unit 1 Progress Check",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-04",
+        time: "11:49 AM",
+        percentage: 95.6,
+        exercise: "Major Assessment",
+        assessment: "Unit 1 Progress Check",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-04",
+        time: "11:50 AM",
+        percentage: 94,
+        exercise: "Major Assessment",
+        assessment: "Unit 1 Progress Check",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-04",
+        time: "11:55 AM",
+        percentage: 96.4,
+        exercise: "Major Assessment",
+        assessment: "Unit 1 Progress Check",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-04",
+        time: "11:55 AM",
+        percentage: 95.8,
+        exercise: "Major Assessment",
+        assessment: "Unit 1 Progress Check",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-04",
+        time: "11:55 AM",
+        percentage: 90.2,
+        exercise: "Major Assessment",
+        assessment: "Unit 1 Progress Check",
+        termsToReview: []
+    },
 ];
