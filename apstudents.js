@@ -12,3 +12,9 @@ const apStudents = [
 const teacherName = "Mr. Tubbs";
 const teacherPasswordSalt = "7593bbe90ce919ec412462bb7e81269d";
 const teacherPasswordHash = "ea6556af8fab18ad7bd2ef5797bec3cb3616977d9d9ebb2eaff7abab92f4a164";
+
+// globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
+// globalThis.studentPasswordCredentials["calvin"] = {
+//     salt: "3e47d1972ac1000cd3d50364d2014ef2",
+//     hash: "dc978aee070dd134d884e18808b35683f1f016eefe1d9c07213f3d9bc8d0f5f7"
+// };

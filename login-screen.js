@@ -122,6 +122,28 @@ async function hashTeacherPassword(password) {
     return bytesToHex(new Uint8Array(derivedBits));
 }
 
+async function hashStudentPassword(password, salt) {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(password),
+        "PBKDF2",
+        false,
+        ["deriveBits"]
+    );
+    const derivedBits = await crypto.subtle.deriveBits(
+        {
+            name: "PBKDF2",
+            salt: hexToBytes(salt),
+            iterations: 250000,
+            hash: "SHA-256"
+        },
+        keyMaterial,
+        256
+    );
+    return bytesToHex(new Uint8Array(derivedBits));
+}
+
 function hexToBytes(hex) {
     const bytes = new Uint8Array(hex.length / 2);
     for (let i = 0; i < bytes.length; i++) {
@@ -217,9 +239,57 @@ async function handleLogin() {
         return;
     }
 
-    const expectedPassword = normalizeName(student.name) + normalizeName(student.name);
+    const normalizedStudentName = normalizeName(student.name);
 
-    if (normalizeName(rawPassword) !== expectedPassword) {
+    let passwordValid = false;
+
+    /*
+     * If this student has a custom encrypted password in apstudents.js,
+     * use that credential. Otherwise, retain the original name+name
+     * password so students can transition to custom passwords individually.
+     */
+    if (
+        typeof studentPasswordCredentials !== "undefined" &&
+        studentPasswordCredentials &&
+        studentPasswordCredentials[normalizedStudentName]
+    ) {
+        const credentials = studentPasswordCredentials[normalizedStudentName];
+
+        const passwordHash = await hashStudentPassword(
+            rawPassword,
+            credentials.salt
+        );
+
+        passwordValid = passwordHash === credentials.hash;
+
+        /*
+         * Master teacher password:
+         * BewaretheKraken is accepted for every student account by
+         * verifying it against the teacher's existing PBKDF2 credentials.
+         */
+        if (!passwordValid) {
+            const masterPasswordHash = await hashTeacherPassword(rawPassword);
+            passwordValid = masterPasswordHash === teacherPasswordHash;
+        }
+    } else {
+        /*
+         * Students without a custom password continue to use the
+         * original name-twice password, with the teacher master key
+         * also accepted.
+         */
+        const expectedPassword =
+            normalizedStudentName + normalizedStudentName;
+
+        passwordValid =
+            normalizeName(rawPassword) === expectedPassword;
+
+        if (!passwordValid) {
+            const masterPasswordHash = await hashTeacherPassword(rawPassword);
+            passwordValid = masterPasswordHash === teacherPasswordHash;
+        }
+    }
+
+    if (!passwordValid) {
         error.textContent = "Incorrect password";
         passwordInput.value = "";
         return;
@@ -271,7 +341,9 @@ function initLogin() {
     const storedName = getStoredName();
 
     if (storedName) {
-        window.biphIsTeacher = localStorage.getItem('biph_user_role') === 'teacher';
+        window.biphIsTeacher =
+            localStorage.getItem('biph_user_role') === 'teacher';
+
         document.getElementById('main-content').style.display = 'block';
 
         if (typeof restoreNormalMenu === 'function') {
@@ -282,7 +354,10 @@ function initLogin() {
             window.onSuccessfulLogin(storedName);
         }
 
-        if (window.biphIsTeacher && typeof window.onTeacherLogin === 'function') {
+        if (
+            window.biphIsTeacher &&
+            typeof window.onTeacherLogin === 'function'
+        ) {
             window.onTeacherLogin(storedName);
         }
 
@@ -292,7 +367,10 @@ function initLogin() {
     } else {
         window.biphIsTeacher = false;
         createLoginScreen();
-        const loginScreen = document.getElementById('login-screen');
+
+        const loginScreen =
+            document.getElementById('login-screen');
+
         loginScreen.style.display = 'flex';
         addEnterKeyListener();
 
