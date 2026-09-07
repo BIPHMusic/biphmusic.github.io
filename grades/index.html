@@ -12,1335 +12,9 @@
 
     <link rel="icon" href="../icons/BGicon.png">
     <link rel="stylesheet" href="../common-styles.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-
-    /* =========================================================
-       BASE / LAYOUT
-       ========================================================= */
-
-    body {
-        min-height: 100vh;
-        margin: 0;
-        padding-bottom: 80px;
-        color: #fff;
-    }
-
-    #main-content {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-    }
-
-    .container {
-        width: 94%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding-bottom: 30px;
-    }
-
-    .hidden {
-        display: none !important;
-    }
-
-
-    /* =========================================================
-       TEACHER TABS
-       ========================================================= */
-
-    .grades-tabs {
-        width: 94%;
-        max-width: 1100px;
-        margin: 0 auto 20px;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-
-        flex-wrap: nowrap;
-        overflow-x: auto;
-
-        scrollbar-width: none;
-    }
-
-    .grades-tabs::-webkit-scrollbar {
-        display: none;
-    }
-
-    .grades-tab {
-        flex: 0 1 auto;
-        white-space: nowrap;
-
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        background: rgba(255, 255, 255, 0.08);
-        color: rgba(255, 255, 255, 0.82);
-
-        border-radius: 30px;
-        padding: 10px 18px;
-
-        cursor: pointer;
-        font-size: clamp(10px, 1.35vw, 14px);
-
-        transition:
-            background 0.2s ease,
-            border-color 0.2s ease;
-    }
-
-    .grades-tab:hover {
-        background: rgba(255, 255, 255, 0.15);
-        color: #fff;
-        border-color: rgba(255, 255, 255, 0.35);
-    }
-
-    .grades-tab.active {
-        background: rgba(104, 169, 255, 0.507);
-        border-color: rgba(205, 227, 255, 0.55);
-        color: #fff;
-        box-shadow: 0 0 18px rgba(104, 169, 255, 0.08);
-    }
-
-
-    /* =========================================================
-       STUDENT DASHBOARD
-       ========================================================= */
-
-    .student-dashboard {
-        max-width: 920px;
-        margin: 0 auto;
-    }
-
-    .welcome-card h2 {
-        margin: 0 0 8px;
-        color: #fff;
-        font-size: 1.45rem;
-    }
-
-    .welcome-card p {
-        margin: 5px 0;
-        color: rgba(255, 255, 255, 0.82);
-    }
-
-    .imported-score strong {
-        color: #fff;
-    }
-
-    .no-records {
-        padding: 35px 20px;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.78);
-        background: rgba(255, 255, 255, 0.07);
-        border-radius: 18px;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    #student-chart-container {
-        position: relative;
-        height: 450px;
-        background: #fff;
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 20px;
-        box-sizing: border-box;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-    }
-
-    #student-chart-title {
-        text-align: center;
-        font-size: 21px;
-        font-weight: bold;
-        margin-bottom: 12px;
-        color: #222;
-    }
-
-    .quarter-display {
-        margin-top: 28px;
-    }
-
-    .quarter-display-title {
-        color: #fff;
-        text-align: center;
-        font-size: 1.45rem;
-        margin: 0 0 14px;
-    }
-
-
-    /* =========================================================
-       TEACHER PANELS / SEARCH
-       ========================================================= */
-
-    .teacher-panel {
-        width: 100%;
-    }
-
-    .teacher-search-container {
-        position: relative;
-        width: 90%;
-        max-width: 420px;
-        margin: 0 auto 14px;
-    }
-
-    #teacher-student-search {
-        width: 100%;
-        padding: 13px 42px 13px 16px;
-        font-size: 16px;
-        border: 2px dotted rgba(104, 169, 255, 0.45);
-        border-radius: 8px;
-        outline: none;
-        background: rgba(255, 255, 255, 0.079);
-        color: #fff;
-        box-sizing: border-box;
-        transition:
-            border-color 0.2s ease,
-            background 0.2s ease;
-    }
-
-    #teacher-student-search:focus {
-        border-color: rgba(104, 169, 255, 0.85);
-        background: rgba(255, 255, 255, 0.11);
-    }
-
-    #teacher-student-search::placeholder {
-        color: rgba(255, 255, 255, 0.62);
-    }
-
-    .teacher-clear-button {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: rgba(255, 255, 255, 0.62);
-        font-size: 18px;
-        background: none;
-        border: none;
-        padding: 4px 8px;
-        line-height: 1;
-        display: none;
-    }
-
-    .teacher-clear-button.visible {
-        display: block;
-    }
-
-    .teacher-clear-button:hover {
-        color: #fff;
-    }
-
-    .teacher-predictions {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: calc(100% + 4px);
-        background: rgba(35, 65, 95, 0.96);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        max-height: 240px;
-        overflow-y: auto;
-        z-index: 100;
-        display: none;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    .teacher-predictions.show {
-        display: block;
-    }
-
-    .teacher-prediction-item {
-        padding: 11px 16px;
-        cursor: pointer;
-        color: #fff;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        font-size: 14.5px;
-        transition: background 0.15s ease;
-    }
-
-    .teacher-prediction-item:hover,
-    .teacher-prediction-item.highlight {
-        background: rgba(104, 169, 255, 0.18);
-    }
-
-
-    /* =========================================================
-       TEACHER ROSTER
-       ========================================================= */
-
-    .teacher-roster {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 8px;
-        justify-content: center;
-        align-items: stretch;
-        width: 100%;
-        max-width: 1100px;
-        margin: 0 auto 22px;
-        padding: 0 8px;
-        overflow-x: auto;
-    }
-
-    .teacher-roster-student {
-        flex: 1 1 0;
-        min-width: 90px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 9px 6px;
-        border-radius: 12px;
-        border: 1.5px solid rgba(255, 255, 255, 0.14);
-        background: rgba(255, 255, 255, 0.06);
-        color: #fff;
-        cursor: pointer;
-        transition:
-            background 0.18s ease,
-            border-color 0.18s ease,
-            transform 0.18s ease;
-        text-align: center;
-        font-size: clamp(10px, 1.5vw, 13.5px);
-        line-height: 1.25;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .teacher-roster-student:hover {
-        background: rgba(104, 169, 255, 0.12);
-        border-color: rgba(104, 169, 255, 0.40);
-        transform: scale(1.03);
-    }
-
-    .teacher-roster-student.active {
-        background: rgba(104, 169, 255, 0.20);
-        border-color: rgba(104, 169, 255, 0.60);
-        color: #fff;
-        font-weight: 600;
-    }
-
-
-    /* =========================================================
-       QUARTERS
-       ========================================================= */
-
-    .quarter-section {
-        margin-bottom: 40px;
-        position: relative;
-    }
-
-    .quarter-header {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        margin-bottom: 14px;
-        padding-bottom: 6px;
-        border-bottom: 2px solid rgba(104, 169, 255, 0.28);
-    }
-
-    .quarter-title {
-        color: #d9eaff;
-        font-size: 1.55rem;
-        margin: 0;
-        letter-spacing: 0.5px;
-        text-align: center;
-    }
-
-    .copy-btn {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(104, 169, 255, 0.14);
-        color: #fff;
-        border: 1px solid rgba(104, 169, 255, 0.38);
-        border-radius: 8px;
-        padding: 6px 14px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        white-space: nowrap;
-        transition:
-            background 0.15s ease,
-            border-color 0.15s ease;
-    }
-
-    .copy-btn:hover {
-        background: rgba(104, 169, 255, 0.24);
-        border-color: rgba(104, 169, 255, 0.55);
-    }
-
-    .copy-btn.copied {
-        background: rgba(80, 180, 100, 0.35);
-        border-color: rgba(80, 180, 100, 0.6);
-        color: #d8ffe0;
-    }
-
-
-    /* =========================================================
-       TABLES
-       ========================================================= */
-
-    .table-wrapper {
-        overflow: auto;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(0, 0, 0, 0.25);
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-        font-size: clamp(10px, 1.35vw, 14.5px);
-    }
-
-    thead th {
-        background: rgba(255, 255, 255, 0.075);
-        color: #fff;
-        font-weight: 700;
-        text-align: center;
-        padding: 8px 4px;
-        border-bottom: 2px solid rgba(104, 169, 255, 0.25);
-        white-space: nowrap;
-        overflow: hidden;
-    }
-
-    tbody td {
-        text-align: center;
-        padding: 7px 3px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        color: #fff;
-        white-space: nowrap;
-        overflow: hidden;
-        vertical-align: top;
-    }
-
-    tbody tr:nth-child(even):not(.detail-row) {
-        background: rgba(255, 255, 255, 0.025);
-    }
-
-    tbody tr:hover:not(.detail-row) {
-        background: rgba(104, 169, 255, 0.07);
-    }
-
-    /*
-     * Weekly Avg is intentionally the one place where
-     * the gold/yellow accent remains.
-     */
-    .avg-cell {
-        font-weight: 700;
-        color: #e2c65a;
-        text-shadow: 0 0 10px rgba(226, 198, 90, 0.08);
-    }
-
-    .na {
-        color: rgba(255, 255, 255, 0.48);
-        font-style: italic;
-    }
-
-    .no-data {
-        text-align: center;
-        padding: 30px;
-        color: rgba(255, 255, 255, 0.78);
-        font-size: 16px;
-    }
-
-
-    /* =========================================================
-       WEEKLY AVERAGES — GENERAL ROW STYLING
-       ========================================================= */
-
-    table.transposed th.row-header {
-        text-align: left;
-        padding-left: 11px;
-        background: rgba(255, 255, 255, 0.055);
-        color: #fff;
-        font-weight: 600;
-        white-space: nowrap;
-        width: 10.8em;
-        min-width: 10.8em;
-        cursor: pointer;
-        user-select: none;
-        transition:
-            background 0.15s ease,
-            border-color 0.15s ease;
-    }
-
-    table.transposed th.row-header:hover {
-        background: rgba(104, 169, 255, 0.10);
-    }
-
-    table.transposed th.row-header.expandable::after {
-        content: " ▸";
-        font-size: 0.85em;
-        opacity: 0.7;
-    }
-
-    table.transposed th.row-header.expanded::after {
-        content: " ▾";
-    }
-
-    table.transposed th.row-header.non-expandable {
-        cursor: default;
-    }
-
-    table.transposed th.student-name {
-        text-align: left;
-        padding-left: 11px;
-        font-weight: 700;
-        color: #fff;
-        width: 10.8em;
-        min-width: 10.8em;
-    }
-
-    table.transposed .week-sub {
-        display: block;
-        font-weight: 400;
-        font-size: 0.85em;
-        color: rgba(255, 255, 255, 0.72);
-        margin-top: 1px;
-    }
-
-
-    /* =========================================================
-       EXERCISE ROW COLORS
-       
-       These are deliberately subtle. The exercise color is
-       used as a translucent wash + left accent rather than
-       a solid background, keeping all text highly legible.
-       ========================================================= */
-
-    table.transposed tr.exercise-row {
-        background: var(--exercise-bg);
-        transition:
-            background 0.18s ease,
-            box-shadow 0.18s ease;
-    }
-
-    table.transposed tr.exercise-row:hover {
-        background: var(--exercise-bg-hover);
-    }
-
-    table.transposed tr.exercise-row th.row-header {
-        background: var(--exercise-bg);
-        border-left: 4px solid var(--exercise-color);
-        color: #fff;
-    }
-
-    table.transposed tr.exercise-row th.row-header:hover {
-        background: var(--exercise-bg-hover);
-    }
-
-    table.transposed tr.exercise-row td {
-        background: var(--exercise-bg);
-    }
-
-    /*
-     * Expandable/detail rows inherit the exercise identity,
-     * but use an even lighter tint.
-     */
-    table.transposed tr.exercise-detail-row {
-        background: var(--exercise-detail-bg);
-    }
-
-    table.transposed tr.exercise-detail-row td,
-    table.transposed tr.exercise-detail-row th {
-        background: var(--exercise-detail-bg);
-        border-left-color: var(--exercise-color);
-    }
-
-    table.transposed tr.exercise-detail-row th.row-header {
-        border-left: 4px solid var(--exercise-color);
-        color: rgba(255, 255, 255, 0.72);
-    }
-
-    table.transposed tr.exercise-detail-row td {
-        color: rgba(255, 255, 255, 0.82);
-    }
-
-
-    /* =========================================================
-       FUTURE WEEKS
-       ========================================================= */
-
-    tr.detail-row {
-        display: none;
-    }
-
-    tr.detail-row.visible {
-        display: table-row;
-    }
-
-    th.future-week,
-    td.future-week {
-        opacity: 0.15;
-    }
-
-
-    /* =========================================================
-       DETAIL ROWS
-       ========================================================= */
-
-    tr.detail-row td,
-    tr.detail-row th {
-        font-size: 0.78em;
-        line-height: 1.3;
-        color: rgba(255, 255, 255, 0.75);
-        background: rgba(0, 0, 0, 0.14);
-        padding: 4px 3px 5px;
-    }
-
-    tr.detail-row th.row-header {
-        color: rgba(255, 255, 255, 0.68);
-        background: rgba(0, 0, 0, 0.2);
-        cursor: default;
-    }
-
-    .detail-list {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        align-items: center;
-    }
-
-    .detail-item {
-        white-space: nowrap;
-    }
-
-    .detail-empty {
-        color: rgba(255, 255, 255, 0.42);
-        font-style: italic;
-    }
-
-
-    /* =========================================================
-       INDIVIDUAL ASSIGNMENTS
-       ========================================================= */
-
-    .assignment-dashboard {
-        width: 100%;
-    }
-
-    .assignment-day {
-        margin-bottom: 24px;
-    }
-
-    .assignment-date {
-        color: #d9eaff;
-        font-size: 1.35rem;
-        font-weight: 600;
-        margin: 0 0 9px;
-        text-align: left;
-    }
-
-    .assignment-table {
-        min-width: 720px;
-    }
-
-    .assignment-table th:first-child {
-        width: 130px;
-    }
-
-    .assignment-table tbody tr {
-        transition:
-            background 0.18s ease,
-            box-shadow 0.18s ease;
-    }
-
-    /*
-     * Individual Assignments exercise rows.
-     *
-     * These classes/variables should be added by the renderer:
-     *   exercise-row
-     *   --exercise-color
-     *   --exercise-bg
-     *   --exercise-bg-hover
-     */
-
-    .assignment-table tr.exercise-row {
-        background: var(--exercise-bg);
-    }
-
-    .assignment-table tr.exercise-row:hover {
-        background: var(--exercise-bg-hover);
-    }
-
-    .assignment-table tr.exercise-row th:first-child {
-        background: var(--exercise-bg);
-        border-left: 4px solid var(--exercise-color);
-        color: #fff;
-        font-weight: 600;
-    }
-
-    .assignment-table tr.exercise-row td {
-        background: var(--exercise-bg);
-    }
-
-    .score-cell {
-        font-weight: 600;
-    }
-
-    .score-cell.missing {
-        color: rgba(255, 255, 255, 0.38);
-        font-weight: 400;
-    }
-
-    .score-cell.present {
-        color: #fff;
-    }
-
-
-    /* =========================================================
-       CACHE PANEL
-       ========================================================= */
-
-    .cache-panel {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-
-    .cache-status-card {
-        padding: 20px;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        margin-bottom: 18px;
-    }
-
-    .cache-status-card h3 {
-        color: #fff;
-        margin: 0 0 10px;
-    }
-
-    .cache-status {
-        padding: 13px 16px;
-        border-radius: 10px;
-        margin-bottom: 15px;
-        color: #fff;
-        font-weight: 600;
-    }
-
-    .cache-status.current {
-        background: rgba(76, 175, 80, 0.2);
-        border: 1px solid rgba(76, 175, 80, 0.45);
-    }
-
-    .cache-status.behind {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-    }
-
-    .cache-status.ahead {
-        background: rgba(54, 162, 235, 0.18);
-        border: 1px solid rgba(54, 162, 235, 0.42);
-    }
-
-    .cache-status.mixed {
-        background: rgba(255, 152, 0, 0.15);
-        border: 1px solid rgba(255, 152, 0, 0.34);
-    }
-
-    .cache-list {
-        margin: 8px 0 0;
-        padding-left: 22px;
-        color: rgba(255, 255, 255, 0.84);
-    }
-
-    .cache-list li {
-        margin: 5px 0;
-    }
-
-    .cache-actions {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-
-        flex-wrap: nowrap;
-        overflow-x: auto;
-
-        margin-top: 20px;
-        width: 100%;
-
-        scrollbar-width: none;
-    }
-
-    .cache-actions::-webkit-scrollbar {
-        display: none;
-    }
-
-    .cache-action {
-        flex: 0 0 auto;
-        white-space: nowrap;
-
-        border: none;
-        border-radius: 30px;
-
-        padding: 11px 15px;
-
-        cursor: pointer;
-
-        font-size: clamp(10px, 1.25vw, 14px);
-        font-weight: 600;
-
-        background: rgba(255, 255, 255, 0.14);
-        color: #fff;
-    }
-
-
-    .cache-action:hover {
-        background: rgba(255, 255, 255, 0.24);
-    }
-
-    .cache-action.danger {
-        background: rgba(211, 47, 47, 0.35);
-    }
-
-    .cache-action.danger:hover {
-        background: rgba(211, 47, 47, 0.52);
-    }
-
-    .cache-action.primary {
-        background: rgba(104, 169, 255, 0.18);
-        border: 1px solid rgba(104, 169, 255, 0.28);
-    }
-
-    .cache-action.primary:hover {
-        background: rgba(104, 169, 255, 0.30);
-    }
-
-    .cache-code {
-        width: 100%;
-        max-height: 360px;
-        overflow: auto;
-        box-sizing: border-box;
-        padding: 15px;
-        border-radius: 10px;
-        background: rgba(0, 0, 0, 0.35);
-        color: #d5ffe4;
-        font-family:
-            ui-monospace,
-            SFMono-Regular,
-            Menlo,
-            Monaco,
-            Consolas,
-            monospace;
-        font-size: 12px;
-        line-height: 1.45;
-        white-space: pre-wrap;
-        word-break: break-word;
-    }
-
-
-    /* =========================================================
-       MANUAL SCORE ENTRY
-       ========================================================= */
-
-    .score-entry-panel {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .score-entry-search-container {
-        position: relative;
-        width: 90%;
-        max-width: 600px;
-        margin: 20px auto 12px;
-    }
-
-    #score-search-bar {
-        width: 100%;
-        padding: 15px;
-        font-size: 16px;
-        border: 2px dotted rgba(104, 169, 255, 0.543);
-        border-radius: 8px;
-        outline: none;
-        background: rgba(255, 255, 255, 0.079);
-        color: #fff;
-        box-sizing: border-box;
-    }
-
-    #score-search-bar::placeholder {
-        color: rgba(255, 255, 255, 0.64);
-    }
-
-    #score-search-bar:focus {
-        border-color: #fff;
-    }
-
-    .score-search-clear {
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: rgba(255, 255, 255, 0.64);
-        font-size: 18px;
-        background: none;
-        border: none;
-        padding: 4px 8px;
-    }
-
-    .score-search-clear:hover {
-        color: #fff;
-    }
-
-    .score-predictions {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: calc(100% + 4px);
-        background: rgba(35, 65, 95, 0.97);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        max-height: 240px;
-        overflow-y: auto;
-        z-index: 100;
-        display: none;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    .score-predictions.show {
-        display: block;
-    }
-
-    .score-prediction-item {
-        padding: 12px 16px;
-        cursor: pointer;
-        color: #fff;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .score-prediction-item:hover,
-    .score-prediction-item.highlight {
-        background: rgba(104, 169, 255, 0.25);
-    }
-
-    .score-form-card {
-        width: 90%;
-        max-width: 520px;
-        margin: 24px auto;
-        background: rgba(255, 255, 255, 0.09);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 20px;
-        padding: 28px 24px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
-    }
-
-    .selected-student {
-        text-align: center;
-        font-size: 1.25em;
-        color: #a8d4ff;
-        margin-bottom: 22px;
-        padding: 10px;
-        background: rgba(104, 169, 255, 0.12);
-        border-radius: 12px;
-        border: 1px solid rgba(104, 169, 255, 0.3);
-    }
-
-    .score-field {
-        margin-bottom: 18px;
-    }
-
-    .score-field label {
-        display: block;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.95em;
-        margin-bottom: 6px;
-    }
-
-    .score-field input[type="date"],
-    .score-field input[type="text"] {
-        width: 100%;
-        padding: 12px 14px;
-        font-size: 16px;
-        border: 2px solid rgba(104, 169, 255, 0.35);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.08);
-        color: #fff;
-        outline: none;
-        box-sizing: border-box;
-        appearance: none;
-    }
-
-    .score-field input:focus {
-        border-color: #fff;
-    }
-
-    input[type="date"]::-webkit-calendar-picker-indicator {
-        display: none;
-    }
-
-    .exercise-options {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        outline: none;
-        border-radius: 14px;
-    }
-
-    .exercise-btn {
-        padding: 14px 12px;
-        border-radius: 12px;
-        border: 2px solid transparent;
-        background: rgba(255, 255, 255, 0.08);
-        color: #fff;
-        font-size: 1em;
-        cursor: pointer;
-        text-align: center;
-        font-weight: 500;
-    }
-
-    .exercise-btn:hover {
-        background: rgba(255, 255, 255, 0.16);
-    }
-
-    .exercise-btn.selected {
-        border-color: currentColor;
-        background: rgba(255, 255, 255, 0.18);
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
-    }
-
-    .score-hint {
-        font-size: 0.8em;
-        color: rgba(255, 255, 255, 0.68);
-        margin-top: 6px;
-    }
-
-    .percentage-preview {
-        margin-top: 8px;
-        font-size: 1.1em;
-        color: #4BC0C0;
-        min-height: 1.4em;
-    }
-
-    .percentage-preview.error {
-        color: #FF6384;
-    }
-
-    .score-btn-row {
-        display: flex;
-        gap: 12px;
-        margin-top: 24px;
-    }
-
-    .score-btn-row button {
-        flex: 1;
-        padding: 14px;
-        font-size: 1.1em;
-        border-radius: 50px;
-        border: none;
-        cursor: pointer;
-        font-weight: 500;
-    }
-
-    .btn-submit {
-        background: rgba(76, 175, 80, 0.72);
-        color: #fff;
-    }
-
-    .btn-submit:hover {
-        background: rgba(76, 175, 80, 0.95);
-    }
-
-    .btn-submit:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-
-    .btn-clear {
-        background: rgba(255, 255, 255, 0.12);
-        color: #fff;
-    }
-
-    .btn-clear:hover {
-        background: rgba(255, 255, 255, 0.25);
-    }
-
-    .drop-zone {
-        width: min(90%, 600px);
-        min-height: 0;
-        max-height: 0;
-        margin: 0 auto;
-        padding: 0;
-        box-sizing: border-box;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 5px;
-
-        overflow: hidden;
-        opacity: 0;
-        pointer-events: none;
-
-        border: 2px dashed transparent;
-        border-radius: 16px;
-
-        color: rgba(255, 255, 255, 0.72);
-        background: rgba(255, 255, 255, 0.04);
-
-        transition:
-            max-height 0.2s ease,
-            min-height 0.2s ease,
-            margin 0.2s ease,
-            padding 0.2s ease,
-            opacity 0.2s ease,
-            border-color 0.2s ease,
-            background 0.2s ease,
-            box-shadow 0.2s ease;
-    }
-
-    .drop-zone.active {
-        min-height: 140px;
-        max-height: 180px;
-        margin: 15px auto 20px;
-        padding: 18px;
-
-        opacity: 1;
-        pointer-events: auto;
-
-        border-color: #36A2EB;
-        background: rgba(54, 162, 235, 0.12);
-        box-shadow:
-            0 0 0 4px rgba(54, 162, 235, 0.12);
-
-        color: #a8d4ff;
-    }
-
-    .drop-zone strong {
-        font-size: 1.1rem;
-    }
-
-    .drop-zone span {
-        font-size: 0.82em;
-        color: rgba(255, 255, 255, 0.65);
-    }
-
-
-
-    /* =========================================================
-       PREVIEW
-       ========================================================= */
-
-    #previewOverlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.65);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 3000;
-        padding: 20px;
-        box-sizing: border-box;
-    }
-
-    #previewOverlay.show {
-        display: flex;
-    }
-
-    .preview-box {
-        background: rgba(25, 40, 55, 0.98);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 16px;
-        padding: 24px;
-        width: 100%;
-        max-width: 560px;
-        max-height: 85vh;
-        overflow: auto;
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
-    }
-
-    .preview-box h3 {
-        margin: 0 0 14px;
-        color: #fff;
-        text-align: center;
-    }
-
-    .preview-box pre {
-        background: rgba(0, 0, 0, 0.35);
-        border-radius: 10px;
-        padding: 16px;
-        color: #a8e6cf;
-        font-size: 13px;
-        line-height: 1.45;
-        overflow-x: auto;
-        white-space: pre-wrap;
-        word-break: break-word;
-        margin: 0 0 18px;
-        user-select: text;
-    }
-
-    .preview-actions {
-        display: flex;
-        gap: 10px;
-    }
-
-    .preview-actions button {
-        flex: 1;
-        padding: 12px;
-        border-radius: 40px;
-        border: none;
-        font-size: 1em;
-        cursor: pointer;
-    }
-
-    .btn-copy {
-        background: #36A2EB;
-        color: #fff;
-    }
-
-    .btn-close {
-        background: rgba(255, 255, 255, 0.15);
-        color: #fff;
-    }
-
-
-    /* =========================================================
-       TOAST / LOGO
-       ========================================================= */
-
-    .copy-toast {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%) scale(0);
-        background: #009688;
-        color: #fff;
-        padding: 14px 28px;
-        border-radius: 40px;
-        z-index: 4000;
-        transition:
-            transform 0.35s
-            cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .copy-toast.show {
-        transform: translateX(-50%) scale(1);
-    }
-
-    .logocontainer {
-        margin-top: 40px;
-        position: relative;
-        z-index: 2;
-    }
-
-
-    /* =========================================================
-       MOBILE
-       ========================================================= */
-
-    @media (max-width: 700px) {
-
-        .grades-tabs {
-            gap: 6px;
-        }
-
-        .grades-tab {
-            padding: 9px 12px;
-            font-size: 12px;
-        }
-
-        #student-chart-container {
-            height: 360px;
-            padding: 12px;
-        }
-
-        .quarter-title {
-            font-size: 1.25rem;
-        }
-
-        .copy-btn {
-            position: static;
-            transform: none;
-            margin-left: 10px;
-            padding: 5px 10px;
-        }
-
-        .quarter-header {
-            justify-content: space-between;
-        }
-
-        .score-btn-row {
-            flex-direction: column;
-        }
-    }
-
-        .imported-grade-greeting {
-            text-align: center;
-            color: #fff;
-            font-size: 1.05rem;
-            line-height: 1.45;
-            margin: 0 0 14px;
-        }
-
-        .imported-grade-greeting strong {
-            color: #d9eaff;
-        }
-
-        .cache-new-entries {
-            margin-top: 20px;
-            padding: 16px 18px;
-            border-radius: 12px;
-            background: rgba(54, 162, 235, 0.10);
-            border: 1px solid rgba(54, 162, 235, 0.28);
-        }
-
-        .cache-new-entries h3 {
-            margin: 0 0 8px;
-            color: #d9eaff;
-        }
-
-        .cache-new-entries p {
-            margin: 0 0 10px;
-            color: rgba(255, 255, 255, 0.72);
-        }
-
-        .cache-missing-entries {
-            margin-top: 20px;
-            padding: 16px 18px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-        }
-
-        .cache-missing-entries h3 {
-            margin: 0 0 8px;
-            color: rgba(255, 255, 255, 0.88);
-        }
-
-        .cache-missing-entries p {
-            margin: 0 0 10px;
-            color: rgba(255, 255, 255, 0.72);
-        }
-
-        /* =========================================================
-           MR. TUBBS / TEACHER KEYBOARD UI FIXES
-           ========================================================= */
-
-        /*
-         * Weekly Averages search is a real teacher control.
-         * Keep it visible even if a shared stylesheet supplies
-         * a conflicting .teacher-search-container rule.
-         */
-        #teacher-weekly-tab .teacher-search-container {
-            position: relative;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-
-        .teacher-prediction-item.keyboard-highlight,
-        .score-prediction-item.keyboard-highlight {
-            background: rgba(104, 169, 255, 0.18);
-        }
-
-</style>
 
 </head>
 
@@ -1376,7 +50,10 @@
                     Weekly Averages
                 </button>
                 <button type="button" class="grades-tab" data-tab="manual" tabindex="-1">
-                    Manual Entry
+                    + Minor
+                </button>
+                <button type="button" class="grades-tab" data-tab="major" tabindex="-1">
+                    + Major
                 </button>
                 <button type="button" class="grades-tab" data-tab="cache" tabindex="-1">
                     Records Cache
@@ -1413,7 +90,27 @@
                     <div id="teacher-predictions" class="teacher-predictions"></div>
                 </div>
 
-                <div class="teacher-roster" id="teacher-roster"></div>
+                <div class="teacher-roster-controls">
+                    <button
+                        type="button"
+                        class="teacher-roster-stepper"
+                        id="teacher-roster-prev"
+                        aria-label="Previous student"
+                        title="Previous student"
+                        tabindex="-1"
+                    >‹</button>
+
+                    <div class="teacher-roster" id="teacher-roster"></div>
+
+                    <button
+                        type="button"
+                        class="teacher-roster-stepper"
+                        id="teacher-roster-next"
+                        aria-label="Next student"
+                        title="Next student"
+                        tabindex="-1"
+                    >›</button>
+                </div>
 
                 <div id="teacher-weekly-results"></div>
             </section>
@@ -1446,8 +143,28 @@
                             Enter Score
                         </h2>
 
-                        <div class="selected-student" id="score-selected-name">
-                            Select a student
+                        <div class="selected-student-stepper">
+                            <button
+                                type="button"
+                                class="score-student-stepper"
+                                id="score-student-prev"
+                                aria-label="Previous student"
+                                title="Previous student"
+                                tabindex="-1"
+                            >‹</button>
+
+                            <div class="selected-student" id="score-selected-name">
+                                Select a student
+                            </div>
+
+                            <button
+                                type="button"
+                                class="score-student-stepper"
+                                id="score-student-next"
+                                aria-label="Next student"
+                                title="Next student"
+                                tabindex="-1"
+                            >›</button>
                         </div>
 
                         <div class="score-field">
@@ -1514,6 +231,121 @@
                                 id="score-btn-submit"
                                 disabled
                                 tabindex="4"
+                            >
+                                Add to Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="teacher-major-tab" class="teacher-panel hidden">
+                <div class="major-entry-panel">
+
+                    <div class="score-entry-search-container">
+                        <input
+                            type="text"
+                            id="major-student-search-bar"
+                            placeholder="Type student name…"
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button
+                            type="button"
+                            class="score-search-clear"
+                            id="major-student-search-clear"
+                            aria-label="Clear"
+                            tabindex="-1"
+                        >
+                            ×
+                        </button>
+                        <div id="major-student-predictions" class="score-predictions"></div>
+                    </div>
+
+                    <div class="score-form-card major-form-card">
+                        <h2 style="color: #fff; text-align: center; margin-top: 0;">
+                            Major Assessment
+                        </h2>
+
+                        <div class="selected-student-stepper">
+                            <button
+                                type="button"
+                                class="score-student-stepper"
+                                id="major-student-prev"
+                                aria-label="Previous student"
+                                title="Previous student"
+                                tabindex="-1"
+                            >‹</button>
+
+                            <div class="selected-student" id="major-selected-student-name">
+                                Select a student
+                            </div>
+
+                            <button
+                                type="button"
+                                class="score-student-stepper"
+                                id="major-student-next"
+                                aria-label="Next student"
+                                title="Next student"
+                                tabindex="-1"
+                            >›</button>
+                        </div>
+
+                        <div class="score-field">
+                            <label for="major-date-input">Date</label>
+                            <input type="date" id="major-date-input">
+                        </div>
+
+                        <div class="score-field">
+                            <label for="major-assessment-name">Assessment Name</label>
+                            <input
+                                type="text"
+                                id="major-assessment-name"
+                                placeholder="e.g. First Quarter Exam"
+                                autocomplete="off"
+                            >
+                            <div id="major-assessment-predictions" class="major-predictions"></div>
+                            <div class="score-hint">
+                                Assessment names are remembered for future grading.
+                            </div>
+                        </div>
+
+                        <div class="major-criteria-header">
+                            <div>Criteria</div>
+                            <div>Score</div>
+                        </div>
+
+                        <div id="major-criteria-list" class="major-criteria-list"></div>
+
+                        <div class="major-criteria-actions">
+                            <button
+                                type="button"
+                                class="btn-clear"
+                                id="major-add-criterion"
+                            >
+                                + Criterion
+                            </button>
+                        </div>
+
+                        <div class="major-composite-row">
+                            <div class="major-composite-label">Composite Score</div>
+                            <div class="major-composite-value" id="major-composite-score">—</div>
+                        </div>
+
+                        <div class="score-btn-row">
+                            <button
+                                type="button"
+                                class="btn-clear"
+                                id="major-btn-reset"
+                            >
+                                Clear
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn-submit"
+                                id="major-btn-submit"
+                                disabled
                             >
                                 Add to Cache
                             </button>
@@ -1618,6 +450,7 @@
 
         const CACHE_KEY = "biph_grades_records_cache_v1";
         const CACHE_VERSION_KEY = "biph_grades_records_cache_version_v1";
+        const MAJOR_DEFINITIONS_KEY = "biph_grades_major_assessment_definitions_v1";
 
         let actualRecords = [];
         let cachedRecords = [];
@@ -1631,6 +464,10 @@
         let currentlyExpanded = null;
 
         let scoreSelectedStudent = null;
+        let scoreRememberedDate = "";
+        let majorSelectedStudent = null;
+        let majorRememberedDate = "";
+        let majorAssessmentDefinition = null;
         let scoreSelectedExercise = null;
         let scoreComputedPercentage = null;
         let importedTermsToReview = [];
@@ -1740,6 +577,7 @@
                 String(record.time || "").trim(),
                 String(record.percentage ?? "").trim(),
                 normalizeExercise(record.exercise),
+                String(record.assessment || "").trim(),
                 JSON.stringify(record.termsToReview || [])
             ].join("|");
         }
@@ -1752,7 +590,8 @@
                 String(record.date || "").trim(),
                 String(record.time || "").trim(),
                 String(record.percentage ?? "").trim(),
-                normalizeExercise(record.exercise)
+                normalizeExercise(record.exercise),
+                String(record.assessment || "").trim()
             ].join("|");
         }
 
@@ -1932,7 +771,12 @@
 
         function formatRecordDescription(record) {
             const exercise = normalizeExercise(record.exercise);
-            return `${record.student} · ${exercise} · ${record.percentage}% (${formatDate(record.date)})`;
+            const assessment =
+                exercise === "Major Assessment" && record.assessment
+                    ? ` · ${record.assessment}`
+                    : "";
+
+            return `${record.student} · ${exercise}${assessment} · ${record.percentage}% (${formatDate(record.date)})`;
         }
 
         function formatRecordsJS(recordsSource) {
@@ -1957,6 +801,18 @@
                 lines.push(
                     `        exercise: ${JSON.stringify(record.exercise)},`
                 );
+
+                /*
+                 * Major assessments need a human-readable assessment
+                 * identifier in addition to exercise: "Major Assessment".
+                 * Keep this field when exporting/copying records.js.
+                 */
+                if (record.assessment) {
+                    lines.push(
+                        `        assessment: ${JSON.stringify(record.assessment)},`
+                    );
+                }
+
                 lines.push(
                     `        termsToReview: ${JSON.stringify(record.termsToReview || [])}`
                 );
@@ -2178,6 +1034,7 @@
             renderTeacherWeekly();
             renderCachePanel();
             initializeManualEntry();
+            initializeMajorEntry();
 
             showTeacherTab("assignments");
         }
@@ -2343,10 +1200,12 @@
         }
     }
 
-    createStudentChart(
-        myRecords,
-        studentName
-    );
+    if (myRecords.length > 0) {
+        createStudentChart(
+            myRecords,
+            studentName
+        );
+    }
 
     ///////mayyybe this next part is unnecessary
 
@@ -3822,244 +2681,231 @@
         }
 
         function renderStudentCurrentQuarter(studentName) {
-    const container =
-        document.getElementById(
-            "student-weekly-container"
-        );
+            const container =
+                document.getElementById(
+                    "student-weekly-container"
+                );
 
-    const currentQuarter =
-        getCurrentQuarter();
+            const currentQuarter =
+                getCurrentQuarter();
 
-    /*
-     * Student view deliberately shows only:
-     * - the current quarter
-     * - weeks that have already started
-     * - and only through the most recent week
-     *   containing actual records for that student.
-     */
-    let weeks =
-        WEEKS.filter(
-            week =>
-                week.q === currentQuarter &&
-                !isFutureWeek(week)
-        );
+            let weeks =
+                WEEKS.filter(
+                    week =>
+                        week.q === currentQuarter &&
+                        !isFutureWeek(week)
+                );
 
-    const studentRecords =
-        getStudentRecords(studentName);
+            const studentRecords =
+                getStudentRecords(studentName);
 
-    const datesWithRecords =
-        new Set(
-            studentRecords.map(
-                record => record.date
-            )
-        );
-
-    weeks = weeks.filter(
-        week =>
-            week.days.some(
-                day =>
-                    datesWithRecords.has(
-                        day.date
+            const datesWithRecords =
+                new Set(
+                    studentRecords.map(
+                        record => record.date
                     )
-            )
-    );
+                );
 
-    if (weeks.length === 0) {
-        container.innerHTML = `
-            <div class="no-records">
-                No Weekly Grades have been recorded
-                for the current quarter yet.
-            </div>
-        `;
-
-        return;
-    }
-
-    const grades =
-        weeks.map(
-            week =>
-                computeWeekGrades(
-                    studentName,
-                    week
-                )
-        );
-
-    let html = `
-        <div class="quarter-section">
-            <div class="quarter-header">
-                <h2 class="quarter-title">
-                    ${QUARTER_NAMES[currentQuarter]}
-                </h2>
-            </div>
-
-            <div class="table-wrapper">
-                <table class="transposed">
-                    <thead>
-                        <tr>
-                            <th class="student-name">
-                                ${escapeHTML(studentName)}
-                            </th>
-    `;
-
-    weeks.forEach(week => {
-        html += `
-            <th>
-                ${weekHeader(week)}
-            </th>
-        `;
-    });
-
-    html += `
-                        </tr>
-                    </thead>
-                    <tbody>
-    `;
-
-    ALL_METRICS.forEach(metric => {
-        const isAverage =
-            metric === "Weekly Avg";
-
-        const expandable =
-            EXPANDABLE_METRICS.has(
-                metric
+            weeks = weeks.filter(
+                week =>
+                    week.days.some(
+                        day =>
+                            datesWithRecords.has(
+                                day.date
+                            )
+                    )
             );
 
-        const headerClass =
-            expandable
-                ? "row-header expandable"
-                : "row-header non-expandable";
+            let minorsHTML = "";
 
-        /*
-         * Give each exercise its own subtle row tint.
-         * The color comes directly from EXERCISES, so:
-         *
-         * Vocab          → #36A2EB
-         * Sight Singing  → #FF6384
-         * MCQs           → #FFCE56
-         * Ear Training   → #4BC0C0
-         *
-         * Participation and Weekly Avg remain neutral.
-         */
-        const rowColor =
-            EXERCISES[metric] || null;
+            if (weeks.length === 0) {
+                minorsHTML = `
+                    <div class="no-records">
+                        No Weekly Grades have been recorded
+                        for the current quarter yet.
+                    </div>
+                `;
+            } else {
+                const grades =
+                    weeks.map(
+                        week =>
+                            computeWeekGrades(
+                                studentName,
+                                week
+                            )
+                    );
 
-        const rowStyle =
-            rowColor
-                ? `
-                    style="
-                        --exercise-color: ${rowColor};
-                        --exercise-bg: ${rowColor}18;
-                        --exercise-bg-hover: ${rowColor}28;
-                    "
-                `
-                : "";
-
-        html += `
-            <tr
-                ${rowStyle}
-                class="${rowColor ? "exercise-row" : ""}"
-            >
-                <th
-                    class="${headerClass}"
-                    data-q="${currentQuarter}"
-                    data-metric="${escapeHTML(metric)}"
-                >
-                    ${escapeHTML(metric)}
-                </th>
-        `;
-
-        grades.forEach(grade => {
-            const value =
-                grade[metric];
-
-            const className =
-                isAverage
-                    ? "avg-cell"
-                    : "";
-
-            html += `
-                <td class="${className}">
-                    ${fmt(value)}
-                </td>
-            `;
-        });
-
-        html += `
-            </tr>
-        `;
-
-        if (expandable) {
-            html += `
-                <tr
-                    class="detail-row ${
-                        rowColor
-                            ? "exercise-detail-row"
-                            : ""
-                    }"
-                    data-q="${currentQuarter}"
-                    data-metric="${escapeHTML(metric)}"
-                    ${
-                        rowColor
-                            ? `style="
-                                --exercise-color: ${rowColor};
-                                --exercise-bg: ${rowColor}0F;
-                              "`
-                            : ""
-                    }
-                >
-                    <th class="row-header"></th>
-            `;
-
-            grades.forEach(grade => {
-                const items =
-                    grade._details &&
-                    grade._details[metric]
-                        ? grade._details[metric]
-                        : [];
-
-                let content =
-                    '<span class="detail-empty">—</span>';
-
-                if (items.length > 0) {
-                    content = `
-                        <div class="detail-list">
-                            ${items.map(item => `
-                                <span class="detail-item">
-                                    ${escapeHTML(item.label)}:
-                                    ${escapeHTML(item.pct)}%
-                                </span>
-                            `).join("")}
+                let html = `
+                    <div class="quarter-section">
+                        <div class="quarter-header">
+                            <h2 class="quarter-title">
+                                ${QUARTER_NAMES[currentQuarter]}
+                            </h2>
                         </div>
+
+                        <div class="table-wrapper">
+                            <table class="transposed">
+                                <thead>
+                                    <tr>
+                                        <th class="student-name">
+                                            ${escapeHTML(studentName)}
+                                        </th>
+                `;
+
+                weeks.forEach(week => {
+                    html += `
+                        <th>
+                            ${weekHeader(week)}
+                        </th>
                     `;
-                }
+                });
 
                 html += `
-                    <td>
-                        ${content}
-                    </td>
+                                    </tr>
+                                </thead>
+                                <tbody>
                 `;
-            });
 
-            html += `
-                </tr>
+                ALL_METRICS.forEach(metric => {
+                    const isAverage =
+                        metric === "Weekly Avg";
+
+                    const expandable =
+                        EXPANDABLE_METRICS.has(
+                            metric
+                        );
+
+                    const headerClass =
+                        expandable
+                            ? "row-header expandable"
+                            : "row-header non-expandable";
+
+                    const rowColor =
+                        EXERCISES[metric] || null;
+
+                    const rowStyle =
+                        rowColor
+                            ? `
+                                style="
+                                    --exercise-color: ${rowColor};
+                                    --exercise-bg: ${rowColor}18;
+                                    --exercise-bg-hover: ${rowColor}28;
+                                "
+                            `
+                            : "";
+
+                    html += `
+                        <tr
+                            ${rowStyle}
+                            class="${rowColor ? "exercise-row" : ""}"
+                        >
+                            <th
+                                class="${headerClass}"
+                                data-q="${currentQuarter}"
+                                data-metric="${escapeHTML(metric)}"
+                            >
+                                ${escapeHTML(metric)}
+                            </th>
+                    `;
+
+                    grades.forEach(grade => {
+                        const value = grade[metric];
+                        const className =
+                            isAverage
+                                ? "avg-cell"
+                                : "";
+
+                        html += `
+                            <td class="${className}">
+                                ${fmt(value)}
+                            </td>
+                        `;
+                    });
+
+                    html += `</tr>`;
+
+                    if (expandable) {
+                        html += `
+                            <tr
+                                class="detail-row ${
+                                    rowColor
+                                        ? "exercise-detail-row"
+                                        : ""
+                                }"
+                                data-q="${currentQuarter}"
+                                data-metric="${escapeHTML(metric)}"
+                                ${
+                                    rowColor
+                                        ? `style="
+                                            --exercise-color: ${rowColor};
+                                            --exercise-bg: ${rowColor}0F;
+                                        "`
+                                        : ""
+                                }
+                            >
+                                <th class="row-header"></th>
+                        `;
+
+                        grades.forEach(grade => {
+                            const items =
+                                grade._details &&
+                                grade._details[metric]
+                                    ? grade._details[metric]
+                                    : [];
+
+                            let content =
+                                '<span class="detail-empty">—</span>';
+
+                            if (items.length > 0) {
+                                content = `
+                                    <div class="detail-list">
+                                        ${items.map(item => `
+                                            <span class="detail-item">
+                                                ${escapeHTML(item.label)}:
+                                                ${escapeHTML(item.pct)}%
+                                            </span>
+                                        `).join("")}
+                                    </div>
+                                `;
+                            }
+
+                            html += `<td>${content}</td>`;
+                        });
+
+                        html += `</tr>`;
+                    }
+                });
+
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                minorsHTML = html;
+            }
+
+            const majorsHTML =
+                buildMajorAssessmentsHTML(
+                    studentName,
+                    false
+                );
+
+            container.innerHTML = `
+                <div class="weekly-grade-area minors-area">
+                    <div class="weekly-area-title">Minors</div>
+                    ${minorsHTML}
+                </div>
+
+                <div class="weekly-grade-area majors-area">
+                    <div class="weekly-area-title">Majors</div>
+                    ${majorsHTML}
+                </div>
             `;
+
+            attachExpandableHandlers(container);
         }
-    });
-
-    html += `
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    `;
-
-    container.innerHTML = html;
-
-    attachExpandableHandlers(
-        container
-    );
-}
-
 
         function showTeacherTab(tabName) {
             const tabs = {
@@ -4069,6 +2915,8 @@
                     "teacher-weekly-tab",
                 manual:
                     "teacher-manual-tab",
+                major:
+                    "teacher-major-tab",
                 cache:
                     "teacher-cache-tab"
             };
@@ -4111,6 +2959,10 @@
 
             if (tabName === "manual") {
                 initializeManualEntry();
+            }
+
+            if (tabName === "major") {
+                initializeMajorEntry();
             }
         }
 
@@ -4372,7 +3224,6 @@
                 `;
 
                 buildTeacherRoster();
-
                 return;
             }
 
@@ -4388,7 +3239,7 @@
                 byQuarter[week.q].push(week);
             });
 
-            let html = "";
+            let minorsHTML = "";
 
             [1, 2, 3, 4].forEach(q => {
                 const quarterWeeks =
@@ -4417,7 +3268,7 @@
                             )
                     );
 
-                html += buildWeeklyQuarterHTML(
+                minorsHTML += buildWeeklyQuarterHTML(
                     teacherSelectedStudent,
                     q,
                     visibleWeeks,
@@ -4426,19 +3277,38 @@
                 );
             });
 
-            if (!html) {
-                html = `
+            if (!minorsHTML) {
+                minorsHTML = `
                     <div class="no-data">
                         No Weekly Grades are available yet.
                     </div>
                 `;
             }
 
-            container.innerHTML = html;
+            const majorsHTML =
+                buildMajorAssessmentsHTML(
+                    teacherSelectedStudent,
+                    true
+                );
 
-            attachWeeklyControls(
-                container
-            );
+            container.innerHTML = `
+                <div class="weekly-grade-area minors-area">
+                    <div class="weekly-area-title">
+                        Minors
+                    </div>
+                    ${minorsHTML}
+                </div>
+
+                <div class="weekly-grade-area majors-area">
+                    <div class="weekly-area-title">
+                        Majors
+                    </div>
+                    ${majorsHTML}
+                </div>
+            `;
+
+            attachWeeklyControls(container);
+            attachMajorAssessmentControls(container);
         }
 
 
@@ -4641,62 +3511,152 @@
 
 
         function buildTeacherRoster() {
-    const roster =
-        document.getElementById(
-            "teacher-roster"
-        );
-
-    if (!roster) {
-        return;
-    }
-
-    roster.innerHTML = "";
-
-    getStudentsForTeacher()
-        .forEach(student => {
-            const button =
-                document.createElement(
-                    "button"
+            const roster =
+                document.getElementById(
+                    "teacher-roster"
                 );
 
-            button.type = "button";
-            button.className =
-                "teacher-roster-student";
+            if (!roster) {
+                return;
+            }
 
-            button.dataset.name =
-                student;
+            roster.innerHTML = "";
 
-            button.textContent =
-                student;
+            const students =
+                getStudentsForTeacher();
 
-            button.title =
-                student;
-
-            /*
-             * Student roster buttons are mouse/click
-             * controls, but they should NOT participate
-             * in the normal Tab sequence.
-             */
-            button.tabIndex = -1;
-
-            button.classList.toggle(
-                "active",
-                student ===
-                    teacherSelectedStudent
-            );
-
-            button.addEventListener(
-                "click",
-                () => {
-                    selectTeacherStudent(
-                        student
+            students.forEach(student => {
+                const button =
+                    document.createElement(
+                        "button"
                     );
-                }
-            );
 
-            roster.appendChild(button);
-        });
-}
+                button.type = "button";
+                button.className =
+                    "teacher-roster-student";
+
+                button.dataset.name =
+                    student;
+
+                button.textContent =
+                    student;
+
+                button.title =
+                    student;
+
+                /*
+                 * Student roster buttons are mouse/click
+                 * controls, but they should NOT participate
+                 * in the normal Tab sequence.
+                 */
+                button.tabIndex = -1;
+
+                button.classList.toggle(
+                    "active",
+                    student ===
+                        teacherSelectedStudent
+                );
+
+                button.addEventListener(
+                    "click",
+                    () => {
+                        selectTeacherStudent(
+                            student
+                        );
+                    }
+                );
+
+                roster.appendChild(button);
+            });
+
+            updateTeacherStudentSteppers();
+        }
+
+        function updateTeacherStudentSteppers() {
+            const students =
+                getStudentsForTeacher();
+
+            const prev =
+                document.getElementById(
+                    "teacher-roster-prev"
+                );
+
+            const next =
+                document.getElementById(
+                    "teacher-roster-next"
+                );
+
+            const hasStudents =
+                students.length > 0;
+
+            if (prev) {
+                prev.disabled = !hasStudents;
+            }
+
+            if (next) {
+                next.disabled = !hasStudents;
+            }
+        }
+
+        function cycleTeacherStudent(direction) {
+            const students =
+                getStudentsForTeacher();
+
+            if (!students.length) {
+                return;
+            }
+
+            let index =
+                students.findIndex(
+                    student =>
+                        student ===
+                        teacherSelectedStudent
+                );
+
+            if (index < 0) {
+                index =
+                    direction > 0
+                        ? -1
+                        : 0;
+            }
+
+            index =
+                (index + direction + students.length) %
+                students.length;
+
+            selectTeacherStudent(
+                students[index]
+            );
+        }
+
+        function selectTeacherStudent(
+            student
+        ) {
+            teacherSelectedStudent =
+                student;
+
+            const input =
+                document.getElementById(
+                    "teacher-student-search"
+                );
+
+            const dropdown =
+                document.getElementById(
+                    "teacher-predictions"
+                );
+
+            if (input) {
+                input.value = student;
+            }
+
+            if (dropdown) {
+                dropdown.classList.remove(
+                    "show"
+                );
+            }
+
+            renderTeacherWeekly();
+        }
 
 
 function selectTeacherStudent(
@@ -5088,6 +4048,253 @@ function setupTeacherStudentSearch() {
                                 metric,
                                 root
                             );
+                        }
+                    );
+                });
+        }
+
+        function getMajorAssessmentRecords(
+            studentName
+        ) {
+            if (!studentName) {
+                return [];
+            }
+
+            return cachedRecords
+                .filter(record => {
+                    if (
+                        !record.student ||
+                        record.student.trim().toLowerCase() !==
+                            studentName.trim().toLowerCase()
+                    ) {
+                        return false;
+                    }
+
+                    return normalizeExercise(
+                        record.exercise
+                    ) === "Major Assessment";
+                })
+                .sort((a, b) => {
+                    const assessmentA =
+                        String(
+                            a.assessment ||
+                            a.title ||
+                            a.assignment ||
+                            ""
+                        ).trim();
+
+                    const assessmentB =
+                        String(
+                            b.assessment ||
+                            b.title ||
+                            b.assignment ||
+                            ""
+                        ).trim();
+
+                    const nameCompare =
+                        assessmentA.localeCompare(
+                            assessmentB
+                        );
+
+                    if (nameCompare !== 0) {
+                        return nameCompare;
+                    }
+
+                    if (a.date !== b.date) {
+                        return String(a.date || "")
+                            .localeCompare(
+                                String(b.date || "")
+                            );
+                    }
+
+                    return String(a.time || "")
+                        .localeCompare(
+                            String(b.time || "")
+                        );
+                });
+        }
+
+        function getMajorAssessmentName(
+            record
+        ) {
+            return String(
+                record.assessment ||
+                record.title ||
+                record.assignment ||
+                `Major Assessment — ${formatLongDate(record.date)}`
+            ).trim();
+        }
+
+        function buildMajorAssessmentTSV(
+            assessmentName,
+            records
+        ) {
+            const lines = [
+                [
+                    tsvField("Assessment"),
+                    tsvField("Date"),
+                    tsvField("Score")
+                ].join("\t")
+            ];
+
+            records.forEach(record => {
+                lines.push(
+                    [
+                        tsvField(assessmentName),
+                        tsvField(formatDate(record.date)),
+                        tsvField(`${record.percentage}%`)
+                    ].join("\t")
+                );
+            });
+
+            return lines.join("\n");
+        }
+
+        function buildMajorAssessmentsHTML(
+            studentName,
+            showCopy = false
+        ) {
+            const records =
+                getMajorAssessmentRecords(
+                    studentName
+                );
+
+            if (!records.length) {
+                return `
+                    <div class="majors-empty">
+                        No Major Assessments have been recorded for
+                        ${escapeHTML(studentName)} yet.
+                    </div>
+                `;
+            }
+
+            const groups = new Map();
+
+            records.forEach(record => {
+                const name =
+                    getMajorAssessmentName(
+                        record
+                    );
+
+                if (!groups.has(name)) {
+                    groups.set(name, []);
+                }
+
+                groups.get(name).push(
+                    record
+                );
+            });
+
+            let html = "";
+
+            groups.forEach(
+                (assessmentRecords, assessmentName) => {
+                    const encodedName =
+                        encodeURIComponent(
+                            assessmentName
+                        );
+
+                    html += `
+                        <div class="major-assessment-section">
+                            <div class="major-assessment-header">
+                                <h3 class="major-assessment-title">
+                                    ${escapeHTML(assessmentName)}
+                                </h3>
+
+                                ${showCopy ? `
+                                    <button
+                                        type="button"
+                                        class="copy-btn major-copy-btn"
+                                        data-major="${escapeHTML(encodedName)}"
+                                    >
+                                        Copy
+                                    </button>
+                                ` : ""}
+                            </div>
+
+                            <div class="table-wrapper">
+                                <table class="major-assessment-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Assessment</th>
+                                            <th>Date</th>
+                                            <th>Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${assessmentRecords.map(record => `
+                                            <tr>
+                                                <td>${escapeHTML(assessmentName)}</td>
+                                                <td>${escapeHTML(formatDate(record.date))}</td>
+                                                <td>${escapeHTML(record.percentage)}%</td>
+                                            </tr>
+                                        `).join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                }
+            );
+
+            return html;
+        }
+
+        function attachMajorAssessmentControls(
+            root
+        ) {
+            root
+                .querySelectorAll(
+                    ".major-copy-btn"
+                )
+                .forEach(button => {
+                    button.addEventListener(
+                        "click",
+                        async () => {
+                            const assessmentName =
+                                decodeURIComponent(
+                                    button.dataset.major ||
+                                        ""
+                                );
+
+                            const records =
+                                getMajorAssessmentRecords(
+                                    teacherSelectedStudent
+                                ).filter(
+                                    record =>
+                                        getMajorAssessmentName(
+                                            record
+                                        ) === assessmentName
+                                );
+
+                            const tsv =
+                                buildMajorAssessmentTSV(
+                                    assessmentName,
+                                    records
+                                );
+
+                            const success =
+                                await copyText(
+                                    tsv
+                                );
+
+                            if (success) {
+                                button.textContent =
+                                    "Copied!";
+
+                                button.classList.add(
+                                    "copied"
+                                );
+
+                                setTimeout(() => {
+                                    button.textContent =
+                                        "Copy";
+
+                                    button.classList.remove(
+                                        "copied"
+                                    );
+                                }, 1600);
+                            }
                         }
                     );
                 });
@@ -5739,6 +4946,66 @@ function setupTeacherStudentSearch() {
                 "score-drop-zone"
             );
 
+        const majorStudentSearchBar =
+            document.getElementById(
+                "major-student-search-bar"
+            );
+
+        const majorStudentSearchClear =
+            document.getElementById(
+                "major-student-search-clear"
+            );
+
+        const majorStudentPredictions =
+            document.getElementById(
+                "major-student-predictions"
+            );
+
+        const majorDateInput =
+            document.getElementById(
+                "major-date-input"
+            );
+
+        const majorAssessmentNameInput =
+            document.getElementById(
+                "major-assessment-name"
+            );
+
+        const majorAssessmentPredictions =
+            document.getElementById(
+                "major-assessment-predictions"
+            );
+
+        const majorCriteriaList =
+            document.getElementById(
+                "major-criteria-list"
+            );
+
+        const majorAddCriterionButton =
+            document.getElementById(
+                "major-add-criterion"
+            );
+
+        const majorCompositeScore =
+            document.getElementById(
+                "major-composite-score"
+            );
+
+        const majorBtnSubmit =
+            document.getElementById(
+                "major-btn-submit"
+            );
+
+        const majorBtnReset =
+            document.getElementById(
+                "major-btn-reset"
+            );
+
+        const majorSelectedStudentName =
+            document.getElementById(
+                "major-selected-student-name"
+            );
+
         function parseScore(raw) {
             const stringValue =
                 raw.trim();
@@ -5962,8 +5229,19 @@ function setupTeacherStudentSearch() {
                 "show"
             );
 
+            /*
+             * Keep the teacher's chosen date when moving
+             * from student to student. Only initialize it
+             * to today the first time the form is opened.
+             */
+            if (!scoreRememberedDate) {
+                scoreRememberedDate =
+                    scoreDateInput.value ||
+                    todayISO();
+            }
+
             scoreDateInput.value =
-                todayISO();
+                scoreRememberedDate;
 
             scoreInput.value =
                 "";
@@ -5995,6 +5273,7 @@ function setupTeacherStudentSearch() {
                 );
 
             updateScoreSubmitState();
+            updateScoreStudentSteppers();
         }
 
         function resetScoreForm() {
@@ -6040,9 +5319,85 @@ function setupTeacherStudentSearch() {
                     )
                 );
 
+            /*
+             * Intentionally do NOT clear scoreRememberedDate.
+             * Clear resets the grade entry, but the selected
+             * assignment date is a useful working-state preference.
+             */
+            if (!scoreRememberedDate) {
+                scoreRememberedDate =
+                    scoreDateInput.value ||
+                    todayISO();
+            }
+
+            scoreDateInput.value =
+                scoreRememberedDate;
+
             scoreBtnSubmit.disabled =
                 true;
+
+            updateScoreStudentSteppers();
         }
+
+        function updateScoreStudentSteppers() {
+            const students =
+                getStudentsForTeacher();
+
+            const prev =
+                document.getElementById(
+                    "score-student-prev"
+                );
+
+            const next =
+                document.getElementById(
+                    "score-student-next"
+                );
+
+            const enabled =
+                students.length > 0;
+
+            if (prev) {
+                prev.disabled = !enabled;
+            }
+
+            if (next) {
+                next.disabled = !enabled;
+            }
+        }
+
+        function cycleScoreStudent(direction) {
+            const students =
+                getStudentsForTeacher();
+
+            if (!students.length) {
+                return;
+            }
+
+            let index =
+                students.findIndex(
+                    student =>
+                        student ===
+                        scoreSelectedStudent
+                );
+
+            if (index < 0) {
+                index =
+                    direction > 0
+                        ? -1
+                        : 0;
+            }
+
+            index =
+                (index + direction + students.length) %
+                students.length;
+
+            selectScoreStudent(
+                students[index]
+            );
+
+            scoreInput.blur();
+        }
+
 
         function updateScorePredictions() {
     const query =
@@ -6114,12 +5469,16 @@ function setupTeacherStudentSearch() {
         function initializeManualEntry() {
             buildExerciseButtons();
 
-            if (
-                !scoreDateInput.value
-            ) {
-                scoreDateInput.value =
+            if (!scoreRememberedDate) {
+                scoreRememberedDate =
+                    scoreDateInput.value ||
                     todayISO();
             }
+
+            scoreDateInput.value =
+                scoreRememberedDate;
+
+            updateScoreStudentSteppers();
 
             if (
                 scoreSearchBar.dataset.ready
@@ -6288,8 +5647,38 @@ function setupTeacherStudentSearch() {
 
             scoreDateInput.addEventListener(
                 "change",
-                updateScoreSubmitState
+                () => {
+                    scoreRememberedDate =
+                        scoreDateInput.value ||
+                        todayISO();
+
+                    updateScoreSubmitState();
+                }
             );
+
+            const scoreStudentPrev =
+                document.getElementById(
+                    "score-student-prev"
+                );
+
+            const scoreStudentNext =
+                document.getElementById(
+                    "score-student-next"
+                );
+
+            if (scoreStudentPrev) {
+                scoreStudentPrev.addEventListener(
+                    "click",
+                    () => cycleScoreStudent(-1)
+                );
+            }
+
+            if (scoreStudentNext) {
+                scoreStudentNext.addEventListener(
+                    "click",
+                    () => cycleScoreStudent(1)
+                );
+            }
 
             scoreExerciseOptions.addEventListener(
                 "focus",
@@ -6553,6 +5942,1172 @@ function setupTeacherStudentSearch() {
             scoreInput.blur();
         }
 
+
+        function loadMajorAssessmentDefinitions() {
+            try {
+                const raw =
+                    localStorage.getItem(
+                        MAJOR_DEFINITIONS_KEY
+                    );
+
+                const parsed =
+                    raw ? JSON.parse(raw) : {};
+
+                return parsed &&
+                    typeof parsed === "object"
+                    ? parsed
+                    : {};
+            } catch (error) {
+                console.warn(
+                    "Could not load major assessment definitions:",
+                    error
+                );
+
+                return {};
+            }
+        }
+
+        function saveMajorAssessmentDefinitions(
+            definitions
+        ) {
+            try {
+                localStorage.setItem(
+                    MAJOR_DEFINITIONS_KEY,
+                    JSON.stringify(definitions)
+                );
+            } catch (error) {
+                console.warn(
+                    "Could not save major assessment definitions:",
+                    error
+                );
+            }
+        }
+
+        function normalizeMajorDefinitionKey(name) {
+            return String(name || "")
+                .trim()
+                .toLowerCase();
+        }
+
+        function getMajorAssessmentDefinitions() {
+            return loadMajorAssessmentDefinitions();
+        }
+
+        function getMajorAssessmentDefinitionNames() {
+            const definitions =
+                getMajorAssessmentDefinitions();
+
+            const names = Object.values(
+                definitions
+            )
+                .map(definition =>
+                    String(
+                        definition?.name || ""
+                    ).trim()
+                )
+                .filter(Boolean);
+
+            cachedRecords.forEach(record => {
+                if (
+                    normalizeExercise(record.exercise) ===
+                    "Major Assessment"
+                ) {
+                    const name =
+                        getMajorAssessmentName(
+                            record
+                        );
+
+                    if (name) {
+                        names.push(name);
+                    }
+                }
+            });
+
+            return Array.from(
+                new Set(names)
+            ).sort((a, b) =>
+                a.localeCompare(b)
+            );
+        }
+
+        function getMajorAssessmentDefinition(
+            assessmentName
+        ) {
+            const key =
+                normalizeMajorDefinitionKey(
+                    assessmentName
+                );
+
+            if (!key) {
+                return null;
+            }
+
+            const definitions =
+                getMajorAssessmentDefinitions();
+
+            return definitions[key] || null;
+        }
+
+        function saveMajorAssessmentDefinition(
+            assessmentName,
+            criteria
+        ) {
+            const cleanName =
+                String(assessmentName || "")
+                    .trim();
+
+            if (!cleanName) {
+                return;
+            }
+
+            const cleanCriteria =
+                criteria
+                    .map(name =>
+                        String(name || "")
+                            .trim()
+                    )
+                    .filter(Boolean);
+
+            const definitions =
+                getMajorAssessmentDefinitions();
+
+            definitions[
+                normalizeMajorDefinitionKey(
+                    cleanName
+                )
+            ] = {
+                name: cleanName,
+                criteria: Array.from(
+                    new Set(cleanCriteria)
+                )
+            };
+
+            saveMajorAssessmentDefinitions(
+                definitions
+            );
+        }
+
+        function getAllMajorCriteriaNames() {
+            const definitions =
+                getMajorAssessmentDefinitions();
+
+            const names = [];
+
+            Object.values(
+                definitions
+            ).forEach(definition => {
+                (definition?.criteria || [])
+                    .forEach(name => {
+                        const clean =
+                            String(name || "")
+                                .trim();
+
+                        if (clean) {
+                            names.push(clean);
+                        }
+                    });
+            });
+
+            return Array.from(
+                new Set(names)
+            ).sort((a, b) =>
+                a.localeCompare(b)
+            );
+        }
+
+        function updateMajorAssessmentPredictions() {
+            if (!majorAssessmentPredictions) {
+                return;
+            }
+
+            const query =
+                majorAssessmentNameInput.value
+                    .trim()
+                    .toLowerCase();
+
+            const matches =
+                getMajorAssessmentDefinitionNames()
+                    .filter(name =>
+                        !query ||
+                        name
+                            .toLowerCase()
+                            .includes(query)
+                    );
+
+            if (!matches.length) {
+                majorAssessmentPredictions.classList.remove(
+                    "show"
+                );
+
+                majorAssessmentPredictions.innerHTML = "";
+                return;
+            }
+
+            majorAssessmentPredictions.innerHTML =
+                matches.map(name => `
+                    <div
+                        class="major-prediction-item"
+                        data-name="${escapeHTML(name)}"
+                        tabindex="-1"
+                    >
+                        ${escapeHTML(name)}
+                    </div>
+                `).join("");
+
+            majorAssessmentPredictions
+                .querySelectorAll(
+                    ".major-prediction-item[data-name]"
+                )
+                .forEach(item => {
+                    item.addEventListener(
+                        "mousedown",
+                        event => {
+                            event.preventDefault();
+                            selectMajorAssessment(
+                                item.dataset.name
+                            );
+                        }
+                    );
+                });
+
+            majorAssessmentPredictions.classList.add(
+                "show"
+            );
+        }
+
+        function selectMajorAssessment(
+            assessmentName
+        ) {
+            const cleanName =
+                String(assessmentName || "")
+                    .trim();
+
+            majorAssessmentNameInput.value =
+                cleanName;
+
+            majorAssessmentPredictions.classList.remove(
+                "show"
+            );
+
+            const definition =
+                getMajorAssessmentDefinition(
+                    cleanName
+                );
+
+            majorAssessmentDefinition =
+                definition
+                    ? {
+                          name: definition.name,
+                          criteria: [
+                              ...(definition.criteria || [])
+                          ]
+                      }
+                    : null;
+
+            renderMajorCriteria(
+                majorAssessmentDefinition?.criteria ||
+                    [""]
+            );
+
+            updateMajorCompositeScore();
+            updateMajorSubmitState();
+        }
+
+        function createMajorCriterionRow(
+            criterionName = ""
+        ) {
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "major-criterion-row";
+
+            const nameInput =
+                document.createElement("input");
+
+            nameInput.type = "text";
+            nameInput.className =
+                "major-criterion-name";
+            nameInput.placeholder =
+                "Criterion";
+            nameInput.value =
+                criterionName;
+            nameInput.autocomplete = "off";
+            nameInput.spellcheck = false;
+
+            const scoreInputElement =
+                document.createElement("input");
+
+            scoreInputElement.type = "text";
+            scoreInputElement.className =
+                "major-criterion-score";
+            scoreInputElement.placeholder =
+                "e.g. 4/5";
+            scoreInputElement.autocomplete = "off";
+
+            const percentage =
+                document.createElement("span");
+
+            percentage.className =
+                "major-criterion-percentage";
+
+            const removeButton =
+                document.createElement("button");
+
+            removeButton.type = "button";
+            removeButton.className =
+                "major-remove-criterion";
+            removeButton.textContent = "×";
+            removeButton.title =
+                "Remove criterion";
+            removeButton.setAttribute(
+                "aria-label",
+                "Remove criterion"
+            );
+            removeButton.tabIndex = -1;
+
+            row.appendChild(nameInput);
+            row.appendChild(scoreInputElement);
+            row.appendChild(percentage);
+            row.appendChild(removeButton);
+
+            nameInput.addEventListener(
+                "focus",
+                () => {
+                    updateMajorCriterionPredictions(
+                        nameInput
+                    );
+                }
+            );
+
+            nameInput.addEventListener(
+                "input",
+                () => {
+                    updateMajorCriterionPredictions(
+                        nameInput
+                    );
+                    updateMajorSubmitState();
+                }
+            );
+
+            nameInput.addEventListener(
+                "keydown",
+                event => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        scoreInputElement.focus();
+                    }
+                }
+            );
+
+            scoreInputElement.addEventListener(
+                "input",
+                () => {
+                    updateMajorCriterionPercentage(
+                        scoreInputElement,
+                        percentage
+                    );
+
+                    updateMajorCompositeScore();
+                    updateMajorSubmitState();
+                }
+            );
+
+            scoreInputElement.addEventListener(
+                "keydown",
+                event => {
+                    if (event.key !== "Enter") {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const rows =
+                        Array.from(
+                            majorCriteriaList.querySelectorAll(
+                                ".major-criterion-row"
+                            )
+                        );
+
+                    const index =
+                        rows.indexOf(row);
+
+                    if (
+                        index >= 0 &&
+                        index < rows.length - 1
+                    ) {
+                        rows[index + 1]
+                            .querySelector(
+                                ".major-criterion-score"
+                            )
+                            ?.focus();
+                        return;
+                    }
+
+                    if (!majorBtnSubmit.disabled) {
+                        addMajorRecord();
+                    }
+                }
+            );
+
+            removeButton.addEventListener(
+                "click",
+                () => {
+                    const rows =
+                        majorCriteriaList.querySelectorAll(
+                            ".major-criterion-row"
+                        );
+
+                    if (rows.length <= 1) {
+                        nameInput.value = "";
+                        scoreInputElement.value = "";
+                        percentage.textContent = "";
+                    } else {
+                        row.remove();
+                    }
+
+                    updateMajorCompositeScore();
+                    updateMajorSubmitState();
+                }
+            );
+
+            majorCriteriaList.appendChild(row);
+
+            updateMajorCriterionPercentage(
+                scoreInputElement,
+                percentage
+            );
+
+            return row;
+        }
+
+        function updateMajorCriterionPercentage(
+            input,
+            preview
+        ) {
+            const raw =
+                input.value.trim();
+
+            if (!raw) {
+                preview.textContent = "";
+                preview.classList.remove("error");
+                return null;
+            }
+
+            const result =
+                parseScore(raw);
+
+            if (!result.ok) {
+                preview.textContent =
+                    result.msg;
+                preview.classList.add("error");
+                return null;
+            }
+
+            preview.textContent =
+                `${result.percentage}%`;
+            preview.classList.remove("error");
+
+            return result.percentage;
+        }
+
+        function updateMajorCriterionPredictions(
+            input
+        ) {
+            const existing =
+                input.parentElement
+                    ?.querySelector(
+                        ".major-criterion-predictions"
+                    );
+
+            if (existing) {
+                existing.remove();
+            }
+
+            const query =
+                input.value
+                    .trim()
+                    .toLowerCase();
+
+            const matches =
+                getAllMajorCriteriaNames()
+                    .filter(name =>
+                        !query ||
+                        name
+                            .toLowerCase()
+                            .includes(query)
+                    );
+
+            if (!matches.length) {
+                return;
+            }
+
+            const dropdown =
+                document.createElement("div");
+
+            dropdown.className =
+                "major-criterion-predictions show";
+
+            matches.forEach(name => {
+                const item =
+                    document.createElement("div");
+
+                item.className =
+                    "major-prediction-item";
+                item.dataset.name = name;
+                item.textContent = name;
+                item.tabIndex = -1;
+
+                item.addEventListener(
+                    "mousedown",
+                    event => {
+                        event.preventDefault();
+                        input.value = name;
+                        dropdown.remove();
+                        updateMajorSubmitState();
+                    }
+                );
+
+                dropdown.appendChild(item);
+            });
+
+            input.parentElement.appendChild(
+                dropdown
+            );
+        }
+
+        function renderMajorCriteria(
+            criteria
+        ) {
+            majorCriteriaList.innerHTML = "";
+
+            const cleanCriteria =
+                Array.isArray(criteria) &&
+                criteria.length
+                    ? criteria
+                    : [""];
+
+            cleanCriteria.forEach(
+                criterion =>
+                    createMajorCriterionRow(
+                        criterion
+                    )
+            );
+
+            updateMajorCompositeScore();
+            updateMajorSubmitState();
+        }
+
+        function getMajorCriterionEntries() {
+            return Array.from(
+                majorCriteriaList.querySelectorAll(
+                    ".major-criterion-row"
+                )
+            ).map(row => ({
+                name:
+                    row.querySelector(
+                        ".major-criterion-name"
+                    )?.value.trim() || "",
+                score:
+                    row.querySelector(
+                        ".major-criterion-score"
+                    )?.value.trim() || ""
+            }));
+        }
+
+        function getMajorCriterionPercentages() {
+            return getMajorCriterionEntries()
+                .map(entry =>
+                    entry.score
+                        ? parseScore(entry.score)
+                        : { ok: false }
+                );
+        }
+
+        function updateMajorCompositeScore() {
+            if (!majorCompositeScore) {
+                return;
+            }
+
+            const results =
+                getMajorCriterionPercentages();
+
+            const entered =
+                results.filter(result =>
+                    result.ok
+                );
+
+            const hasError =
+                results.some(
+                    result =>
+                        result &&
+                        !result.ok
+                ) &&
+                getMajorCriterionEntries()
+                    .some(entry => entry.score);
+
+            if (hasError || !entered.length) {
+                majorCompositeScore.textContent =
+                    entered.length
+                        ? `${average(entered.map(result => result.percentage))}% entered`
+                        : "—";
+                return;
+            }
+
+            const composite =
+                average(
+                    entered.map(
+                        result => result.percentage
+                    )
+                );
+
+            majorCompositeScore.textContent =
+                `${composite}%`;
+        }
+
+        function updateMajorSubmitState() {
+            if (!majorBtnSubmit) {
+                return;
+            }
+
+            const assessmentName =
+                majorAssessmentNameInput.value.trim();
+
+            const entries =
+                getMajorCriterionEntries();
+
+            const ready =
+                !!majorSelectedStudent &&
+                !!majorDateInput.value &&
+                !!assessmentName &&
+                entries.length > 0 &&
+                entries.every(entry =>
+                    entry.name &&
+                    entry.score &&
+                    parseScore(entry.score).ok
+                );
+
+            majorBtnSubmit.disabled =
+                !ready;
+        }
+
+        function updateMajorStudentSteppers() {
+            const enabled =
+                getStudentsForTeacher().length > 0;
+
+            [
+                document.getElementById(
+                    "major-student-prev"
+                ),
+                document.getElementById(
+                    "major-student-next"
+                )
+            ].forEach(button => {
+                if (button) {
+                    button.disabled = !enabled;
+                }
+            });
+        }
+
+        function selectMajorStudent(
+            student
+        ) {
+            majorSelectedStudent =
+                student;
+
+            majorSelectedStudentName.textContent =
+                student;
+
+            majorStudentSearchBar.value =
+                student;
+
+            majorStudentPredictions.classList.remove(
+                "show"
+            );
+
+            if (!majorRememberedDate) {
+                majorRememberedDate =
+                    majorDateInput.value ||
+                    todayISO();
+            }
+
+            majorDateInput.value =
+                majorRememberedDate;
+
+            updateMajorStudentSteppers();
+            updateMajorSubmitState();
+        }
+
+        function cycleMajorStudent(
+            direction
+        ) {
+            const students =
+                getStudentsForTeacher();
+
+            if (!students.length) {
+                return;
+            }
+
+            let index =
+                students.findIndex(
+                    student =>
+                        student ===
+                        majorSelectedStudent
+                );
+
+            if (index < 0) {
+                index =
+                    direction > 0
+                        ? -1
+                        : 0;
+            }
+
+            index =
+                (index + direction + students.length) %
+                students.length;
+
+            selectMajorStudent(
+                students[index]
+            );
+
+            majorCriteriaList
+                .querySelector(
+                    ".major-criterion-score"
+                )?.blur();
+        }
+
+        function updateMajorStudentPredictions() {
+            const query =
+                majorStudentSearchBar.value
+                    .trim()
+                    .toLowerCase();
+
+            const matches =
+                query
+                    ? getStudentsForTeacher().filter(
+                          student =>
+                              student
+                                  .toLowerCase()
+                                  .includes(query)
+                      )
+                    : getStudentsForTeacher();
+
+            majorStudentPredictions.dataset.highlightedIndex =
+                "-1";
+
+            majorStudentPredictions.innerHTML =
+                matches.length
+                    ? matches.map(student => `
+                        <div\n                            class="score-prediction-item"\n                            data-name="${escapeHTML(student)}"\n                            tabindex="-1"\n                        >\n                            ${escapeHTML(student)}\n                        </div>\n                    `).join("")
+                    : `
+                        <div class="score-prediction-item">\n                            No students found\n                        </div>\n                    `;
+
+            majorStudentPredictions
+                .querySelectorAll(
+                    ".score-prediction-item[data-name]"
+                )
+                .forEach(item => {
+                    item.addEventListener(
+                        "mousedown",
+                        event => {
+                            event.preventDefault();
+                            selectMajorStudent(
+                                item.dataset.name
+                            );
+                        }
+                    );
+                });
+
+            majorStudentPredictions.classList.add(
+                "show"
+            );
+        }
+
+        async function addMajorRecord() {
+            if (majorBtnSubmit.disabled) {
+                return;
+            }
+
+            const assessmentName =
+                majorAssessmentNameInput.value.trim();
+
+            const entries =
+                getMajorCriterionEntries();
+
+            const percentages =
+                entries.map(entry =>
+                    parseScore(entry.score).percentage
+                );
+
+            const percentage =
+                average(percentages);
+
+            if (percentage === null) {
+                return;
+            }
+
+            const record = {
+                student:
+                    majorSelectedStudent,
+                date:
+                    majorDateInput.value,
+                time:
+                    nowTime(),
+                percentage,
+                exercise:
+                    "Major Assessment",
+                assessment:
+                    assessmentName,
+                termsToReview: []
+            };
+
+            const result =
+                addRecordToCache(record);
+
+            if (result.duplicate) {
+                showToast(
+                    "That record is already in the cache"
+                );
+                return;
+            }
+
+            saveMajorAssessmentDefinition(
+                assessmentName,
+                entries.map(entry => entry.name)
+            );
+
+            majorAssessmentDefinition = {
+                name: assessmentName,
+                criteria: entries.map(
+                    entry => entry.name
+                )
+            };
+
+            importedRecord = record;
+
+            await sendAftertouchForRecords([
+                record
+            ]);
+
+            showToast(
+                "Major grade added to cache"
+            );
+
+            renderTeacherAssignments();
+            renderTeacherWeekly();
+            renderCachePanel();
+
+            /*
+             * Keep the selected student, date, assessment name,
+             * and criteria in place. Only the criterion scores
+             * are cleared so the teacher can use the same
+             * assessment for the next student.
+             */
+            getMajorCriterionEntries().forEach((entry, index) => {
+                const row =
+                    majorCriteriaList.querySelectorAll(
+                        ".major-criterion-row"
+                    )[index];
+
+                const score =
+                    row?.querySelector(
+                        ".major-criterion-score"
+                    );
+
+                if (score) {
+                    score.value = "";
+                }
+
+                const preview =
+                    row?.querySelector(
+                        ".major-criterion-percentage"
+                    );
+
+                if (preview) {
+                    preview.textContent = "";
+                    preview.classList.remove("error");
+                }
+            });
+
+            updateMajorCompositeScore();
+            updateMajorSubmitState();
+
+            majorCriteriaList
+                .querySelector(
+                    ".major-criterion-score"
+                )?.blur();
+        }
+
+        function resetMajorForm(
+            keepStudent = true
+        ) {
+            if (!keepStudent) {
+                majorSelectedStudent =
+                    null;
+
+                majorSelectedStudentName.textContent =
+                    "Select a student";
+
+                majorStudentSearchBar.value =
+                    "";
+            }
+
+            majorAssessmentNameInput.value = "";
+            majorAssessmentDefinition = null;
+            majorAssessmentPredictions.classList.remove(
+                "show"
+            );
+
+            renderMajorCriteria([""]);
+
+            if (!majorRememberedDate) {
+                majorRememberedDate =
+                    majorDateInput.value ||
+                    todayISO();
+            }
+
+            majorDateInput.value =
+                majorRememberedDate;
+
+            updateMajorStudentSteppers();
+            updateMajorSubmitState();
+        }
+
+        function initializeMajorEntry() {
+            if (!majorDateInput.value) {
+                majorDateInput.value =
+                    majorRememberedDate ||
+                    todayISO();
+            }
+
+            majorRememberedDate =
+                majorRememberedDate ||
+                majorDateInput.value;
+
+            updateMajorStudentSteppers();
+
+            if (majorStudentSearchBar.dataset.ready) {
+                return;
+            }
+
+            majorStudentSearchBar.dataset.ready =
+                "1";
+
+            majorStudentSearchBar.addEventListener(
+                "focus",
+                updateMajorStudentPredictions
+            );
+
+            majorStudentSearchBar.addEventListener(
+                "input",
+                () => {
+                    if (
+                        majorSelectedStudent &&
+                        majorStudentSearchBar.value.trim() !==
+                            majorSelectedStudent
+                    ) {
+                        majorSelectedStudent = null;
+                        majorSelectedStudentName.textContent =
+                            "Select a student";
+                        updateMajorSubmitState();
+                    }
+
+                    updateMajorStudentPredictions();
+                }
+            );
+
+            majorStudentSearchBar.addEventListener(
+                "keydown",
+                event => {
+                    const options =
+                        Array.from(
+                            majorStudentPredictions.querySelectorAll(
+                                ".score-prediction-item[data-name]"
+                            )
+                        );
+
+                    let index = Number(
+                        majorStudentPredictions.dataset.highlightedIndex ||
+                            "-1"
+                    );
+
+                    if (
+                        event.key === "ArrowDown" ||
+                        event.key === "ArrowUp"
+                    ) {
+                        if (!options.length) return;
+
+                        event.preventDefault();
+
+                        index =
+                            event.key === "ArrowDown"
+                                ? index < 0
+                                    ? 0
+                                    : (index + 1) % options.length
+                                : index < 0
+                                    ? options.length - 1
+                                    : (index - 1 + options.length) %
+                                      options.length;
+
+                        options.forEach(
+                            (item, itemIndex) =>
+                                item.classList.toggle(
+                                    "keyboard-highlight",
+                                    itemIndex === index
+                                )
+                        );
+
+                        majorStudentPredictions.dataset.highlightedIndex =
+                            String(index);
+
+                        return;
+                    }
+
+                    if (event.key === "Enter") {
+                        const option =
+                            options[
+                                index >= 0 ? index : 0
+                            ];
+
+                        if (option) {
+                            event.preventDefault();
+                            selectMajorStudent(
+                                option.dataset.name
+                            );
+                        }
+
+                        return;
+                    }
+
+                    if (event.key === "Escape") {
+                        event.preventDefault();
+                        majorStudentPredictions.classList.remove(
+                            "show"
+                        );
+                        majorStudentSearchBar.blur();
+                    }
+                }
+            );
+
+            majorStudentSearchClear.addEventListener(
+                "click",
+                () => {
+                    resetMajorForm(false);
+                    majorStudentSearchBar.focus();
+                }
+            );
+
+            majorDateInput.addEventListener(
+                "change",
+                () => {
+                    majorRememberedDate =
+                        majorDateInput.value ||
+                        todayISO();
+                    updateMajorSubmitState();
+                }
+            );
+
+            majorAssessmentNameInput.addEventListener(
+                "focus",
+                updateMajorAssessmentPredictions
+            );
+
+            majorAssessmentNameInput.addEventListener(
+                "input",
+                () => {
+                    const definition =
+                        getMajorAssessmentDefinition(
+                            majorAssessmentNameInput.value
+                        );
+
+                    if (
+                        definition &&
+                        normalizeMajorDefinitionKey(
+                            definition.name
+                        ) ===
+                            normalizeMajorDefinitionKey(
+                                majorAssessmentNameInput.value
+                            )
+                    ) {
+                        majorAssessmentDefinition =
+                            definition;
+
+                        renderMajorCriteria(
+                            definition.criteria || [""]
+                        );
+                    }
+
+                    updateMajorAssessmentPredictions();
+                    updateMajorSubmitState();
+                }
+            );
+
+            majorAssessmentNameInput.addEventListener(
+                "keydown",
+                event => {
+                    if (event.key === "Enter") {
+                        const options =
+                            Array.from(
+                                majorAssessmentPredictions.querySelectorAll(
+                                    ".major-prediction-item[data-name]"
+                                )
+                            );
+
+                        if (options.length) {
+                            event.preventDefault();
+                            selectMajorAssessment(
+                                options[0].dataset.name
+                            );
+                        } else {
+                            event.preventDefault();
+                            majorCriteriaList
+                                .querySelector(
+                                    ".major-criterion-name"
+                                )?.focus();
+                        }
+                    }
+                }
+            );
+
+            majorAddCriterionButton.addEventListener(
+                "click",
+                () => {
+                    createMajorCriterionRow();
+                    majorCriteriaList
+                        .lastElementChild
+                        ?.querySelector(
+                            ".major-criterion-name"
+                        )?.focus();
+                }
+            );
+
+            majorBtnSubmit.addEventListener(
+                "click",
+                addMajorRecord
+            );
+
+            majorBtnReset.addEventListener(
+                "click",
+                () => resetMajorForm(false)
+            );
+
+            document
+                .getElementById("major-student-prev")
+                ?.addEventListener(
+                    "click",
+                    () => cycleMajorStudent(-1)
+                );
+
+            document
+                .getElementById("major-student-next")
+                ?.addEventListener(
+                    "click",
+                    () => cycleMajorStudent(1)
+                );
+
+            renderMajorCriteria([""]);
+        }
+
         function decodeBase64JSON(
             raw
         ) {
@@ -6647,6 +7202,10 @@ function setupTeacherStudentSearch() {
                     String(
                         data.exercise
                     ),
+
+                ...(data.assessment
+                    ? { assessment: String(data.assessment) }
+                    : {}),
 
                 termsToReview:
                     Array.isArray(
@@ -7632,6 +8191,46 @@ function setupTeacherStudentSearch() {
 
         /*
          * -------------------------------------------------
+         * Weekly Averages student navigation
+         *
+         * Left / Right = previous / next student.
+         * Do not steal these keys while typing in the
+         * weekly search box or another text input.
+         * -------------------------------------------------
+         */
+
+        if (
+            teacherInterfaceVisible &&
+            isTeacher() &&
+            !document
+                .getElementById("teacher-weekly-tab")
+                ?.classList.contains("hidden") &&
+            (
+                event.key === "ArrowLeft" ||
+                event.key === "ArrowRight"
+            ) &&
+            ![
+                "INPUT",
+                "TEXTAREA",
+                "SELECT"
+            ].includes(
+                document.activeElement?.tagName
+            )
+        ) {
+            event.preventDefault();
+
+            cycleTeacherStudent(
+                event.key === "ArrowRight"
+                    ? 1
+                    : -1
+            );
+
+            return;
+        }
+
+
+        /*
+         * -------------------------------------------------
          * Teacher Tab / keyboard navigation
          *
          * Mr. Tubbs should Tab only through the useful
@@ -7661,6 +8260,11 @@ function setupTeacherStudentSearch() {
             const manual =
                 document.getElementById(
                     "teacher-manual-tab"
+                );
+
+            const major =
+                document.getElementById(
+                    "teacher-major-tab"
                 );
 
             const cache =
@@ -7755,6 +8359,41 @@ function setupTeacherStudentSearch() {
                             element.tabIndex = -1;
                         }
                     );
+            } else if (
+                major &&
+                !major.classList.contains(
+                    "hidden"
+                )
+            ) {
+                [
+                    majorStudentSearchBar,
+                    majorDateInput,
+                    majorAssessmentNameInput,
+                    majorAddCriterionButton,
+                    majorBtnSubmit
+                ].forEach(element => {
+                    if (element && !element.disabled) {
+                        focusables.push(element);
+                    }
+                });
+
+                major
+                    .querySelectorAll(
+                        ".score-prediction-item, .major-prediction-item, .major-criterion-predictions, .major-remove-criterion"
+                    )
+                    .forEach(element => {
+                        element.tabIndex = -1;
+                    });
+
+                major
+                    .querySelectorAll(
+                        ".major-criterion-name, .major-criterion-score"
+                    )
+                    .forEach(element => {
+                        if (!element.disabled) {
+                            focusables.push(element);
+                        }
+                    });
             } else if (
                 cache &&
                 !cache.classList.contains(
@@ -7910,6 +8549,23 @@ function setupTeacherStudentSearch() {
 
                 return;
             }
+
+            if (
+                teacherInterfaceVisible &&
+                isTeacher() &&
+                !document
+                    .getElementById(
+                        "teacher-major-tab"
+                    )
+                    .classList.contains(
+                        "hidden"
+                    )
+            ) {
+                majorStudentSearchBar.focus();
+                majorStudentSearchBar.select();
+
+                return;
+            }
         }
 
 
@@ -7958,12 +8614,40 @@ function setupTeacherStudentSearch() {
 
             buildExerciseButtons();
 
-            scoreDateInput.value =
+            scoreRememberedDate =
+                scoreRememberedDate ||
                 todayISO();
+
+            scoreDateInput.value =
+                scoreRememberedDate;
 
             initMIDI();
 
             setupTeacherStudentSearch();
+
+            const teacherRosterPrev =
+                document.getElementById(
+                    "teacher-roster-prev"
+                );
+
+            const teacherRosterNext =
+                document.getElementById(
+                    "teacher-roster-next"
+                );
+
+            if (teacherRosterPrev) {
+                teacherRosterPrev.addEventListener(
+                    "click",
+                    () => cycleTeacherStudent(-1)
+                );
+            }
+
+            if (teacherRosterNext) {
+                teacherRosterNext.addEventListener(
+                    "click",
+                    () => cycleTeacherStudent(1)
+                );
+            }
 
             const student =
                 getCurrentStudentName();
