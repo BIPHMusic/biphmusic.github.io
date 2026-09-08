@@ -1212,17 +1212,19 @@
             }
         }
 
+
         function getStudentRecords(studentName) {
             const lower = String(studentName || "")
                 .trim()
                 .toLowerCase();
 
-            return cachedRecords.filter(record =>
+            return actualRecords.filter(record =>
                 String(record.student || "")
                     .trim()
                     .toLowerCase() === lower
             );
         }
+
 
         function renderStudentDashboard(studentName) {
     const studentView =
@@ -2891,10 +2893,11 @@
             return 4;
         }
 
+
         function computeWeekGrades(
             studentName,
             week,
-            recordsSource = cachedRecords
+            recordsSource = actualRecords
         ) {
             const dateSet =
                 new Set(
@@ -2972,6 +2975,7 @@
                         )
                 );
             });
+
 
             const result = {
                 Participation: 100,
@@ -3651,94 +3655,106 @@
                 );
             });
 
-        function getAssignmentDates() {
-            const dates = new Set();
+function getAssignmentDates() {
+    const dates = new Set();
 
-            cachedRecords.forEach(record => {
-                if (record.date) {
-                    dates.add(record.date);
-                }
-            });
-
-            return Array.from(dates)
-                .sort()
-                .reverse();
+    actualRecords.forEach(record => {
+        if (record.date) {
+            dates.add(record.date);
         }
+    });
 
-        function getStudentsForTeacher() {
-            const source =
-                allStudents.length > 0
-                    ? allStudents
-                    : getStudentsFromRecords(
-                        cachedRecords
-                    );
+    return Array.from(dates)
+        .sort()
+        .reverse();
+}
 
-            /*
-             * Preserve the order supplied by apstudents.js.
-             * Do not alphabetize the teacher roster or search results.
-             */
-            return source.slice();
-        }
-
-        function getAssignmentTypesForDate(
-            date
-        ) {
-            const types = new Set();
-
-            cachedRecords
-                .filter(record => record.date === date)
-                .forEach(record => {
-                    if (
-                        normalizeExercise(record.exercise) ===
-                        "Major Assessment"
-                    ) {
-                        types.add(getMajorAssessmentName(record));
-                    } else {
-                        types.add(normalizeExercise(record.exercise));
-                    }
-                });
-
-            return Array.from(types);
-        }
-
-        function findRecordForAssignment(
-            student,
-            date,
-            exercise
-        ) {
-            const matches =
-                cachedRecords.filter(record => {
-                    if (
-                        !record.student ||
-                        record.student.trim().toLowerCase() !==
-                            student.trim().toLowerCase() ||
-                        record.date !== date
-                    ) {
-                        return false;
-                    }
-
-                    const normalized = normalizeExercise(record.exercise);
-
-                    if (normalized === "Major Assessment") {
-                        return getMajorAssessmentName(record) === exercise;
-                    }
-
-                    return normalized === exercise;
-                });
-
-            if (matches.length === 0) {
-                return null;
-            }
-
-            matches.sort((a, b) =>
-                String(a.time || "")
-                    .localeCompare(
-                        String(b.time || "")
-                    )
+function getStudentsForTeacher() {
+    const source =
+        allStudents.length > 0
+            ? allStudents
+            : getStudentsFromRecords(
+                actualRecords
             );
 
-            return matches[matches.length - 1];
-        }
+    /*
+     * Preserve the order supplied by apstudents.js.
+     * Do not alphabetize the teacher roster or search results.
+     */
+    return source.slice();
+}
+
+function getAssignmentTypesForDate(
+    date
+) {
+    const types = new Set();
+
+    actualRecords
+        .filter(record => record.date === date)
+        .forEach(record => {
+            if (
+                normalizeExercise(record.exercise) ===
+                "Major Assessment"
+            ) {
+                types.add(
+                    getMajorAssessmentName(record)
+                );
+            } else {
+                types.add(
+                    normalizeExercise(record.exercise)
+                );
+            }
+        });
+
+    return Array.from(types);
+}
+
+function findRecordForAssignment(
+    student,
+    date,
+    exercise
+) {
+    const matches =
+        actualRecords.filter(record => {
+            if (
+                !record.student ||
+                record.student.trim().toLowerCase() !==
+                    student.trim().toLowerCase() ||
+                record.date !== date
+            ) {
+                return false;
+            }
+
+            const normalized =
+                normalizeExercise(record.exercise);
+
+            if (
+                normalized ===
+                "Major Assessment"
+            ) {
+                return (
+                    getMajorAssessmentName(record) ===
+                    exercise
+                );
+            }
+
+            return normalized === exercise;
+        });
+
+    if (matches.length === 0) {
+        return null;
+    }
+
+    matches.sort((a, b) =>
+        String(a.time || "")
+            .localeCompare(
+                String(b.time || "")
+            )
+    );
+
+    return matches[matches.length - 1];
+}
+
 
         function renderTeacherAssignments() {
             const container =
@@ -3808,12 +3824,12 @@
 
                 exercises.forEach(exercise => {
                     const isMajorAssignment =
-                        cachedRecords.some(record =>
-                            record.date === date &&
-                            normalizeExercise(record.exercise) ===
-                                "Major Assessment" &&
-                            getMajorAssessmentName(record) === exercise
-                        );
+                    actualRecords.some(record =>
+                        record.date === date &&
+                        normalizeExercise(record.exercise) ===
+                            "Major Assessment" &&
+                        getMajorAssessmentName(record) === exercise
+                    );
 
                     const exerciseColor =
                         isMajorAssignment ? "#ffffff" :
@@ -4737,7 +4753,7 @@ function setupTeacherStudentSearch() {
                 quarter &&
                 QUARTER_RANGES[quarter];
 
-            return cachedRecords
+            return actualRecords
                 .filter(record => {
                     if (
                         !record.student ||
