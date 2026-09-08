@@ -1289,4 +1289,156 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "William",
+        date: "2026-09-08",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-08",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-08",
+        time: "10:51 am",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-08",
+        time: "上午10:51",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-08",
+        time: "上午10:50",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-08",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-08",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-08",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-08",
+        time: "10:52 AM",
+        percentage: 90,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: ["Minor 2nd"]
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-08",
+        time: "上午10:52",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-08",
+        time: "上午10:52",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-08",
+        time: "10:53 am",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-08",
+        time: "11:05 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-08",
+        time: "10:56 AM",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-07",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-05",
+        time: "07:17 PM",
+        percentage: 60,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: ["Major 2nd","Major 2nd","Major 2nd","Major 2nd"]
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-05",
+        time: "06:33 PM",
+        percentage: 40,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: ["Major 2nd","Major 2nd","Major 2nd","Major 2nd","Major 2nd","Major 2nd"]
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-05",
+        time: "06:32 PM",
+        percentage: 20,
+        exercise: "Vocab",
+        termsToReview: ["Disjunct Motion","Double Flat","Double Sharp","Major Scale","Measure","Natural","Pentatonic Scale","Whole Tone Scale"]
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-05",
+        time: "04:34 PM",
+        percentage: 40,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: ["Major 2nd","Major 2nd","Major 2nd","Major 2nd","Major 2nd","Major 2nd"]
+    },
 ];
