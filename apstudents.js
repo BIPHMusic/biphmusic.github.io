@@ -38,3 +38,13 @@ globalThis.studentPasswordCredentials["thomas"] = {
     salt: "514a1136b2429c92cb605711b9486317",
     hash: "b3899b8113f567ca6987a83008b85ba0a46bb7eda6aa10877cf014f2ce499e1e"
 };
+globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
+globalThis.studentPasswordCredentials["jocelyn"] = {
+   salt: "46fb44fbba3dab9991d4ae482204e4ed",
+   hash: "8b6625f3c2a64244685d8872a8d9fafffc1c9bb9c7eaede0806bf63f8e9a06ad"
+};
+globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
+globalThis.studentPasswordCredentials["teresa"] = {
+    salt: "4eab8805adb59834a0a735080929ee03",
+    hash: "90986d641e3e00c0d47fbd8a87cae5614199597070c7f8c2e1bfa85cd8478b44"
+};
