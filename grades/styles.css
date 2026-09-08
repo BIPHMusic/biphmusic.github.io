@@ -1639,3 +1639,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         );
     }
 }
+
+body.file-drag-active::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.439);
+    pointer-events: none;
+    z-index: 9998;
+}
+
+body.file-drag-active .drop-zone {
+    position: relative;
+    z-index: 9999;
+}
+
+body.file-drag-active .drop-zone.active {
+    transform: scale(1.01);
+}

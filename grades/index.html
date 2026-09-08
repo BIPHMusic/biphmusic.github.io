@@ -8406,7 +8406,22 @@ function setupTeacherStudentSearch() {
 
             importedRecord = record;
 
-            const result = addRecordToCache(record);
+            const result =
+                addRecordToCache(record);
+
+            /*
+            * Send the MIDI signal for imported records too.
+            *
+            * This covers both:
+            *   - .txt files dropped onto the page
+            *   - records opened/imported through a URL
+            *
+            * Manual entry already calls sendAftertouchForRecords()
+            * directly, so it does not go through this function.
+            */
+            sendAftertouchForRecords([
+                record
+            ]);
 
             if (isTeacher()) {
                 showTeacherInterface();
@@ -8421,14 +8436,17 @@ function setupTeacherStudentSearch() {
                 return true;
             }
 
-            const currentStudent = getCurrentStudentName();
+            const currentStudent =
+                getCurrentStudentName();
 
             if (
                 currentStudent &&
                 record.student.trim().toLowerCase() ===
                 currentStudent.trim().toLowerCase()
             ) {
-                renderStudentDashboard(currentStudent);
+                renderStudentDashboard(
+                    currentStudent
+                );
             }
 
             return true;
@@ -8463,253 +8481,249 @@ function setupTeacherStudentSearch() {
         }
 
         function setupScoreDragDrop() {
-            if (
-                scoreDropZone.dataset.ready
-            ) {
+    if (
+        scoreDropZone.dataset.ready
+    ) {
+        return;
+    }
+
+    scoreDropZone.dataset.ready = "1";
+
+    let fileDragDepth = 0;
+
+    function setFileDragActive(active) {
+        if (active) {
+            document.body.classList.add(
+                "file-drag-active"
+            );
+
+            scoreDropZone.classList.add(
+                "active"
+            );
+        } else {
+            document.body.classList.remove(
+                "file-drag-active"
+            );
+
+            scoreDropZone.classList.remove(
+                "active"
+            );
+        }
+    }
+
+    document.addEventListener(
+        "dragenter",
+        event => {
+            if (!isFileDrag(event)) {
                 return;
             }
 
-            scoreDropZone.dataset.ready = "1";
+            event.preventDefault();
 
-            document.addEventListener(
-                "dragenter",
-                event => {
-                    if (!isFileDrag(event)) {
-                        return;
-                    }
+            fileDragDepth++;
 
-                    event.preventDefault();
-
-                    scoreDropZone.classList.add(
-                        "active"
-                    );
-                }
-            );
-
-            document.addEventListener(
-                "dragover",
-                event => {
-                    if (!isFileDrag(event)) {
-                        return;
-                    }
-
-                    event.preventDefault();
-
-                    event.dataTransfer.dropEffect =
-                        "copy";
-
-                    scoreDropZone.classList.add(
-                        "active"
-                    );
-                }
-            );
-
-            document.addEventListener(
-                "dragleave",
-                event => {
-                    if (!isFileDrag(event)) {
-                        return;
-                    }
-
-                    event.preventDefault();
-
-                    if (
-                        event.clientX <= 0 ||
-                        event.clientY <= 0 ||
-                        event.clientX >=
-                            window.innerWidth ||
-                        event.clientY >=
-                            window.innerHeight
-                    ) {
-                        scoreDropZone.classList.remove(
-                            "active"
-                        );
-                    }
-                }
-            );
-
-            document.addEventListener(
-                "drop",
-                async event => {
-                    if (!isFileDrag(event)) {
-                        return;
-                    }
-
-                    event.preventDefault();
-
-                    scoreDropZone.classList.remove(
-                        "active"
-                    );
-
-                    const files =
-                        Array.from(
-                            event.dataTransfer.files ||
-                                []
-                        );
-
-                    if (files.length === 0) {
-                        return;
-                    }
-
-                    const textFiles =
-                        files.filter(
-                            file =>
-                                file.name
-                                    .toLowerCase()
-                                    .endsWith(".txt") ||
-                                file.type ===
-                                    "text/plain"
-                        );
-
-                    const audioFiles =
-                        files.filter(file => {
-                            const name =
-                                file.name.toLowerCase();
-
-                            return (
-                                name.endsWith(".mp3") ||
-                                name.endsWith(".wav") ||
-                                name.endsWith(".m4a") ||
-                                name.endsWith(".aac") ||
-                                name.endsWith(".ogg") ||
-                                (
-                                    file.type &&
-                                    file.type.startsWith(
-                                        "audio/"
-                                    )
-                                )
-                            );
-                        });
-
-                    /*
-                    * --------------------------------------------------
-                    * AUDIO FILES → MIDI
-                    * --------------------------------------------------
-                    */
-
-                    const audioSignals = [];
-
-                    audioFiles.forEach(file => {
-                        const exercise =
-                            exerciseFromFilename(
-                                file.name
-                            );
-
-                        const student =
-                            studentFromFilename(
-                                file.name
-                            );
-
-                        if (
-                            exercise &&
-                            student &&
-                            EXERCISE_TO_NOTE[
-                                exercise
-                            ] != null
-                        ) {
-                            audioSignals.push({
-                                student,
-                                exercise
-                            });
-                        }
-                    });
-
-                    if (audioSignals.length) {
-                        await sendAftertouchForRecords(
-                            audioSignals
-                        );
-
-                        showToast(
-                            audioSignals.length === 1
-                                ? `Sent: ${audioSignals[0].student} · ${audioSignals[0].exercise}`
-                                : `Sent ${audioSignals.length} MIDI signals`
-                        );
-                    }
-
-                    /*
-                    * --------------------------------------------------
-                    * .TXT FILES → RECORDS CACHE
-                    * --------------------------------------------------
-                    */
-
-                    if (textFiles.length === 0) {
-                        if (
-                            audioSignals.length === 0
-                        ) {
-                            showToast(
-                                "No .txt or recognized audio files found"
-                            );
-                        }
-
-                        return;
-                    }
-
-                    const imported = [];
-                    let errors = 0;
-
-                    for (
-                        const file of textFiles
-                    ) {
-                        try {
-                            const text =
-                                await file.text();
-
-                            const record =
-                                extractDataFromURLString(
-                                    text
-                                );
-
-                            if (record) {
-                                imported.push(
-                                    record
-                                );
-                            } else {
-                                errors++;
-                            }
-                        } catch (error) {
-                            console.error(
-                                "Could not read file:",
-                                file.name,
-                                error
-                            );
-
-                            errors++;
-                        }
-                    }
-
-                    imported.forEach(record => {
-                        addRecordToCache(record);
-                    });
-
-                    if (imported.length) {
-                        importedRecord =
-                            imported.length === 1
-                                ? imported[0]
-                                : imported[
-                                    imported.length - 1
-                                ];
-
-                        showTeacherTab("cache");
-
-                        showToast(
-                            imported.length === 1
-                                ? "Grade imported into cache"
-                                : `${imported.length} grades imported into cache`
-                        );
-                    }
-
-                    if (errors > 0) {
-                        setTimeout(
-                            () =>
-                                showToast(
-                                    `${errors} file(s) skipped`
-                                ),
-                            1800
-                        );
-                    }
-                }
-            );
+            setFileDragActive(true);
         }
+    );
+
+    document.addEventListener(
+        "dragover",
+        event => {
+            if (!isFileDrag(event)) {
+                return;
+            }
+
+            event.preventDefault();
+
+            event.dataTransfer.dropEffect =
+                "copy";
+
+            setFileDragActive(true);
+        }
+    );
+
+    document.addEventListener(
+        "dragleave",
+        event => {
+            if (!isFileDrag(event)) {
+                return;
+            }
+
+            event.preventDefault();
+
+            fileDragDepth--;
+
+            /*
+             * Browsers can fire several dragleave events
+             * while moving across child elements, so don't
+             * remove the active state until the drag has
+             * actually left the page.
+             */
+            if (
+                fileDragDepth <= 0 ||
+                event.clientX <= 0 ||
+                event.clientY <= 0 ||
+                event.clientX >= window.innerWidth ||
+                event.clientY >= window.innerHeight
+            ) {
+                fileDragDepth = 0;
+
+                setFileDragActive(false);
+            }
+        }
+    );
+
+    document.addEventListener(
+        "drop",
+        async event => {
+            if (!isFileDrag(event)) {
+                return;
+            }
+
+            event.preventDefault();
+
+            fileDragDepth = 0;
+
+            setFileDragActive(false);
+
+            const files =
+                Array.from(
+                    event.dataTransfer.files ||
+                        []
+                );
+
+            if (files.length === 0) {
+                return;
+            }
+
+            const textFiles =
+                files.filter(
+                    file =>
+                        file.name
+                            .toLowerCase()
+                            .endsWith(".txt") ||
+                        file.type ===
+                            "text/plain"
+                );
+
+            const audioFiles =
+                files.filter(file => {
+                    const name =
+                        file.name.toLowerCase();
+
+                    return (
+                        name.endsWith(".mp3") ||
+                        name.endsWith(".wav") ||
+                        name.endsWith(".m4a") ||
+                        name.endsWith(".aac") ||
+                        name.endsWith(".ogg") ||
+                        (
+                            file.type &&
+                            file.type.startsWith(
+                                "audio/"
+                            )
+                        )
+                    );
+                });
+
+            /*
+             * --------------------------------------------------
+             * AUDIO FILES → MIDI
+             * --------------------------------------------------
+             */
+
+            const audioSignals = [];
+
+            audioFiles.forEach(file => {
+                const exercise =
+                    exerciseFromFilename(
+                        file.name
+                    );
+
+                const student =
+                    studentFromFilename(
+                        file.name
+                    );
+
+                if (
+                    exercise &&
+                    student &&
+                    EXERCISE_TO_NOTE[
+                        exercise
+                    ] != null
+                ) {
+                    audioSignals.push({
+                        student,
+                        exercise
+                    });
+                }
+            });
+
+            if (audioSignals.length) {
+                await sendAftertouchForRecords(
+                    audioSignals
+                );
+
+                showToast(
+                    audioSignals.length === 1
+                        ? `Sent: ${audioSignals[0].student} · ${audioSignals[0].exercise}`
+                        : `Sent ${audioSignals.length} MIDI signals`
+                );
+            }
+
+            /*
+             * --------------------------------------------------
+             * .TXT FILES → RECORDS CACHE
+             * --------------------------------------------------
+             */
+
+            if (textFiles.length === 0) {
+                if (
+                    audioSignals.length === 0
+                ) {
+                    showToast(
+                        "No .txt or recognized audio files found"
+                    );
+                }
+
+                return;
+            }
+
+            for (
+                const file of textFiles
+            ) {
+                try {
+                    const text =
+                        await file.text();
+
+                    const record =
+                        parseScoreData(
+                            text
+                        );
+
+                    if (!record) {
+                        console.warn(
+                            "Could not parse dropped file:",
+                            file.name
+                        );
+
+                        continue;
+                    }
+
+                    processImportedRecord(
+                        record
+                    );
+                } catch (error) {
+                    console.error(
+                        "Could not process dropped file:",
+                        file.name,
+                        error
+                    );
+                }
+            }
+        }
+    );
+}
 
 
         function exerciseFromFilename(
