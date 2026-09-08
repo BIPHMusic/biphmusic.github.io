@@ -1410,35 +1410,19 @@ const records = [
         termsToReview: []
     },
     {
-        student: "Alex",
-        date: "2026-09-05",
-        time: "07:17 PM",
+        student: "Maggie",
+        date: "2026-09-08",
+        time: "2:27 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-08",
+        time: "2:27 PM",
         percentage: 60,
-        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
-        termsToReview: ["Major 2nd","Major 2nd","Major 2nd","Major 2nd"]
-    },
-    {
-        student: "Calvin",
-        date: "2026-09-05",
-        time: "06:33 PM",
-        percentage: 40,
-        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
-        termsToReview: ["Major 2nd","Major 2nd","Major 2nd","Major 2nd","Major 2nd","Major 2nd"]
-    },
-    {
-        student: "Calvin",
-        date: "2026-09-05",
-        time: "06:32 PM",
-        percentage: 20,
-        exercise: "Vocab",
-        termsToReview: ["Disjunct Motion","Double Flat","Double Sharp","Major Scale","Measure","Natural","Pentatonic Scale","Whole Tone Scale"]
-    },
-    {
-        student: "Calvin",
-        date: "2026-09-05",
-        time: "04:34 PM",
-        percentage: 40,
-        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
-        termsToReview: ["Major 2nd","Major 2nd","Major 2nd","Major 2nd","Major 2nd","Major 2nd"]
+        exercise: "MCQs",
+        termsToReview: []
     },
 ];
