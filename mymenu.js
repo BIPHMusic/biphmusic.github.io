@@ -72,7 +72,7 @@ function initMyMenu(forceHideIfNotLoggedIn = false) {
                 ${storedName}
             </div>
             <button class="menu-btn" onclick="goToMyRecords()">
-                📊 ${isTeacher ? 'Grades' : 'My Records'}
+                📊 ${isTeacher ? 'Gradebook' : 'My Grades'}
             </button>
             <hr style="margin: 3px 0; border:none; border-top: 1px solid #eee;">
             <button id="signout-btn" class="menu-btn" onclick="handleSignOutClick(event)">🚪 Sign Out</button>

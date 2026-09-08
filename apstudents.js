@@ -28,3 +28,13 @@ globalThis.studentPasswordCredentials["alex"] = {
     salt: "687cbabe6d2dfe70613b4beac6d8aa4b",
     hash: "d7457813c94e1a5df8a2f1e220086b1b203c70f97f5c0800b7a26dc6fe82bce4"
 };
+globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
+globalThis.studentPasswordCredentials["william"] = {
+    salt: "70e6b55b84fd27e06a876ba3e1b88478",
+    hash: "029af3e3bdab25d77114ec2506aeb530b6817da55e2ee53ea22aa17d9ffbaa27"
+};
+globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
+globalThis.studentPasswordCredentials["thomas"] = {
+    salt: "514a1136b2429c92cb605711b9486317",
+    hash: "b3899b8113f567ca6987a83008b85ba0a46bb7eda6aa10877cf014f2ce499e1e"
+};
