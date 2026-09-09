@@ -1633,4 +1633,12 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-09-09",
+        time: "11:04 PM",
+        percentage: 25,
+        exercise: "MCQs",
+        termsToReview: []
+    },
 ];
