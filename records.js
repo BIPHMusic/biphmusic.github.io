@@ -1425,4 +1425,100 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "William",
+        date: "2026-09-09",
+        time: "10:40 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-09",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-09",
+        time: "10:49 am",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-09",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-09",
+        time: "10:51 am",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-09",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-09",
+        time: "上午10:51",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-09",
+        time: "上午10:53",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-09",
+        time: "上午10:54",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-09",
+        time: "10:54 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-09",
+        time: "上午10:55",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-09",
+        time: "10:56 AM",
+        percentage: 100,
+        exercise: "Ear Training – Intervals (Major & Minor 2nds)",
+        termsToReview: []
+    },
 ];
