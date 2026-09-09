@@ -1521,4 +1521,84 @@ const records = [
         exercise: "Ear Training – Intervals (Major & Minor 2nds)",
         termsToReview: []
     },
+    {
+        student: "Thomas",
+        date: "2026-09-08",
+        time: "2:20 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-08",
+        time: "2:20 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-08",
+        time: "2:20 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-08",
+        time: "2:20 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-08",
+        time: "2:20 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-09",
+        time: "2:21 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-09",
+        time: "2:21 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-07",
+        time: "2:23 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-03",
+        time: "2:23 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-03",
+        time: "2:24 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
 ];
