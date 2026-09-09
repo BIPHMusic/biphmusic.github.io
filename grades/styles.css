@@ -559,13 +559,6 @@ tr.detail-row th.row-header {
     background: var(--exercise-bg-hover);
 }
 
-.assignment-table tr.exercise-row th:first-child {
-    background: var(--exercise-bg);
-    border-left: 4px solid var(--exercise-color);
-    color: #fff;
-    font-weight: 600;
-}
-
 .assignment-table tr.exercise-row td {
     background: var(--exercise-bg);
 }
