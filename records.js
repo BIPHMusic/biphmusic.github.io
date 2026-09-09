@@ -1565,7 +1565,7 @@ const records = [
         student: "Maggie",
         date: "2026-09-09",
         time: "2:21 PM",
-        percentage: 60,
+        percentage: 75,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1573,7 +1573,7 @@ const records = [
         student: "Teresa",
         date: "2026-09-09",
         time: "2:21 PM",
-        percentage: 60,
+        percentage: 75,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1605,7 +1605,7 @@ const records = [
         student: "Thomas",
         date: "2026-09-09",
         time: "8:16 PM",
-        percentage: 60,
+        percentage: 75,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1613,7 +1613,7 @@ const records = [
         student: "Jocelyn",
         date: "2026-09-09",
         time: "8:16 PM",
-        percentage: 40,
+        percentage: 50,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1621,7 +1621,7 @@ const records = [
         student: "Calvin",
         date: "2026-09-09",
         time: "8:16 PM",
-        percentage: 60,
+        percentage: 75,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1629,7 +1629,7 @@ const records = [
         student: "William",
         date: "2026-09-09",
         time: "8:17 PM",
-        percentage: 60,
+        percentage: 75,
         exercise: "MCQs",
         termsToReview: []
     },
