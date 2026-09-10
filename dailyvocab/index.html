@@ -38,13 +38,11 @@
 
         .word-bank-container {
             flex: 0.65;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
             position: sticky;
             top: 20px;
             align-self: flex-start;
-            overflow: hidden;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
         }
 
         /* ====================== QUESTION BOXES ====================== */
@@ -100,28 +98,68 @@
             border-radius: 4px;
             padding: 4px 8px;
             color: white;
-            font-size: 1rem;
-            width: 12px;
-            text-align: center;
-            text-transform: uppercase;
-            flex-shrink: 0;
+            font-size: 0.85rem;
+            height: 20px;
+            min-width: 120px;
+            width: 120px;
+            max-width: 100%;
+            box-sizing: content-box;
+            text-align: left;
+            text-transform: none;
+            flex: 0 1 auto;
+        }
+
+        .word-bank button.used {
+            opacity: 0.4 !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .word-bank button.possible {
+            background: rgba(255, 255, 255, 0.22) !important;
+            border-color: rgba(255, 255, 255, 0.55);
+        }
+
+        .word-bank button.filtered-out {
+            opacity: 0.18;
+        }
+
+        .word-bank button.keyboard-highlight {
+            background: rgba(255, 215, 0, 0.35) !important;
+            border-color: #ffd700;
+        }
+
+        .word-bank button.duplicate {
+            background: rgba(255, 255, 0, 0.212) !important;
+            border: 1.5px dotted rgb(237, 255, 77);
+            color: black;
+            position: relative;
+        }
+
+        .duplicate-input {
+            background-color: rgba(255, 255, 0, 0.2) !important;
+        }
+
+        .invalid-input {
+            outline: 2px solid rgba(255, 0, 0, 0.463);
+            background: rgba(255, 0, 0, 0.12) !important;
         }
 
         /* ====================== WORD BANK ====================== */
         .word-bank {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 3px;
         }
 
         .word-bank button {
             background: rgba(255, 255, 255, 0.1);
             border: 1.5px solid rgba(255, 255, 255, 0.2);
             border-radius: 4px;
-            padding: 5px 10px;
+            padding: 4px 10px;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: white;
             text-align: left;
         }
@@ -194,14 +232,14 @@
         }
 
         /* ====================== RESULTS ====================== */
-    .results-section {
-        width: 100%;
-        max-width: 850px;
-        margin: 30px auto;
-        padding: 0 15px;
-        text-align: center;
-        box-sizing: border-box;
-    }
+        .results-section {
+            width: 100%;
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 0 15px;
+            text-align: center;
+            box-sizing: border-box;
+        }
 
         .results-table {
             border-collapse: collapse;
@@ -234,13 +272,6 @@
         }
 
         /* ====================== STATE CLASSES ====================== */
-        .duplicate-input {
-            background-color: rgba(255, 255, 0, 0.2) !important;
-        }
-
-        .invalid-input {
-            outline: 2px solid rgba(255, 0, 0, 0.6);
-        }
 
         .hidden {
             display: none;
@@ -268,6 +299,7 @@
             justify-content: center;
             margin-top: 24px;
         }
+
         .link-actions .copy-button {
             margin-top: 0;
             min-width: 200px;
@@ -276,6 +308,7 @@
 </head>
 <body>
 <div id="shared-menu"></div>
+
     <!-- MAIN CONTENT - Hidden until login -->
     <div id="main-content" style="display: none;">
 
@@ -288,6 +321,7 @@
 
         <div class="quiz-container">
             <div class="questions-container" id="quiz-questions"></div>
+
             <div class="word-bank-container">
                 <div class="word-bank" id="word-bank"></div>
             </div>
@@ -314,13 +348,19 @@
 // Unicode-safe base64 encoding and decoding functions
 function unicodeToBase64(str) {
     const utf8Bytes = new TextEncoder().encode(str);
-    const binary = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('');
+    const binary = Array.from(
+        utf8Bytes,
+        byte => String.fromCharCode(byte)
+    ).join('');
     return btoa(binary);
 }
 
 function base64ToUnicode(base64) {
     const binary = atob(base64);
-    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+    const bytes = Uint8Array.from(
+        binary,
+        char => char.charCodeAt(0)
+    );
     return new TextDecoder().decode(bytes);
 }
 
@@ -330,14 +370,20 @@ function unscrambleTerms(scrambledArray) {
             if (char.match(/[a-zA-Z]/)) {
                 const code = char.charCodeAt(0);
                 const base = char >= 'a' ? 97 : 65;
-                return String.fromCharCode((code - base - shift + 26) % 26 + base);
+
+                return String.fromCharCode(
+                    (code - base - shift + 26) % 26 + base
+                );
             }
+
             return char;
         }).join('');
     }
+
     return scrambledArray.map(item => {
         const decodedTerm = base64ToUnicode(item.Term);
-        const decodedDef  = base64ToUnicode(item.Definition);
+        const decodedDef = base64ToUnicode(item.Definition);
+
         return {
             Term: unshiftString(decodedTerm, 3),
             Definition: unshiftString(decodedDef, 3)
@@ -348,7 +394,8 @@ function unscrambleTerms(scrambledArray) {
 const vocabularyTerms = unscrambleTerms(scrambledVocabularyTerms);
 
 // Use apStudents from apstudents.js
-let approvedStudents = typeof apStudents !== 'undefined' ? apStudents : [];
+let approvedStudents =
+    typeof apStudents !== 'undefined' ? apStudents : [];
 
 let currentStudent = '';
 let questionBank = {};
@@ -356,27 +403,44 @@ let answers = [];
 let usedTerms = {};
 
 let selectedQuestion = null;
-let selectedWord = null;     
+let selectedWord = null;
 
+
+// ==================== INITIAL PAGE LOAD ====================
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const resultsParam = urlParams.get('results');
-    
+
     if (resultsParam) {
         try {
-            const decodedData = base64ToUnicode(decodeURIComponent(resultsParam));
+            const decodedData =
+                base64ToUnicode(decodeURIComponent(resultsParam));
+
             const resultData = JSON.parse(decodedData);
 
             if (resultData.questions) {
                 resultData.questionSet = {
-                    questions: resultData.questions.map(q => ({ Definition: q.definition })),
-                    answers: resultData.questions.map(q => q.correctAnswer)
+                    questions: resultData.questions.map(q => ({
+                        Definition: q.definition
+                    })),
+                    answers: resultData.questions.map(
+                        q => q.correctAnswer
+                    )
                 };
-                resultData.answers = resultData.questions.map(q => q.studentAnswer);
-                resultData.student = resultData.student || "Unknown";
-                resultData.date = resultData.date || "N/A";
-                resultData.time = resultData.time || "N/A";
+
+                resultData.answers =
+                    resultData.questions.map(q => q.studentAnswer);
+
+                resultData.student =
+                    resultData.student || "Unknown";
+
+                resultData.date =
+                    resultData.date || "N/A";
+
+                resultData.time =
+                    resultData.time || "N/A";
+
             } else if (resultData.s) {
                 resultData.student = resultData.s;
                 resultData.date = resultData.d;
@@ -384,29 +448,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultData.p = resultData.p;
             }
 
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('quiz-section').classList.remove('hidden');
-            document.querySelector('.quiz-actions').classList.add('hidden');
-            document.getElementById('results-section').classList.remove('hidden');
+            document.getElementById('login-section')
+                .classList.add('hidden');
+
+            document.getElementById('quiz-section')
+                .classList.remove('hidden');
+
+            document.querySelector('.quiz-actions')
+                .classList.add('hidden');
+
+            document.getElementById('results-section')
+                .classList.remove('hidden');
+
             displayResults(resultData, true);
+
             window.scrollTo({ top: 10 });
+
         } catch (err) {
-            console.error('Failed to decode results from URL:', err);
+            console.error(
+                'Failed to decode results from URL:',
+                err
+            );
+
             alert('Invalid results URL');
         }
+
         return;
     }
-
 });
 
 
 function capitalizeName(name) {
-    return name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    return name.trim().split(' ').map(
+        w =>
+            w.charAt(0).toUpperCase() +
+            w.slice(1).toLowerCase()
+    ).join(' ');
 }
 
+
 function generateQuestionSet(student) {
-    const shuffledQuestions = [...vocabularyTerms].sort(() => Math.random() - 0.5).slice(0, 10);
-    const sortedTerms = [...shuffledQuestions.map(q => q.Term)].sort((a, b) => a.localeCompare(b));
+    const shuffledQuestions =
+        [...vocabularyTerms]
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 10);
+
+    const sortedTerms =
+        [...shuffledQuestions.map(q => q.Term)]
+            .sort((a, b) => a.localeCompare(b));
+
     return {
         questions: shuffledQuestions,
         terms: sortedTerms,
@@ -414,379 +504,1235 @@ function generateQuestionSet(student) {
     };
 }
 
-function selectQuestion(index) {
-    clearSelections();
-    selectedQuestion = index;
-    
-    const questions = document.querySelectorAll('.question-box');
-    const qBox = questions[index];
-    
-    if (qBox) {
-        qBox.classList.add('selected');
-        
-        const rect = qBox.getBoundingClientRect();
-        const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
 
-        if (!isVisible) {
+// ==================== QUESTION SELECTION ====================
+
+function selectQuestion(index, focusInput = true) {
+    clearSelections();
+
+    selectedQuestion = index;
+    lastSelectedIndex = index;
+
+    const qBox = document.querySelectorAll('.question-box')[index];
+    const input = document.getElementById(`answer-${index}`);
+
+    if (qBox) {
+        // Clicking the question itself highlights it.
+        qBox.classList.add('selected');
+
+        const rect = qBox.getBoundingClientRect();
+
+        if (
+            rect.top < 0 ||
+            rect.bottom > window.innerHeight
+        ) {
             qBox.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center'
             });
         }
     }
+
+    if (focusInput && input) {
+        // Remember that the textbox is being focused
+        // because the question box was clicked.
+        input.dataset.focusFromQuestion = 'true';
+
+        input.focus();
+
+        input.setSelectionRange(
+            input.value.length,
+            input.value.length
+        );
+
+        updateInputWidth(input);
+        updateTypingHighlights(input);
+    }
 }
 
-function setupInputFocusListeners() {
-    document.querySelectorAll('.answer-input').forEach((input, index) => {
-        input.addEventListener('focus', () => {
-            selectQuestion(index);
-            updateLastSelected(index);
-        });
+
+function selectWord(index) {
+    const buttons =
+        Array.from(
+            document.querySelectorAll('.word-bank button')
+        );
+
+    if (!buttons[index]) return;
+
+    buttons.forEach(b =>
+        b.classList.remove(
+            'selected',
+            'keyboard-highlight'
+        )
+    );
+
+    selectedWord = index;
+
+    buttons[index].classList.add(
+        'selected',
+        'keyboard-highlight'
+    );
+
+    buttons[index].scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
     });
 }
 
-function selectWord(index) {
-    clearSelections();
-    selectedWord = index;
-    const buttons = document.querySelectorAll('.word-bank button');
-    if (buttons[index]) buttons[index].classList.add('selected');
-}
 
 function clearSelections() {
-    document.querySelectorAll('.question-box').forEach(q => q.classList.remove('selected'));
-    document.querySelectorAll('.word-bank button').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.question-box')
+        .forEach(q =>
+            q.classList.remove('selected')
+        );
+
+    document.querySelectorAll('.word-bank button')
+        .forEach(b =>
+            b.classList.remove(
+                'selected',
+                'keyboard-highlight'
+            )
+        );
+
     selectedQuestion = null;
     selectedWord = null;
 }
 
+
+// ==================== MATCHING WORDS ====================
+
 function makeMatch(qIndex, wIndex) {
     const input = document.getElementById(`answer-${qIndex}`);
-    if (!input) return;
+    const term = questionBank[currentStudent]?.terms?.[wIndex];
 
-    const letter = String.fromCharCode(65 + wIndex);
-    input.value = letter;
+    if (!input || !term) return;
 
-    handleInput(input, qIndex);
+    input.value = term;
+    input.dataset.committed = term;
 
-    // Keep question selected after match + scroll to it
-    const buttons = document.querySelectorAll('.word-bank button');
-    if (buttons[wIndex]) buttons[wIndex].classList.remove('selected');
-    selectedWord = null;
-    
-    selectQuestion(qIndex);
+    input.classList.remove('invalid-input');
+
+    updateInputWidth(input);
+
+    lastSelectedIndex = qIndex;
+
+    // Marks the selected word as used.
+    updateAllAnswerStates();
+
+    // Remove question/word-bank selections.
+    clearSelections();
+
+    // Keep the textbox focused.
+    input.focus();
+    input.setSelectionRange(
+        input.value.length,
+        input.value.length
+    );
 }
+
+
+// ==================== COMMIT TYPED ANSWER ====================
+
+function commitTypedAnswer(index) {
+    const input =
+        document.getElementById(`answer-${index}`);
+
+    if (!input) return false;
+
+    const typed = input.value.trim();
+
+    const terms =
+        questionBank[currentStudent]?.terms || [];
+
+    const exactMatch = terms.find(
+        term =>
+            term.toLowerCase() ===
+            typed.toLowerCase()
+    );
+
+    const prefixMatches = terms.filter(
+        term =>
+            !usedTerms[term.toLowerCase()] &&
+            term.toLowerCase()
+                .startsWith(typed.toLowerCase())
+    );
+
+    const term =
+        exactMatch ||
+        (
+            prefixMatches.length === 1
+                ? prefixMatches[0]
+                : null
+        );
+
+    if (!term) {
+        // Empty input should never be red.
+        // Non-empty invalid input should be red.
+        if (typed) {
+            input.classList.add('invalid-input');
+        } else {
+            input.classList.remove('invalid-input');
+        }
+
+        return false;
+    }
+
+    input.value = term;
+    input.dataset.committed = term;
+
+    input.classList.remove('invalid-input');
+
+    updateInputWidth(input);
+
+    lastSelectedIndex = index;
+
+    updateAllAnswerStates();
+
+    // Clear selection but KEEP TEXTBOX FOCUSED.
+    clearSelections();
+
+    input.focus();
+
+    input.setSelectionRange(
+        input.value.length,
+        input.value.length
+    );
+
+    updateWordBank('');
+
+    return true;
+}
+
+
+// ==================== CLEAR ANSWER ====================
 
 function clearAnswer(index) {
-    const input = document.getElementById(`answer-${index}`);
-    if (input) {
-        input.value = '';
-        handleInput(input, index);
-    }
+    const input =
+        document.getElementById(`answer-${index}`);
+
+    if (!input) return;
+
+    input.value = '';
+
+    delete input.dataset.committed;
+
+    input.classList.remove(
+        'invalid-input',
+        'duplicate-input'
+    );
+
+    updateInputWidth(input);
+    updateAllAnswerStates();
+    updateWordBank('');
 }
+
+
+// ==================== INPUT WIDTH ====================
+
+function updateInputWidth(input) {
+    const canvas =
+        updateInputWidth.canvas ||
+        (
+            updateInputWidth.canvas =
+            document.createElement('canvas')
+        );
+
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return;
+
+    const style = getComputedStyle(input);
+
+    ctx.font =
+        `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    const textWidth =
+        ctx.measureText(input.value || '').width;
+
+    input.style.width =
+        `${Math.max(120, Math.ceil(textWidth))}px`;
+}
+
+
+// ==================== ANSWER STATES ====================
+
+function updateAllAnswerStates() {
+    const inputs =
+        Array.from(
+            document.querySelectorAll('.answer-input')
+        );
+
+    const buttons =
+        Array.from(
+            document.querySelectorAll('.word-bank button')
+        );
+
+    const terms =
+        questionBank[currentStudent]?.terms || [];
+
+    inputs.forEach(input => {
+        input.classList.remove('duplicate-input');
+    });
+
+    buttons.forEach(button => {
+        button.classList.remove(
+            'used',
+            'duplicate',
+            'possible',
+            'filtered-out',
+            'selected',
+            'keyboard-highlight'
+        );
+
+        button.style.opacity = '1';
+        button.style.backgroundColor =
+            'rgba(255, 255, 255, 0.1)';
+        button.style.color = 'white';
+    });
+
+    const usedCounts = {};
+
+    inputs.forEach((input, idx) => {
+        const committed =
+            input.dataset.committed;
+
+        if (!committed) return;
+
+        const key =
+            committed.toLowerCase();
+
+        if (!usedCounts[key]) {
+            usedCounts[key] = [];
+        }
+
+        usedCounts[key].push(idx);
+    });
+
+    Object.entries(usedCounts).forEach(
+        ([key, positions]) => {
+            const termIndex =
+                terms.findIndex(
+                    term =>
+                        term.toLowerCase() === key
+                );
+
+            const button =
+                termIndex >= 0
+                    ? buttons[termIndex]
+                    : null;
+
+            if (positions.length > 1) {
+                positions.forEach(position => {
+                    inputs[position]
+                        .classList.add(
+                            'duplicate-input'
+                        );
+                });
+
+                if (button) {
+                    button.classList.add('duplicate');
+                    button.style.opacity = '1';
+                }
+
+            } else if (button) {
+                button.classList.add('used');
+                button.style.opacity = '0.4';
+            }
+        }
+    );
+
+    answers =
+        inputs.map(
+            input =>
+                input.dataset.committed || ''
+        );
+
+    usedTerms = {};
+
+    answers.forEach((answer, idx) => {
+        if (!answer) return;
+
+        const key =
+            answer.toLowerCase();
+
+        if (!usedTerms[key]) {
+            usedTerms[key] = [];
+        }
+
+        usedTerms[key].push(idx + 1);
+    });
+}
+
+
+// ==================== WORD BANK SCROLLING ====================
+
+
+function scrollHighlightedWordBankButtons(buttons) {
+    const wordBankContainer = document.querySelector('.word-bank-container');
+    if (!wordBankContainer) return;
+
+    const highlighted = buttons.filter(button =>
+        button.classList.contains('possible') ||
+        button.classList.contains('keyboard-highlight')
+    );
+
+    if (!highlighted.length) return;
+
+    const target = highlighted[0];
+    const targetRect = target.getBoundingClientRect();
+    const input = document.activeElement?.classList.contains('answer-input')
+        ? document.activeElement
+        : null;
+
+    const viewportPadding = 24;
+
+    // First make sure the word bank itself is visible on the page.
+    const bankRect = wordBankContainer.getBoundingClientRect();
+
+    const bankAbove = bankRect.bottom < viewportPadding;
+    const bankBelow = bankRect.top > window.innerHeight - viewportPadding;
+
+    if (bankAbove || bankBelow) {
+        wordBankContainer.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+
+    // After the page scroll begins, also make sure the answer input
+    // and the prospective word are visible together when possible.
+    requestAnimationFrame(() => {
+        const newTargetRect = target.getBoundingClientRect();
+        const inputRect = input?.getBoundingClientRect();
+
+        if (inputRect) {
+            const inputVisible =
+                inputRect.top >= viewportPadding &&
+                inputRect.bottom <= window.innerHeight - viewportPadding;
+
+            const targetVisible =
+                newTargetRect.top >= viewportPadding &&
+                newTargetRect.bottom <= window.innerHeight - viewportPadding;
+
+            if (!inputVisible || !targetVisible) {
+                const combinedTop = Math.min(
+                    inputRect.top,
+                    newTargetRect.top
+                );
+
+                const combinedBottom = Math.max(
+                    inputRect.bottom,
+                    newTargetRect.bottom
+                );
+
+                if (
+                    combinedTop < viewportPadding ||
+                    combinedBottom > window.innerHeight - viewportPadding
+                ) {
+                    window.scrollBy({
+                        top:
+                            (combinedTop + combinedBottom) / 2 -
+                            window.innerHeight / 2,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+
+        // Finally, scroll within the word bank if the highlighted word
+        // itself is outside the visible portion of the bank.
+        const currentBankRect =
+            wordBankContainer.getBoundingClientRect();
+
+        const currentTargetRect =
+            target.getBoundingClientRect();
+
+        const padding = 8;
+
+        const targetAbove =
+            currentTargetRect.top <
+            currentBankRect.top + padding;
+
+        const targetBelow =
+            currentTargetRect.bottom >
+            currentBankRect.bottom - padding;
+
+        if (targetAbove) {
+            wordBankContainer.scrollBy({
+                top:
+                    currentTargetRect.top -
+                    currentBankRect.top -
+                    padding,
+                behavior: 'smooth'
+            });
+        } else if (targetBelow) {
+            wordBankContainer.scrollBy({
+                top:
+                    currentTargetRect.bottom -
+                    currentBankRect.bottom +
+                    padding,
+                behavior: 'smooth'
+            });
+        }
+    });
+}
+
+
+// ==================== TYPING HIGHLIGHTS ====================
+
+function updateTypingHighlights(input) {
+    const buttons = Array.from(document.querySelectorAll('.word-bank button'));
+    const terms = questionBank[currentStudent]?.terms || [];
+    const typed = input.value.trim().toLowerCase();
+
+    // A committed answer came from the word bank or a valid
+    // manual commit, so it is already known to be valid.
+    // Do not treat it as an invalid typing search.
+    if (input.dataset.committed) {
+        input.classList.remove('invalid-input');
+
+        buttons.forEach(button => {
+            button.classList.remove(
+                'possible',
+                'filtered-out',
+                'keyboard-highlight'
+            );
+        });
+
+        updateInputWidth(input);
+        return;
+    }
+
+    buttons.forEach((button, index) => {
+        button.classList.remove(
+            'possible',
+            'filtered-out',
+            'keyboard-highlight'
+        );
+
+        const term = terms[index];
+        const used = term && !!usedTerms[term.toLowerCase()];
+
+        if (used) {
+            button.classList.add('used');
+            button.style.opacity = '0.4';
+            return;
+        }
+
+        if (!typed) {
+            button.style.opacity = '1';
+            return;
+        }
+
+        if (term.toLowerCase().startsWith(typed)) {
+            button.classList.add('possible');
+            button.style.opacity = '1';
+        } else {
+            button.classList.add('filtered-out');
+            button.style.opacity = '0.18';
+        }
+    });
+
+    if (!typed) {
+        selectedWord = null;
+        input.classList.remove('invalid-input');
+        updateInputWidth(input);
+        return;
+    }
+
+    const matches = terms
+        .map((term, index) => ({ term, index }))
+        .filter(item =>
+            !usedTerms[item.term.toLowerCase()] &&
+            item.term.toLowerCase().startsWith(typed)
+        );
+
+    if (matches.length === 1) {
+        selectedWord = matches[0].index;
+        buttons[selectedWord]?.classList.add('keyboard-highlight');
+    } else {
+        selectedWord = null;
+    }
+
+    scrollHighlightedWordBankButtons(buttons);
+
+    // Red ONLY when the current uncommitted text
+    // cannot possibly become a word in the bank.
+    if (matches.length === 0) {
+        input.classList.add('invalid-input');
+    } else {
+        input.classList.remove('invalid-input');
+    }
+
+    updateInputWidth(input);
+}
+
 
 // ==================== INITIALIZE QUIZ ====================
 
 function initializeQuiz() {
-    const quizQuestionsDiv = document.getElementById('quiz-questions');
-    const wordBankDiv = document.getElementById('word-bank');
+    const quizQuestionsDiv =
+        document.getElementById(
+            'quiz-questions'
+        );
+
+    const wordBankDiv =
+        document.getElementById(
+            'word-bank'
+        );
+
     quizQuestionsDiv.innerHTML = '';
     wordBankDiv.innerHTML = '';
+
     answers = [];
     usedTerms = {};
+
     selectedQuestion = null;
     selectedWord = null;
+    lastSelectedIndex = -1;
 
-    const studentQuestions = questionBank[currentStudent];
+    const studentQuestions =
+        questionBank[currentStudent];
 
-    // Questions
-    studentQuestions.questions.forEach((question, index) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.className = 'question-box';
-        questionDiv.tabIndex = -1;
-        
-        questionDiv.innerHTML = `
-            <div class="question-label">
-                <strong>${index + 1}.</strong>
-                <input type="text" id="answer-${index}" class="answer-input" 
-                       oninput="handleInput(this, '${index}')" 
-                       autocomplete="off" maxlength="1">
-            </div>
-            <div class="question-text">
-                ${question.Definition}
-            </div>
-        `;
 
-        questionDiv.addEventListener('click', (e) => {
-            if (e.target.tagName === 'INPUT') return;
-            if (selectedWord !== null) {
-                makeMatch(index, selectedWord);
-            } else {
-                selectQuestion(index);
-            }
-        });
+    // ==================== QUESTIONS ====================
 
-        quizQuestionsDiv.appendChild(questionDiv);
-    });
+    studentQuestions.questions.forEach(
+        (question, index) => {
+            const questionDiv =
+                document.createElement('div');
 
-    // Word Bank
-    studentQuestions.terms.forEach((term, index) => {
-        const button = document.createElement('button');
-        button.textContent = `${String.fromCharCode(65 + index)}. ${term}`;
-        button.dataset.index = index;
-        button.tabIndex = -1;
+            questionDiv.className =
+                'question-box';
 
-        button.addEventListener('click', () => {
-            if (selectedQuestion !== null) {
-                makeMatch(selectedQuestion, index);
-            } else {
-                selectWord(index);
-            }
-        });
+            questionDiv.tabIndex = -1;
 
-        wordBankDiv.appendChild(button);
-    });
+            questionDiv.innerHTML = `
+                <div class="question-label">
+                    <strong>${index + 1}.</strong>
+                    <input type="text"
+                           id="answer-${index}"
+                           class="answer-input"
+                           autocomplete="off"
+                           spellcheck="false">
+                </div>
 
-    setupInputFocusListeners();
+                <div class="question-text">
+                    ${question.Definition}
+                </div>
+            `;
+
+            const input =
+                questionDiv.querySelector(
+                    '.answer-input'
+                );
+
+
+            // ==================== QUESTION CLICK ====================
+
+            questionDiv.addEventListener('click', e => {
+                if (e.target === input) return;
+
+                // If a word is currently selected, clicking the question
+                // immediately puts that word into this question.
+                if (selectedWord !== null) {
+                    makeMatch(index, selectedWord);
+                } else {
+                    selectQuestion(index, false);
+                }
+            });
+
+
+            // ==================== INPUT FOCUS ====================
+
+            input.addEventListener('focus', () => {
+                selectedQuestion = index;
+                lastSelectedIndex = index;
+
+                if (input.dataset.focusFromQuestion === 'true') {
+                    // The question box itself was clicked.
+                    // Keep its yellow highlight.
+                    delete input.dataset.focusFromQuestion;
+                } else {
+                    // Directly clicking/focusing the textbox should
+                    // NOT highlight the question.
+                    document.querySelectorAll('.question-box').forEach(q => {
+                        q.classList.remove('selected');
+                    });
+                }
+
+                // Show predictions for whatever is currently being typed.
+                updateTypingHighlights(input);
+            });
+
+
+            // ==================== INPUT ====================
+
+            input.addEventListener('input', () => {
+                // The moment the student changes a committed answer,
+                // it becomes an uncommitted typed answer again.
+                delete input.dataset.committed;
+
+                input.classList.remove('duplicate-input');
+
+                selectedQuestion = index;
+                lastSelectedIndex = index;
+
+                updateAllAnswerStates();
+
+                // Now prediction highlighting takes over.
+                updateTypingHighlights(input);
+            });
+
+
+            quizQuestionsDiv.appendChild(
+                questionDiv
+            );
+
+            updateInputWidth(input);
+        }
+    );
+
+
+    // ==================== WORD BANK ====================
+
+    studentQuestions.terms.forEach(
+        (term, index) => {
+            const button =
+                document.createElement('button');
+
+            // No A., B., C. prefixes.
+            button.textContent = term;
+
+            button.dataset.index = index;
+            button.tabIndex = -1;
+
+            button.addEventListener(
+                'click',
+                () => {
+                    if (selectedQuestion !== null) {
+                        makeMatch(
+                            selectedQuestion,
+                            index
+                        );
+
+                    } else if (
+                        lastSelectedIndex >= 0
+                    ) {
+                        makeMatch(
+                            lastSelectedIndex,
+                            index
+                        );
+
+                    } else {
+                        selectWord(index);
+                    }
+                }
+            );
+
+            wordBankDiv.appendChild(button);
+        }
+    );
+
+    updateAllAnswerStates();
+
+    // Make absolutely sure nothing is focused
+    // or highlighted on initial quiz creation.
+    clearSelections();
+
+    document
+        .querySelectorAll('.answer-input')
+        .forEach(input => input.blur());
+
+    document.activeElement?.blur();
 }
+
 
 // ==================== KEYBOARD SUPPORT ====================
 
 let lastSelectedIndex = -1;
+let keyboardCandidates = [];
+let keyboardCandidatePosition = 0;
+
 
 function updateLastSelected(index) {
     lastSelectedIndex = index;
 }
 
+
 function focusQuestion(index) {
-    const input = document.getElementById(`answer-${index}`);
-    if (input) {
-        selectQuestion(index);
-        input.focus();
-        updateLastSelected(index);
+    const input =
+        document.getElementById(
+            `answer-${index}`
+        );
+
+    if (!input) return;
+
+    clearSelections();
+
+    selectedQuestion = index;
+    lastSelectedIndex = index;
+
+    const qBox =
+        input.closest('.question-box');
+
+    if (qBox) {
+        // IMPORTANT:
+        // Tab/focusing a textbox does NOT
+        // yellow-highlight the question.
+
+        const rect =
+            qBox.getBoundingClientRect();
+
+        if (
+            rect.top < 0 ||
+            rect.bottom > window.innerHeight
+        ) {
+            qBox.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
     }
+
+    input.focus();
+
+    input.setSelectionRange(
+        input.value.length,
+        input.value.length
+    );
+
+    updateTypingHighlights(input);
 }
 
+
 function focusSubmitButton() {
-    const submitBtn = document.querySelector('.quiz-actions .action-button');
+    const submitBtn =
+        document.querySelector(
+            '.quiz-actions .action-button'
+        );
+
     if (submitBtn) {
         clearSelections();
         submitBtn.focus();
     }
 }
 
-// Main keyboard handler
-document.addEventListener('keydown', (e) => {
-    const inputs = Array.from(document.querySelectorAll('.answer-input'));
-    if (inputs.length === 0) return;
 
-    const currentInput = document.activeElement;
-    const currentIndex = inputs.indexOf(currentInput);
-    const isSubmitFocused = document.querySelector('.quiz-actions .action-button') === currentInput;
+// ==================== WORD CANDIDATES ====================
 
-    // ESCAPE
-    if (e.key === 'Escape') {
-        e.preventDefault();
-        clearSelections();
-        if (currentInput?.classList.contains('answer-input')) currentInput.blur();
-        return;
+function getCandidateWordIndices() {
+    const terms =
+        questionBank[currentStudent]?.terms || [];
+
+    const input =
+        document.activeElement
+            ?.classList.contains('answer-input')
+            ? document.activeElement
+            : (
+                selectedQuestion !== null
+                    ? document.getElementById(
+                        `answer-${selectedQuestion}`
+                    )
+                    : null
+            );
+
+    const prefix =
+        input
+            ? input.value.trim().toLowerCase()
+            : '';
+
+    return terms
+        .map((term, i) => ({
+            term,
+            i
+        }))
+        .filter(item =>
+            !usedTerms[
+                item.term.toLowerCase()
+            ] &&
+            (
+                !prefix ||
+                item.term
+                    .toLowerCase()
+                    .startsWith(prefix)
+            )
+        )
+        .map(item => item.i);
+}
+
+
+function moveWordSelection(direction) {
+    const candidates =
+        getCandidateWordIndices();
+
+    if (!candidates.length) return;
+
+    let currentPos =
+        candidates.indexOf(selectedWord);
+
+    if (currentPos < 0) {
+        currentPos =
+            direction > 0
+                ? -1
+                : candidates.length;
     }
 
-    // ==================== TAB ====================
-    if (e.key === 'Tab') {
-        e.preventDefault();
+    let nextPos =
+        currentPos + direction;
 
-        let targetIndex = 0;
-
-        if (isSubmitFocused) {
-            if (e.shiftKey) focusQuestion(inputs.length - 1);
-            return;
-        }
-
-        if (currentIndex >= 0) {
-            if (e.shiftKey) {
-                targetIndex = currentIndex > 0 ? currentIndex - 1 : 0;
-            } else {
-                targetIndex = currentIndex < inputs.length - 1 ? currentIndex + 1 : null;
-            }
-        } else {
-            targetIndex = 0;
-        }
-
-        if (targetIndex !== null) {
-            focusQuestion(targetIndex);
-        } else {
-            focusSubmitButton();
-        }
-        return;
+    if (
+        nextPos >= candidates.length
+    ) {
+        nextPos = 0;
     }
 
-    // ==================== ARROW KEYS ====================
-    if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        if (isSubmitFocused) return;
-
-        const current = selectedQuestion ?? lastSelectedIndex ?? -1;
-        const nextIndex = current + 1;
-
-        if (nextIndex >= inputs.length) {
-            focusSubmitButton();
-        } else {
-            focusQuestion(nextIndex);
-        }
-        return;
+    if (nextPos < 0) {
+        nextPos =
+            candidates.length - 1;
     }
 
-    if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        if (isSubmitFocused) {
-            focusQuestion(inputs.length - 1);
-            return;
-        }
+    const nextIndex =
+        candidates[nextPos];
 
-        const current = selectedQuestion ?? lastSelectedIndex ?? 0;
-        focusQuestion(Math.max(0, current - 1));
-        return;
-    }
+    selectWord(nextIndex);
 
-    // Letter typing
-    if (/^[a-zA-Z]$/.test(e.key) && selectedQuestion !== null) {
-        const input = document.getElementById(`answer-${selectedQuestion}`);
-        if (input) {
-            input.value = e.key.toUpperCase();
-            handleInput(input, selectedQuestion);
-            updateLastSelected(selectedQuestion);
-        }
-    }
-});
+    const button =
+        document.querySelectorAll(
+            '.word-bank button'
+        )[nextIndex];
 
-// Click outside handler
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.question-box') && !e.target.closest('.word-bank button')) {
-        clearSelections();
-    }
-});
+    if (button) {
+        button.classList.add(
+            'keyboard-highlight'
+        );
 
-function setupInputFocusListeners() {
-    document.querySelectorAll('.answer-input').forEach((input, index) => {
-        input.addEventListener('focus', () => {
-            selectQuestion(index);
-            updateLastSelected(index);
+        button.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
         });
-    });
-}
-
-function handleInput(input, index) {
-    const value = input.value.toUpperCase();
-    const currentLetter = value.charAt(0);
-
-    const allInputs = document.querySelectorAll('.answer-input');
-    const buttons = document.querySelectorAll('.word-bank button');
-    
-    allInputs.forEach(input => {
-        input.classList.remove('duplicate-input');
-        input.classList.remove('invalid-input');
-    });
-    
-    buttons.forEach(button => {
-        button.classList.remove('used');
-        button.classList.remove('duplicate');
-        button.style.opacity = '1';
-        button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        button.style.color = 'white';
-    });
-
-    const letterCounts = {};
-    const letterPositions = {};
-
-    allInputs.forEach((input, idx) => {
-        const letter = input.value.toUpperCase().charAt(0);
-        if (letter) {
-            const letterIndex = letter.charCodeAt(0) - 65;
-            const isValidLetter = letterIndex >= 0 && letterIndex < questionBank[currentStudent].terms.length;
-            
-            if (!isValidLetter) input.classList.add('invalid-input');
-            
-            if (isValidLetter) {
-                if (!letterCounts[letter]) {
-                    letterCounts[letter] = 0;
-                    letterPositions[letter] = [];
-                }
-                letterCounts[letter]++;
-                letterPositions[letter].push(idx);
-            }
-        }
-    });
-
-    Object.entries(letterCounts).forEach(([letter, count]) => {
-        const letterIndex = letter.charCodeAt(0) - 65;
-        if (letterIndex >= 0 && letterIndex < buttons.length) {
-            const button = buttons[letterIndex];
-            
-            if (count > 1) {
-                letterPositions[letter].forEach(position => {
-                    const duplicateInput = document.querySelector(`#answer-${position}`);
-                    duplicateInput.classList.add('duplicate-input');
-                });
-                button.classList.add('duplicate');
-            } else {
-                button.classList.add('used');
-                button.style.opacity = '0.4';
-                button.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-                button.style.color = 'rgba(255, 255, 255, 0.4)';
-            }
-        }
-    });
-
-    if (currentLetter) {
-        const letterIndex = currentLetter.charCodeAt(0) - 65;
-        if (letterIndex >= 0 && letterIndex < questionBank[currentStudent].terms.length) {
-            answers[index] = questionBank[currentStudent].terms[letterIndex];
-        } else {
-            answers[index] = '';
-            input.classList.add('invalid-input');
-        }
-    } else {
-        answers[index] = '';
     }
+}
 
-    usedTerms = {};
-    allInputs.forEach((input, idx) => {
-        const letter = input.value.toUpperCase().charAt(0);
-        if (letter) {
-            const letterIndex = letter.charCodeAt(0) - 65;
-            if (letterIndex >= 0 && letterIndex < questionBank[currentStudent].terms.length) {
-                const term = questionBank[currentStudent].terms[letterIndex];
-                if (!usedTerms[term]) usedTerms[term] = [];
-                usedTerms[term].push(idx + 1);
+
+// ==================== GLOBAL KEYBOARD ====================
+
+document.addEventListener(
+    'keydown',
+    e => {
+        const inputs =
+            Array.from(
+                document.querySelectorAll(
+                    '.answer-input'
+                )
+            );
+
+        if (!inputs.length) return;
+
+        const currentInput =
+            document.activeElement;
+
+        const currentIndex =
+            inputs.indexOf(currentInput);
+
+        const submitButton =
+            document.querySelector(
+                '.quiz-actions .action-button'
+            );
+
+        const isSubmitFocused =
+            submitButton === currentInput;
+
+
+        // ==================== ESCAPE ====================
+
+        if (e.key === 'Escape') {
+            e.preventDefault();
+
+            clearSelections();
+
+            if (
+                currentInput?.classList
+                    .contains('answer-input')
+            ) {
+                currentInput.blur();
+            }
+
+            updateWordBank('');
+
+            return;
+        }
+
+
+        // ==================== TAB ====================
+
+        if (e.key === 'Tab') {
+            e.preventDefault();
+
+            let baseIndex =
+                currentIndex >= 0
+                    ? currentIndex
+                    : lastSelectedIndex;
+
+            // IMPORTANT:
+            // If nothing has been selected/focused yet,
+            // the first Tab goes to question 1.
+            if (baseIndex < 0) {
+                baseIndex = -1;
+            }
+
+            let targetIndex;
+
+            if (e.shiftKey) {
+                if (baseIndex <= 0) {
+                    // Nothing before question 1.
+                    return;
+                }
+
+                targetIndex =
+                    baseIndex - 1;
+
+            } else if (
+                baseIndex < inputs.length - 1
+            ) {
+                targetIndex =
+                    baseIndex + 1;
+
+            } else {
+                targetIndex = null;
+            }
+
+
+            // Submit button is currently focused.
+            if (isSubmitFocused) {
+                if (e.shiftKey) {
+                    focusQuestion(
+                        inputs.length - 1
+                    );
+                }
+
+                return;
+            }
+
+
+            // Move to Submit after final question.
+            if (targetIndex === null) {
+                focusSubmitButton();
+
+            } else {
+                focusQuestion(
+                    targetIndex
+                );
+            }
+
+            return;
+        }
+
+
+        // ==================== ARROW KEYS ====================
+
+        if (
+            e.key === 'ArrowDown' ||
+            e.key === 'ArrowUp'
+        ) {
+            if (
+                currentIndex < 0 &&
+                selectedQuestion === null &&
+                selectedWord === null
+            ) {
+                return;
+            }
+
+            e.preventDefault();
+
+            keyboardCandidates =
+                getCandidateWordIndices();
+
+            if (
+                !keyboardCandidates.length
+            ) {
+                return;
+            }
+
+            moveWordSelection(
+                e.key === 'ArrowDown'
+                    ? 1
+                    : -1
+            );
+
+            return;
+        }
+
+
+        // ==================== ENTER ====================
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+
+
+            // If an answer input is active,
+            // use the selected word or commit typed text.
+            if (currentIndex >= 0) {
+
+                if (selectedWord !== null) {
+                    const terms =
+                        questionBank[
+                            currentStudent
+                        ].terms;
+
+                    const typed =
+                        currentInput.value
+                            .trim()
+                            .toLowerCase();
+
+                    if (
+                        !typed ||
+                        terms[selectedWord]
+                            .toLowerCase()
+                            .startsWith(typed)
+                    ) {
+                        makeMatch(
+                            currentIndex,
+                            selectedWord
+                        );
+
+                    } else {
+                        commitTypedAnswer(
+                            currentIndex
+                        );
+                    }
+
+                } else {
+                    commitTypedAnswer(
+                        currentIndex
+                    );
+                }
+
+                return;
+            }
+
+
+            // If a word is selected with no input
+            // focused, apply it to the most recent question.
+            if (
+                selectedWord !== null &&
+                lastSelectedIndex >= 0
+            ) {
+                makeMatch(
+                    lastSelectedIndex,
+                    selectedWord
+                );
             }
         }
-    });
-}
+    }
+);
+
+
+// ==================== CLICK OUTSIDE ====================
+
+document.addEventListener(
+    'click',
+    e => {
+        if (
+            !e.target.closest(
+                '.question-box'
+            ) &&
+            !e.target.closest(
+                '.word-bank button'
+            )
+        ) {
+            clearSelections();
+        }
+    }
+);
+
+
+// ==================== SUBMIT QUIZ ====================
 
 function submitQuiz() {
-    const hasBlankAnswers = [...document.querySelectorAll('.answer-input')].some(input => input.value.trim() === '');
-    const duplicateAnswers = Object.keys(usedTerms).filter(term => usedTerms[term].length > 1);
+    const hasBlankAnswers =
+        answers.some(
+            answer => !answer
+        );
 
-    if (hasBlankAnswers && duplicateAnswers.length > 0) {
-        if (!confirm('There are blank answers and duplicate responses.\nWould you still like to proceed?')) return;
+    const usedCounts = {};
+
+    answers.forEach(answer => {
+        if (answer) {
+            usedCounts[answer] =
+                (usedCounts[answer] || 0) + 1;
+        }
+    });
+
+    const duplicateAnswers =
+        Object.keys(usedCounts)
+            .filter(
+                term =>
+                    usedCounts[term] > 1
+            );
+
+
+    if (
+        hasBlankAnswers &&
+        duplicateAnswers.length > 0
+    ) {
+        if (
+            !confirm(
+                'There are blank answers and duplicate responses.\nWould you still like to proceed?'
+            )
+        ) return;
+
     } else if (hasBlankAnswers) {
-        if (!confirm('There are some questions left blank.\nWould you still like to proceed?')) return;
-    } else if (duplicateAnswers.length > 0) {
-        if (!confirm('There are duplicate responses (each word should only be used once).\n\nWould you still like to proceed?')) return;
+        if (
+            !confirm(
+                'There are some questions left blank.\nWould you still like to proceed?'
+            )
+        ) return;
+
+    } else if (
+        duplicateAnswers.length > 0
+    ) {
+        if (
+            !confirm(
+                'There are duplicate responses (each word should only be used once).\n\nWould you still like to proceed?'
+            )
+        ) return;
     }
 
-    const resultData = prepareResultData();
-    displayResults(resultData, false);
 
-    document.querySelector('.quiz-container').classList.add('hidden');
-    document.querySelector('.quiz-actions').classList.add('hidden');
-    document.getElementById('results-section').classList.remove('hidden');
+    const resultData =
+        prepareResultData();
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    displayResults(
+        resultData,
+        false
+    );
+
+    document
+        .querySelector('.quiz-container')
+        .classList.add('hidden');
+
+    document
+        .querySelector('.quiz-actions')
+        .classList.add('hidden');
+
+    document
+        .getElementById('results-section')
+        .classList.remove('hidden');
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
 }
 
+
 // ==================== SHARE / AIRDROP ====================
-async function shareScoreEntryLink(resultData, percentage) {
+
+async function shareScoreEntryLink(
+    resultData,
+    percentage
+) {
     try {
         const exportPayload = {
             student: resultData.student,
@@ -794,78 +1740,204 @@ async function shareScoreEntryLink(resultData, percentage) {
             time: resultData.time,
             percentage: percentage,
             exercise: "Vocab",
-            termsToReview: resultData.termsToReview.map(t => t.term)
+            termsToReview:
+                resultData.termsToReview
+                    .map(t => t.term)
         };
 
-        const jsonStr = JSON.stringify(exportPayload);
-        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+        const jsonStr =
+            JSON.stringify(exportPayload);
 
-        // Change this if your score-entry lives elsewhere
-        const scoreEntryBase = 'https://biphmusic.github.io/grades/';
-        const deepLink = `${scoreEntryBase}#data=${base64}`;
+        const base64 =
+            btoa(
+                unescape(
+                    encodeURIComponent(
+                        jsonStr
+                    )
+                )
+            );
 
-        // Filename: "[Name] - Vocab, [Date].txt"
-        const safeName = (resultData.student || 'Student').replace(/[\/\\?%*:|"<>]/g, '').trim();
-        const fileName = `${safeName} - Vocab, ${resultData.date}.txt`;
+        const scoreEntryBase =
+            'https://biphmusic.github.io/grades/';
 
-        const blob = new Blob([deepLink + '\n'], { type: 'text/plain' });
-        const file = new File([blob], fileName, { type: 'text/plain' });
+        const deepLink =
+            `${scoreEntryBase}#data=${base64}`;
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        const safeName =
+            (
+                resultData.student ||
+                'Student'
+            )
+                .replace(
+                    /[\/\\?%*:|"<>]/g,
+                    ''
+                )
+                .trim();
+
+        const fileName =
+            `${safeName} - Vocab, ${resultData.date}.txt`;
+
+        const blob =
+            new Blob(
+                [deepLink + '\n'],
+                {
+                    type: 'text/plain'
+                }
+            );
+
+        const file =
+            new File(
+                [blob],
+                fileName,
+                {
+                    type: 'text/plain'
+                }
+            );
+
+
+        if (
+            navigator.canShare &&
+            navigator.canShare({
+                files: [file]
+            })
+        ) {
             await navigator.share({
                 files: [file],
                 title: fileName,
-                text: 'Score for ' + resultData.student
+                text:
+                    'Score for ' +
+                    resultData.student
             });
+
         } else {
-            // Fallback download
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
+            const url =
+                URL.createObjectURL(blob);
+
+            const a =
+                document.createElement('a');
+
             a.href = url;
             a.download = fileName;
+
             a.click();
+
             URL.revokeObjectURL(url);
         }
+
     } catch (err) {
-        if (err.name !== 'AbortError') {
+        if (
+            err.name !== 'AbortError'
+        ) {
             console.error(err);
-            alert('Could not share the file.');
+            alert(
+                'Could not share the file.'
+            );
         }
     }
 }
 
+
 // ==================== DISPLAY RESULTS ====================
-function displayResults(resultData, isUrlView = false) {
-    const resultsSection = document.getElementById('results-section');
+
+function displayResults(
+    resultData,
+    isUrlView = false
+) {
+    const resultsSection =
+        document.getElementById(
+            'results-section'
+        );
+
     resultsSection.innerHTML = '';
 
-    const title = document.createElement('h2');
-    title.textContent = `Results for ${resultData.student || resultData.s}`;
+
+    const title =
+        document.createElement('h2');
+
+    title.textContent =
+        `Results for ${
+            resultData.student ||
+            resultData.s
+        }`;
+
     resultsSection.appendChild(title);
 
-    const dateTime = document.createElement('p');
-    dateTime.textContent = `Date: ${resultData.date || resultData.d} | Time: ${resultData.time || resultData.t}`;
-    resultsSection.appendChild(dateTime);
+
+    const dateTime =
+        document.createElement('p');
+
+    dateTime.textContent =
+        `Date: ${
+            resultData.date ||
+            resultData.d
+        } | Time: ${
+            resultData.time ||
+            resultData.t
+        }`;
+
+    resultsSection.appendChild(
+        dateTime
+    );
+
 
     let percentage;
-    if (isUrlView && resultData.p !== undefined) {
-        percentage = resultData.p;
-    } else if (resultData.questionSet && resultData.answers) {
-        const correctCount = resultData.answers.filter((ans, idx) => 
-            ans && ans.toLowerCase() === resultData.questionSet.answers[idx].toLowerCase()
-        ).length;
-        percentage = Math.round(correctCount / resultData.questionSet.answers.length * 100);
+
+    if (
+        isUrlView &&
+        resultData.p !== undefined
+    ) {
+        percentage =
+            resultData.p;
+
+    } else if (
+        resultData.questionSet &&
+        resultData.answers
+    ) {
+        const correctCount =
+            resultData.answers.filter(
+                (ans, idx) =>
+                    ans &&
+                    ans.toLowerCase() ===
+                    resultData
+                        .questionSet
+                        .answers[idx]
+                        .toLowerCase()
+            ).length;
+
+        percentage =
+            Math.round(
+                correctCount /
+                resultData
+                    .questionSet
+                    .answers
+                    .length *
+                100
+            );
+
     } else {
         percentage = 'N/A';
     }
 
-    const score = document.createElement('p');
-    score.textContent = `Score: ${percentage}%`;
+
+    const score =
+        document.createElement('p');
+
+    score.textContent =
+        `Score: ${percentage}%`;
+
     resultsSection.appendChild(score);
 
-    if (!isUrlView && resultData.questionSet) {
-        const table = document.createElement('table');
-        table.className = 'results-table';
+
+    if (
+        !isUrlView &&
+        resultData.questionSet
+    ) {
+        const table =
+            document.createElement('table');
+
+        table.className =
+            'results-table';
+
         table.innerHTML = `
             <tr>
                 <th>#</th>
@@ -873,153 +1945,460 @@ function displayResults(resultData, isUrlView = false) {
                 <th>Your Answer</th>
                 <th>Correct Answer</th>
             </tr>
-            ${resultData.questionSet.questions.map((question, index) => {
-                const studentAnswer = resultData.answers[index] || "";
-                const correctAnswer = resultData.questionSet.answers[index];
-                const isCorrect = studentAnswer.toLowerCase() === correctAnswer.toLowerCase();
-                return `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${question.Definition}</td>
-                        <td class="${isCorrect ? '' : 'incorrect'}">${studentAnswer}${isCorrect ? '<span class="correct-mark">√</span>' : ''}</td>
-                        <td>${correctAnswer}</td>
-                    </tr>
-                `;
-            }).join('')}
+
+            ${
+                resultData
+                    .questionSet
+                    .questions
+                    .map(
+                        (question, index) => {
+                            const studentAnswer =
+                                resultData
+                                    .answers[index] ||
+                                "";
+
+                            const correctAnswer =
+                                resultData
+                                    .questionSet
+                                    .answers[index];
+
+                            const isCorrect =
+                                studentAnswer
+                                    .toLowerCase() ===
+                                correctAnswer
+                                    .toLowerCase();
+
+                            return `
+                                <tr>
+                                    <td>${index + 1}</td>
+
+                                    <td>
+                                        ${question.Definition}
+                                    </td>
+
+                                    <td class="${
+                                        isCorrect
+                                            ? ''
+                                            : 'incorrect'
+                                    }">
+                                        ${studentAnswer}
+
+                                        ${
+                                            isCorrect
+                                                ? '<span class="correct-mark">√</span>'
+                                                : ''
+                                        }
+                                    </td>
+
+                                    <td>
+                                        ${correctAnswer}
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                    )
+                    .join('')
+            }
         `;
-        resultsSection.appendChild(table);
+
+        resultsSection.appendChild(
+            table
+        );
     }
+
 
     if (isUrlView) {
-        const authContainer = document.createElement('div');
-        authContainer.className = 'auth-container';
-        authContainer.innerHTML = `<span class="auth-check">✔</span><span class="auth-text">Authentication successful</span>`;
-        resultsSection.appendChild(authContainer);
+        const authContainer =
+            document.createElement('div');
 
-        const copyScoreButton = document.createElement('button');
-        copyScoreButton.className = 'copy-button';
-        copyScoreButton.textContent = 'Copy Score';
-        copyScoreButton.onclick = () => {
-            navigator.clipboard.writeText(`${percentage}%`).then(() => {
-                copyScoreButton.textContent = '√ Copied';
-                setTimeout(() => copyScoreButton.textContent = 'Copy Score', 2000);
-            });
-        };
-        resultsSection.appendChild(copyScoreButton);
+        authContainer.className =
+            'auth-container';
+
+        authContainer.innerHTML =
+            `<span class="auth-check">✔</span>
+             <span class="auth-text">
+                Authentication successful
+             </span>`;
+
+        resultsSection.appendChild(
+            authContainer
+        );
+
+
+        const copyScoreButton =
+            document.createElement(
+                'button'
+            );
+
+        copyScoreButton.className =
+            'copy-button';
+
+        copyScoreButton.textContent =
+            'Copy Score';
+
+        copyScoreButton.onclick =
+            () => {
+                navigator.clipboard
+                    .writeText(
+                        `${percentage}%`
+                    )
+                    .then(() => {
+                        copyScoreButton
+                            .textContent =
+                            '√ Copied';
+
+                        setTimeout(
+                            () =>
+                                copyScoreButton
+                                    .textContent =
+                                    'Copy Score',
+                            2000
+                        );
+                    });
+            };
+
+        resultsSection.appendChild(
+            copyScoreButton
+        );
     }
 
+
     if (!isUrlView) {
-        const termsToReview = document.createElement('div');
-        termsToReview.className = 'terms-to-review';
-        
-        const heading = document.createElement('h3');
-        heading.textContent = (percentage === 100) ? 'Great job!' : 'Terms to Review';
-        termsToReview.appendChild(heading);
+        const termsToReview =
+            document.createElement('div');
 
-        const termsList = document.createElement('div');
-        termsList.style.marginTop = '12px';
-        termsList.style.textAlign = 'left';
-        termsList.style.lineHeight = '1.8';
-        termsList.style.paddingLeft = '10px';
+        termsToReview.className =
+            'terms-to-review';
 
-        resultData.termsToReview.forEach(item => {
-            const termLine = document.createElement('div');
-            termLine.style.marginBottom = '14px';
-            termLine.innerHTML = `<strong>${item.term}:</strong> ${item.definition}`;
-            termsList.appendChild(termLine);
-        });
 
-        termsToReview.appendChild(termsList);
-        resultsSection.appendChild(termsToReview);
+        const heading =
+            document.createElement('h3');
+
+        heading.textContent =
+            percentage === 100
+                ? 'Great job!'
+                : 'Terms to Review';
+
+        termsToReview.appendChild(
+            heading
+        );
+
+
+        const termsList =
+            document.createElement('div');
+
+        termsList.style.marginTop =
+            '12px';
+
+        termsList.style.textAlign =
+            'left';
+
+        termsList.style.lineHeight =
+            '1.8';
+
+        termsList.style.paddingLeft =
+            '10px';
+
+
+        resultData.termsToReview
+            .forEach(item => {
+                const termLine =
+                    document.createElement(
+                        'div'
+                    );
+
+                termLine.style.marginBottom =
+                    '14px';
+
+                termLine.innerHTML =
+                    `<strong>${item.term}:</strong>
+                     ${item.definition}`;
+
+                termsList.appendChild(
+                    termLine
+                );
+            });
+
+
+        termsToReview.appendChild(
+            termsList
+        );
+
+        resultsSection.appendChild(
+            termsToReview
+        );
+
 
         // ========== Score-Entry deep-link actions ==========
-        const linkActions = document.createElement('div');
-        linkActions.className = 'link-actions';
 
-        // Build the payload once
+        const linkActions =
+            document.createElement('div');
+
+        linkActions.className =
+            'link-actions';
+
+
         const exportPayload = {
             student: resultData.student,
             date: resultData.date,
             time: resultData.time,
             percentage: percentage,
             exercise: "Vocab",
-            termsToReview: resultData.termsToReview.map(t => t.term)
+            termsToReview:
+                resultData.termsToReview
+                    .map(t => t.term)
         };
 
-        const jsonStr = JSON.stringify(exportPayload);
-        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
-        const scoreEntryBase = 'https://biphmusic.github.io/grades/';
-        const deepLink = `${scoreEntryBase}#data=${base64}`;
+
+        const jsonStr =
+            JSON.stringify(
+                exportPayload
+            );
+
+        const base64 =
+            btoa(
+                unescape(
+                    encodeURIComponent(
+                        jsonStr
+                    )
+                )
+            );
+
+        const scoreEntryBase =
+            'https://biphmusic.github.io/grades/';
+
+        const deepLink =
+            `${scoreEntryBase}#data=${base64}`;
+
 
         // 1. Copy link button
-        const copyLinkBtn = document.createElement('button');
-        copyLinkBtn.className = 'copy-button';
-        copyLinkBtn.textContent = '📋 Copy Score';
-        copyLinkBtn.onclick = async () => {
-            try {
-                await navigator.clipboard.writeText(deepLink);
-                copyLinkBtn.textContent = '√ Link Copied!';
-                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score', 2200);
-            } catch {
-                const ta = document.createElement('textarea');
-                ta.value = deepLink;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                copyLinkBtn.textContent = '√ Link Copied!';
-                setTimeout(() => copyLinkBtn.textContent = '📋 Copy Score', 2200);
-            }
-        };
-        linkActions.appendChild(copyLinkBtn);
+
+        const copyLinkBtn =
+            document.createElement(
+                'button'
+            );
+
+        copyLinkBtn.className =
+            'copy-button';
+
+        copyLinkBtn.textContent =
+            '📋 Copy Score';
+
+        copyLinkBtn.onclick =
+            async () => {
+                try {
+                    await navigator.clipboard
+                        .writeText(
+                            deepLink
+                        );
+
+                    copyLinkBtn.textContent =
+                        '√ Link Copied!';
+
+                    setTimeout(
+                        () =>
+                            copyLinkBtn.textContent =
+                            '📋 Copy Score',
+                        2200
+                    );
+
+                } catch {
+                    const ta =
+                        document.createElement(
+                            'textarea'
+                        );
+
+                    ta.value =
+                        deepLink;
+
+                    document.body.appendChild(
+                        ta
+                    );
+
+                    ta.select();
+
+                    document.execCommand(
+                        'copy'
+                    );
+
+                    document.body.removeChild(
+                        ta
+                    );
+
+                    copyLinkBtn.textContent =
+                        '√ Link Copied!';
+
+                    setTimeout(
+                        () =>
+                            copyLinkBtn.textContent =
+                            '📋 Copy Score',
+                        2200
+                    );
+                }
+            };
+
+        linkActions.appendChild(
+            copyLinkBtn
+        );
+
 
         // 2. Share / AirDrop button
-        const shareBtn = document.createElement('button');
-        shareBtn.className = 'copy-button';
-        shareBtn.textContent = '📤 Share / AirDrop';
-        shareBtn.onclick = () => shareScoreEntryLink(resultData, percentage);
-        linkActions.appendChild(shareBtn);
 
-        resultsSection.appendChild(linkActions);
+        const shareBtn =
+            document.createElement(
+                'button'
+            );
+
+        shareBtn.className =
+            'copy-button';
+
+        shareBtn.textContent =
+            '📤 Share / AirDrop';
+
+        shareBtn.onclick =
+            () =>
+                shareScoreEntryLink(
+                    resultData,
+                    percentage
+                );
+
+        linkActions.appendChild(
+            shareBtn
+        );
+
+
+        resultsSection.appendChild(
+            linkActions
+        );
     }
 }
 
+
+// ==================== PREPARE RESULT DATA ====================
+
 function prepareResultData() {
-    const correctAnswers = questionBank[currentStudent].answers;
-    const allTerms = [...correctAnswers];
-    const correctTerms = answers
-        .map((answer, index) => answer && answer.toLowerCase() === correctAnswers[index].toLowerCase() ? correctAnswers[index] : null)
-        .filter(term => term);
-    const termsToReview = allTerms.filter(term => !correctTerms.includes(term));
+    const correctAnswers =
+        questionBank[
+            currentStudent
+        ].answers;
+
+    const allTerms =
+        [...correctAnswers];
+
+    const correctTerms =
+        answers
+            .map(
+                (answer, index) =>
+                    answer &&
+                    answer.toLowerCase() ===
+                    correctAnswers[index]
+                        .toLowerCase()
+                        ? correctAnswers[index]
+                        : null
+            )
+            .filter(term => term);
+
+    const termsToReview =
+        allTerms.filter(
+            term =>
+                !correctTerms.includes(term)
+        );
+
 
     return {
-        student: capitalizeName(currentStudent),
-        date: new Date().toISOString().split('T')[0],
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
-        exercise: "Vocab",  
-        answers: Array.from({ length: 15 }, (_, index) => answers[index] || ""),
-        questionSet: questionBank[currentStudent],
-        termsToReview: termsToReview.map(term => ({
-            term,
-            definition: vocabularyTerms.find(v => v.Term === term)?.Definition || "Definition not found"
-        })).sort((a, b) => a.term.localeCompare(b.term))
+        student:
+            capitalizeName(
+                currentStudent
+            ),
+
+        date:
+            new Date()
+                .toISOString()
+                .split('T')[0],
+
+        time:
+            new Date()
+                .toLocaleTimeString(
+                    [],
+                    {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    }
+                ),
+
+        exercise:
+            "Vocab Quiz",
+
+        answers:
+            Array.from(
+                { length: 10 },
+                (_, index) =>
+                    answers[index] || ""
+            ),
+
+        questionSet:
+            questionBank[currentStudent],
+
+        termsToReview:
+            termsToReview
+                .map(term => ({
+                    term,
+                    definition:
+                        vocabularyTerms
+                            .find(
+                                v =>
+                                    v.Term ===
+                                    term
+                            )
+                            ?.Definition ||
+                        "Definition not found"
+                }))
+                .sort(
+                    (a, b) =>
+                        a.term.localeCompare(
+                            b.term
+                        )
+                )
     };
 }
 
-// ==================== LOGIN CALLBACK ====================
-        window.onSuccessfulLogin = function(displayName) {
-            currentStudent = displayName.toLowerCase();
-            questionBank[currentStudent] = generateQuestionSet(currentStudent);
-            initializeQuiz();
-            document.querySelector('.quiz-actions').classList.remove('hidden');
-            if (typeof initMyMenu === 'function') {
-                initMyMenu();
-            }
-        };
 
-        window.onload = function() {
-            initLogin();
-        };
+// ==================== LOGIN CALLBACK ====================
+
+window.onSuccessfulLogin =
+    function(displayName) {
+        currentStudent =
+            displayName.toLowerCase();
+
+        questionBank[currentStudent] =
+            generateQuestionSet(
+                currentStudent
+            );
+
+        initializeQuiz();
+
+        document
+            .querySelector('.quiz-actions')
+            .classList.remove(
+                'hidden'
+            );
+
+        if (
+            typeof initMyMenu ===
+            'function'
+        ) {
+            initMyMenu();
+        }
+    };
+
+
+// ==================== WINDOW LOAD ====================
+
+window.onload =
+    function() {
+        initLogin();
+    };
 </script>
 </body>
 </html>
