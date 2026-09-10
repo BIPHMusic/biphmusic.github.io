@@ -508,15 +508,11 @@ function selectQuestion(index, focusInput = true) {
     selectedQuestion = index;
     lastSelectedIndex = index;
 
-    const qBox =
-        document.querySelectorAll('.question-box')[index];
-
-    const input =
-        document.getElementById(`answer-${index}`);
+    const qBox = document.querySelectorAll('.question-box')[index];
+    const input = document.getElementById(`answer-${index}`);
 
     if (qBox) {
-        // Clicking the QUESTION BOX is what creates
-        // the yellow highlight.
+        // Clicking the question itself highlights it.
         qBox.classList.add('selected');
 
         const rect = qBox.getBoundingClientRect();
@@ -533,6 +529,10 @@ function selectQuestion(index, focusInput = true) {
     }
 
     if (focusInput && input) {
+        // Remember that the textbox is being focused
+        // because the question box was clicked.
+        input.dataset.focusFromQuestion = 'true';
+
         input.focus();
 
         input.setSelectionRange(
@@ -597,11 +597,8 @@ function clearSelections() {
 // ==================== MATCHING WORDS ====================
 
 function makeMatch(qIndex, wIndex) {
-    const input =
-        document.getElementById(`answer-${qIndex}`);
-
-    const term =
-        questionBank[currentStudent]?.terms?.[wIndex];
+    const input = document.getElementById(`answer-${qIndex}`);
+    const term = questionBank[currentStudent]?.terms?.[wIndex];
 
     if (!input || !term) return;
 
@@ -614,19 +611,18 @@ function makeMatch(qIndex, wIndex) {
 
     lastSelectedIndex = qIndex;
 
+    // Marks the selected word as used.
     updateAllAnswerStates();
 
-    // Clear visual selections, but KEEP THE TEXTBOX FOCUSED.
+    // Remove question/word-bank selections.
     clearSelections();
 
+    // Keep the textbox focused.
     input.focus();
-
     input.setSelectionRange(
         input.value.length,
         input.value.length
     );
-
-    updateWordBank('');
 }
 
 
@@ -923,18 +919,27 @@ function scrollHighlightedWordBankButtons(buttons) {
 // ==================== TYPING HIGHLIGHTS ====================
 
 function updateTypingHighlights(input) {
-    const buttons =
-        Array.from(
-            document.querySelectorAll(
-                '.word-bank button'
-            )
-        );
+    const buttons = Array.from(document.querySelectorAll('.word-bank button'));
+    const terms = questionBank[currentStudent]?.terms || [];
+    const typed = input.value.trim().toLowerCase();
 
-    const terms =
-        questionBank[currentStudent]?.terms || [];
+    // A committed answer came from the word bank or a valid
+    // manual commit, so it is already known to be valid.
+    // Do not treat it as an invalid typing search.
+    if (input.dataset.committed) {
+        input.classList.remove('invalid-input');
 
-    const typed =
-        input.value.trim().toLowerCase();
+        buttons.forEach(button => {
+            button.classList.remove(
+                'possible',
+                'filtered-out',
+                'keyboard-highlight'
+            );
+        });
+
+        updateInputWidth(input);
+        return;
+    }
 
     buttons.forEach((button, index) => {
         button.classList.remove(
@@ -944,10 +949,7 @@ function updateTypingHighlights(input) {
         );
 
         const term = terms[index];
-
-        const used =
-            term &&
-            !!usedTerms[term.toLowerCase()];
+        const used = term && !!usedTerms[term.toLowerCase()];
 
         if (used) {
             button.classList.add('used');
@@ -960,66 +962,40 @@ function updateTypingHighlights(input) {
             return;
         }
 
-        if (
-            term.toLowerCase()
-                .startsWith(typed)
-        ) {
+        if (term.toLowerCase().startsWith(typed)) {
             button.classList.add('possible');
             button.style.opacity = '1';
-
         } else {
-            button.classList.add(
-                'filtered-out'
-            );
-
+            button.classList.add('filtered-out');
             button.style.opacity = '0.18';
         }
     });
 
     if (!typed) {
         selectedWord = null;
-
-        // IMPORTANT:
-        // Removing all text also removes the invalid state.
         input.classList.remove('invalid-input');
-
         updateInputWidth(input);
-
         return;
     }
 
-    const matches =
-        terms
-            .map((term, index) => ({
-                term,
-                index
-            }))
-            .filter(item =>
-                !usedTerms[
-                    item.term.toLowerCase()
-                ] &&
-                item.term
-                    .toLowerCase()
-                    .startsWith(typed)
-            );
+    const matches = terms
+        .map((term, index) => ({ term, index }))
+        .filter(item =>
+            !usedTerms[item.term.toLowerCase()] &&
+            item.term.toLowerCase().startsWith(typed)
+        );
 
     if (matches.length === 1) {
-        selectedWord =
-            matches[0].index;
-
-        buttons[selectedWord]
-            ?.classList.add(
-                'keyboard-highlight'
-            );
-
+        selectedWord = matches[0].index;
+        buttons[selectedWord]?.classList.add('keyboard-highlight');
     } else {
         selectedWord = null;
     }
 
     scrollHighlightedWordBankButtons(buttons);
 
-    // Invalid text is red.
-    // As soon as it becomes valid OR empty, the red disappears.
+    // Red ONLY when the current uncommitted text
+    // cannot possibly become a word in the bank.
     if (matches.length === 0) {
         input.classList.add('invalid-input');
     } else {
@@ -1092,76 +1068,59 @@ function initializeQuiz() {
 
             // ==================== QUESTION CLICK ====================
 
-            questionDiv.addEventListener(
-                'click',
-                e => {
-                    if (e.target === input) return;
+            questionDiv.addEventListener('click', e => {
+                if (e.target === input) return;
 
-                    // If a word is selected, put it
-                    // into this question.
-                    if (selectedWord !== null) {
-                        makeMatch(
-                            index,
-                            selectedWord
-                        );
-                    } else {
-                        // Clicking the question box
-                        // itself creates the yellow highlight.
-                        selectQuestion(
-                            index,
-                            true
-                        );
-                    }
+                // If a word is currently selected, clicking the question
+                // immediately puts that word into this question.
+                if (selectedWord !== null) {
+                    makeMatch(index, selectedWord);
+                } else {
+                    selectQuestion(index, false);
                 }
-            );
+            });
 
 
             // ==================== INPUT FOCUS ====================
 
-            input.addEventListener(
-                'focus',
-                () => {
-                    selectedQuestion = index;
-                    lastSelectedIndex = index;
+            input.addEventListener('focus', () => {
+                selectedQuestion = index;
+                lastSelectedIndex = index;
 
-                    // IMPORTANT:
-                    // Focusing the textbox does NOT
-                    // highlight its question.
-                    document
-                        .querySelectorAll(
-                            '.question-box'
-                        )
-                        .forEach(q =>
-                            q.classList.remove(
-                                'selected'
-                            )
-                        );
-
-                    updateTypingHighlights(input);
+                if (input.dataset.focusFromQuestion === 'true') {
+                    // The question box itself was clicked.
+                    // Keep its yellow highlight.
+                    delete input.dataset.focusFromQuestion;
+                } else {
+                    // Directly clicking/focusing the textbox should
+                    // NOT highlight the question.
+                    document.querySelectorAll('.question-box').forEach(q => {
+                        q.classList.remove('selected');
+                    });
                 }
-            );
+
+                // Show predictions for whatever is currently being typed.
+                updateTypingHighlights(input);
+            });
 
 
             // ==================== INPUT ====================
 
-            input.addEventListener(
-                'input',
-                () => {
-                    // Editing a committed answer makes it
-                    // an uncommitted typed answer again.
-                    delete input.dataset.committed;
+            input.addEventListener('input', () => {
+                // The moment the student changes a committed answer,
+                // it becomes an uncommitted typed answer again.
+                delete input.dataset.committed;
 
-                    input.classList.remove(
-                        'duplicate-input'
-                    );
+                input.classList.remove('duplicate-input');
 
-                    selectedQuestion = index;
-                    lastSelectedIndex = index;
+                selectedQuestion = index;
+                lastSelectedIndex = index;
 
-                    updateAllAnswerStates();
-                    updateTypingHighlights(input);
-                }
-            );
+                updateAllAnswerStates();
+
+                // Now prediction highlighting takes over.
+                updateTypingHighlights(input);
+            });
 
 
             quizQuestionsDiv.appendChild(
