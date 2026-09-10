@@ -1653,7 +1653,7 @@ const records = [
         student: "Alex",
         date: "2026-09-09",
         time: "11:04 PM",
-        percentage: 25,
+        percentage: 50,
         exercise: "MCQs",
         termsToReview: []
     },
