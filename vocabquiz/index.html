@@ -861,10 +861,9 @@ function updateAllAnswerStates() {
 
 // ==================== WORD BANK SCROLLING ====================
 
-function scrollHighlightedWordBankButtons(buttons) {
-    const wordBankContainer =
-        document.querySelector('.word-bank-container');
 
+function scrollHighlightedWordBankButtons(buttons) {
+    const wordBankContainer = document.querySelector('.word-bank-container');
     if (!wordBankContainer) return;
 
     const highlighted = buttons.filter(button =>
@@ -874,45 +873,103 @@ function scrollHighlightedWordBankButtons(buttons) {
 
     if (!highlighted.length) return;
 
-    // Use the first highlighted word as the scroll target.
     const target = highlighted[0];
+    const targetRect = target.getBoundingClientRect();
+    const input = document.activeElement?.classList.contains('answer-input')
+        ? document.activeElement
+        : null;
 
-    const containerRect =
-        wordBankContainer.getBoundingClientRect();
+    const viewportPadding = 24;
 
-    const targetRect =
-        target.getBoundingClientRect();
+    // First make sure the word bank itself is visible on the page.
+    const bankRect = wordBankContainer.getBoundingClientRect();
 
-    // Give the word a little breathing room so it isn't
-    // pressed directly against the top or bottom edge.
-    const padding = 8;
+    const bankAbove = bankRect.bottom < viewportPadding;
+    const bankBelow = bankRect.top > window.innerHeight - viewportPadding;
 
-    const targetAbove =
-        targetRect.top <
-        containerRect.top + padding;
-
-    const targetBelow =
-        targetRect.bottom >
-        containerRect.bottom - padding;
-
-    if (targetAbove) {
-        wordBankContainer.scrollBy({
-            top:
-                targetRect.top -
-                containerRect.top -
-                padding,
-            behavior: 'smooth'
-        });
-
-    } else if (targetBelow) {
-        wordBankContainer.scrollBy({
-            top:
-                targetRect.bottom -
-                containerRect.bottom +
-                padding,
-            behavior: 'smooth'
+    if (bankAbove || bankBelow) {
+        wordBankContainer.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
         });
     }
+
+    // After the page scroll begins, also make sure the answer input
+    // and the prospective word are visible together when possible.
+    requestAnimationFrame(() => {
+        const newTargetRect = target.getBoundingClientRect();
+        const inputRect = input?.getBoundingClientRect();
+
+        if (inputRect) {
+            const inputVisible =
+                inputRect.top >= viewportPadding &&
+                inputRect.bottom <= window.innerHeight - viewportPadding;
+
+            const targetVisible =
+                newTargetRect.top >= viewportPadding &&
+                newTargetRect.bottom <= window.innerHeight - viewportPadding;
+
+            if (!inputVisible || !targetVisible) {
+                const combinedTop = Math.min(
+                    inputRect.top,
+                    newTargetRect.top
+                );
+
+                const combinedBottom = Math.max(
+                    inputRect.bottom,
+                    newTargetRect.bottom
+                );
+
+                if (
+                    combinedTop < viewportPadding ||
+                    combinedBottom > window.innerHeight - viewportPadding
+                ) {
+                    window.scrollBy({
+                        top:
+                            (combinedTop + combinedBottom) / 2 -
+                            window.innerHeight / 2,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+
+        // Finally, scroll within the word bank if the highlighted word
+        // itself is outside the visible portion of the bank.
+        const currentBankRect =
+            wordBankContainer.getBoundingClientRect();
+
+        const currentTargetRect =
+            target.getBoundingClientRect();
+
+        const padding = 8;
+
+        const targetAbove =
+            currentTargetRect.top <
+            currentBankRect.top + padding;
+
+        const targetBelow =
+            currentTargetRect.bottom >
+            currentBankRect.bottom - padding;
+
+        if (targetAbove) {
+            wordBankContainer.scrollBy({
+                top:
+                    currentTargetRect.top -
+                    currentBankRect.top -
+                    padding,
+                behavior: 'smooth'
+            });
+        } else if (targetBelow) {
+            wordBankContainer.scrollBy({
+                top:
+                    currentTargetRect.bottom -
+                    currentBankRect.bottom +
+                    padding,
+                behavior: 'smooth'
+            });
+        }
+    });
 }
 
 
