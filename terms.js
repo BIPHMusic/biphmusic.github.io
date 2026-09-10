@@ -63,7 +63,19 @@ const unit1 = [
 ];
 
 const unit2 = [
-    
+    "Perfect Unison",
+    "Minor 2",
+    "Major 2",
+    "Minor 3",
+    "Major 3",
+    "Perfect 4",
+    "Tritone",
+    "Perfect 5",
+    "Minor 6",
+    "Major 6",
+    "Minor 7",
+    "Major 7",
+    "Perfect Octave",
 ];
 
 const unit3 = [
@@ -143,6 +155,19 @@ const cumulative = [
     "Duple Pulse",
     "Triple Pulse",
     "Quadruple Pulse",
+    "Perfect Unison",
+    "Minor 2",
+    "Major 2",
+    "Minor 3",
+    "Major 3",
+    "Perfect 4",
+    "Tritone",
+    "Perfect 5",
+    "Minor 6",
+    "Major 6",
+    "Minor 7",
+    "Major 7",
+    "Perfect Octave",
     ];
 
     const theglossary = [
@@ -207,4 +232,17 @@ const cumulative = [
         {"Term":"Duple Pulse","Definition":"Time signature with two main beats"}, 
         {"Term":"Triple Pulse","Definition":"Time signature with three main beats"}, 
         {"Term":"Quadruple Pulse","Definition":"Time signature with four main beats"},
+        {"Term":"Perfect Unison","Definition":"No distance between the pitches; the same note"}, 
+        {"Term":"Minor 2","Definition":"One half step between the pitches, “Jaws”"}, 
+        {"Term":"Major 2","Definition":"Two half steps between the pitches, “Do-re”"}, 
+        {"Term":"Minor 3","Definition":"Three half steps between the pitches, “Funeral March”"}, 
+        {"Term":"Major 3","Definition":"Four half steps between the pitches, “Mario”"}, 
+        {"Term":"Perfect 4","Definition":"Five half steps between the pitches, “Here comes the bride,” “起来”"}, 
+        {"Term":"Tritone","Definition":"Six half steps between the pitches, “The Simpsons”"}, 
+        {"Term":"Perfect 5","Definition":"Seven half steps between the pitches, “Star Wars”"}, 
+        {"Term":"Minor 6","Definition":"Eight half steps between the pitches, “Romance,” “Bad Romance”"}, 
+        {"Term":"Major 6","Definition":"Nine half steps between the pitches, “NBC,” “Not At All”"}, 
+        {"Term":"Minor 7","Definition":"Ten half steps between the pitches, “Winnie the Pooh”"}, 
+        {"Term":"Major 7","Definition":"Eleven half steps between the pitches, “Pure Imagination”"}, 
+        {"Term":"Perfect Octave","Definition":"Twelve half steps between the pitches, space of 8 notes"},
     ];
