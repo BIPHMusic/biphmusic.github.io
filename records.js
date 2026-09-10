@@ -1565,7 +1565,7 @@ const records = [
         student: "Maggie",
         date: "2026-09-09",
         time: "2:21 PM",
-        percentage: 75,
+        percentage: 60,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1573,7 +1573,7 @@ const records = [
         student: "Teresa",
         date: "2026-09-09",
         time: "2:21 PM",
-        percentage: 75,
+        percentage: 60,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1598,6 +1598,22 @@ const records = [
         date: "2026-09-03",
         time: "2:24 PM",
         percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-09",
+        time: "2:21 PM",
+        percentage: 75,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-09",
+        time: "2:21 PM",
+        percentage: 75,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1640,5 +1656,101 @@ const records = [
         percentage: 25,
         exercise: "MCQs",
         termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-10",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-10",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-10",
+        time: "上午10:14",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-10",
+        time: "10:18 am",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-10",
+        time: "10:21 am",
+        percentage: 100,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-10",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-10",
+        time: "10:57 AM",
+        percentage: 100,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-10",
+        time: "10:35 AM",
+        percentage: 90,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: ["Tritone"]
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-10",
+        time: "10:58 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-10",
+        time: "10:18 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-10",
+        time: "上午10:54",
+        percentage: 100,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-10",
+        time: "11:01 AM",
+        percentage: 60,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: ["Tritone","Minor 6th","Major 6th","Tritone"]
     },
 ];
