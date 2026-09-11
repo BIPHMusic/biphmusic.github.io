@@ -1,3 +1,4 @@
+|
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -970,12 +971,122 @@ function scrollHighlightedWordBankButtons(buttons) {
 
     if (!highlighted.length) return;
 
-    // Keep the existing auto-scroll behavior, but scroll
-    // ONLY the word-bank container—not the page.
-    scrollWordBankToButton(
-        highlighted[0],
-        'smooth'
-    );
+    const target = highlighted[0];
+
+    const wordBankContainer =
+        document.querySelector('.word-bank-container');
+
+    if (!wordBankContainer) return;
+
+    /*
+     * Use the visual viewport when available.
+     * This is important on iPad because the keyboard changes
+     * the portion of the page that is actually visible.
+     */
+    const vv = window.visualViewport;
+
+    const viewportTop =
+        vv ? vv.offsetTop : 0;
+
+    const viewportHeight =
+        vv ? vv.height : window.innerHeight;
+
+    const viewportBottom =
+        viewportTop + viewportHeight;
+
+    /*
+     * Give the highlighted word a comfortable area to live in.
+     *
+     * Rather than merely keeping it technically visible,
+     * we try to keep it away from the top and bottom edges.
+     */
+    const safeTop =
+        viewportTop + 70;
+
+    const safeBottom =
+        viewportBottom - 100;
+
+    const targetRect =
+        target.getBoundingClientRect();
+
+    /*
+     * If the word is above the safe area,
+     * scroll the word bank upward.
+     */
+    if (targetRect.top < safeTop) {
+        wordBankContainer.scrollBy({
+            top:
+                targetRect.top -
+                safeTop,
+            behavior: 'smooth'
+        });
+
+    /*
+     * If the word is below the safe area,
+     * scroll the word bank downward.
+     */
+    } else if (targetRect.bottom > safeBottom) {
+        wordBankContainer.scrollBy({
+            top:
+                targetRect.bottom -
+                safeBottom,
+            behavior: 'smooth'
+        });
+    }
+
+    /*
+     * iPad Safari can adjust the visual viewport again
+     * shortly after the keyboard appears or moves.
+     *
+     * Check one more time after the adjustment.
+     */
+    setTimeout(() => {
+        const finalVV =
+            window.visualViewport;
+
+        const finalViewportTop =
+            finalVV
+                ? finalVV.offsetTop
+                : 0;
+
+        const finalViewportHeight =
+            finalVV
+                ? finalVV.height
+                : window.innerHeight;
+
+        const finalViewportBottom =
+            finalViewportTop +
+            finalViewportHeight;
+
+        const finalSafeTop =
+            finalViewportTop + 70;
+
+        const finalSafeBottom =
+            finalViewportBottom - 100;
+
+        const finalRect =
+            target.getBoundingClientRect();
+
+        if (finalRect.top < finalSafeTop) {
+            wordBankContainer.scrollBy({
+                top:
+                    finalRect.top -
+                    finalSafeTop,
+                behavior: 'smooth'
+            });
+
+        } else if (
+            finalRect.bottom >
+            finalSafeBottom
+        ) {
+            wordBankContainer.scrollBy({
+                top:
+                    finalRect.bottom -
+                    finalSafeBottom,
+                behavior: 'smooth'
+            });
+        }
+    }, 250);
 }
 
 
