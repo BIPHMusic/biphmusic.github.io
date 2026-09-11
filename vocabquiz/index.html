@@ -900,54 +900,49 @@ function updateWordBankScrollPadding() {
 }
 
 
-function resetWordBankScrollFreedom(smooth = true) {
+function resetWordBankScrollFreedom() {
     const container = document.querySelector('.word-bank-container');
     const bank = document.getElementById('word-bank');
+
     if (!container || !bank) return;
 
-    if (smooth && container.scrollTop !== 0) {
-        container.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-
-        setTimeout(() => {
-            container.scrollTop = 0;
-            container.classList.remove('word-bank-scroll-expanded');
-            bank.style.removeProperty('--word-bank-spacer-top');
-            bank.style.removeProperty('--word-bank-spacer-bottom');
-        }, 350);
-    } else {
-        container.scrollTop = 0;
-        container.classList.remove('word-bank-scroll-expanded');
-        bank.style.removeProperty('--word-bank-spacer-top');
-        bank.style.removeProperty('--word-bank-spacer-bottom');
+    if (container._wordBankScrollAnimation) {
+        cancelAnimationFrame(container._wordBankScrollAnimation);
+        container._wordBankScrollAnimation = null;
     }
+
+    container.scrollTop = 0;
+    container.classList.remove('word-bank-scroll-expanded');
+    bank.style.removeProperty('--word-bank-spacer-top');
+    bank.style.removeProperty('--word-bank-spacer-bottom');
 }
 
 
 function scrollHighlightedWordBankButtons(buttons) {
     const container = document.querySelector('.word-bank-container');
-    if (!container || !buttons?.length) return;
+    const bank = document.getElementById('word-bank');
 
-    const highlighted = buttons.filter(button =>
+    if (!container || !bank || !buttons?.length) return;
+
+    const highlighted = buttons.find(button =>
         button.classList.contains('possible') ||
         button.classList.contains('keyboard-highlight')
     );
 
-    if (!highlighted.length) return;
+    if (!highlighted) return;
 
-    const target = highlighted[0];
-    const containerRect = container.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
+    if (container._wordBankScrollAnimation) {
+        cancelAnimationFrame(container._wordBankScrollAnimation);
+        container._wordBankScrollAnimation = null;
+    }
 
-    const targetPosition = targetRect.top - containerRect.top;
-    const comfortableTop = container.clientHeight * 0.25;
+    const index = buttons.indexOf(highlighted);
 
-    if (
-        targetPosition >= 0 &&
-        targetPosition <= comfortableTop
-    ) {
+    if (index < 7) {
+        container.scrollTop = 0;
+        container.classList.remove('word-bank-scroll-expanded');
+        bank.style.removeProperty('--word-bank-spacer-top');
+        bank.style.removeProperty('--word-bank-spacer-bottom');
         return;
     }
 
@@ -956,35 +951,30 @@ function scrollHighlightedWordBankButtons(buttons) {
 
     void container.offsetHeight;
 
-    const currentContainerRect = container.getBoundingClientRect();
-    const currentTargetRect = target.getBoundingClientRect();
-    const currentScrollTop = container.scrollTop;
-
-    const currentTargetPosition =
-        currentTargetRect.top - currentContainerRect.top;
+    const comfortableTop = container.clientHeight * 0.25;
 
     const desiredScrollTop = Math.max(
         0,
         Math.min(
-            currentScrollTop +
-                currentTargetPosition -
-                comfortableTop,
-            container.scrollHeight -
-                container.clientHeight
+            highlighted.offsetTop - comfortableTop,
+            container.scrollHeight - container.clientHeight
         )
     );
 
-    if (Math.abs(desiredScrollTop - currentScrollTop) < 1) {
+    const startScrollTop = container.scrollTop;
+
+    if (Math.abs(desiredScrollTop - startScrollTop) < 1) {
+        container.scrollTop = desiredScrollTop;
         return;
     }
 
-    // ADJUST THESE: delay (ms) and scroll speed/duration (ms)
+    // Adjust delay and duration here:
     const delay = 0;
-    const duration = 10;
+    const duration = 70;
 
     setTimeout(() => {
-        const startScrollTop = container.scrollTop;
-        const distance = desiredScrollTop - startScrollTop;
+        const actualStart = container.scrollTop;
+        const distance = desiredScrollTop - actualStart;
         const startTime = performance.now();
 
         function animateScroll(now) {
@@ -996,16 +986,19 @@ function scrollHighlightedWordBankButtons(buttons) {
             const eased = 1 - Math.pow(1 - progress, 4);
 
             container.scrollTop =
-                startScrollTop + distance * eased;
+                actualStart + distance * eased;
 
             if (progress < 1) {
-                requestAnimationFrame(animateScroll);
+                container._wordBankScrollAnimation =
+                    requestAnimationFrame(animateScroll);
             } else {
                 container.scrollTop = desiredScrollTop;
+                container._wordBankScrollAnimation = null;
             }
         }
 
-        requestAnimationFrame(animateScroll);
+        container._wordBankScrollAnimation =
+            requestAnimationFrame(animateScroll);
     }, delay);
 }
 
@@ -1095,7 +1088,7 @@ function updateTypingHighlights(input) {
     if (!typed) {
         selectedWord = null;
         input.classList.remove('invalid-input');
-        resetWordBankScrollFreedom(true);
+        resetWordBankScrollFreedom();
         updateInputWidth(input);
         return;
     }
@@ -1241,7 +1234,7 @@ function initializeQuiz() {
                 updateAllAnswerStates();
 
                 if (!input.value.trim()) {
-                    resetWordBankScrollFreedom(true);
+                    resetWordBankScrollFreedom();
                 }
 
                 // Now prediction highlighting takes over.
@@ -1511,7 +1504,7 @@ document.addEventListener(
                 currentInput.blur();
             }
 
-            resetWordBankScrollFreedom(true);
+            resetWordBankScrollFreedom();
             updateWordBank('');
 
             return;
