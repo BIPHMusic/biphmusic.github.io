@@ -1,4 +1,3 @@
-%
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,11 +25,8 @@
             text-align: left;
             width: 90vw;
             max-width: 1150px;
-            height: calc(100dvh - 180px);
-            max-height: calc(100dvh - 180px);
-            min-height: 0;
             margin: 0 auto;
-            align-items: stretch;
+            align-items: flex-start;
         }
 
         .questions-container {
@@ -39,26 +35,17 @@
             flex-direction: column;
             gap: 10px;
             min-width: 0;
-            min-height: 0;
-            overflow-y: auto;
-            overflow-x: hidden;
-
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .questions-container::-webkit-scrollbar {
-            display: none;
         }
 
         .word-bank-container {
             flex: 0.65;
-            align-self: stretch;
+            align-self: flex-start;
             min-width: 0;
-            min-height: 0;
+            position: sticky;
+            top: 12px;
+            max-height: calc(100dvh - 24px);
             overflow-y: auto;
             overflow-x: hidden;
-
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -172,6 +159,14 @@
             display: flex;
             flex-direction: column;
             gap: 3px;
+            box-sizing: border-box;
+        }
+
+        /* Only temporarily add the extra scrolling room when a highlighted
+           word actually needs to be brought into the word-bank viewport. */
+        .word-bank-container.word-bank-scroll-expanded .word-bank {
+            padding-top: var(--word-bank-spacer-top, 0px);
+            padding-bottom: var(--word-bank-spacer-bottom, 0px);
         }
 
         .word-bank button {
@@ -542,27 +537,7 @@ function selectQuestion(index, focusInput = true) {
         // Clicking the question itself highlights it.
         qBox.classList.add('selected');
 
-        const rect = qBox.getBoundingClientRect();
-
-        const vv = window.visualViewport;
-
-        const viewportTop =
-            vv ? vv.offsetTop : 0;
-
-        const viewportBottom =
-            vv
-                ? vv.offsetTop + vv.height
-                : window.innerHeight;
-
-        if (
-            rect.top < viewportTop ||
-            rect.bottom > viewportBottom
-        ) {
-            qBox.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-        }
+        keepQuestionVisible(qBox);
     }
 
     if (focusInput && input) {
@@ -605,7 +580,7 @@ function selectWord(index) {
         'keyboard-highlight'
     );
 
-scrollHighlightedWordBankButtons(buttons);
+    scrollHighlightedWordBankButtons(buttons);
 }
 
 
@@ -647,6 +622,10 @@ function makeMatch(qIndex, wIndex) {
 
     // Marks the selected word as used.
     updateAllAnswerStates();
+
+    // The word has now actually been selected and placed in the blank.
+    // Return the word bank to its normal, non-expanded scrolling behavior.
+    resetWordBankScrollFreedom();
 
     // Remove question/word-bank selections.
     clearSelections();
@@ -717,6 +696,10 @@ function commitTypedAnswer(index) {
 
     updateAllAnswerStates();
 
+    // The typed answer is now committed, so any temporary word-bank
+    // scrolling freedom is no longer needed.
+    resetWordBankScrollFreedom();
+
     // Clear selection but KEEP TEXTBOX FOCUSED.
     clearSelections();
 
@@ -752,6 +735,7 @@ function clearAnswer(index) {
 
     updateInputWidth(input);
     updateAllAnswerStates();
+    resetWordBankScrollFreedom();
     updateWordBank('');
 }
 
@@ -895,215 +879,165 @@ function updateAllAnswerStates() {
 
 // ==================== WORD BANK SCROLLING ====================
 
-function scrollHighlightedWordBankButtons(buttons) {
-    if (!buttons?.length) return;
 
-    const highlighted =
-        buttons.filter(button =>
-            button.classList.contains('possible') ||
-            button.classList.contains('keyboard-highlight')
-        );
+function updateWordBankScrollPadding() {
+    const container = document.querySelector('.word-bank-container');
+    const bank = document.getElementById('word-bank');
+    if (!container || !bank) return;
+
+    const buttons = Array.from(bank.querySelectorAll('button'));
+    if (!buttons.length) return;
+
+    const containerHeight = container.clientHeight;
+    const firstHeight = buttons[0].getBoundingClientRect().height;
+    const lastHeight = buttons[buttons.length - 1].getBoundingClientRect().height;
+
+    const topSpacer = Math.max(0, containerHeight - firstHeight);
+    const bottomSpacer = Math.max(0, containerHeight - lastHeight);
+
+    bank.style.setProperty('--word-bank-spacer-top', `${topSpacer}px`);
+    bank.style.setProperty('--word-bank-spacer-bottom', `${bottomSpacer}px`);
+}
+
+
+function resetWordBankScrollFreedom(smooth = true) {
+    const container = document.querySelector('.word-bank-container');
+    const bank = document.getElementById('word-bank');
+    if (!container || !bank) return;
+
+    if (smooth && container.scrollTop !== 0) {
+        container.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+        setTimeout(() => {
+            container.scrollTop = 0;
+            container.classList.remove('word-bank-scroll-expanded');
+            bank.style.removeProperty('--word-bank-spacer-top');
+            bank.style.removeProperty('--word-bank-spacer-bottom');
+        }, 350);
+    } else {
+        container.scrollTop = 0;
+        container.classList.remove('word-bank-scroll-expanded');
+        bank.style.removeProperty('--word-bank-spacer-top');
+        bank.style.removeProperty('--word-bank-spacer-bottom');
+    }
+}
+
+
+function scrollHighlightedWordBankButtons(buttons) {
+    const container = document.querySelector('.word-bank-container');
+    if (!container || !buttons?.length) return;
+
+    const highlighted = buttons.filter(button =>
+        button.classList.contains('possible') ||
+        button.classList.contains('keyboard-highlight')
+    );
 
     if (!highlighted.length) return;
 
     const target = highlighted[0];
 
-    const container =
-        document.querySelector('.word-bank-container');
+    const containerRect = container.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
 
-    if (!container) return;
+    const targetPosition =
+        targetRect.top - containerRect.top;
 
-
-    // --------------------------------------------------
-    // Make sure the question itself remains visible.
-    //
-    // The keyboard can change the visual viewport height,
-    // so use visualViewport when available.
-    // --------------------------------------------------
+    const comfortableTop =
+        container.clientHeight * 0.25;
 
     if (
-        selectedQuestion !== null &&
-        selectedQuestion >= 0
+        targetPosition >= 0 &&
+        targetPosition <= comfortableTop
     ) {
-        const questionBox =
-            document.querySelectorAll(
-                '.question-box'
-            )[selectedQuestion];
-
-        if (questionBox) {
-            const vv = window.visualViewport;
-
-            const viewportTop =
-                vv ? vv.offsetTop : 0;
-
-            const viewportBottom =
-                vv
-                    ? vv.offsetTop + vv.height
-                    : window.innerHeight;
-
-            const questionRect =
-                questionBox.getBoundingClientRect();
-
-            const questionPadding = 12;
-
-            if (
-                questionRect.bottom >
-                viewportBottom - questionPadding
-            ) {
-                window.scrollBy({
-                    top:
-                        questionRect.bottom -
-                        (viewportBottom - questionPadding),
-                    behavior: 'instant'
-                });
-
-            } else if (
-                questionRect.top <
-                viewportTop + questionPadding
-            ) {
-                window.scrollBy({
-                    top:
-                        questionRect.top -
-                        (viewportTop + questionPadding),
-                    behavior: 'instant'
-                });
-            }
-        }
+        return;
     }
 
+    const startScrollTop = container.scrollTop;
 
-    // --------------------------------------------------
-    // Deterministically position the highlighted word.
-    //
-    // IMPORTANT:
-    // We do NOT use scrollIntoView() here.
-    //
-    // The word bank is its own scroll container, so we
-    // calculate exactly where its scrollTop needs to be.
-    // --------------------------------------------------
+    container.classList.add('word-bank-scroll-expanded');
+    updateWordBankScrollPadding();
 
-    const containerRect =
-        container.getBoundingClientRect();
+    void container.offsetHeight;
 
-    const targetRect =
-        target.getBoundingClientRect();
+    const bankRect = container.getBoundingClientRect();
+    const currentTargetRect = target.getBoundingClientRect();
 
-    /*
-        Put the highlighted word approximately 12px below
-        the top of the word-bank's visible scrolling area.
-
-        Because targetRect is relative to the viewport,
-        while scrollTop is relative to the word bank's
-        internal content, the required scrollTop is:
-
-            current scrollTop
-            + target position relative to container
-            - desired position
-    */
-
-    const desiredTop = 12;
-
-    const targetOffsetInsideContainer =
-        targetRect.top -
-        containerRect.top +
-        container.scrollTop;
+    const targetTopWithinBank =
+        currentTargetRect.top -
+        bankRect.top +
+        startScrollTop;
 
     const desiredScrollTop =
-        targetOffsetInsideContainer -
-        desiredTop;
-
-    const maxScroll =
-        Math.max(
-            0,
-            container.scrollHeight -
-            container.clientHeight
-        );
-
-    const finalScrollTop =
         Math.max(
             0,
             Math.min(
-                desiredScrollTop,
-                maxScroll
+                targetTopWithinBank -
+                (container.clientHeight * 0.25),
+                container.scrollHeight -
+                container.clientHeight
             )
         );
 
+    container.scrollTop = startScrollTop;
 
-    // --------------------------------------------------
-    // iPad / iOS Safari:
-    //
-    // Directly assign scrollTop.
-    //
-    // This is intentionally deterministic instead of
-    // relying on smooth scrolling, which can be unreliable
-    // while the onscreen keyboard is changing the viewport.
-    // --------------------------------------------------
+    const distance =
+        desiredScrollTop - startScrollTop;
 
-    const isIOS =
-        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-        (
-            navigator.platform === 'MacIntel' &&
-            navigator.maxTouchPoints > 1
-        );
-
-    if (isIOS) {
-        container.scrollTop =
-            finalScrollTop;
-
-    } else {
-        container.scrollTo({
-            top: finalScrollTop,
-            behavior: 'smooth'
-        });
+    if (Math.abs(distance) < 1) {
+        container.scrollTop = desiredScrollTop;
+        return;
     }
 
+    const duration = 1;
+    const startTime = performance.now();
 
-    // --------------------------------------------------
-    // iPad Safari sometimes performs one more viewport
-    // resize after the keyboard settles.
-    //
-    // Recalculate after the keyboard/layout has settled.
-    // --------------------------------------------------
+    function animateScroll(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
 
-    if (isIOS) {
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
+        const eased =
+            1 - Math.pow(1 - progress, 3);
 
-                const updatedContainerRect =
-                    container.getBoundingClientRect();
+        container.scrollTop =
+            startScrollTop +
+            distance * eased;
 
-                const updatedTargetRect =
-                    target.getBoundingClientRect();
+        if (progress < 1) {
+            requestAnimationFrame(animateScroll);
+        } else {
+            container.scrollTop = desiredScrollTop;
+        }
+    }
 
-                const updatedTargetOffset =
-                    updatedTargetRect.top -
-                    updatedContainerRect.top +
-                    container.scrollTop;
+    requestAnimationFrame(animateScroll);
+}
 
-                const updatedScrollTop =
-                    Math.max(
-                        0,
-                        Math.min(
-                            updatedTargetOffset -
-                            desiredTop,
-                            Math.max(
-                                0,
-                                container.scrollHeight -
-                                container.clientHeight
-                            )
-                        )
-                    );
 
-                if (
-                    Math.abs(
-                        container.scrollTop -
-                        updatedScrollTop
-                    ) > 1
-                ) {
-                    container.scrollTop =
-                        updatedScrollTop;
-                }
-            });
+
+function keepQuestionVisible(qBox) {
+    if (!qBox) return;
+
+    const vv = window.visualViewport;
+    const viewportTop = vv ? vv.offsetTop : 0;
+    const viewportBottom = vv
+        ? vv.offsetTop + vv.height
+        : window.innerHeight;
+    const padding = 12;
+    const rect = qBox.getBoundingClientRect();
+
+    if (
+        rect.top < viewportTop + padding ||
+        rect.bottom > viewportBottom - padding
+    ) {
+        const desiredTop = viewportTop + padding;
+        const delta = rect.top - desiredTop;
+
+        window.scrollBy({
+            top: delta,
+            behavior: 'smooth'
         });
     }
 }
@@ -1167,6 +1101,7 @@ function updateTypingHighlights(input) {
     if (!typed) {
         selectedWord = null;
         input.classList.remove('invalid-input');
+        resetWordBankScrollFreedom(true);
         updateInputWidth(input);
         return;
     }
@@ -1311,6 +1246,10 @@ function initializeQuiz() {
 
                 updateAllAnswerStates();
 
+                if (!input.value.trim()) {
+                    resetWordBankScrollFreedom(true);
+                }
+
                 // Now prediction highlighting takes over.
                 updateTypingHighlights(input);
             });
@@ -1365,6 +1304,7 @@ function initializeQuiz() {
         }
     );
 
+    resetWordBankScrollFreedom();
     updateAllAnswerStates();
 
     // Make absolutely sure nothing is focused
@@ -1412,28 +1352,7 @@ function focusQuestion(index) {
         // Tab/focusing a textbox does NOT
         // yellow-highlight the question.
 
-        const rect =
-            qBox.getBoundingClientRect();
-
-        const vv = window.visualViewport;
-
-        const viewportTop =
-            vv ? vv.offsetTop : 0;
-
-        const viewportBottom =
-            vv
-                ? vv.offsetTop + vv.height
-                : window.innerHeight;
-
-        if (
-            rect.top < viewportTop ||
-            rect.bottom > viewportBottom
-        ) {
-            qBox.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-        }
+        keepQuestionVisible(qBox);
     }
 
     input.focus();
@@ -1544,18 +1463,14 @@ function moveWordSelection(direction) {
         )[nextIndex];
 
     if (button) {
-    button.classList.add(
-        'keyboard-highlight'
-    );
+        button.classList.add(
+            'keyboard-highlight'
+        );
 
-    scrollHighlightedWordBankButtons(
-        Array.from(
-            document.querySelectorAll(
-                '.word-bank button'
-            )
-        )
-    );
-}
+        scrollHighlightedWordBankButtons(
+            Array.from(document.querySelectorAll('.word-bank button'))
+        );
+    }
 }
 
 
@@ -1602,6 +1517,7 @@ document.addEventListener(
                 currentInput.blur();
             }
 
+            resetWordBankScrollFreedom(true);
             updateWordBank('');
 
             return;
@@ -1713,15 +1629,6 @@ document.addEventListener(
         if (e.key === 'Enter') {
             e.preventDefault();
 
-            const submitButton =
-                document.querySelector('.quiz-actions .action-button');
-
-
-            // If the Submit button is focused, submit the quiz.
-            if (submitButton === currentInput) {
-                submitQuiz();
-                return;
-            }
 
             // If an answer input is active,
             // use the selected word or commit typed text.
@@ -2544,6 +2451,25 @@ window.onSuccessfulLogin =
             initMyMenu();
         }
     };
+
+
+// Keep the artificial word-bank scroll range correct after iPad Safari
+// changes the available height (keyboard, rotation, split view, etc.).
+window.addEventListener('resize', () => {
+    const container = document.querySelector('.word-bank-container');
+    if (container?.classList.contains('word-bank-scroll-expanded')) {
+        updateWordBankScrollPadding();
+    }
+});
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+        const container = document.querySelector('.word-bank-container');
+        if (container?.classList.contains('word-bank-scroll-expanded')) {
+            updateWordBankScrollPadding();
+        }
+    });
+}
 
 
 // ==================== WINDOW LOAD ====================
