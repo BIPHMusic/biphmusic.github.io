@@ -938,15 +938,11 @@ function scrollHighlightedWordBankButtons(buttons) {
     if (!highlighted.length) return;
 
     const target = highlighted[0];
-
     const containerRect = container.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
 
-    const targetPosition =
-        targetRect.top - containerRect.top;
-
-    const comfortableTop =
-        container.clientHeight * 0.25;
+    const targetPosition = targetRect.top - containerRect.top;
+    const comfortableTop = container.clientHeight * 0.25;
 
     if (
         targetPosition >= 0 &&
@@ -955,64 +951,62 @@ function scrollHighlightedWordBankButtons(buttons) {
         return;
     }
 
-    const startScrollTop = container.scrollTop;
-
     container.classList.add('word-bank-scroll-expanded');
     updateWordBankScrollPadding();
 
     void container.offsetHeight;
 
-    const bankRect = container.getBoundingClientRect();
+    const currentContainerRect = container.getBoundingClientRect();
     const currentTargetRect = target.getBoundingClientRect();
+    const currentScrollTop = container.scrollTop;
 
-    const targetTopWithinBank =
-        currentTargetRect.top -
-        bankRect.top +
-        startScrollTop;
+    const currentTargetPosition =
+        currentTargetRect.top - currentContainerRect.top;
 
-    const desiredScrollTop =
-        Math.max(
-            0,
-            Math.min(
-                targetTopWithinBank -
-                (container.clientHeight * 0.25),
-                container.scrollHeight -
+    const desiredScrollTop = Math.max(
+        0,
+        Math.min(
+            currentScrollTop +
+                currentTargetPosition -
+                comfortableTop,
+            container.scrollHeight -
                 container.clientHeight
-            )
-        );
+        )
+    );
 
-    container.scrollTop = startScrollTop;
-
-    const distance =
-        desiredScrollTop - startScrollTop;
-
-    if (Math.abs(distance) < 1) {
-        container.scrollTop = desiredScrollTop;
+    if (Math.abs(desiredScrollTop - currentScrollTop) < 1) {
         return;
     }
 
-    const duration = 1;
-    const startTime = performance.now();
+    // ADJUST THESE: delay (ms) and scroll speed/duration (ms)
+    const delay = 0;
+    const duration = 10;
 
-    function animateScroll(now) {
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+    setTimeout(() => {
+        const startScrollTop = container.scrollTop;
+        const distance = desiredScrollTop - startScrollTop;
+        const startTime = performance.now();
 
-        const eased =
-            1 - Math.pow(1 - progress, 3);
+        function animateScroll(now) {
+            const progress = Math.min(
+                (now - startTime) / duration,
+                1
+            );
 
-        container.scrollTop =
-            startScrollTop +
-            distance * eased;
+            const eased = 1 - Math.pow(1 - progress, 4);
 
-        if (progress < 1) {
-            requestAnimationFrame(animateScroll);
-        } else {
-            container.scrollTop = desiredScrollTop;
+            container.scrollTop =
+                startScrollTop + distance * eased;
+
+            if (progress < 1) {
+                requestAnimationFrame(animateScroll);
+            } else {
+                container.scrollTop = desiredScrollTop;
+            }
         }
-    }
 
-    requestAnimationFrame(animateScroll);
+        requestAnimationFrame(animateScroll);
+    }, delay);
 }
 
 
