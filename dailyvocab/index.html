@@ -632,18 +632,16 @@ function makeMatch(qIndex, wIndex) {
 
     lastSelectedIndex = qIndex;
 
-    // Marks the selected word as used.
     updateAllAnswerStates();
 
-    // Remove question/word-bank selections.
+    resetWordBankScrollFreedom();
+
     clearSelections();
 
-    // Keep the textbox focused.
-    input.focus();
-    input.setSelectionRange(
-        input.value.length,
-        input.value.length
-    );
+    const qBox = input.closest('.question-box');
+    if (qBox) {
+        qBox.classList.remove('selected');
+    }
 }
 
 
@@ -1081,90 +1079,91 @@ function scrollHighlightedWordBankButtons(buttons) {
 // ==================== TYPING HIGHLIGHTS ====================
 
 function updateTypingHighlights(input) {
-    const buttons = Array.from(document.querySelectorAll('.word-bank button'));
+    const buttons = Array.from(
+        document.querySelectorAll('.word-bank button')
+    );
     const terms = questionBank[currentStudent]?.terms || [];
     const typed = input.value.trim().toLowerCase();
 
-    // A committed answer came from the word bank or a valid
-    // manual commit, so it is already known to be valid.
-    // Do not treat it as an invalid typing search.
     if (input.dataset.committed) {
-        input.classList.remove('invalid-input');
-
-        buttons.forEach(button => {
-            button.classList.remove(
-                'possible',
-                'filtered-out',
-                'keyboard-highlight'
-            );
-        });
-
-        updateInputWidth(input);
+        input.classList.remove(
+            'invalid-input',
+            'duplicate-input'
+        );
         return;
     }
 
-    buttons.forEach((button, index) => {
+    buttons.forEach(button => {
         button.classList.remove(
             'possible',
-            'filtered-out',
             'keyboard-highlight'
         );
-
-        const term = terms[index];
-        const used = term && !!usedTerms[term.toLowerCase()];
-
-        if (used) {
-            button.classList.add('used');
-            button.style.opacity = '0.4';
-            return;
-        }
-
-        if (!typed) {
-            button.style.opacity = '1';
-            return;
-        }
-
-        if (term.toLowerCase().startsWith(typed)) {
-            button.classList.add('possible');
-            button.style.opacity = '1';
-        } else {
-            button.classList.add('filtered-out');
-            button.style.opacity = '0.18';
-        }
     });
 
+    selectedWord = null;
+
     if (!typed) {
-        selectedWord = null;
-        input.classList.remove('invalid-input');
-        updateInputWidth(input);
+        input.classList.remove(
+            'invalid-input',
+            'duplicate-input'
+        );
+        resetWordBankScrollFreedom();
         return;
     }
 
     const matches = terms
-        .map((term, index) => ({ term, index }))
+        .map((term, index) => ({
+            term,
+            index
+        }))
         .filter(item =>
-            !usedTerms[item.term.toLowerCase()] &&
-            item.term.toLowerCase().startsWith(typed)
+            item.term
+                .toLowerCase()
+                .startsWith(typed)
         );
+
+    const exactMatch = terms.find(
+        term =>
+            term.toLowerCase() === typed
+    );
+
+    const isDuplicate =
+        exactMatch &&
+        !!usedTerms[
+            exactMatch.toLowerCase()
+        ];
+
+    input.classList.remove('invalid-input');
+
+    if (isDuplicate) {
+        input.classList.add('duplicate-input');
+    } else {
+        input.classList.remove('duplicate-input');
+
+        if (matches.length === 0) {
+            input.classList.add('invalid-input');
+        }
+    }
+
+    matches.forEach(match => {
+        const button = buttons[match.index];
+
+        if (!button) return;
+
+        button.classList.add('possible');
+        button.style.opacity = '1';
+    });
 
     if (matches.length === 1) {
         selectedWord = matches[0].index;
-        buttons[selectedWord]?.classList.add('keyboard-highlight');
+        buttons[selectedWord]?.classList.add(
+            'keyboard-highlight'
+        );
+
+        scrollHighlightedWordBankButtons(buttons);
     } else {
-        selectedWord = null;
+        resetWordBankScrollFreedom();
     }
-
-    scrollHighlightedWordBankButtons(buttons);
-
-    // Red ONLY when the current uncommitted text
-    // cannot possibly become a word in the bank.
-    if (matches.length === 0) {
-        input.classList.add('invalid-input');
-    } else {
-        input.classList.remove('invalid-input');
-    }
-
-    updateInputWidth(input);
 }
 
 
