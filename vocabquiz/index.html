@@ -1,4 +1,4 @@
-&
+%
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -544,9 +544,19 @@ function selectQuestion(index, focusInput = true) {
 
         const rect = qBox.getBoundingClientRect();
 
+        const vv = window.visualViewport;
+
+        const viewportTop =
+            vv ? vv.offsetTop : 0;
+
+        const viewportBottom =
+            vv
+                ? vv.offsetTop + vv.height
+                : window.innerHeight;
+
         if (
-            rect.top < 0 ||
-            rect.bottom > window.innerHeight
+            rect.top < viewportTop ||
+            rect.bottom > viewportBottom
         ) {
             qBox.scrollIntoView({
                 behavior: 'smooth',
@@ -595,10 +605,7 @@ function selectWord(index) {
         'keyboard-highlight'
     );
 
-    buttons[index].scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest'
-    });
+scrollHighlightedWordBankButtons(buttons);
 }
 
 
@@ -888,7 +895,6 @@ function updateAllAnswerStates() {
 
 // ==================== WORD BANK SCROLLING ====================
 
-
 function scrollHighlightedWordBankButtons(buttons) {
     if (!buttons?.length) return;
 
@@ -907,104 +913,199 @@ function scrollHighlightedWordBankButtons(buttons) {
 
     if (!container) return;
 
-    const vv = window.visualViewport;
 
-    const viewportTop =
-        vv ? vv.offsetTop : 0;
+    // --------------------------------------------------
+    // Make sure the question itself remains visible.
+    //
+    // The keyboard can change the visual viewport height,
+    // so use visualViewport when available.
+    // --------------------------------------------------
 
-    const viewportHeight =
-        vv ? vv.height : window.innerHeight;
+    if (
+        selectedQuestion !== null &&
+        selectedQuestion >= 0
+    ) {
+        const questionBox =
+            document.querySelectorAll(
+                '.question-box'
+            )[selectedQuestion];
 
-    // Put the highlighted word around 40% down the
-    // ACTUAL visible viewport. This works much better
-    // when the iPad keyboard is open.
-    const desiredY =
-        viewportTop + viewportHeight * 0.40;
+        if (questionBox) {
+            const vv = window.visualViewport;
 
-    const rect =
+            const viewportTop =
+                vv ? vv.offsetTop : 0;
+
+            const viewportBottom =
+                vv
+                    ? vv.offsetTop + vv.height
+                    : window.innerHeight;
+
+            const questionRect =
+                questionBox.getBoundingClientRect();
+
+            const questionPadding = 12;
+
+            if (
+                questionRect.bottom >
+                viewportBottom - questionPadding
+            ) {
+                window.scrollBy({
+                    top:
+                        questionRect.bottom -
+                        (viewportBottom - questionPadding),
+                    behavior: 'instant'
+                });
+
+            } else if (
+                questionRect.top <
+                viewportTop + questionPadding
+            ) {
+                window.scrollBy({
+                    top:
+                        questionRect.top -
+                        (viewportTop + questionPadding),
+                    behavior: 'instant'
+                });
+            }
+        }
+    }
+
+
+    // --------------------------------------------------
+    // Deterministically position the highlighted word.
+    //
+    // IMPORTANT:
+    // We do NOT use scrollIntoView() here.
+    //
+    // The word bank is its own scroll container, so we
+    // calculate exactly where its scrollTop needs to be.
+    // --------------------------------------------------
+
+    const containerRect =
+        container.getBoundingClientRect();
+
+    const targetRect =
         target.getBoundingClientRect();
 
-    const wordCenter =
-        (rect.top + rect.bottom) / 2;
+    /*
+        Put the highlighted word approximately 12px below
+        the top of the word-bank's visible scrolling area.
 
-    let scrollAmount =
-        wordCenter - desiredY;
+        Because targetRect is relative to the viewport,
+        while scrollTop is relative to the word bank's
+        internal content, the required scrollTop is:
 
-    // Keep the scroll amount within the word bank's
-    // actual scrollable range.
+            current scrollTop
+            + target position relative to container
+            - desired position
+    */
+
+    const desiredTop = 12;
+
+    const targetOffsetInsideContainer =
+        targetRect.top -
+        containerRect.top +
+        container.scrollTop;
+
+    const desiredScrollTop =
+        targetOffsetInsideContainer -
+        desiredTop;
+
     const maxScroll =
-        container.scrollHeight -
-        container.clientHeight;
+        Math.max(
+            0,
+            container.scrollHeight -
+            container.clientHeight
+        );
 
-    const newScrollTop =
+    const finalScrollTop =
         Math.max(
             0,
             Math.min(
-                container.scrollTop + scrollAmount,
+                desiredScrollTop,
                 maxScroll
             )
         );
 
-    scrollAmount =
-        newScrollTop - container.scrollTop;
 
-    if (Math.abs(scrollAmount) > 1) {
-        container.scrollBy({
-            top: scrollAmount,
+    // --------------------------------------------------
+    // iPad / iOS Safari:
+    //
+    // Directly assign scrollTop.
+    //
+    // This is intentionally deterministic instead of
+    // relying on smooth scrolling, which can be unreliable
+    // while the onscreen keyboard is changing the viewport.
+    // --------------------------------------------------
+
+    const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (
+            navigator.platform === 'MacIntel' &&
+            navigator.maxTouchPoints > 1
+        );
+
+    if (isIOS) {
+        container.scrollTop =
+            finalScrollTop;
+
+    } else {
+        container.scrollTo({
+            top: finalScrollTop,
             behavior: 'smooth'
         });
     }
 
-    // iPad Safari can finish resizing the visual viewport
-    // slightly after the keyboard appears. Recheck once.
-    setTimeout(() => {
-        const finalVV =
-            window.visualViewport;
 
-        const finalViewportTop =
-            finalVV ? finalVV.offsetTop : 0;
+    // --------------------------------------------------
+    // iPad Safari sometimes performs one more viewport
+    // resize after the keyboard settles.
+    //
+    // Recalculate after the keyboard/layout has settled.
+    // --------------------------------------------------
 
-        const finalViewportHeight =
-            finalVV ? finalVV.height : window.innerHeight;
+    if (isIOS) {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
 
-        const finalDesiredY =
-            finalViewportTop +
-            finalViewportHeight * 0.40;
+                const updatedContainerRect =
+                    container.getBoundingClientRect();
 
-        const finalRect =
-            target.getBoundingClientRect();
+                const updatedTargetRect =
+                    target.getBoundingClientRect();
 
-        const finalWordCenter =
-            (finalRect.top + finalRect.bottom) / 2;
+                const updatedTargetOffset =
+                    updatedTargetRect.top -
+                    updatedContainerRect.top +
+                    container.scrollTop;
 
-        let finalScrollAmount =
-            finalWordCenter - finalDesiredY;
+                const updatedScrollTop =
+                    Math.max(
+                        0,
+                        Math.min(
+                            updatedTargetOffset -
+                            desiredTop,
+                            Math.max(
+                                0,
+                                container.scrollHeight -
+                                container.clientHeight
+                            )
+                        )
+                    );
 
-        const finalMaxScroll =
-            container.scrollHeight -
-            container.clientHeight;
-
-        const finalScrollTop =
-            Math.max(
-                0,
-                Math.min(
-                    container.scrollTop +
-                    finalScrollAmount,
-                    finalMaxScroll
-                )
-            );
-
-        finalScrollAmount =
-            finalScrollTop -
-            container.scrollTop;
-
-        if (Math.abs(finalScrollAmount) > 1) {
-            container.scrollBy({
-                top: finalScrollAmount,
-                behavior: 'smooth'
+                if (
+                    Math.abs(
+                        container.scrollTop -
+                        updatedScrollTop
+                    ) > 1
+                ) {
+                    container.scrollTop =
+                        updatedScrollTop;
+                }
             });
-        }
-    }, 300);
+        });
+    }
 }
 
 
@@ -1314,9 +1415,19 @@ function focusQuestion(index) {
         const rect =
             qBox.getBoundingClientRect();
 
+        const vv = window.visualViewport;
+
+        const viewportTop =
+            vv ? vv.offsetTop : 0;
+
+        const viewportBottom =
+            vv
+                ? vv.offsetTop + vv.height
+                : window.innerHeight;
+
         if (
-            rect.top < 0 ||
-            rect.bottom > window.innerHeight
+            rect.top < viewportTop ||
+            rect.bottom > viewportBottom
         ) {
             qBox.scrollIntoView({
                 behavior: 'smooth',
@@ -1433,15 +1544,18 @@ function moveWordSelection(direction) {
         )[nextIndex];
 
     if (button) {
-        button.classList.add(
-            'keyboard-highlight'
-        );
+    button.classList.add(
+        'keyboard-highlight'
+    );
 
-        button.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest'
-        });
-    }
+    scrollHighlightedWordBankButtons(
+        Array.from(
+            document.querySelectorAll(
+                '.word-bank button'
+            )
+        )
+    );
+}
 }
 
 
