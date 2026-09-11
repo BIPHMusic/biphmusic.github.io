@@ -1,4 +1,3 @@
-*
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,8 +25,11 @@
             text-align: left;
             width: 90vw;
             max-width: 1150px;
+            height: calc(100dvh - 180px);
+            max-height: calc(100dvh - 180px);
+            min-height: 0;
             margin: 0 auto;
-            align-items: flex-start;
+            align-items: stretch;
         }
 
         .questions-container {
@@ -35,15 +37,33 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            min-width: 0;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .questions-container::-webkit-scrollbar {
+            display: none;
         }
 
         .word-bank-container {
             flex: 0.65;
-            position: sticky;
-            top: 20px;
-            align-self: flex-start;
-            max-height: calc(100vh - 40px);
+            align-self: stretch;
+            min-width: 0;
+            min-height: 0;
             overflow-y: auto;
+            overflow-x: hidden;
+
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .word-bank-container::-webkit-scrollbar {
+            display: none;
         }
 
         /* ====================== QUESTION BOXES ====================== */
@@ -523,15 +543,9 @@ function selectQuestion(index, focusInput = true) {
 
         const rect = qBox.getBoundingClientRect();
 
-        if (
-            rect.top < 0 ||
-            rect.bottom > window.innerHeight
-        ) {
-            qBox.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-        }
+        // The questions column has its own scroll position.
+        // Do not scroll the page when a question is selected.
+        scrollQuestionToBox(qBox);
     }
 
     if (focusInput && input) {
@@ -574,10 +588,11 @@ function selectWord(index) {
         'keyboard-highlight'
     );
 
-    buttons[index].scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest'
-    });
+    // Scroll only the word-bank column, never the page.
+    scrollWordBankToButton(
+        buttons[index],
+        'smooth'
+    );
 }
 
 
@@ -868,11 +883,84 @@ function updateAllAnswerStates() {
 // ==================== WORD BANK SCROLLING ====================
 
 
-function scrollHighlightedWordBankButtons(buttons) {
-    const wordBankContainer =
+function scrollQuestionToBox(box, behavior = 'smooth') {
+    const container =
+        document.querySelector('.questions-container');
+
+    if (!container || !box) return;
+
+    const containerRect =
+        container.getBoundingClientRect();
+
+    const boxRect =
+        box.getBoundingClientRect();
+
+    const padding = 10;
+
+    if (boxRect.top < containerRect.top + padding) {
+        container.scrollBy({
+            top:
+                boxRect.top -
+                containerRect.top -
+                padding,
+            behavior
+        });
+
+    } else if (
+        boxRect.bottom >
+        containerRect.bottom - padding
+    ) {
+        container.scrollBy({
+            top:
+                boxRect.bottom -
+                containerRect.bottom +
+                padding,
+            behavior
+        });
+    }
+}
+
+
+function scrollWordBankToButton(button, behavior = 'smooth') {
+    const container =
         document.querySelector('.word-bank-container');
 
-    if (!wordBankContainer) return;
+    if (!container || !button) return;
+
+    const containerRect =
+        container.getBoundingClientRect();
+
+    const buttonRect =
+        button.getBoundingClientRect();
+
+    const padding = 10;
+
+    if (buttonRect.top < containerRect.top + padding) {
+        container.scrollBy({
+            top:
+                buttonRect.top -
+                containerRect.top -
+                padding,
+            behavior
+        });
+
+    } else if (
+        buttonRect.bottom >
+        containerRect.bottom - padding
+    ) {
+        container.scrollBy({
+            top:
+                buttonRect.bottom -
+                containerRect.bottom +
+                padding,
+            behavior
+        });
+    }
+}
+
+
+function scrollHighlightedWordBankButtons(buttons) {
+    if (!buttons?.length) return;
 
     const highlighted =
         buttons.filter(button =>
@@ -882,207 +970,12 @@ function scrollHighlightedWordBankButtons(buttons) {
 
     if (!highlighted.length) return;
 
-    const target = highlighted[0];
-
-    /*
-     * On iPad/iPhone, the software keyboard reduces the
-     * visual viewport. window.innerHeight can still describe
-     * the layout viewport, so use visualViewport.height
-     * whenever it is available.
-     */
-    const visualViewport =
-        window.visualViewport;
-
-    const viewportTop =
-        visualViewport
-            ? visualViewport.offsetTop
-            : 0;
-
-    const viewportHeight =
-        visualViewport
-            ? visualViewport.height
-            : window.innerHeight;
-
-    const viewportBottom =
-        viewportTop + viewportHeight;
-
-    /*
-     * Keep a little breathing room around the highlighted
-     * word so it isn't sitting directly against the keyboard
-     * or the edge of the screen.
-     */
-    const viewportPadding = 18;
-
-    /*
-     * The answer input is still useful to keep visible,
-     * but the word bank gets priority when the keyboard
-     * makes the available viewport very small.
-     */
-    const input =
-        document.activeElement?.classList.contains(
-            'answer-input'
-        )
-            ? document.activeElement
-            : null;
-
-    /*
-     * First make sure the word-bank container itself is
-     * somewhere inside the currently visible viewport.
-     */
-    let bankRect =
-        wordBankContainer.getBoundingClientRect();
-
-    const bankAbove =
-        bankRect.bottom <
-        viewportTop + viewportPadding;
-
-    const bankBelow =
-        bankRect.top >
-        viewportBottom - viewportPadding;
-
-    if (bankAbove || bankBelow) {
-        /*
-         * With the keyboard open, centering the entire bank
-         * can actually place part of it underneath the
-         * keyboard. Instead, bring its top into view.
-         */
-        const desiredTop =
-            viewportTop +
-            Math.min(
-                90,
-                viewportHeight * 0.18
-            );
-
-        const scrollAmount =
-            bankRect.top - desiredTop;
-
-        window.scrollBy({
-            top: scrollAmount,
-            behavior: 'smooth'
-        });
-    }
-
-    /*
-     * Wait for the page scroll to settle before calculating
-     * the highlighted word's position again.
-     */
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-
-            const currentTargetRect =
-                target.getBoundingClientRect();
-
-            /*
-             * Re-read the visual viewport because the iPad
-             * keyboard can resize it while this code runs.
-             */
-            const vv =
-                window.visualViewport;
-
-            const top =
-                vv
-                    ? vv.offsetTop
-                    : 0;
-
-            const height =
-                vv
-                    ? vv.height
-                    : window.innerHeight;
-
-            const bottom =
-                top + height;
-
-            const targetTopLimit =
-                top + viewportPadding;
-
-            const targetBottomLimit =
-                bottom - viewportPadding;
-
-            /*
-             * If the highlighted word is below the visible
-             * area (usually underneath the iPad keyboard),
-             * scroll the PAGE first.
-             */
-            if (
-                currentTargetRect.bottom >
-                targetBottomLimit
-            ) {
-                const amount =
-                    currentTargetRect.bottom -
-                    targetBottomLimit;
-
-                window.scrollBy({
-                    top: amount,
-                    behavior: 'smooth'
-                });
-            }
-
-            /*
-             * If the highlighted word is above the visible
-             * area, bring it back down into view.
-             */
-            else if (
-                currentTargetRect.top <
-                targetTopLimit
-            ) {
-                const amount =
-                    currentTargetRect.top -
-                    targetTopLimit;
-
-                window.scrollBy({
-                    top: amount,
-                    behavior: 'smooth'
-                });
-            }
-
-            /*
-             * Finally, make sure the highlighted word is
-             * visible inside the scrollable word-bank area.
-             *
-             * This is especially important once the iPad
-             * keyboard has reduced the available height.
-             */
-            requestAnimationFrame(() => {
-
-                const finalBankRect =
-                    wordBankContainer.getBoundingClientRect();
-
-                const finalTargetRect =
-                    target.getBoundingClientRect();
-
-                const bankPadding = 8;
-
-                const targetAboveBank =
-                    finalTargetRect.top <
-                    finalBankRect.top + bankPadding;
-
-                const targetBelowBank =
-                    finalTargetRect.bottom >
-                    finalBankRect.bottom - bankPadding;
-
-                if (targetAboveBank) {
-
-                    wordBankContainer.scrollBy({
-                        top:
-                            finalTargetRect.top -
-                            finalBankRect.top -
-                            bankPadding,
-                        behavior: 'smooth'
-                    });
-
-                } else if (targetBelowBank) {
-
-                    wordBankContainer.scrollBy({
-                        top:
-                            finalTargetRect.bottom -
-                            finalBankRect.bottom +
-                            bankPadding,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-    });
+    // Keep the existing auto-scroll behavior, but scroll
+    // ONLY the word-bank container—not the page.
+    scrollWordBankToButton(
+        highlighted[0],
+        'smooth'
+    );
 }
 
 
@@ -1392,15 +1285,9 @@ function focusQuestion(index) {
         const rect =
             qBox.getBoundingClientRect();
 
-        if (
-            rect.top < 0 ||
-            rect.bottom > window.innerHeight
-        ) {
-            qBox.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-        }
+        // The questions column has its own scroll position.
+        // Do not scroll the page when a question is selected.
+        scrollQuestionToBox(qBox);
     }
 
     input.focus();
@@ -1515,10 +1402,12 @@ function moveWordSelection(direction) {
             'keyboard-highlight'
         );
 
-        button.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest'
-        });
+        // Keep keyboard navigation inside the word-bank
+        // scroll area instead of scrolling the page.
+        scrollWordBankToButton(
+            button,
+            'smooth'
+        );
     }
 }
 
@@ -1677,6 +1566,11 @@ document.addEventListener(
         if (e.key === 'Enter') {
             e.preventDefault();
 
+            // If the Submit button is focused, submit the quiz.
+            if (submitButton === currentInput) {
+                submitQuiz();
+                return;
+            }
 
             // If an answer input is active,
             // use the selected word or commit typed text.
