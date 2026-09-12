@@ -2057,4 +2057,76 @@ const records = [
         exercise: "Sight Singing",
         termsToReview: []
     },
+    {
+        student: "Thomas",
+        date: "2026-09-08",
+        time: "2:03 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-10",
+        time: "2:03 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-11",
+        time: "2:03 PM",
+        percentage: 89,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-10",
+        time: "2:11 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-10",
+        time: "2:11 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-10",
+        time: "2:11 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-10",
+        time: "2:11 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-10",
+        time: "2:11 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-11",
+        time: "2:12 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
 ];
