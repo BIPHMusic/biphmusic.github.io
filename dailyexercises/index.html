@@ -1,0 +1,3153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Exercises</title>
+<link rel="stylesheet" href="../common-styles.css">
+<link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+<link rel="icon" href="../icons/BGicon.png">
+<style>
+
+#exercise-stage { width: 100%; }
+#exercise-subtitle { text-align:center; }
+#exercise-title { margin-bottom: 0; }
+.daily-exercise-progress {
+  text-align:center;
+  margin: 8px auto 20px;
+  color: rgba(255,255,255,.78);
+  font-size: .95rem;
+}
+.hidden { display:none !important; }
+.daily-final {
+  width: 92%;
+  max-width: 850px;
+  margin: 35px auto;
+  text-align:center;
+}
+.daily-final h2 { margin-bottom: 8px; }
+.daily-score-card {
+  margin: 16px 0;
+  padding: 16px 20px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 8px;
+  text-align:left;
+}
+.daily-score-row {
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+.daily-score-row:last-child { border-bottom:0; }
+.daily-final-actions {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+  margin-top:24px;
+}
+.daily-final-actions .copy-button { margin-top:0; min-width:190px; }
+.daily-note {
+  color:rgba(255,255,255,.72);
+  line-height:1.5;
+}
+.sight-begin-button { margin: 5px auto 18px; display:block; }
+.sight-status { min-height:24px; margin: 5px 0 14px; color:rgba(255,255,255,.78); }
+#sightCountdown { min-height: 28px; }
+
+</style>
+<style id="exercise-style"></style>
+</head>
+<body>
+<div id="shared-menu"></div>
+<div id="main-content" style="display:none;">
+  <div class="background"></div>
+  <div class="overlay"></div>
+  <div class="overlay2"></div>
+  <h1 class="Title" id="exercise-title">BIPH Music</h1>
+  <h1 class="Subtitle" id="exercise-subtitle">Daily Exercises</h1>
+  <div class="daily-exercise-progress" id="exercise-progress"></div>
+  <div id="exercise-stage"></div>
+  <div class="logocontainer">
+    <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
+  </div>
+</div>
+
+<script src="../apstudents.js"></script>
+<script src="../login-screen.js"></script>
+<script src="../menu.js"></script>
+<script src="../mymenu.js"></script>
+<script src="vocab.js"></script>
+<script src="../dailyeartraining/quiz-intervals-all.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
+
+
+<script>
+window.dailyExerciseState = {
+  active: null,
+  student: '',
+  order: [],
+  index: 0,
+  results: {},
+  sightRecording: null,
+  sightExample: null
+};
+
+const DAILY_EXERCISE_TEMPLATES = {
+  vocab: `
+<div class="quiz-container">
+  <div class="questions-container" id="quiz-questions"></div>
+  <div class="word-bank-container">
+    <div class="word-bank" id="word-bank"></div>
+  </div>
+</div>
+<div class="quiz-actions hidden">
+  <button class="action-button" onclick="submitQuiz()" tabindex="0">Submit</button>
+</div>
+`,
+  earTraining: `
+<div class="quiz-section">
+  <div class="quiz-container">
+    <div class="questions-container" id="quiz-questions"></div>
+  </div>
+  <div class="quiz-actions hidden">
+    <button class="action-button" onclick="dailyEarSubmitCurrentAnswer()">Submit Answer</button>
+  </div>
+</div>
+`,
+  sightSinging: `
+<div class="sight-container">
+  <div id="sightCountdown" class="time-restriction">Press Begin! when you're ready.</div>
+  <button id="beginSightButton" class="action-button sight-begin-button">Begin!</button>
+  <div class="image-container">
+    <img id="exerciseImage" alt="Sight Singing Exercise" draggable="false">
+  </div>
+  <div id="recordingNotice" class="recording-notice">
+    You may record once. Your recording will be available after all three exercises are complete.
+  </div>
+  <button id="recordButton" class="action-btn" disabled aria-label="Record">
+    <div id="recordIcon"></div>
+  </button>
+  <canvas id="visualizer"></canvas>
+  <div id="recordStatus" class="sight-status"></div>
+  <div class="reminders">
+    <h2>Some Reminders:</h2>
+    <h3>
+      <p>• Observe the key signature, first and last notes</p>
+      <p>• Look for accidentals</p>
+      <p>• Sing the scale before you start</p>
+      <p>• Aim for accurate rhythms and consistency of tempo</p>
+    </h3>
+  </div>
+</div>
+`
+};
+
+const DAILY_EXERCISE_STYLES = {
+  vocab: `
+        /* SHARED STYLES */
+        /* Loaded from common-styles.css - Do not duplicate/edit: */
+        /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
+
+       .quiz-container {
+            display: flex;
+            gap: 20px;
+            text-align: left;
+            width: 90vw;
+            max-width: 1150px;
+            margin: 0 auto;
+            align-items: flex-start;
+        }
+
+        .questions-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .word-bank-container {
+            flex: 0.65;
+            align-self: flex-start;
+            min-width: 0;
+            position: sticky;
+            top: 12px;
+            max-height: calc(100dvh - 24px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .word-bank-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* ====================== QUESTION BOXES ====================== */
+        .question-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+
+        .question-box:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .question-box.selected {
+            background: rgba(255, 215, 0, 0.25);
+            border: 1.5px solid #ffd700;
+        }
+
+        .question-box:focus-visible,
+        .word-bank button:focus-visible {
+            outline: none;
+        }
+
+        .question-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .question-label strong {
+            min-width: 1.5em;
+        }
+
+        .question-text {
+            flex-grow: 1;
+            line-height: 1.45;
+        }
+
+        .question-box input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: white;
+            font-size: 0.85rem;
+            height: 20px;
+            min-width: 120px;
+            width: 120px;
+            max-width: 100%;
+            box-sizing: content-box;
+            text-align: left;
+            text-transform: none;
+            flex: 0 1 auto;
+        }
+
+        .word-bank button.used {
+            opacity: 0.4 !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .word-bank button.possible {
+            background: rgba(255, 255, 255, 0.22) !important;
+            border-color: rgba(255, 255, 255, 0.55);
+        }
+
+        .word-bank button.filtered-out {
+            opacity: 0.18;
+        }
+
+        .word-bank button.keyboard-highlight {
+            background: rgba(255, 215, 0, 0.35) !important;
+            border-color: #ffd700;
+        }
+
+        .word-bank button.duplicate {
+            background: rgba(255, 255, 0, 0.212) !important;
+            border: 1.5px dotted rgb(237, 255, 77);
+            color: black;
+            position: relative;
+        }
+
+        .duplicate-input {
+            background-color: rgba(255, 255, 0, 0.2) !important;
+        }
+
+        .invalid-input {
+            outline: 2px solid rgba(255, 0, 0, 0.463);
+            background: rgba(255, 0, 0, 0.12) !important;
+        }
+
+        /* ====================== WORD BANK ====================== */
+        .word-bank {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .word-bank button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            color: white;
+            text-align: left;
+        }
+
+        .word-bank button:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        .word-bank button.selected {
+            background: rgba(255, 215, 0, 0.3) !important;
+            border: 1.5px solid #ffd700;
+        }
+
+        .word-bank button.duplicate {
+            background: rgb(255, 255, 0);
+            border: 1.5px dotted rgb(237, 255, 77);
+            color: black;
+            position: relative;
+        }
+
+        .word-bank button.duplicate:hover::after {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* ====================== ACTIONS ====================== */
+        .quiz-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-left: 10px;
+            justify-content: flex-start;
+        }
+
+        .action-button {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            color: white;
+            font-size: 1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .copy-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ====================== RESULTS ====================== */
+        .results-section {
+            width: 100%;
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 0 15px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .results-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .results-table th,
+        .results-table td {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .results-table th {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .incorrect { color: #dc2626; }
+        .correct-mark { color: #16a34a; margin-left: 4px; }
+
+        .terms-to-review {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .terms-to-review ul {
+            padding-left: 20px;
+        }
+
+        /* ====================== STATE CLASSES ====================== */
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes checkFadeIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes textFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* NEW – link action buttons */
+        .link-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .link-actions .copy-button {
+            margin-top: 0;
+            min-width: 200px;
+        }
+    `,
+  earTraining: `
+    /* SHARED STYLES - Do not duplicate core styles from common-styles.css */
+    
+    .login-section {
+        text-align: center;
+        margin-top: 80px;
+    }
+
+    .quiz-container {
+        display: flex;
+        gap: 30px;
+        width: 80vw;
+        max-width: 800px;
+        margin: 0 auto;
+        align-items: flex-start;
+    }
+
+    .questions-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* ====================== QUESTION BOXES ====================== */
+
+    .section-header {
+        font-size: 1.65rem;
+        font-weight: 400;
+        text-align: center;
+        margin: -30px 0 10px 0;
+        letter-spacing: 1px;
+    }
+
+    .play-button {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 6px;
+        color: white;
+        font-size: 1.05rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .play-button:hover {
+        background-color: #3a6da8;
+    }
+
+    .play-count {
+        color: #d2d2d2;
+        font-size: 0.95rem;
+        margin: 8px 0 12px 0;
+    }
+
+    .answer-select {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 1.05rem;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 1.5px solid rgba(255,255,255,0.25);
+        border-radius: 6px;
+        margin-top: 8px;
+        transition: all 0.2s;
+    }
+    .answer-select:hover {
+        background-color: #3a6da8;
+    }
+
+    .play-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        background-color: #4c87af;
+    }
+
+    /* ====================== ACTIONS ====================== */
+    .quiz-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+        justify-content: center;
+    }
+
+    .action-button {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 6px;
+        color: white;
+        font-size: 1.05rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .action-button:hover {
+        background-color: #3a6da8;
+    }
+
+    .action-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* ====================== RESULTS ====================== */
+    .results-section {
+        width: 100%;
+        max-width: 850px;
+        margin: 30px auto;
+        padding: 0 15px;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    .results-table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 20px 0;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .results-table th,
+    .results-table td {
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 10px 12px;
+        text-align: left;
+    }
+
+    .results-table th {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .incorrect { color: #ff5555; }
+    .correct-mark { color: #16a34a; margin-left: 6px; font-weight: bold; }
+
+    .terms-to-review {
+        margin-top: 30px;
+        text-align: left;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .terms-to-review h3 {
+        margin-top: 0;
+    }
+
+    /* ====================== UTILITY ====================== */
+    .hidden {
+        display: none;
+    }
+
+    .copy-button {
+        margin-top: 25px;
+        padding: 12px 28px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .copy-button:hover {
+        background: rgba(255, 255, 255, 0.35);
+    }
+
+    .error {
+        color: #ff6666;
+        margin-top: 10px;
+    }
+
+    .link-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 24px;
+    }
+    .link-actions .copy-button {
+        margin-top: 0;
+        min-width: 200px;
+    }
+`,
+  sightSinging: `
+
+        .container {
+            margin: 30px auto;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .reminders {
+            width: 400px;
+            border-radius: 10px;
+            margin: 30px auto;
+            border: solid #6ec5d9a5;
+            background-color: rgba(49, 129, 125, 0.543);
+            padding: 18px 25px 20px;
+            text-align: left;      
+        }
+
+        .reminders h2 {
+            font-size: 1.2rem;
+            text-align: center; 
+        }
+
+        .reminders h3 {
+            font-size: 0.95rem;
+            font-weight: 300;
+            line-height: 1.45;
+        }
+
+        .time-restriction {
+            font-size: 1.15rem;
+            margin: 15px 0 20px 0;
+            text-align: center;
+        }
+
+        .image-container {
+            position: relative;
+            width: 90%;
+            max-width: 720px;
+            margin: 15px auto 10px;
+        }
+
+        #exerciseImage {
+            width: 100%;
+            height: auto;
+            margin-bottom: 25px;
+            filter: blur(10px);
+            transition: filter 0.6s ease;
+        }
+
+        #exerciseImage.revealed { 
+            filter: blur(0); 
+        }
+
+        .recording-notice {
+            color: #ff9800;
+            font-size: 15px;
+            margin-top: -8px;
+            margin-bottom: 22px;
+            display: none;
+        }
+
+        #recordButton {
+            width: 60px;
+            height: 60px;
+            margin: 8px auto 25px;
+            border-radius: 50%;
+            background-color: #888888;
+            cursor: not-allowed;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #recordButton:not(:disabled) {
+            background-color: #f44336;
+            cursor: pointer;
+        }
+
+        #recordIcon {
+            width: 20px;
+            height: 20px;
+            background-color: #ffffff;
+            border-radius: 50%;
+        }
+
+        #recordIcon.recording {
+            width: 14px;
+            height: 14px;
+            border-radius: 0;
+        }
+
+        #visualizer {
+            width: 100%;
+            height: 180px;
+            background-color: #3c3c3c;
+            margin: 10px auto;
+            display: none;
+        }
+
+        #audioPlayback { 
+            display: none; 
+            margin: 5px auto 20px;
+            width: 100%;
+        }
+
+        #downloadButton,
+        #shareButton {
+            display: none;
+            color: white;
+            margin: 8px 6px 30px;
+        }
+
+        #downloadButton {
+            background-color: #4c8baf;
+        }
+
+        #shareButton {
+            background-color: #34c759;
+        }
+    
+
+.sight-container { width:90%; max-width:800px; margin:30px auto; text-align:center; }
+.sight-container .reminders {
+  width:400px; max-width:90%; border-radius:10px; margin:30px auto;
+  border:solid #6ec5d9a5; background-color:rgba(49,129,125,.543);
+  padding:18px 25px 20px; text-align:left; box-sizing:border-box;
+}
+.sight-container .reminders h2 { font-size:1.2rem; text-align:center; }
+.sight-container .reminders h3 { font-size:.95rem; font-weight:300; line-height:1.45; }
+.sight-container .image-container { position:relative; width:90%; max-width:720px; margin:15px auto 10px; }
+.sight-container #exerciseImage { width:100%; height:auto; margin-bottom:25px; filter:blur(10px); transition:filter .6s ease; }
+.sight-container #exerciseImage.revealed { filter:blur(0); }
+.sight-container .recording-notice { color:#ff9800; font-size:15px; margin-top:-8px; margin-bottom:22px; display:none; }
+.sight-container #recordButton {
+  width:60px; height:60px; margin:8px auto 25px; border-radius:50%;
+  background-color:#888; cursor:not-allowed; padding:0; display:flex; align-items:center; justify-content:center;
+}
+.sight-container #recordButton:not(:disabled) { background-color:#f44336; cursor:pointer; }
+.sight-container #recordIcon { width:20px; height:20px; background-color:#fff; border-radius:50%; }
+.sight-container #recordIcon.recording { width:14px; height:14px; border-radius:0; }
+.sight-container #visualizer { width:100%; height:180px; background-color:#3c3c3c; margin:10px auto; display:none; }
+`
+};
+
+function dailyShuffle(array) {
+  const a = [...array];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function dailySetProgress() {
+  const el = document.getElementById('exercise-progress');
+  if (!el) return;
+  const done = window.dailyExerciseState.index;
+  el.textContent = `Exercise ${done + 1} of 3`;
+}
+
+function dailyShowExercise(type) {
+  const state = window.dailyExerciseState;
+  state.active = type;
+  document.getElementById('exercise-stage').innerHTML = DAILY_EXERCISE_TEMPLATES[type];
+  document.getElementById('exercise-style').textContent = DAILY_EXERCISE_STYLES[type];
+  document.getElementById('exercise-subtitle').textContent =
+    type === 'vocab' ? 'Daily Vocab' :
+    type === 'earTraining' ? 'Daily Ear Training' :
+    'Daily Sight Singing';
+  dailySetProgress();
+
+  if (type === 'vocab') {
+    dailyVocabStudent = state.student.toLowerCase();
+    dailyVocabQuestionBank[dailyVocabStudent] = dailyVocabGenerateQuestionSet(dailyVocabStudent);
+    dailyVocabInitializeQuiz();
+    const actions = document.querySelector('.quiz-actions');
+    if (actions) actions.classList.remove('hidden');
+  } else if (type === 'earTraining') {
+    dailyEarStudent = state.student;
+    dailyEarInitQuiz();
+  } else {
+    dailyInitSightSinging();
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function dailyCompleteExercise(type, resultData) {
+  const state = window.dailyExerciseState;
+  if (state.results[type]) return;
+
+  if (type === 'vocab') {
+    const correct = (resultData.answers || []).filter((answer, i) =>
+      answer && resultData.questionSet?.answers?.[i] &&
+      answer.toLowerCase() === resultData.questionSet.answers[i].toLowerCase()
+    ).length;
+    const total = resultData.questionSet?.answers?.length || resultData.answers?.length || 0;
+    resultData.percentage = total ? Math.round(correct / total * 100) : 0;
+    resultData.exercise = 'Vocab';
+  }
+
+  state.results[type] = resultData;
+  state.index++;
+
+  if (state.index < state.order.length) {
+    dailyShowExercise(state.order[state.index]);
+  } else {
+    dailyShowFinalScreen();
+  }
+}
+
+function dailySightRecordingReady(blob, example) {
+  window.dailyExerciseState.sightRecording = blob;
+  window.dailyExerciseState.sightExample = example;
+  dailyCompleteExercise('sightSinging', {
+    student: window.dailyExerciseState.student,
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}),
+    exercise: 'Sight Singing',
+    example: example,
+    recorded: true
+  });
+}
+
+function dailyMakeExportData() {
+  const s = window.dailyExerciseState;
+  const result = {
+    version: 1,
+    student: s.student,
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}),
+    exercises: {
+      vocab: s.results.vocab,
+      earTraining: s.results.earTraining,
+      sightSinging: s.results.sightSinging
+    }
+  };
+  return result;
+}
+
+function dailyUnicodeBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+
+function dailyScoreLink() {
+  const json = JSON.stringify(dailyMakeExportData());
+  return `https://biphmusic.github.io/grades/#data=${dailyUnicodeBase64(json)}`;
+}
+
+function dailySafeName(name) {
+  return (name || 'Student').replace(/[\/\\?%*:|"<>]/g, '').trim() || 'Student';
+}
+
+function dailyTextFile() {
+  const state = window.dailyExerciseState;
+  const name = dailySafeName(state.student);
+  const date = new Date().toISOString().split('T')[0];
+  const link = dailyScoreLink();
+  return new File([link + '\n'], `${name} - Daily Exercises, ${date}.txt`, {type:'text/plain'});
+}
+
+function dailyRecordingFile() {
+  const state = window.dailyExerciseState;
+  const name = dailySafeName(state.student);
+  const date = new Date().toISOString().split('T')[0];
+  return new File([state.sightRecording], `${date} Sight Singing - ${name}.mp3`, {type:'audio/mp3'});
+}
+
+function dailyDownloadFile(file) {
+  const url = URL.createObjectURL(file);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = file.name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function dailyCopyLink(button) {
+  const link = dailyScoreLink();
+  navigator.clipboard.writeText(link).then(() => {
+    button.textContent = '✓ Link Copied!';
+    setTimeout(() => button.textContent = '📋 Copy Score Link', 2200);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = link;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    button.textContent = '✓ Link Copied!';
+    setTimeout(() => button.textContent = '📋 Copy Score Link', 2200);
+  });
+}
+
+async function dailyShareBoth() {
+  try {
+    const txt = dailyTextFile();
+    const mp3 = dailyRecordingFile();
+    if (navigator.canShare && navigator.canShare({files:[txt, mp3]})) {
+      await navigator.share({
+        files:[txt, mp3],
+        title:'Daily Exercises',
+        text:`Daily Exercises for ${window.dailyExerciseState.student}`
+      });
+      return;
+    }
+    dailyDownloadFile(txt);
+    dailyDownloadFile(mp3);
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      console.error(err);
+      alert('Could not share the files. You can download them instead.');
+    }
+  }
+}
+
+function dailyShowFinalScreen() {
+  const s = window.dailyExerciseState;
+  const safe = dailySafeName(s.student);
+  const results = s.results;
+  document.getElementById('exercise-subtitle').textContent = 'Daily Exercises — Complete!';
+  document.getElementById('exercise-progress').textContent = 'All three exercises complete';
+  document.getElementById('exercise-stage').innerHTML = `
+    <div class="daily-final">
+      <h2>Great job, ${safe}!</h2>
+      <p class="daily-note">You completed all three daily exercises.</p>
+      <div class="daily-score-card">
+        <div class="daily-score-row"><span>Vocab</span><strong>${results.vocab?.percentage ?? '—'}%</strong></div>
+        <div class="daily-score-row"><span>Ear Training</span><strong>${results.earTraining?.percentage ?? '—'}%</strong></div>
+        <div class="daily-score-row"><span>Sight Singing</span><strong>Recording complete</strong></div>
+      </div>
+      <p class="daily-note">Your score link contains the three separate quiz records in JSON. The MP3 is kept as a separate file.</p>
+      <div class="daily-final-actions">
+        <button class="copy-button" id="dailyCopyLink">📋 Copy Score Link</button>
+        <button class="copy-button" id="dailyDownloadTxt">Download Scores (.txt)</button>
+        <button class="copy-button" id="dailyDownloadMp3">Download Recording (.mp3)</button>
+        <button class="copy-button" id="dailyShareBoth">📤 Share / AirDrop Both</button>
+      </div>
+      <audio id="dailyFinalAudio" controls style="width:100%;max-width:650px;margin:24px auto 0;"></audio>
+    </div>`;
+  document.getElementById('exercise-style').textContent += `
+    .daily-final audio { display:block; }`;
+  const audio = document.getElementById('dailyFinalAudio');
+  audio.src = URL.createObjectURL(s.sightRecording);
+  document.getElementById('dailyCopyLink').onclick = function(){ dailyCopyLink(this); };
+  document.getElementById('dailyDownloadTxt').onclick = () => dailyDownloadFile(dailyTextFile());
+  document.getElementById('dailyDownloadMp3').onclick = () => dailyDownloadFile(dailyRecordingFile());
+  document.getElementById('dailyShareBoth').onclick = dailyShareBoth;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function dailyStartSession(displayName) {
+  const s = window.dailyExerciseState;
+  s.student = displayName;
+  s.order = dailyShuffle(['vocab','earTraining','sightSinging']);
+  s.index = 0;
+  s.results = {};
+  s.sightRecording = null;
+  s.sightExample = null;
+  document.getElementById('main-content').style.display = 'block';
+  document.getElementById('exercise-progress').textContent = 'Exercise 1 of 3';
+  if (typeof initMyMenu === 'function') initMyMenu();
+  dailyShowExercise(s.order[0]);
+}
+
+window.onSuccessfulLogin = function(displayName) {
+  localStorage.setItem('biph_student_name', displayName);
+  localStorage.setItem('biph_name_timestamp', Date.now().toString());
+  dailyStartSession(displayName);
+};
+</script>
+
+
+<script>
+
+// Unicode-safe base64 encoding and decoding functions
+function unicodeToBase64(str) {
+    const utf8Bytes = new TextEncoder().encode(str);
+    const binary = Array.from(
+        utf8Bytes,
+        byte => String.fromCharCode(byte)
+    ).join('');
+    return btoa(binary);
+}
+
+function base64ToUnicode(base64) {
+    const binary = atob(base64);
+    const bytes = Uint8Array.from(
+        binary,
+        char => char.charCodeAt(0)
+    );
+    return new TextDecoder().decode(bytes);
+}
+
+function unscrambleTerms(scrambledArray) {
+    function unshiftString(str, shift) {
+        return str.split('').map(char => {
+            if (char.match(/[a-zA-Z]/)) {
+                const code = char.charCodeAt(0);
+                const base = char >= 'a' ? 97 : 65;
+
+                return String.fromCharCode(
+                    (code - base - shift + 26) % 26 + base
+                );
+            }
+
+            return char;
+        }).join('');
+    }
+
+    return scrambledArray.map(item => {
+        const decodedTerm = base64ToUnicode(item.Term);
+        const decodedDef = base64ToUnicode(item.Definition);
+
+        return {
+            Term: unshiftString(decodedTerm, 3),
+            Definition: unshiftString(decodedDef, 3)
+        };
+    });
+}
+
+const vocabularyTerms = unscrambleTerms(scrambledVocabularyTerms);
+
+// Use apStudents from apstudents.js
+let dailyVocabApprovedStudents =
+    typeof apStudents !== 'undefined' ? apStudents : [];
+
+let dailyVocabStudent = '';
+let dailyVocabQuestionBank = {};
+let answers = [];
+let usedTerms = {};
+
+let selectedQuestion = null;
+let selectedWord = null;
+
+
+// ==================== INITIAL PAGE LOAD ====================
+
+function dailyVocabCapitalizeName(name) {
+    return name.trim().split(' ').map(
+        w =>
+            w.charAt(0).toUpperCase() +
+            w.slice(1).toLowerCase()
+    ).join(' ');
+}
+
+
+function dailyVocabGenerateQuestionSet(student) {
+    const shuffledQuestions =
+        [...vocabularyTerms]
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 10);
+
+    const sortedTerms =
+        [...shuffledQuestions.map(q => q.Term)]
+            .sort((a, b) => a.localeCompare(b));
+
+    return {
+        questions: shuffledQuestions,
+        terms: sortedTerms,
+        answers: shuffledQuestions.map(q => q.Term)
+    };
+}
+
+
+// ==================== QUESTION SELECTION ====================
+
+function selectQuestion(index, focusInput = true) {
+    clearSelections();
+
+    selectedQuestion = index;
+    lastSelectedIndex = index;
+
+    const qBox = document.querySelectorAll('.question-box')[index];
+    const input = document.getElementById(`answer-${index}`);
+
+    if (qBox) {
+        // Clicking the question itself highlights it.
+        qBox.classList.add('selected');
+
+        const rect = qBox.getBoundingClientRect();
+
+        // The questions column has its own scroll position.
+        // Do not scroll the page when a question is selected.
+        scrollQuestionToBox(qBox);
+    }
+
+    if (focusInput && input) {
+        // Remember that the textbox is being focused
+        // because the question box was clicked.
+        input.dataset.focusFromQuestion = 'true';
+
+        input.focus();
+
+        input.setSelectionRange(
+            input.value.length,
+            input.value.length
+        );
+
+        updateInputWidth(input);
+        updateTypingHighlights(input);
+    }
+}
+
+
+function selectWord(index) {
+    const buttons =
+        Array.from(
+            document.querySelectorAll('.word-bank button')
+        );
+
+    if (!buttons[index]) return;
+
+    buttons.forEach(b =>
+        b.classList.remove(
+            'selected',
+            'keyboard-highlight'
+        )
+    );
+
+    selectedWord = index;
+
+    buttons[index].classList.add(
+        'selected',
+        'keyboard-highlight'
+    );
+
+    // Scroll only the word-bank column, never the page.
+    scrollWordBankToButton(
+        buttons[index],
+        'smooth'
+    );
+}
+
+
+function clearSelections() {
+    document.querySelectorAll('.question-box')
+        .forEach(q =>
+            q.classList.remove('selected')
+        );
+
+    document.querySelectorAll('.word-bank button')
+        .forEach(b =>
+            b.classList.remove(
+                'selected',
+                'keyboard-highlight'
+            )
+        );
+
+    selectedQuestion = null;
+    selectedWord = null;
+}
+
+
+// ==================== MATCHING WORDS ====================
+
+function makeMatch(qIndex, wIndex) {
+    const input = document.getElementById(`answer-${qIndex}`);
+    const term = dailyVocabQuestionBank[dailyVocabStudent]?.terms?.[wIndex];
+
+    if (!input || !term) return;
+
+    input.value = term;
+    input.dataset.committed = term;
+
+    input.classList.remove('invalid-input');
+
+    updateInputWidth(input);
+
+    lastSelectedIndex = qIndex;
+
+    updateAllAnswerStates();
+
+    resetWordBankScrollFreedom();
+
+    clearSelections();
+
+    const qBox = input.closest('.question-box');
+    if (qBox) {
+        qBox.classList.remove('selected');
+    }
+}
+
+
+// ==================== COMMIT TYPED ANSWER ====================
+
+function commitTypedAnswer(index) {
+    const input =
+        document.getElementById(`answer-${index}`);
+
+    if (!input) return false;
+
+    const typed = input.value.trim();
+
+    const terms =
+        dailyVocabQuestionBank[dailyVocabStudent]?.terms || [];
+
+    const exactMatch = terms.find(
+        term =>
+            term.toLowerCase() ===
+            typed.toLowerCase()
+    );
+
+    const prefixMatches = terms.filter(
+        term =>
+            !usedTerms[term.toLowerCase()] &&
+            term.toLowerCase()
+                .startsWith(typed.toLowerCase())
+    );
+
+    const term =
+        exactMatch ||
+        (
+            prefixMatches.length === 1
+                ? prefixMatches[0]
+                : null
+        );
+
+    if (!term) {
+        // Empty input should never be red.
+        // Non-empty invalid input should be red.
+        if (typed) {
+            input.classList.add('invalid-input');
+        } else {
+            input.classList.remove('invalid-input');
+        }
+
+        return false;
+    }
+
+    input.value = term;
+    input.dataset.committed = term;
+
+    input.classList.remove('invalid-input');
+
+    updateInputWidth(input);
+
+    lastSelectedIndex = index;
+
+    updateAllAnswerStates();
+
+    // Clear selection but KEEP TEXTBOX FOCUSED.
+    clearSelections();
+
+    input.focus();
+
+    input.setSelectionRange(
+        input.value.length,
+        input.value.length
+    );
+
+    updateWordBank('');
+
+    return true;
+}
+
+
+// ==================== CLEAR ANSWER ====================
+
+function clearAnswer(index) {
+    const input =
+        document.getElementById(`answer-${index}`);
+
+    if (!input) return;
+
+    input.value = '';
+
+    delete input.dataset.committed;
+
+    input.classList.remove(
+        'invalid-input',
+        'duplicate-input'
+    );
+
+    updateInputWidth(input);
+    updateAllAnswerStates();
+    updateWordBank('');
+}
+
+
+// ==================== INPUT WIDTH ====================
+
+function updateInputWidth(input) {
+    const canvas =
+        updateInputWidth.canvas ||
+        (
+            updateInputWidth.canvas =
+            document.createElement('canvas')
+        );
+
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return;
+
+    const style = getComputedStyle(input);
+
+    ctx.font =
+        `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    const textWidth =
+        ctx.measureText(input.value || '').width;
+
+    input.style.width =
+        `${Math.max(120, Math.ceil(textWidth))}px`;
+}
+
+
+// ==================== ANSWER STATES ====================
+
+function updateAllAnswerStates() {
+    const inputs =
+        Array.from(
+            document.querySelectorAll('.answer-input')
+        );
+
+    const buttons =
+        Array.from(
+            document.querySelectorAll('.word-bank button')
+        );
+
+    const terms =
+        dailyVocabQuestionBank[dailyVocabStudent]?.terms || [];
+
+    inputs.forEach(input => {
+        input.classList.remove('duplicate-input');
+    });
+
+    buttons.forEach(button => {
+        button.classList.remove(
+            'used',
+            'duplicate',
+            'possible',
+            'filtered-out',
+            'selected',
+            'keyboard-highlight'
+        );
+
+        button.style.opacity = '1';
+        button.style.backgroundColor =
+            'rgba(255, 255, 255, 0.1)';
+        button.style.color = 'white';
+    });
+
+    const usedCounts = {};
+
+    inputs.forEach((input, idx) => {
+        const committed =
+            input.dataset.committed;
+
+        if (!committed) return;
+
+        const key =
+            committed.toLowerCase();
+
+        if (!usedCounts[key]) {
+            usedCounts[key] = [];
+        }
+
+        usedCounts[key].push(idx);
+    });
+
+    Object.entries(usedCounts).forEach(
+        ([key, positions]) => {
+            const termIndex =
+                terms.findIndex(
+                    term =>
+                        term.toLowerCase() === key
+                );
+
+            const button =
+                termIndex >= 0
+                    ? buttons[termIndex]
+                    : null;
+
+            if (positions.length > 1) {
+                positions.forEach(position => {
+                    inputs[position]
+                        .classList.add(
+                            'duplicate-input'
+                        );
+                });
+
+                if (button) {
+                    button.classList.add('duplicate');
+                    button.style.opacity = '1';
+                }
+
+            } else if (button) {
+                button.classList.add('used');
+                button.style.opacity = '0.4';
+            }
+        }
+    );
+
+    answers =
+        inputs.map(
+            input =>
+                input.dataset.committed || ''
+        );
+
+    usedTerms = {};
+
+    answers.forEach((answer, idx) => {
+        if (!answer) return;
+
+        const key =
+            answer.toLowerCase();
+
+        if (!usedTerms[key]) {
+            usedTerms[key] = [];
+        }
+
+        usedTerms[key].push(idx + 1);
+    });
+}
+
+
+// ==================== WORD BANK SCROLLING ====================
+
+
+function scrollQuestionToBox(box, behavior = 'smooth') {
+    const container =
+        document.querySelector('.questions-container');
+
+    if (!container || !box) return;
+
+    const containerRect =
+        container.getBoundingClientRect();
+
+    const boxRect =
+        box.getBoundingClientRect();
+
+    const padding = 10;
+
+    if (boxRect.top < containerRect.top + padding) {
+        container.scrollBy({
+            top:
+                boxRect.top -
+                containerRect.top -
+                padding,
+            behavior
+        });
+
+    } else if (
+        boxRect.bottom >
+        containerRect.bottom - padding
+    ) {
+        container.scrollBy({
+            top:
+                boxRect.bottom -
+                containerRect.bottom +
+                padding,
+            behavior
+        });
+    }
+}
+
+
+function scrollWordBankToButton(button, behavior = 'smooth') {
+    const container =
+        document.querySelector('.word-bank-container');
+
+    if (!container || !button) return;
+
+    const containerRect =
+        container.getBoundingClientRect();
+
+    const buttonRect =
+        button.getBoundingClientRect();
+
+    const padding = 10;
+
+    if (buttonRect.top < containerRect.top + padding) {
+        container.scrollBy({
+            top:
+                buttonRect.top -
+                containerRect.top -
+                padding,
+            behavior
+        });
+
+    } else if (
+        buttonRect.bottom >
+        containerRect.bottom - padding
+    ) {
+        container.scrollBy({
+            top:
+                buttonRect.bottom -
+                containerRect.bottom +
+                padding,
+            behavior
+        });
+    }
+}
+
+
+function scrollHighlightedWordBankButtons(buttons) {
+    if (!buttons?.length) return;
+
+    const highlighted =
+        buttons.filter(button =>
+            button.classList.contains('possible') ||
+            button.classList.contains('keyboard-highlight')
+        );
+
+    if (!highlighted.length) return;
+
+    const target = highlighted[0];
+
+    const container =
+        document.querySelector('.word-bank-container');
+
+    if (!container) return;
+
+    const vv = window.visualViewport;
+
+    const viewportTop =
+        vv ? vv.offsetTop : 0;
+
+    const viewportHeight =
+        vv ? vv.height : window.innerHeight;
+
+    // Put the highlighted word around 40% down the
+    // ACTUAL visible viewport. This works much better
+    // when the iPad keyboard is open.
+    const desiredY =
+        viewportTop + viewportHeight * 0.40;
+
+    const rect =
+        target.getBoundingClientRect();
+
+    const wordCenter =
+        (rect.top + rect.bottom) / 2;
+
+    let scrollAmount =
+        wordCenter - desiredY;
+
+    // Keep the scroll amount within the word bank's
+    // actual scrollable range.
+    const maxScroll =
+        container.scrollHeight -
+        container.clientHeight;
+
+    const newScrollTop =
+        Math.max(
+            0,
+            Math.min(
+                container.scrollTop + scrollAmount,
+                maxScroll
+            )
+        );
+
+    scrollAmount =
+        newScrollTop - container.scrollTop;
+
+    if (Math.abs(scrollAmount) > 1) {
+        container.scrollBy({
+            top: scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+
+    // iPad Safari can finish resizing the visual viewport
+    // slightly after the keyboard appears. Recheck once.
+    setTimeout(() => {
+        const finalVV =
+            window.visualViewport;
+
+        const finalViewportTop =
+            finalVV ? finalVV.offsetTop : 0;
+
+        const finalViewportHeight =
+            finalVV ? finalVV.height : window.innerHeight;
+
+        const finalDesiredY =
+            finalViewportTop +
+            finalViewportHeight * 0.40;
+
+        const finalRect =
+            target.getBoundingClientRect();
+
+        const finalWordCenter =
+            (finalRect.top + finalRect.bottom) / 2;
+
+        let finalScrollAmount =
+            finalWordCenter - finalDesiredY;
+
+        const finalMaxScroll =
+            container.scrollHeight -
+            container.clientHeight;
+
+        const finalScrollTop =
+            Math.max(
+                0,
+                Math.min(
+                    container.scrollTop +
+                    finalScrollAmount,
+                    finalMaxScroll
+                )
+            );
+
+        finalScrollAmount =
+            finalScrollTop -
+            container.scrollTop;
+
+        if (Math.abs(finalScrollAmount) > 1) {
+            container.scrollBy({
+                top: finalScrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    }, 300);
+}
+
+
+// ==================== TYPING HIGHLIGHTS ====================
+
+function updateTypingHighlights(input) {
+    const buttons = Array.from(
+        document.querySelectorAll('.word-bank button')
+    );
+    const terms = dailyVocabQuestionBank[dailyVocabStudent]?.terms || [];
+    const typed = input.value.trim().toLowerCase();
+
+    if (input.dataset.committed) {
+        input.classList.remove(
+            'invalid-input',
+            'duplicate-input'
+        );
+        return;
+    }
+
+    buttons.forEach(button => {
+        button.classList.remove(
+            'possible',
+            'keyboard-highlight'
+        );
+    });
+
+    selectedWord = null;
+
+    if (!typed) {
+        input.classList.remove(
+            'invalid-input',
+            'duplicate-input'
+        );
+        resetWordBankScrollFreedom();
+        return;
+    }
+
+    const matches = terms
+        .map((term, index) => ({
+            term,
+            index
+        }))
+        .filter(item =>
+            item.term
+                .toLowerCase()
+                .startsWith(typed)
+        );
+
+    const exactMatch = terms.find(
+        term =>
+            term.toLowerCase() === typed
+    );
+
+    const isDuplicate =
+        exactMatch &&
+        !!usedTerms[
+            exactMatch.toLowerCase()
+        ];
+
+    input.classList.remove('invalid-input');
+
+    if (isDuplicate) {
+        input.classList.add('duplicate-input');
+    } else {
+        input.classList.remove('duplicate-input');
+
+        if (matches.length === 0) {
+            input.classList.add('invalid-input');
+        }
+    }
+
+    matches.forEach(match => {
+        const button = buttons[match.index];
+
+        if (!button) return;
+
+        button.classList.add('possible');
+        button.style.opacity = '1';
+    });
+
+    if (matches.length === 1) {
+        selectedWord = matches[0].index;
+        buttons[selectedWord]?.classList.add(
+            'keyboard-highlight'
+        );
+
+        scrollHighlightedWordBankButtons(buttons);
+    } else {
+        resetWordBankScrollFreedom();
+    }
+}
+
+
+// ==================== INITIALIZE QUIZ ====================
+
+function dailyVocabInitializeQuiz() {
+    const quizQuestionsDiv =
+        document.getElementById(
+            'quiz-questions'
+        );
+
+    const wordBankDiv =
+        document.getElementById(
+            'word-bank'
+        );
+
+    quizQuestionsDiv.innerHTML = '';
+    wordBankDiv.innerHTML = '';
+
+    answers = [];
+    usedTerms = {};
+
+    selectedQuestion = null;
+    selectedWord = null;
+    lastSelectedIndex = -1;
+
+    const studentQuestions =
+        dailyVocabQuestionBank[dailyVocabStudent];
+
+
+    // ==================== QUESTIONS ====================
+
+    studentQuestions.questions.forEach(
+        (question, index) => {
+            const questionDiv =
+                document.createElement('div');
+
+            questionDiv.className =
+                'question-box';
+
+            questionDiv.tabIndex = -1;
+
+            questionDiv.innerHTML = `
+                <div class="question-label">
+                    <strong>${index + 1}.</strong>
+                    <input type="text"
+                           id="answer-${index}"
+                           class="answer-input"
+                           autocomplete="off"
+                           spellcheck="false">
+                </div>
+
+                <div class="question-text">
+                    ${question.Definition}
+                </div>
+            `;
+
+            const input =
+                questionDiv.querySelector(
+                    '.answer-input'
+                );
+
+
+            // ==================== QUESTION CLICK ====================
+
+            questionDiv.addEventListener('click', e => {
+                if (e.target === input) return;
+
+                // If a word is currently selected, clicking the question
+                // immediately puts that word into this question.
+                if (selectedWord !== null) {
+                    makeMatch(index, selectedWord);
+                } else {
+                    selectQuestion(index, false);
+                }
+            });
+
+
+            // ==================== INPUT FOCUS ====================
+
+            input.addEventListener('focus', () => {
+                selectedQuestion = index;
+                lastSelectedIndex = index;
+
+                if (input.dataset.focusFromQuestion === 'true') {
+                    // The question box itself was clicked.
+                    // Keep its yellow highlight.
+                    delete input.dataset.focusFromQuestion;
+                } else {
+                    // Directly clicking/focusing the textbox should
+                    // NOT highlight the question.
+                    document.querySelectorAll('.question-box').forEach(q => {
+                        q.classList.remove('selected');
+                    });
+                }
+
+                // Show predictions for whatever is currently being typed.
+                updateTypingHighlights(input);
+            });
+
+
+            // ==================== INPUT ====================
+
+            input.addEventListener('input', () => {
+                // The moment the student changes a committed answer,
+                // it becomes an uncommitted typed answer again.
+                delete input.dataset.committed;
+
+                input.classList.remove('duplicate-input');
+
+                selectedQuestion = index;
+                lastSelectedIndex = index;
+
+                updateAllAnswerStates();
+
+                // Now prediction highlighting takes over.
+                updateTypingHighlights(input);
+            });
+
+
+            quizQuestionsDiv.appendChild(
+                questionDiv
+            );
+
+            updateInputWidth(input);
+        }
+    );
+
+
+    // ==================== WORD BANK ====================
+
+    studentQuestions.terms.forEach(
+        (term, index) => {
+            const button =
+                document.createElement('button');
+
+            // No A., B., C. prefixes.
+            button.textContent = term;
+
+            button.dataset.index = index;
+            button.tabIndex = -1;
+
+            button.addEventListener(
+                'click',
+                () => {
+                    if (selectedQuestion !== null) {
+                        makeMatch(
+                            selectedQuestion,
+                            index
+                        );
+
+                    } else if (
+                        lastSelectedIndex >= 0
+                    ) {
+                        makeMatch(
+                            lastSelectedIndex,
+                            index
+                        );
+
+                    } else {
+                        selectWord(index);
+                    }
+                }
+            );
+
+            wordBankDiv.appendChild(button);
+        }
+    );
+
+    updateAllAnswerStates();
+
+    // Make absolutely sure nothing is focused
+    // or highlighted on initial quiz creation.
+    clearSelections();
+
+    document
+        .querySelectorAll('.answer-input')
+        .forEach(input => input.blur());
+
+    document.activeElement?.blur();
+}
+
+
+// ==================== KEYBOARD SUPPORT ====================
+
+let lastSelectedIndex = -1;
+let keyboardCandidates = [];
+let keyboardCandidatePosition = 0;
+
+
+function updateLastSelected(index) {
+    lastSelectedIndex = index;
+}
+
+
+function focusQuestion(index) {
+    const input =
+        document.getElementById(
+            `answer-${index}`
+        );
+
+    if (!input) return;
+
+    clearSelections();
+
+    selectedQuestion = index;
+    lastSelectedIndex = index;
+
+    const qBox =
+        input.closest('.question-box');
+
+    if (qBox) {
+        // IMPORTANT:
+        // Tab/focusing a textbox does NOT
+        // yellow-highlight the question.
+
+        const rect =
+            qBox.getBoundingClientRect();
+
+        // The questions column has its own scroll position.
+        // Do not scroll the page when a question is selected.
+        scrollQuestionToBox(qBox);
+    }
+
+    input.focus();
+
+    input.setSelectionRange(
+        input.value.length,
+        input.value.length
+    );
+
+    updateTypingHighlights(input);
+}
+
+
+function focusSubmitButton() {
+    const submitBtn =
+        document.querySelector(
+            '.quiz-actions .action-button'
+        );
+
+    if (submitBtn) {
+        clearSelections();
+        submitBtn.focus();
+    }
+}
+
+
+// ==================== WORD CANDIDATES ====================
+
+function getCandidateWordIndices() {
+    const terms =
+        dailyVocabQuestionBank[dailyVocabStudent]?.terms || [];
+
+    const input =
+        document.activeElement
+            ?.classList.contains('answer-input')
+            ? document.activeElement
+            : (
+                selectedQuestion !== null
+                    ? document.getElementById(
+                        `answer-${selectedQuestion}`
+                    )
+                    : null
+            );
+
+    const prefix =
+        input
+            ? input.value.trim().toLowerCase()
+            : '';
+
+    return terms
+        .map((term, i) => ({
+            term,
+            i
+        }))
+        .filter(item =>
+            !usedTerms[
+                item.term.toLowerCase()
+            ] &&
+            (
+                !prefix ||
+                item.term
+                    .toLowerCase()
+                    .startsWith(prefix)
+            )
+        )
+        .map(item => item.i);
+}
+
+
+function moveWordSelection(direction) {
+    const candidates =
+        getCandidateWordIndices();
+
+    if (!candidates.length) return;
+
+    let currentPos =
+        candidates.indexOf(selectedWord);
+
+    if (currentPos < 0) {
+        currentPos =
+            direction > 0
+                ? -1
+                : candidates.length;
+    }
+
+    let nextPos =
+        currentPos + direction;
+
+    if (
+        nextPos >= candidates.length
+    ) {
+        nextPos = 0;
+    }
+
+    if (nextPos < 0) {
+        nextPos =
+            candidates.length - 1;
+    }
+
+    const nextIndex =
+        candidates[nextPos];
+
+    selectWord(nextIndex);
+
+    const button =
+        document.querySelectorAll(
+            '.word-bank button'
+        )[nextIndex];
+
+    if (button) {
+        button.classList.add(
+            'keyboard-highlight'
+        );
+
+        // Keep keyboard navigation inside the word-bank
+        // scroll area instead of scrolling the page.
+        scrollWordBankToButton(
+            button,
+            'smooth'
+        );
+    }
+}
+
+
+// ==================== GLOBAL KEYBOARD ====================
+
+document.addEventListener(
+    'keydown',
+    e => {
+        if (window.dailyExerciseState?.active !== 'vocab') return;
+        const inputs =
+            Array.from(
+                document.querySelectorAll(
+                    '.answer-input'
+                )
+            );
+
+        if (!inputs.length) return;
+
+        const currentInput =
+            document.activeElement;
+
+        const currentIndex =
+            inputs.indexOf(currentInput);
+
+        const submitButton =
+            document.querySelector(
+                '.quiz-actions .action-button'
+            );
+
+        const isSubmitFocused =
+            submitButton === currentInput;
+
+
+        // ==================== ESCAPE ====================
+
+        if (e.key === 'Escape') {
+            e.preventDefault();
+
+            clearSelections();
+
+            if (
+                currentInput?.classList
+                    .contains('answer-input')
+            ) {
+                currentInput.blur();
+            }
+
+            updateWordBank('');
+
+            return;
+        }
+
+
+        // ==================== TAB ====================
+
+        if (e.key === 'Tab') {
+            e.preventDefault();
+
+            let baseIndex =
+                currentIndex >= 0
+                    ? currentIndex
+                    : lastSelectedIndex;
+
+            // IMPORTANT:
+            // If nothing has been selected/focused yet,
+            // the first Tab goes to question 1.
+            if (baseIndex < 0) {
+                baseIndex = -1;
+            }
+
+            let targetIndex;
+
+            if (e.shiftKey) {
+                if (baseIndex <= 0) {
+                    // Nothing before question 1.
+                    return;
+                }
+
+                targetIndex =
+                    baseIndex - 1;
+
+            } else if (
+                baseIndex < inputs.length - 1
+            ) {
+                targetIndex =
+                    baseIndex + 1;
+
+            } else {
+                targetIndex = null;
+            }
+
+
+            // Submit button is currently focused.
+            if (isSubmitFocused) {
+                if (e.shiftKey) {
+                    focusQuestion(
+                        inputs.length - 1
+                    );
+                }
+
+                return;
+            }
+
+
+            // Move to Submit after final question.
+            if (targetIndex === null) {
+                focusSubmitButton();
+
+            } else {
+                focusQuestion(
+                    targetIndex
+                );
+            }
+
+            return;
+        }
+
+
+        // ==================== ARROW KEYS ====================
+
+        if (
+            e.key === 'ArrowDown' ||
+            e.key === 'ArrowUp'
+        ) {
+            if (
+                currentIndex < 0 &&
+                selectedQuestion === null &&
+                selectedWord === null
+            ) {
+                return;
+            }
+
+            e.preventDefault();
+
+            keyboardCandidates =
+                getCandidateWordIndices();
+
+            if (
+                !keyboardCandidates.length
+            ) {
+                return;
+            }
+
+            moveWordSelection(
+                e.key === 'ArrowDown'
+                    ? 1
+                    : -1
+            );
+
+            return;
+        }
+
+
+        // ==================== ENTER ====================
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+
+            // If the Submit button is focused, submit the quiz.
+            if (submitButton === currentInput) {
+                submitQuiz();
+                return;
+            }
+
+            // If an answer input is active,
+            // use the selected word or commit typed text.
+            if (currentIndex >= 0) {
+
+                if (selectedWord !== null) {
+                    const terms =
+                        dailyVocabQuestionBank[
+                            dailyVocabStudent
+                        ].terms;
+
+                    const typed =
+                        currentInput.value
+                            .trim()
+                            .toLowerCase();
+
+                    if (
+                        !typed ||
+                        terms[selectedWord]
+                            .toLowerCase()
+                            .startsWith(typed)
+                    ) {
+                        makeMatch(
+                            currentIndex,
+                            selectedWord
+                        );
+
+                    } else {
+                        commitTypedAnswer(
+                            currentIndex
+                        );
+                    }
+
+                } else {
+                    commitTypedAnswer(
+                        currentIndex
+                    );
+                }
+
+                return;
+            }
+
+
+            // If a word is selected with no input
+            // focused, apply it to the most recent question.
+            if (
+                selectedWord !== null &&
+                lastSelectedIndex >= 0
+            ) {
+                makeMatch(
+                    lastSelectedIndex,
+                    selectedWord
+                );
+            }
+        }
+    }
+);
+
+
+// ==================== CLICK OUTSIDE ====================
+
+document.addEventListener(
+    'click',
+    e => {
+        if (
+            !e.target.closest(
+                '.question-box'
+            ) &&
+            !e.target.closest(
+                '.word-bank button'
+            )
+        ) {
+            clearSelections();
+        }
+    }
+);
+
+
+// ==================== SUBMIT QUIZ ====================
+
+function submitQuiz() {
+    const hasBlankAnswers =
+        answers.some(
+            answer => !answer
+        );
+
+    const usedCounts = {};
+
+    answers.forEach(answer => {
+        if (answer) {
+            usedCounts[answer] =
+                (usedCounts[answer] || 0) + 1;
+        }
+    });
+
+    const duplicateAnswers =
+        Object.keys(usedCounts)
+            .filter(
+                term =>
+                    usedCounts[term] > 1
+            );
+
+
+    if (
+        hasBlankAnswers &&
+        duplicateAnswers.length > 0
+    ) {
+        if (
+            !confirm(
+                'There are blank answers and duplicate responses.\nWould you still like to proceed?'
+            )
+        ) return;
+
+    } else if (hasBlankAnswers) {
+        if (
+            !confirm(
+                'There are some questions left blank.\nWould you still like to proceed?'
+            )
+        ) return;
+
+    } else if (
+        duplicateAnswers.length > 0
+    ) {
+        if (
+            !confirm(
+                'There are duplicate responses (each word should only be used once).\n\nWould you still like to proceed?'
+            )
+        ) return;
+    }
+    const resultData = dailyVocabPrepareResultData();
+    dailyCompleteExercise("vocab", resultData);
+}
+
+
+// ==================== SHARE / AIRDROP ====================
+
+// Handled by the combined Daily Exercises export flow.
+
+// ==================== DISPLAY RESULTS ====================
+
+
+
+
+// ==================== PREPARE RESULT DATA ====================
+
+function dailyVocabPrepareResultData() {
+    const correctAnswers =
+        dailyVocabQuestionBank[
+            dailyVocabStudent
+        ].answers;
+
+    const allTerms =
+        [...correctAnswers];
+
+    const correctTerms =
+        answers
+            .map(
+                (answer, index) =>
+                    answer &&
+                    answer.toLowerCase() ===
+                    correctAnswers[index]
+                        .toLowerCase()
+                        ? correctAnswers[index]
+                        : null
+            )
+            .filter(term => term);
+
+    const termsToReview =
+        allTerms.filter(
+            term =>
+                !correctTerms.includes(term)
+        );
+
+
+    return {
+        student:
+            dailyVocabCapitalizeName(
+                dailyVocabStudent
+            ),
+
+        date:
+            new Date()
+                .toISOString()
+                .split('T')[0],
+
+        time:
+            new Date()
+                .toLocaleTimeString(
+                    [],
+                    {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    }
+                ),
+
+        exercise:
+            "Vocab Quiz",
+
+        answers:
+            Array.from(
+                { length: 10 },
+                (_, index) =>
+                    answers[index] || ""
+            ),
+
+        questionSet:
+            dailyVocabQuestionBank[dailyVocabStudent],
+
+        termsToReview:
+            termsToReview
+                .map(term => ({
+                    term,
+                    definition:
+                        vocabularyTerms
+                            .find(
+                                v =>
+                                    v.Term ===
+                                    term
+                            )
+                            ?.Definition ||
+                        "Definition not found"
+                }))
+                .sort(
+                    (a, b) =>
+                        a.term.localeCompare(
+                            b.term
+                        )
+                )
+    };
+}
+
+
+
+
+</script>
+
+<script>
+
+        let dailyEarApprovedStudents = typeof apStudents !== 'undefined' ? apStudents : [];
+
+        let dailyEarStudent = '';
+        let dailyEarQuestionBank = {};
+        let currentSectionIndex = 0;
+        let currentQuestionIndex = 0;
+        let studentAnswers = [];
+        let currentAudio = null;
+        let playsLeft = 2;
+
+        // Pull from the loaded QUIZ_CONFIG
+        const sections = QUIZ_CONFIG.sections;
+        const sectionTitles = QUIZ_CONFIG.sectionTitles;
+
+        
+
+        const audioFiles = {
+            intervals: [
+                { file: 'Major2-1.mp3', answer: 'Major 2nd' },
+                { file: 'Major2-2.mp3', answer: 'Major 2nd' },
+                { file: 'Major2-3.mp3', answer: 'Major 2nd' },
+                { file: 'Major2-4.mp3', answer: 'Major 2nd' },
+                { file: 'Major2-5.mp3', answer: 'Major 2nd' },
+                { file: 'Major2-6.mp3', answer: 'Major 2nd' },
+                { file: 'Major2-7.mp3', answer: 'Major 2nd' },
+                { file: 'Major2-8.mp3', answer: 'Major 2nd' },
+                { file: 'Major2-9.mp3', answer: 'Major 2nd' },
+                { file: 'Major2-10.mp3', answer: 'Major 2nd' },
+                { file: 'Major3-1.mp3', answer: 'Major 3rd' },
+                { file: 'Major3-2.mp3', answer: 'Major 3rd' },
+                { file: 'Major3-3.mp3', answer: 'Major 3rd' },
+                { file: 'Major3-4.mp3', answer: 'Major 3rd' },
+                { file: 'Major3-5.mp3', answer: 'Major 3rd' },
+                { file: 'Major3-6.mp3', answer: 'Major 3rd' },
+                { file: 'Major3-7.mp3', answer: 'Major 3rd' },
+                { file: 'Major3-8.mp3', answer: 'Major 3rd' },
+                { file: 'Major6-1.mp3', answer: 'Major 6th' },
+                { file: 'Major6-2.mp3', answer: 'Major 6th' },
+                { file: 'Major6-3.mp3', answer: 'Major 6th' },
+                { file: 'Major6-4.mp3', answer: 'Major 6th' },
+                { file: 'Major6-5.mp3', answer: 'Major 6th' },
+                { file: 'Major6-6.mp3', answer: 'Major 6th' },
+                { file: 'Major6-7.mp3', answer: 'Major 6th' },
+                { file: 'Major6-8.mp3', answer: 'Major 6th' },
+                { file: 'Major6-9.mp3', answer: 'Major 6th' },
+                { file: 'Major7-1.mp3', answer: 'Major 7th' },
+                { file: 'Major7-2.mp3', answer: 'Major 7th' },
+                { file: 'Major7-3.mp3', answer: 'Major 7th' },
+                { file: 'Major7-4.mp3', answer: 'Major 7th' },
+                { file: 'Minor2-1.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor2-2.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor2-3.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor2-4.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor2-5.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor2-6.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor2-7.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor2-8.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor2-9.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor2-10.mp3', answer: 'Minor 2nd' },
+                { file: 'Minor3-1.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor3-2.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor3-3.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor3-4.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor3-5.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor3-6.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor3-7.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor3-8.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor3-9.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor3-10.mp3', answer: 'Minor 3rd' },
+                { file: 'Minor6-1.mp3', answer: 'Minor 6th' },
+                { file: 'Minor6-2.mp3', answer: 'Minor 6th' },
+                { file: 'Minor6-3.mp3', answer: 'Minor 6th' },
+                { file: 'Minor6-4.mp3', answer: 'Minor 6th' },
+                { file: 'Minor6-5.mp3', answer: 'Minor 6th' },
+                { file: 'Minor6-6.mp3', answer: 'Minor 6th' },
+                { file: 'Minor6-7.mp3', answer: 'Minor 6th' },
+                { file: 'Minor6-8.mp3', answer: 'Minor 6th' },
+                { file: 'Minor6-9.mp3', answer: 'Minor 6th' },
+                { file: 'Minor6-10.mp3', answer: 'Minor 6th' },
+                { file: 'Minor7-1.mp3', answer: 'Minor 7th' },
+                { file: 'Minor7-2.mp3', answer: 'Minor 7th' },
+                { file: 'Minor7-3.mp3', answer: 'Minor 7th' },
+                { file: 'Minor7-4.mp3', answer: 'Minor 7th' },
+                { file: 'Minor7-5.mp3', answer: 'Minor 7th' },
+                { file: 'Minor7-6.mp3', answer: 'Minor 7th' },
+                { file: 'Minor7-7.mp3', answer: 'Minor 7th' },
+                { file: 'Minor7-8.mp3', answer: 'Minor 7th' },
+                { file: 'Perfect4-1.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect4-2.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect4-3.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect4-4.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect4-5.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect4-6.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect4-7.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect4-8.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect4-9.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect4-10.mp3', answer: 'Perfect 4th' },
+                { file: 'Perfect5-1.mp3', answer: 'Perfect 5th' },
+                { file: 'Perfect5-2.mp3', answer: 'Perfect 5th' },
+                { file: 'Perfect5-3.mp3', answer: 'Perfect 5th' },
+                { file: 'Perfect5-4.mp3', answer: 'Perfect 5th' },
+                { file: 'Perfect5-5.mp3', answer: 'Perfect 5th' },
+                { file: 'Perfect5-6.mp3', answer: 'Perfect 5th' },
+                { file: 'Perfect5-7.mp3', answer: 'Perfect 5th' },
+                { file: 'Perfect5-8.mp3', answer: 'Perfect 5th' },
+                { file: 'Perfect5-9.mp3', answer: 'Perfect 5th' },
+                { file: 'Perfect8-1.mp3', answer: 'Perfect 8ve' },
+                { file: 'Perfect8-2.mp3', answer: 'Perfect 8ve' },
+                { file: 'Perfect8-3.mp3', answer: 'Perfect 8ve' },
+                { file: 'Perfect8-4.mp3', answer: 'Perfect 8ve' },
+                { file: 'Perfect8-5.mp3', answer: 'Perfect 8ve' },
+                { file: 'Perfect8-6.mp3', answer: 'Perfect 8ve' },
+                { file: 'Perfect8-7.mp3', answer: 'Perfect 8ve' },
+                { file: 'Perfect8-8.mp3', answer: 'Perfect 8ve' },
+                { file: 'Perfect8-9.mp3', answer: 'Perfect 8ve' },
+                { file: 'Tritone-1.mp3', answer: 'Tritone' },
+                { file: 'Tritone-2.mp3', answer: 'Tritone' },
+                { file: 'Tritone-3.mp3', answer: 'Tritone' },
+                { file: 'Tritone-4.mp3', answer: 'Tritone' },
+                { file: 'Tritone-5.mp3', answer: 'Tritone' },
+                { file: 'Tritone-6.mp3', answer: 'Tritone' },
+                { file: 'Tritone-7.mp3', answer: 'Tritone' },
+                { file: 'Tritone-8.mp3', answer: 'Tritone' },
+                { file: 'Tritone-9.mp3', answer: 'Tritone' },
+                { file: 'Tritone-10.mp3', answer: 'Tritone' }
+            ],
+            triads: [
+                { file: 'Augmented1.mp3', answer: 'Augmented Triad' },
+                { file: 'Augmented2.mp3', answer: 'Augmented Triad' },
+                { file: 'Augmented3.mp3', answer: 'Augmented Triad' },
+                { file: 'Augmented4.mp3', answer: 'Augmented Triad' },
+                { file: 'Augmented5.mp3', answer: 'Augmented Triad' },
+                { file: 'Augmented6.mp3', answer: 'Augmented Triad' },
+                { file: 'Augmented7.mp3', answer: 'Augmented Triad' },
+                { file: 'Augmented8.mp3', answer: 'Augmented Triad' },
+                { file: 'Diminished1.mp3', answer: 'Diminished Triad' },
+                { file: 'Diminished2.mp3', answer: 'Diminished Triad' },
+                { file: 'Diminished3.mp3', answer: 'Diminished Triad' },
+                { file: 'Diminished4.mp3', answer: 'Diminished Triad' },
+                { file: 'Diminished5.mp3', answer: 'Diminished Triad' },
+                { file: 'Diminished6.mp3', answer: 'Diminished Triad' },
+                { file: 'Major1.mp3', answer: 'Major Triad' },
+                { file: 'Major2.mp3', answer: 'Major Triad' },
+                { file: 'Major3.mp3', answer: 'Major Triad' },
+                { file: 'Major4.mp3', answer: 'Major Triad' },
+                { file: 'Major5.mp3', answer: 'Major Triad' },
+                { file: 'Major6.mp3', answer: 'Major Triad' },
+                { file: 'Major7.mp3', answer: 'Major Triad' },
+                { file: 'Major8.mp3', answer: 'Major Triad' },
+                { file: 'Major9.mp3', answer: 'Major Triad' },
+                { file: 'Minor1.mp3', answer: 'Minor Triad' },
+                { file: 'Minor2.mp3', answer: 'Minor Triad' },
+                { file: 'Minor3.mp3', answer: 'Minor Triad' },
+                { file: 'Minor4.mp3', answer: 'Minor Triad' },
+                { file: 'Minor5.mp3', answer: 'Minor Triad' },
+                { file: 'Minor6.mp3', answer: 'Minor Triad' },
+                { file: 'Minor7.mp3', answer: 'Minor Triad' }
+            ],
+            seventhChords: [
+                { file: 'Diminished7-1.mp3', answer: 'Diminished 7' },
+                { file: 'Diminished7-3.mp3', answer: 'Diminished 7' },
+                { file: 'Diminished7-4.mp3', answer: 'Diminished 7' },
+                { file: 'Diminished7-5.mp3', answer: 'Diminished 7' },
+                { file: 'Diminished7-6.mp3', answer: 'Diminished 7' },
+                { file: 'Diminished7-7.mp3', answer: 'Diminished 7' },
+                { file: 'Diminished7-8.mp3', answer: 'Diminished 7' },
+                { file: 'Dominant7-1.mp3', answer: 'Dominant 7' },
+                { file: 'Dominant7-2.mp3', answer: 'Dominant 7' },
+                { file: 'Dominant7-3.mp3', answer: 'Dominant 7' },
+                { file: 'Dominant7-4.mp3', answer: 'Dominant 7' },
+                { file: 'Dominant7-5.mp3', answer: 'Dominant 7' },
+                { file: 'Dominant7-6.mp3', answer: 'Dominant 7' },
+                { file: 'Dominant7-7.mp3', answer: 'Dominant 7' },
+                { file: 'Dominant7-8.mp3', answer: 'Dominant 7' },
+                { file: 'Dominant7-9.mp3', answer: 'Dominant 7' },
+                { file: 'HalfDiminished7-1.mp3', answer: 'Half-Diminished 7' },
+                { file: 'HalfDiminished7-2.mp3', answer: 'Half-Diminished 7' },
+                { file: 'HalfDiminished7-3.mp3', answer: 'Half-Diminished 7' },
+                { file: 'HalfDiminished7-4.mp3', answer: 'Half-Diminished 7' },
+                { file: 'HalfDiminished7-5.mp3', answer: 'Half-Diminished 7' },
+                { file: 'HalfDiminished7-6.mp3', answer: 'Half-Diminished 7' },
+                { file: 'HalfDiminished7-7.mp3', answer: 'Half-Diminished 7' },
+                { file: 'HalfDiminished7-8.mp3', answer: 'Half-Diminished 7' },
+                { file: 'HalfDiminished7-9.mp3', answer: 'Half-Diminished 7' },
+                { file: 'Major7-1.mp3', answer: 'Major 7' },
+                { file: 'Major7-2.mp3', answer: 'Major 7' },
+                { file: 'Major7-3.mp3', answer: 'Major 7' },
+                { file: 'Major7-4.mp3', answer: 'Major 7' },
+                { file: 'Major7-5.mp3', answer: 'Major 7' },
+                { file: 'Major7-6.mp3', answer: 'Major 7' },
+                { file: 'Major7-7.mp3', answer: 'Major 7' },
+                { file: 'Major7-8.mp3', answer: 'Major 7' },
+                { file: 'Major7-9.mp3', answer: 'Major 7' },
+                { file: 'Minor7-1.mp3', answer: 'Minor 7' },
+                { file: 'Minor7-2.mp3', answer: 'Minor 7' },
+                { file: 'Minor7-3.mp3', answer: 'Minor 7' },
+                { file: 'Minor7-4.mp3', answer: 'Minor 7' },
+                { file: 'Minor7-5.mp3', answer: 'Minor 7' },
+                { file: 'Minor7-6.mp3', answer: 'Minor 7' },
+                { file: 'Minor7-7.mp3', answer: 'Minor 7' },
+                { file: 'Minor7-8.mp3', answer: 'Minor 7' }
+            ],
+            modes: [
+                { file: 'Aeolian1.mp3', answer: 'Aeolian' },
+                { file: 'Aeolian2.mp3', answer: 'Aeolian' },
+                { file: 'Aeolian3.mp3', answer: 'Aeolian' },
+                { file: 'Dorian1.mp3', answer: 'Dorian' },
+                { file: 'Dorian2.mp3', answer: 'Dorian' },
+                { file: 'Dorian3.mp3', answer: 'Dorian' },
+                { file: 'Ionian1.mp3', answer: 'Ionian' },
+                { file: 'Ionian2.mp3', answer: 'Ionian' },
+                { file: 'Locrian1.mp3', answer: 'Locrian' },
+                { file: 'Locrian2.mp3', answer: 'Locrian' },
+                { file: 'Locrian3.mp3', answer: 'Locrian' },
+                { file: 'Lydian1.mp3', answer: 'Lydian' },
+                { file: 'Lydian2.mp3', answer: 'Lydian' },
+                { file: 'Lydian3.mp3', answer: 'Lydian' },
+                { file: 'Lydian4.mp3', answer: 'Lydian' },
+                { file: 'Mixolydian1.mp3', answer: 'Mixolydian' },
+                { file: 'Mixolydian2.mp3', answer: 'Mixolydian' },
+                { file: 'Mixolydian3.mp3', answer: 'Mixolydian' },
+                { file: 'Mixolydian4.mp3', answer: 'Mixolydian' },
+                { file: 'Mixolydian5.mp3', answer: 'Mixolydian' },
+                { file: 'Mixolydian6.mp3', answer: 'Mixolydian' },
+                { file: 'Mixolydian7.mp3', answer: 'Mixolydian' },
+                { file: 'Phrygian1.mp3', answer: 'Phrygian' },
+                { file: 'Phrygian2.mp3', answer: 'Phrygian' },
+                { file: 'Phrygian3.mp3', answer: 'Phrygian' },
+                { file: 'Phrygian4.mp3', answer: 'Phrygian' },
+                { file: 'Phrygian5.mp3', answer: 'Phrygian' },
+                { file: 'Phrygian6.mp3', answer: 'Phrygian' },
+                { file: 'Phrygian7.mp3', answer: 'Phrygian' },
+                { file: 'Phrygian8.mp3', answer: 'Phrygian' }
+            ]
+        };
+
+        function unicodeToBase64(str) {
+            const utf8Bytes = new TextEncoder().encode(str);
+            const binary = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('');
+            return btoa(binary);
+        }
+
+        function dailyEarCapitalizeName(name) {
+            return name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
+        // ====================== QUIZ LOGIC ======================
+        function dailyEarGenerateQuestionSet(section, num) {
+            let pool = [...audioFiles[section]];
+
+            // Apply difficulty filter if present
+            if (QUIZ_CONFIG.allowedAnswers && QUIZ_CONFIG.allowedAnswers[section]) {
+                pool = pool.filter(item => 
+                    QUIZ_CONFIG.allowedAnswers[section].includes(item.answer)
+                );
+            }
+
+            pool.sort(() => Math.random() - 0.5);
+            const selected = pool.slice(0, num);
+
+            return {
+                urls: selected.map(item => `audio/${section}/${item.file}`),
+                answers: selected.map(item => item.answer)
+            };
+        }
+
+        function dailyEarInitQuiz() {
+            dailyEarQuestionBank[dailyEarStudent] = {};
+            sections.forEach((sec, i) => {
+                const n = QUIZ_CONFIG.questionsPerSection[i];
+                dailyEarQuestionBank[dailyEarStudent][sec] = dailyEarGenerateQuestionSet(sec, n);
+            });
+
+            studentAnswers = [];
+            currentSectionIndex = 0;
+            currentQuestionIndex = 0;
+            dailyEarRenderCurrentQuestion();
+        }
+
+        function dailyEarGetOrderedOptions(section) {
+            const fullOrdered = {
+                intervals: ['Minor 2nd','Major 2nd','Minor 3rd','Major 3rd','Perfect 4th','Tritone','Perfect 5th','Minor 6th','Major 6th','Minor 7th','Major 7th','Perfect 8ve'],
+                triads: ['Major Triad','Minor Triad','Augmented Triad','Diminished Triad'],
+                seventhChords: ['Major 7','Dominant 7','Minor 7','Half-Diminished 7','Diminished 7'],
+                modes: ['Ionian','Dorian','Phrygian','Lydian','Mixolydian','Aeolian','Locrian']
+            };
+
+            const options = fullOrdered[section] || [];
+
+            // Filter to only the answers allowed by the current difficulty
+            if (QUIZ_CONFIG.allowedAnswers && QUIZ_CONFIG.allowedAnswers[section]) {
+                return options.filter(opt => 
+                    QUIZ_CONFIG.allowedAnswers[section].includes(opt)
+                );
+            }
+            return options;
+        }
+
+        function dailyEarRenderCurrentQuestion() {
+            const container = document.getElementById('quiz-questions');
+            container.innerHTML = '';
+
+            const sectionKey = sections[currentSectionIndex];
+            const numQs = QUIZ_CONFIG.questionsPerSection[currentSectionIndex];
+
+            const header = document.createElement('div');
+            header.className = 'section-header';
+            header.innerHTML = `<strong>Part ${currentSectionIndex + 1}: ${sectionTitles[currentSectionIndex]}</strong><br>Question ${currentQuestionIndex + 1}/${numQs}`;
+            container.appendChild(header);
+
+            const box = document.createElement('div');
+            box.className = 'question-box';
+            box.innerHTML = `
+                <button class="play-button" onclick="dailyEarPlayCurrentAudio()">▶ Play Audio</button>
+                <p id="play-count" class="play-count">Plays remaining: 2</p>
+                <select id="answer-select" class="answer-select">
+                    <option value="" disabled selected>Select your answer</option>
+                </select>
+            `;
+            container.appendChild(box);
+
+            // Populate dropdown with only relevant options
+            const select = document.getElementById('answer-select');
+            dailyEarGetOrderedOptions(sectionKey).forEach(opt => {
+                const o = document.createElement('option');
+                o.value = opt;
+                o.textContent = opt;
+                select.appendChild(o);
+            });
+
+            // Reset audio state
+            playsLeft = 2;
+            currentAudio = null;
+            
+            const playBtn = document.querySelector('.play-button');
+            if (playBtn) playBtn.disabled = false;
+
+            document.querySelector('.quiz-actions').classList.remove('hidden');
+        }
+
+        function dailyEarPlayCurrentAudio() {
+            const playBtn = document.querySelector('.play-button');
+            
+            if (!currentAudio) {
+                const sectionKey = sections[currentSectionIndex];
+                const url = dailyEarQuestionBank[dailyEarStudent][sectionKey].urls[currentQuestionIndex];
+                currentAudio = new Audio(url);
+            }
+
+            if (playsLeft > 0) {
+                currentAudio.currentTime = 0;
+                currentAudio.play().catch(e => console.error(e));
+                
+                playsLeft--;
+                document.getElementById('play-count').textContent = `Plays remaining: ${playsLeft}`;
+
+                if (playsLeft === 0 && playBtn) {
+                    playBtn.disabled = true;
+                }
+            }
+        }
+
+        function dailyEarSubmitCurrentAnswer() {
+            const answer = document.getElementById('answer-select').value;
+            if (!answer) {
+                alert("Please select an answer.");
+                return;
+            }
+            studentAnswers.push(answer);
+
+            const numQs = QUIZ_CONFIG.questionsPerSection[currentSectionIndex];
+
+            if (currentQuestionIndex < numQs - 1) {
+                currentQuestionIndex++;
+                dailyEarRenderCurrentQuestion();
+            } else if (currentSectionIndex < sections.length - 1) {
+                currentSectionIndex++;
+                currentQuestionIndex = 0;
+                dailyEarRenderCurrentQuestion();
+            } else {
+                dailyCompleteExercise("earTraining", dailyEarPrepareResultData());
+            }
+        }
+
+        // ====================== RESULTS ======================
+        
+
+        function dailyEarPrepareResultData() {
+            const allCorrect = sections.flatMap(sec => dailyEarQuestionBank[dailyEarStudent][sec].answers);
+            const termsToReview = [];
+
+            studentAnswers.forEach((ans, i) => {
+                if (ans.toLowerCase() !== allCorrect[i].toLowerCase()) {
+                    termsToReview.push({ item: `Q${i+1}`, correct: allCorrect[i] });
+                }
+            });
+
+            const correctCount = studentAnswers.filter((a, i) => 
+                a.toLowerCase() === allCorrect[i].toLowerCase()
+            ).length;
+
+            const total = studentAnswers.length;
+
+            return {
+                student: dailyEarCapitalizeName(dailyEarStudent),
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+                exercise: QUIZ_CONFIG.name || "Ear Training",
+                answers: studentAnswers,
+                questionSet: { correctAnswers: allCorrect },
+                termsToReview: termsToReview,
+                percentage: Math.round((correctCount / total) * 100)
+            };
+        }
+
+        // Initialize standard login
+        
+
+        // ====================== NEW SHARE / AIRDROP ======================
+
+        // Handled by the combined Daily Exercises export flow.
+
+        // ====================== DISPLAY RESULTS ======================
+
+        
+
+
+        // ====================== KEYBOARD SHORTCUTS ======================
+        document.addEventListener('keydown', function(e) {
+            if (window.dailyExerciseState?.active !== 'earTraining') return;
+            const activeElement = document.activeElement;
+            const answerSelect = document.getElementById('answer-select');
+
+            const quizContainer = document.querySelector('.quiz-container');
+            const isQuizActive = quizContainer && 
+                                !quizContainer.classList.contains('hidden') &&
+                                document.getElementById('main-content').style.display !== 'none';
+
+            const isLoginActive = document.getElementById('login-section') !== null && 
+                                 !document.getElementById('login-section').classList.contains('hidden');
+
+            // TAB (Login)
+            if (e.key === 'Tab' && isLoginActive) {
+                const nameInput = document.getElementById('name-input');
+                if (nameInput) {
+                    nameInput.focus();
+                    e.preventDefault();
+                }
+                return;
+            }
+
+            // ENTER
+            if (e.key === 'Enter') {
+                if (isLoginActive) {
+                    if (typeof checkName === 'function') checkName();
+                    e.preventDefault();
+                } 
+                else if (isQuizActive && answerSelect) {
+                    dailyEarSubmitCurrentAnswer();
+                    e.preventDefault();
+                }
+                return;
+            }
+
+            // SPACE - Play Audio
+            if ((e.key === ' ' || e.key === 'Spacebar') && isQuizActive) {
+                if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'SELECT') {
+                    e.preventDefault();
+                    dailyEarPlayCurrentAudio();
+                }
+            }
+
+            // ARROW KEYS - Navigate dropdown
+            if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isQuizActive && answerSelect) {
+                const sectionKey = sections[currentSectionIndex];
+                const options = dailyEarGetOrderedOptions(sectionKey);
+                if (options.length === 0) return;
+
+                let currentIndex = options.indexOf(answerSelect.value);
+
+                if (e.key === 'ArrowDown') {
+                    currentIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
+                } else {
+                    currentIndex = currentIndex === -1 ? options.length - 1 : (currentIndex - 1 + options.length) % options.length;
+                }
+
+                answerSelect.value = options[currentIndex];
+                e.preventDefault();
+            }
+        });
+    
+</script>
+
+
+<script>
+let dailySightMediaRecorder = null;
+let dailySightAudioChunks = [];
+let dailySightIsRecording = false;
+let dailySightHasRecorded = false;
+let dailySightAnalyser = null;
+let dailySightAnimationId = null;
+let dailySightCountdownTimer = null;
+let dailySightStartedAt = null;
+let dailySightExample = null;
+
+function dailyInitSightSinging() {
+  const startDate = new Date('2024-11-04');
+  const today = new Date();
+  let differenceInDays = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
+  const completeWeeks = Math.floor(differenceInDays / 7);
+  differenceInDays -= completeWeeks * 2;
+  const currentDay = today.getDay();
+  if (currentDay === 0) differenceInDays -= 2;
+  if (currentDay === 6) differenceInDays -= 1;
+  dailySightExample = (differenceInDays % 30) + 1;
+  document.getElementById('exerciseImage').src = `examples/${dailySightExample}.jpg`;
+  dailySightIsRecording = false;
+  dailySightHasRecorded = false;
+  dailySightStartedAt = null;
+  document.getElementById('exerciseImage').classList.remove('revealed');
+  document.getElementById('beginSightButton').disabled = false;
+  document.getElementById('recordButton').disabled = true;
+  document.getElementById('recordingNotice').style.display = 'none';
+  document.getElementById('recordStatus').textContent = '';
+}
+
+function dailyBeginSightSinging() {
+  if (dailySightStartedAt || dailySightHasRecorded) return;
+  dailySightStartedAt = Date.now();
+  document.getElementById('beginSightButton').disabled = true;
+  document.getElementById('exerciseImage').classList.add('revealed');
+  document.getElementById('recordButton').disabled = false;
+  document.getElementById('recordingNotice').style.display = 'block';
+  dailySightUpdateCountdown();
+  dailySightCountdownTimer = setInterval(dailySightUpdateCountdown, 250);
+}
+
+function dailySightUpdateCountdown() {
+  if (!dailySightStartedAt) return;
+  const elapsed = Date.now() - dailySightStartedAt;
+  const remaining = Math.max(0, 180000 - elapsed);
+  const minutes = Math.floor(remaining / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+  const el = document.getElementById('sightCountdown');
+  if (remaining > 0) {
+    el.textContent = `${minutes}:${seconds.toString().padStart(2,'0')} remaining`;
+  } else {
+    el.textContent = "Time's up!";
+    clearInterval(dailySightCountdownTimer);
+    dailySightCountdownTimer = null;
+    if (!dailySightIsRecording && !dailySightHasRecorded) {
+      document.getElementById('recordButton').disabled = true;
+      document.getElementById('recordingNotice').style.display = 'none';
+      document.getElementById('recordStatus').textContent = 'The 3-minute sight-singing window has ended.';
+    }
+  }
+}
+
+async function dailyToggleSightRecording() {
+  const recordButton = document.getElementById('recordButton');
+  if (!dailySightIsRecording) {
+    if (dailySightHasRecorded) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      dailySightAnalyser = audioContext.createAnalyser();
+      source.connect(dailySightAnalyser);
+      dailySightMediaRecorder = new MediaRecorder(stream);
+      dailySightAudioChunks = [];
+      document.getElementById('visualizer').style.display = 'block';
+      dailySightDrawVisualization();
+      dailySightMediaRecorder.ondataavailable = e => dailySightAudioChunks.push(e.data);
+      dailySightMediaRecorder.onstop = async () => {
+        try {
+          const webmBlob = new Blob(dailySightAudioChunks, {type: dailySightMediaRecorder.mimeType || 'audio/webm'});
+          const arrayBuffer = await webmBlob.arrayBuffer();
+          const audioCtx = new AudioContext();
+          const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+          const samples = audioBuffer.getChannelData(0);
+          const sampleRate = audioBuffer.sampleRate;
+          const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, 128);
+          const sampleBlockSize = 1152;
+          const mp3Data = [];
+          for (let i=0; i<samples.length; i+=sampleBlockSize) {
+            const chunk = samples.subarray(i, i+sampleBlockSize);
+            const int16 = new Int16Array(chunk.length);
+            for (let j=0; j<chunk.length; j++) {
+              int16[j] = Math.max(-32768, Math.min(32767, chunk[j] * 32768));
+            }
+            const buf = mp3encoder.encodeBuffer(int16);
+            if (buf.length) mp3Data.push(buf);
+          }
+          const flushed = mp3encoder.flush();
+          if (flushed.length) mp3Data.push(flushed);
+          const mp3Blob = new Blob(mp3Data, {type:'audio/mp3'});
+          stream.getTracks().forEach(track => track.stop());
+          document.getElementById('visualizer').style.display = 'none';
+          cancelAnimationFrame(dailySightAnimationId);
+          document.getElementById('recordStatus').textContent = 'Recording saved. Moving to the next exercise…';
+          dailySightRecordingReady(mp3Blob, dailySightExample);
+        } catch (err) {
+          console.error('MP3 conversion error:', err);
+          document.getElementById('recordStatus').textContent = 'Could not finish the recording.';
+          recordButton.disabled = false;
+        }
+      };
+      dailySightMediaRecorder.start();
+      dailySightIsRecording = true;
+      recordButton.disabled = false;
+      document.getElementById('recordIcon').classList.add('recording');
+      document.getElementById('recordingNotice').textContent = 'Recording… press the button again to stop.';
+    } catch (err) {
+      console.error('Microphone error:', err);
+      alert('Microphone access is required for the sight-singing recording.');
+    }
+  } else {
+    dailySightMediaRecorder.stop();
+    dailySightIsRecording = false;
+    dailySightHasRecorded = true;
+    recordButton.disabled = true;
+    document.getElementById('recordIcon').classList.remove('recording');
+    document.getElementById('recordingNotice').style.display = 'none';
+  }
+}
+
+function dailySightDrawVisualization() {
+  const canvas = document.getElementById('visualizer');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 800; canvas.height = 180;
+  const bufferLength = dailySightAnalyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  function draw() {
+    if (!dailySightAnalyser) return;
+    dailySightAnalyser.getByteFrequencyData(dataArray);
+    ctx.fillStyle = '#3c3c3c';
+    ctx.fillRect(0,0,800,180);
+    const barWidth = 800 / bufferLength * 2.5;
+    let x=0;
+    for (let i=0; i<bufferLength; i++) {
+      const barHeight = dataArray[i] / 2;
+      ctx.fillStyle = `rgb(${barHeight+100},50,50)`;
+      ctx.fillRect(x,180-barHeight,barWidth,barHeight);
+      x += barWidth + 1;
+    }
+    dailySightAnimationId = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+document.addEventListener('click', e => {
+  if (e.target.closest('#beginSightButton')) dailyBeginSightSinging();
+  if (e.target.closest('#recordButton')) dailyToggleSightRecording();
+});
+</script>
+
+
+<script>
+window.addEventListener('load', () => initLogin());
+</script>
+</body>
+</html>
