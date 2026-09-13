@@ -2129,4 +2129,36 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "Teresa",
+        date: "2026-09-11",
+        time: "9:09 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-11",
+        time: "9:11 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-11",
+        time: "9:11 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-10",
+        time: "9:13 PM",
+        percentage: 25,
+        exercise: "MCQs",
+        termsToReview: []
+    },
 ];
