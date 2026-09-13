@@ -1150,11 +1150,6 @@ const records = [
         percentage: 97.2,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
-        criteria1: {"name":"MCQ-A","score":"24/28"},
-        criteria2: {"name":"FRQ-A","score":"10/10"},
-        criteria3: {"name":"MCQ-B","score":"28/28"},
-        criteria4: {"name":"FRQ-B","score":"5/5"},
-        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1164,11 +1159,6 @@ const records = [
         percentage: 99.2,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
-        criteria1: {"name":"MCQ-A","score":"27/28"},
-        criteria2: {"name":"FRQ-A","score":"10/10"},
-        criteria3: {"name":"MCQ-B","score":"28/28"},
-        criteria4: {"name":"FRQ-B","score":"5/5"},
-        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1178,11 +1168,6 @@ const records = [
         percentage: 95.6,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
-        criteria1: {"name":"MCQ-A","score":"25/28"},
-        criteria2: {"name":"FRQ-A","score":"10/10"},
-        criteria3: {"name":"MCQ-B","score":"25/28"},
-        criteria4: {"name":"FRQ-B","score":"5/5"},
-        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1192,11 +1177,6 @@ const records = [
         percentage: 95.6,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
-        criteria1: {"name":"MCQ-A","score":"23/28"},
-        criteria2: {"name":"FRQ-A","score":"10/10"},
-        criteria3: {"name":"MCQ-B","score":"27/28"},
-        criteria4: {"name":"FRQ-B","score":"5/5"},
-        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1206,11 +1186,6 @@ const records = [
         percentage: 96.4,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
-        criteria1: {"name":"MCQ-A","score":"24/28"},
-        criteria2: {"name":"FRQ-A","score":"10/10"},
-        criteria3: {"name":"MCQ-B","score":"27/28"},
-        criteria4: {"name":"FRQ-B","score":"5/5"},
-        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1220,11 +1195,6 @@ const records = [
         percentage: 95.8,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
-        criteria1: {"name":"MCQ-A","score":"24/28"},
-        criteria2: {"name":"FRQ-A","score":"10/10"},
-        criteria3: {"name":"MCQ-B","score":"26/28"},
-        criteria4: {"name":"FRQ-B","score":"5/5"},
-        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1234,11 +1204,6 @@ const records = [
         percentage: 90.2,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
-        criteria1: {"name":"MCQ-A","score":"25/28"},
-        criteria2: {"name":"FRQ-A","score":"10/10"},
-        criteria3: {"name":"MCQ-B","score":"23/28"},
-        criteria4: {"name":"FRQ-B","score":"4/5"},
-        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1562,6 +1527,22 @@ const records = [
         termsToReview: []
     },
     {
+        student: "Maggie",
+        date: "2026-09-09",
+        time: "2:21 PM",
+        percentage: 75,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-09",
+        time: "2:21 PM",
+        percentage: 75,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
         student: "Thomas",
         date: "2026-09-07",
         time: "2:23 PM",
@@ -1582,22 +1563,6 @@ const records = [
         date: "2026-09-03",
         time: "2:24 PM",
         percentage: 40,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Maggie",
-        date: "2026-09-09",
-        time: "2:21 PM",
-        percentage: 75,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Teresa",
-        date: "2026-09-09",
-        time: "2:21 PM",
-        percentage: 75,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1630,6 +1595,14 @@ const records = [
         date: "2026-09-09",
         time: "8:17 PM",
         percentage: 75,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-09",
+        time: "11:04 PM",
+        percentage: 25,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -2158,6 +2131,22 @@ const records = [
         date: "2026-09-10",
         time: "9:13 PM",
         percentage: 25,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-10",
+        time: "10:49 PM",
+        percentage: 25,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-11",
+        time: "10:50 PM",
+        percentage: 40,
         exercise: "MCQs",
         termsToReview: []
     },
