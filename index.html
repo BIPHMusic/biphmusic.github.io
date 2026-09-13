@@ -67,10 +67,11 @@
             font-size: 1.5em; 
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.322);
         }
+
         .greeting-text {
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.7);
-            white-space: nowrap;   /* keep "Today is …" on a single line */
-            font-size: 0.95em;     /* slightly smaller so it fits more easily */
+            white-space: nowrap;
+            font-size: 0.95em;
         }
 
         .days-left {
@@ -100,6 +101,7 @@
             transform: translateY(20px);
             transition: all 0.8s ease;
         }
+
         .fade-in.visible {
             opacity: 1;
             transform: translateY(0);
@@ -113,9 +115,9 @@
             box-shadow: 0 0 0 30px white inset !important;
             transition: background-color 5000s ease-in-out 0s !important;
         }
-
     </style>
 </head>
+
 <body>
     <div id="shared-menu"></div>
 
@@ -132,10 +134,16 @@
         <div class="container" id="container-section">
             <div class="countdown" id="upcoming-dates">
                 <h2 class="fade-in" id="dates-title">Dates of Importance</h2>
-                <p class="fade-in" id="mock-exam"><strong>Mock Exam</strong>: February 18th, 2027 <span class="days-left" id="mock-countdown"></span></p>
-                <p class="fade-in" id="ap-exam"><strong>AP Exam</strong>: May 10, 2027 <span class="days-left" id="ap-countdown"></span></p>
+                <p class="fade-in" id="mock-exam">
+                    <strong>Mock Exam</strong>: February 18th, 2027
+                    <span class="days-left" id="mock-countdown"></span>
+                </p>
+                <p class="fade-in" id="ap-exam">
+                    <strong>AP Exam</strong>: May 10, 2027
+                    <span class="days-left" id="ap-countdown"></span>
+                </p>
             </div>
-            
+
             <div style="margin: 30px 0;">
                 <button id="daily-btn" class="fade-in" onclick="startDailyExercises()">
                     Start Daily Exercises
@@ -154,87 +162,112 @@
     <script src="mymenu.js"></script>
 
     <script>
-    function getGreeting(displayName = "") {
-        const now = new Date();
-        const hours = now.getHours();
-        let greeting = hours < 12 ? "Good morning" : hours < 18 ? "Good afternoon" : "Good evening";
+        function getGreeting(displayName = "") {
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting = hours < 12
+                ? "Good morning"
+                : hours < 18
+                    ? "Good afternoon"
+                    : "Good evening";
 
-        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const daysOfWeek = [
+                "Sunday", "Monday", "Tuesday", "Wednesday",
+                "Thursday", "Friday", "Saturday"
+            ];
 
-        const dayOfWeek = daysOfWeek[now.getDay()];
-        const month = months[now.getMonth()];
-        const day = now.getDate();
+            const months = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
 
-        return `<span class="zapfino">${greeting}, ${displayName}!</span><br>
-                <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
-    }
+            const dayOfWeek = daysOfWeek[now.getDay()];
+            const month = months[now.getMonth()];
+            const day = now.getDate();
 
-    // Days-until helper (whole days remaining)
-    function daysUntil(year, month, day) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const target = new Date(year, month - 1, day);
-        target.setHours(0, 0, 0, 0);
-        const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
-        if (diff > 1) return `(${diff} days)`;
-        if (diff === 1) return `(1 day)`;
-        if (diff === 0) return `(today!)`;
-        return `(passed)`;
-    }
+            return `<span class="zapfino">${greeting}, ${displayName}!</span><br>
+                    <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
+        }
 
-    function updateCountdowns() {
-        const mockEl = document.getElementById('mock-countdown');
-        const apEl   = document.getElementById('ap-countdown');
-        if (mockEl) mockEl.textContent = daysUntil(2027, 2, 18);
-        if (apEl)   apEl.textContent   = daysUntil(2027, 5, 10);
-    }
+        // Days-until helper (whole days remaining)
+        function daysUntil(year, month, day) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-    window.onSuccessfulLogin = function(displayName) {
-        // The shared login-screen.js already called restoreNormalMenu() and initMyMenu(false)
-        // so we only need the page-specific greeting / fade-in logic here.
+            const target = new Date(year, month - 1, day);
+            target.setHours(0, 0, 0, 0);
 
-        const banner = document.getElementById('banner-section');
-        const datesTitle = document.getElementById('dates-title');
-        const mockExam = document.getElementById('mock-exam');
-        const apExam = document.getElementById('ap-exam');
-        const dailyBtn = document.getElementById('daily-btn');
-        const logoContainer = document.querySelector('.logo-container');
+            const diff = Math.ceil(
+                (target - today) / (1000 * 60 * 60 * 24)
+            );
 
-        setTimeout(() => { if (banner) banner.classList.add('visible'); }, 100);
-        setTimeout(() => { if (datesTitle) datesTitle.classList.add('visible'); }, 600);
-        setTimeout(() => { if (mockExam) mockExam.classList.add('visible'); }, 900);
-        setTimeout(() => { if (apExam) apExam.classList.add('visible'); }, 1200);
-        setTimeout(() => { if (dailyBtn) dailyBtn.classList.add('visible'); }, 1600);
-        setTimeout(() => { if (logoContainer) logoContainer.classList.add('visible'); }, 1400);
+            if (diff > 1) return `(${diff} days)`;
+            if (diff === 1) return `(1 day)`;
+            if (diff === 0) return `(today!)`;
+            return `(passed)`;
+        }
 
-        document.getElementById('banner-text').innerHTML = getGreeting(displayName);
-        updateCountdowns();
-    };
+        function updateCountdowns() {
+            const mockEl = document.getElementById('mock-countdown');
+            const apEl = document.getElementById('ap-countdown');
 
-    function startDailyExercises() {
-        const urls = [
-            "https://biphmusic.github.io/dailysightsinging/",
-            "https://biphmusic.github.io/dailyeartraining/",
-            "https://biphmusic.github.io/dailyvocab/"
-        ];
+            if (mockEl) mockEl.textContent = daysUntil(2027, 2, 18);
+            if (apEl) apEl.textContent = daysUntil(2027, 5, 10);
+        }
 
-        window.location.href = urls[0];
+        window.onSuccessfulLogin = function(displayName) {
+            // The shared login-screen.js already called restoreNormalMenu()
+            // and initMyMenu(false), so we only need the page-specific
+            // greeting / fade-in logic here.
 
-        setTimeout(() => {
-            urls.slice(1).forEach(url => {
-                const win = window.open(url, '_blank', 'noopener,noreferrer');
-                if (win) {
-                    win.blur();
-                    setTimeout(() => window.focus(), 50);
-                }
-            });
-        }, 150);
-    }
+            const banner = document.getElementById('banner-section');
+            const datesTitle = document.getElementById('dates-title');
+            const mockExam = document.getElementById('mock-exam');
+            const apExam = document.getElementById('ap-exam');
+            const dailyBtn = document.getElementById('daily-btn');
+            const logoContainer = document.querySelector('.logo-container');
 
-    window.onload = () => {
-        initLogin();
-    };
-</script>
+            setTimeout(() => {
+                if (banner) banner.classList.add('visible');
+            }, 100);
+
+            setTimeout(() => {
+                if (datesTitle) datesTitle.classList.add('visible');
+            }, 600);
+
+            setTimeout(() => {
+                if (mockExam) mockExam.classList.add('visible');
+            }, 900);
+
+            setTimeout(() => {
+                if (apExam) apExam.classList.add('visible');
+            }, 1200);
+
+            setTimeout(() => {
+                if (dailyBtn) dailyBtn.classList.add('visible');
+            }, 1600);
+
+            setTimeout(() => {
+                if (logoContainer) logoContainer.classList.add('visible');
+            }, 1400);
+
+            document.getElementById('banner-text').innerHTML =
+                getGreeting(displayName);
+
+            updateCountdowns();
+        };
+
+        function startDailyExercises() {
+            // Daily Exercises has now been consolidated into one site.
+            // No separate Vocab, Ear Training, or Sight Singing windows
+            // should be opened.
+            window.location.href =
+                "https://biphmusic.github.io/dailyexercises/";
+        }
+
+        window.onload = () => {
+            initLogin();
+        };
+    </script>
 </body>
 </html>
