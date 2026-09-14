@@ -1104,7 +1104,7 @@
                 showTeacherInterface();
 
                 if (imported) {
-                    processImportedRecord(
+                    await processImportedRecord(
                         imported
                     );
 
@@ -1121,7 +1121,7 @@
             }
 
             if (imported) {
-                processImportedRecord(
+                await processImportedRecord(
                     imported
                 );
 
@@ -7525,7 +7525,7 @@ function setupTeacherStudentSearch() {
             return getURLImportedRecord() || [];
         }
 
-        function processImportedRecord(record) {
+        async function processImportedRecord(record) {
             if (!record) {
                 return false;
             }
@@ -7542,6 +7542,11 @@ function setupTeacherStudentSearch() {
 
             let addedCount = 0;
             let duplicateCount = 0;
+
+            // A single imported link can represent several exercise types.
+            // Send all mapped MIDI notes at the same timestamp so they arrive
+            // simultaneously.
+            await sendAftertouchForRecords(records);
 
             records.forEach(currentRecord => {
                 const result = addRecordToCache(currentRecord);
@@ -7594,14 +7599,14 @@ function setupTeacherStudentSearch() {
             return true;
         }
 
-        function tryImportFromURL() {
+        async function tryImportFromURL() {
             const record = getURLImportedRecord();
 
             if (!record) {
                 return false;
             }
 
-            processImportedRecord(record);
+            await processImportedRecord(record);
 
             history.replaceState(
                 null,
@@ -7750,8 +7755,8 @@ function setupTeacherStudentSearch() {
                     const audioSignals = [];
 
                     audioFiles.forEach(file => {
-                        const exercise =
-                            exerciseFromFilename(
+                        const exercises =
+                            exercisesFromFilename(
                                 file.name
                             );
 
@@ -7760,18 +7765,22 @@ function setupTeacherStudentSearch() {
                                 file.name
                             );
 
-                        if (
-                            exercise &&
-                            student &&
-                            EXERCISE_TO_NOTE[
-                                exercise
-                            ] != null
-                        ) {
-                            audioSignals.push({
-                                student,
-                                exercise
-                            });
+                        if (!student) {
+                            return;
                         }
+
+                        exercises.forEach(exercise => {
+                            if (
+                                EXERCISE_TO_NOTE[
+                                    exercise
+                                ] != null
+                            ) {
+                                audioSignals.push({
+                                    student,
+                                    exercise
+                                });
+                            }
+                        });
                     });
 
                     if (audioSignals.length) {
@@ -7855,6 +7864,10 @@ function setupTeacherStudentSearch() {
                         importedRecord =
                             imported[imported.length - 1];
 
+                        // A dropped score URL may contain multiple exercise
+                        // records. Signal every mapped exercise together.
+                        await sendAftertouchForRecords(imported);
+
                         showTeacherTab("cache");
 
                         showToast(
@@ -7883,51 +7896,45 @@ function setupTeacherStudentSearch() {
         }
 
 
-        function exerciseFromFilename(
+        function exercisesFromFilename(
             filename
         ) {
             const lower =
-                filename.toLowerCase();
+                String(filename || "").toLowerCase();
+
+            const exercises = [];
 
             if (
-                lower.includes(
-                    "sight singing"
-                ) ||
-                lower.includes(
-                    "sightsinging"
-                )
+                lower.includes("sight singing") ||
+                lower.includes("sightsinging")
             ) {
-                return "Sight Singing";
+                exercises.push("Sight Singing");
             }
 
             if (
-                lower.includes(
-                    "ear training"
-                ) ||
-                lower.includes(
-                    "eartraining"
-                )
+                lower.includes("ear training") ||
+                lower.includes("eartraining")
             ) {
-                return "Ear Training";
+                exercises.push("Ear Training");
             }
 
-            if (
-                lower.includes(
-                    "vocab"
-                )
-            ) {
-                return "Vocab";
+            if (lower.includes("vocab")) {
+                exercises.push("Vocab");
             }
 
-            if (
-                lower.includes(
-                    "mcq"
-                )
-            ) {
-                return "MCQs";
+            if (lower.includes("mcq")) {
+                exercises.push("MCQs");
             }
 
-            return null;
+            return exercises;
+        }
+
+        // Preserve the original single-exercise helper for any existing
+        // callers while allowing filenames to identify multiple exercises.
+        function exerciseFromFilename(
+            filename
+        ) {
+            return exercisesFromFilename(filename)[0] || null;
         }
 
         function studentFromFilename(
@@ -8087,10 +8094,11 @@ function setupTeacherStudentSearch() {
                 return;
             }
 
-            let timestamp =
+            // Use one shared timestamp for every note. This is important when
+            // one file/link represents multiple exercise types: the notes are
+            // scheduled to fire simultaneously rather than 20 ms apart.
+            const timestamp =
                 performance.now();
-
-            const gap = 20;
 
             recordsToSend.forEach(record => {
                 const note =
@@ -8133,7 +8141,6 @@ function setupTeacherStudentSearch() {
                     timestamp
                 );
 
-                timestamp += gap;
             });
         }
 
