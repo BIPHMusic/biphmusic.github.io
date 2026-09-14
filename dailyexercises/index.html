@@ -918,22 +918,22 @@ function dailyDownloadFile(file) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function dailyCopyLink(button) {
-  const link = dailyScoreLink();
-  navigator.clipboard.writeText(link).then(() => {
-    button.textContent = '✓ Link Copied!';
-    setTimeout(() => button.textContent = '📋 Copy Score Link', 2200);
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = link;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    ta.remove();
-    button.textContent = '✓ Link Copied!';
-    setTimeout(() => button.textContent = '📋 Copy Score Link', 2200);
-  });
-}
+// function dailyCopyLink(button) {
+//   const link = dailyScoreLink();
+//   navigator.clipboard.writeText(link).then(() => {
+//     button.textContent = '✓ Link Copied!';
+//     setTimeout(() => button.textContent = '📋 Copy Score Link', 2200);
+//   }).catch(() => {
+//     const ta = document.createElement('textarea');
+//     ta.value = link;
+//     document.body.appendChild(ta);
+//     ta.select();
+//     document.execCommand('copy');
+//     ta.remove();
+//     button.textContent = '✓ Link Copied!';
+//     setTimeout(() => button.textContent = '📋 Copy Score Link', 2200);
+//   });
+// }
 
 async function dailyShareBoth() {
   try {
@@ -961,31 +961,30 @@ function dailyShowFinalScreen() {
   const s = window.dailyExerciseState;
   const safe = dailySafeName(s.student);
   const results = s.results;
-  document.getElementById('exercise-subtitle').textContent = 'Daily Exercises — Complete!';
-  document.getElementById('exercise-progress').textContent = 'All three exercises complete';
+  document.getElementById('exercise-subtitle').textContent = 'Daily Exercises';
   document.getElementById('exercise-stage').innerHTML = `
     <div class="daily-final">
       <h2>Great job, ${safe}!</h2>
-      <p class="daily-note">You completed all three daily exercises.</p>
+      <p class="daily-note">Here are your scores for today's exercises:</p>
       <div class="daily-score-card">
         <div class="daily-score-row"><span>Vocab</span><strong>${results.vocab?.percentage ?? '—'}%</strong></div>
         <div class="daily-score-row"><span>Ear Training</span><strong>${results.earTraining?.percentage ?? '—'}%</strong></div>
         <div class="daily-score-row"><span>Sight Singing</span><strong>Recording complete</strong></div>
       </div>
-      <p class="daily-note">Your score link contains the three separate quiz records in JSON. The MP3 is kept as a separate file.</p>
+
       <div class="daily-final-actions">
-        <button class="copy-button" id="dailyCopyLink">📋 Copy Score Link</button>
         <button class="copy-button" id="dailyDownloadTxt">Download Scores (.txt)</button>
         <button class="copy-button" id="dailyDownloadMp3">Download Recording (.mp3)</button>
         <button class="copy-button" id="dailyShareBoth">📤 Share / AirDrop Both</button>
       </div>
       <audio id="dailyFinalAudio" controls style="width:100%;max-width:650px;margin:24px auto 0;"></audio>
     </div>`;
+    // <button class="copy-button" id="dailyCopyLink">📋 Copy Score Link</button>
   document.getElementById('exercise-style').textContent += `
     .daily-final audio { display:block; }`;
   const audio = document.getElementById('dailyFinalAudio');
   audio.src = URL.createObjectURL(s.sightRecording);
-  document.getElementById('dailyCopyLink').onclick = function(){ dailyCopyLink(this); };
+//   document.getElementById('dailyCopyLink').onclick = function(){ dailyCopyLink(this); };
   document.getElementById('dailyDownloadTxt').onclick = () => dailyDownloadFile(dailyTextFile());
   document.getElementById('dailyDownloadMp3').onclick = () => dailyDownloadFile(dailyRecordingFile());
   document.getElementById('dailyShareBoth').onclick = dailyShareBoth;
