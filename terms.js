@@ -76,6 +76,17 @@ const unit2 = [
     "Minor 7",
     "Major 7",
     "Perfect Octave",
+    "Function",
+    "Motive",
+    "Anacrusis",
+    "Contour",
+    "Alberti Bass",
+    "Countermelody",
+    "Harmony",
+    "Arpeggio",
+    "Accompaniment",
+    "Orchestration",
+    "Phrase",
 ];
 
 const unit3 = [
@@ -168,6 +179,17 @@ const cumulative = [
     "Minor 7",
     "Major 7",
     "Perfect Octave",
+    "Function",
+    "Motive",
+    "Anacrusis",
+    "Contour",
+    "Alberti Bass",
+    "Countermelody",
+    "Harmony",
+    "Arpeggio",
+    "Accompaniment",
+    "Orchestration",
+    "Phrase",
     ];
 
     const theglossary = [
@@ -245,4 +267,15 @@ const cumulative = [
         {"Term":"Minor 7","Definition":"Ten half steps between the pitches, “Winnie the Pooh”"}, 
         {"Term":"Major 7","Definition":"Eleven half steps between the pitches, “Pure Imagination”"}, 
         {"Term":"Perfect Octave","Definition":"Twelve half steps between the pitches, space of 8 notes"},
+        {"Term":"Function","Definition":"The specific role (job) that a chord plays "}, 
+        {"Term":"Motive","Definition":"A musical idea, piece of melody that is important to the song as a whole"}, 
+        {"Term":"Anacrusis","Definition":"A pickup note that starts before the beginning of a phrase"}, 
+        {"Term":"Contour","Definition":"The shape of a given melody or phrase"}, 
+        {"Term":"Alberti Bass","Definition":"The practice of arpeggiating the chords under the main melody"}, 
+        {"Term":"Countermelody","Definition":"A secondary melody that accompanies the main one"}, 
+        {"Term":"Harmony","Definition":"The general concept that describes the way notes sound together"}, 
+        {"Term":"Arpeggio","Definition":"Playing a chord one note at a time instead of all at once"}, 
+        {"Term":"Accompaniment","Definition":"A musical part of lesser importance, mostly serving to give the harmony"}, 
+        {"Term":"Orchestration","Definition":"The selection of instruments that play a particular part (instrumentation)"}, 
+        {"Term":"Phrase","Definition":"A short segment of music with a clearly defined beginning and end"},
     ];
