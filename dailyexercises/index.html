@@ -42,7 +42,7 @@
   background: rgb(45, 70, 119);
   opacity: 1;
   pointer-events: auto;
-  transition: opacity 3s ease;
+  transition: opacity 1s ease;
 }
 
 .daily-access-overlay.daily-access-ending {
@@ -64,14 +64,26 @@
 .daily-access-overlay .overlay { z-index: 1 !important; }
 .daily-access-overlay .overlay2 { z-index: 2 !important; }
 
-.daily-access-overlay-title,
+.daily-access-overlay-title {
+  position: fixed !important;
+  z-index: 3 !important;
+  box-sizing: border-box !important;
+  filter: blur(18px) !important;
+  opacity: 1 !important;
+  margin-left: 5px !important;
+  margin-top: 0 !important;
+  text-align: center !important;
+  pointer-events: none !important;
+}
+
 .daily-access-overlay-subtitle {
   position: fixed !important;
   z-index: 3 !important;
   box-sizing: border-box !important;
   filter: blur(18px) !important;
   opacity: 1 !important;
-  margin: 0 !important;
+  margin-left: 25px !important;
+  margin-top: 0 !important;
   text-align: center !important;
   pointer-events: none !important;
 }
@@ -92,7 +104,7 @@
 }
 
 .daily-access-message {
-  margin-top: 85px;
+  margin-top: 0px;
   font-size: clamp(1.1rem, 2.5vw, 1.55rem);
   line-height: 1.5;
 }
@@ -1111,7 +1123,7 @@ function dailyUpdateAccessWindow() {
 
   const remaining = accessState.target - new Date();
 
-  if (remaining <= 3000 && !state.sessionReady) {
+  if (remaining <= 1000 && !state.sessionReady) {
     dailyPrepareExercisesForAccessWindow();
   }
 }
