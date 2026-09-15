@@ -42,7 +42,7 @@
   background: rgb(45, 70, 119);
   opacity: 1;
   pointer-events: auto;
-  transition: opacity 1s ease;
+  transition: opacity 3s ease;
 }
 
 .daily-access-overlay.daily-access-ending {
@@ -64,26 +64,14 @@
 .daily-access-overlay .overlay { z-index: 1 !important; }
 .daily-access-overlay .overlay2 { z-index: 2 !important; }
 
-.daily-access-overlay-title {
-  position: fixed !important;
-  z-index: 3 !important;
-  box-sizing: border-box !important;
-  filter: blur(18px) !important;
-  opacity: 1 !important;
-  margin-left: 5px !important;
-  margin-top: 0 !important;
-  text-align: center !important;
-  pointer-events: none !important;
-}
-
+.daily-access-overlay-title,
 .daily-access-overlay-subtitle {
   position: fixed !important;
   z-index: 3 !important;
   box-sizing: border-box !important;
   filter: blur(18px) !important;
   opacity: 1 !important;
-  margin-left: 25px !important;
-  margin-top: 0 !important;
+  margin: 0 !important;
   text-align: center !important;
   pointer-events: none !important;
 }
@@ -104,7 +92,7 @@
 }
 
 .daily-access-message {
-  margin-top: 0px;
+  margin-top: 85px;
   font-size: clamp(1.1rem, 2.5vw, 1.55rem);
   line-height: 1.5;
 }
@@ -127,14 +115,66 @@
   display: block;
   margin: 28px auto 0;
 }
-.daily-exercise-complete {
-  width: 92%;
-  max-width: 700px;
-  margin: 50px auto;
-  text-align: center;
+.daily-review-row {
+  cursor: pointer;
+  user-select: none;
+  transition: background .2s ease;
 }
-.daily-exercise-complete h2 { margin-bottom: 8px; }
-.daily-exercise-complete p { color: rgba(255,255,255,.75); }
+.daily-review-row:hover {
+  background: rgba(255,255,255,.06);
+}
+.daily-review-row:focus-visible {
+  outline: 2px solid rgba(255,255,255,.7);
+  outline-offset: -2px;
+}
+.daily-review-row .daily-review-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.daily-review-arrow {
+  display: inline-block;
+  width: 14px;
+  font-size: .9em;
+  line-height: 1;
+  transition: transform .2s ease;
+}
+.daily-review-row.expanded .daily-review-arrow {
+  transform: rotate(90deg);
+}
+.daily-review-content {
+  display: none;
+  padding: 0 0 4px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.daily-review-content.expanded {
+  display: block;
+}
+.daily-review-item,
+.daily-review-empty {
+  padding: 12px 0 12px 23px;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.daily-review-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.daily-review-item strong {
+  font-size: 1rem;
+}
+.daily-review-item span {
+  color: rgba(255,255,255,.78);
+  line-height: 1.45;
+}
+.daily-review-empty {
+  color: rgba(255,255,255,.75);
+}
+.sight-actions {
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
 
 .daily-final {
   width: 92%;
@@ -252,6 +292,9 @@ const DAILY_EXERCISE_TEMPLATES = {
   </button>
   <canvas id="visualizer"></canvas>
   <div id="recordStatus" class="sight-status"></div>
+  <div class="quiz-actions hidden sight-actions">
+    <button class="action-button" id="sightNextButton">Next exercise</button>
+  </div>
   <div class="reminders">
     <h2>Some Reminders:</h2>
     <h3>
@@ -1123,7 +1166,7 @@ function dailyUpdateAccessWindow() {
 
   const remaining = accessState.target - new Date();
 
-  if (remaining <= 1000 && !state.sessionReady) {
+  if (remaining <= 3000 && !state.sessionReady) {
     dailyPrepareExercisesForAccessWindow();
   }
 }
@@ -1146,13 +1189,19 @@ function dailyShuffle(array) {
 function dailySetProgress() {
   const el = document.getElementById('exercise-progress');
   if (!el) return;
+
+  el.style.display = '';
   const done = window.dailyExerciseState.index;
   el.textContent = `Exercise ${done + 1} of 3`;
 }
 
 function dailyShowExercise(type) {
   const state = window.dailyExerciseState;
+
+
   state.active = type;
+  state.waitingForAdvance = false;
+
   document.getElementById('exercise-stage').innerHTML = DAILY_EXERCISE_TEMPLATES[type];
   document.getElementById('exercise-style').textContent = DAILY_EXERCISE_STYLES[type];
   document.getElementById('exercise-subtitle').textContent =
@@ -1161,27 +1210,29 @@ function dailyShowExercise(type) {
     'Daily Sight Singing';
   dailySetProgress();
 
-  const continueButton = document.querySelector('.daily-exercise-continue');
-  if (continueButton) {
-    continueButton.textContent = state.index === state.order.length - 1 ? 'Submit' : 'Next exercise';
-  }
-
   if (type === 'vocab') {
     dailyVocabStudent = state.student.toLowerCase();
     dailyVocabQuestionBank[dailyVocabStudent] = dailyVocabGenerateQuestionSet(dailyVocabStudent);
     dailyVocabInitializeQuiz();
+
     const actions = document.querySelector('.quiz-actions');
     if (actions) actions.classList.remove('hidden');
+
+    const actionButton = document.querySelector('.quiz-actions .action-button');
+    if (actionButton) {
+      actionButton.textContent = state.index === state.order.length - 1 ? 'Submit' : 'Next exercise';
+    }
   } else if (type === 'earTraining') {
     dailyEarStudent = state.student;
     dailyEarInitQuiz();
   } else {
     dailyInitSightSinging();
-  }
 
-  const actionButton = document.querySelector('.quiz-actions .action-button');
-  if (actionButton) {
-    actionButton.textContent = state.index === state.order.length - 1 ? 'Submit' : 'Next exercise';
+    const button = document.getElementById('sightNextButton');
+    if (button) {
+      button.textContent = state.index === state.order.length - 1 ? 'Submit' : 'Next exercise';
+      button.onclick = dailyAdvanceExercise;
+    }
   }
 
   window.scrollTo({top: 0, behavior: 'smooth'});
@@ -1202,54 +1253,79 @@ function dailyCompleteExercise(type, resultData) {
   }
 
   state.results[type] = resultData;
+
+  if (type === 'sightSinging') {
+    state.waitingForAdvance = true;
+
+    const button = document.getElementById('sightNextButton');
+    if (button) {
+      button.textContent = state.index === state.order.length - 1 ? 'Submit' : 'Next exercise';
+      button.onclick = dailyAdvanceExercise;
+    }
+
+    const actions = document.querySelector('.sight-actions');
+    if (actions) actions.classList.remove('hidden');
+
+    document.getElementById('exercise-progress').textContent =
+      state.index === state.order.length - 1
+        ? 'Final exercise'
+        : `Exercise ${state.index + 1} of ${state.order.length}`;
+
+    return;
+  }
+
   state.index++;
-  state.waitingForAdvance = true;
-
-  const isLast = state.index >= state.order.length;
-  const label = isLast ? 'Submit' : 'Next exercise';
-  const title = type === 'vocab' ? 'Vocab complete!' :
-                type === 'earTraining' ? 'Ear Training complete!' :
-                'Sight Singing complete!';
-  const score = type === 'sightSinging'
-    ? 'Your recording has been saved.'
-    : `Score: ${resultData.percentage ?? 0}%`;
-
-  document.getElementById('exercise-progress').textContent =
-    isLast ? 'All exercises complete' : `Exercise ${state.index + 1} of ${state.order.length}`;
-  document.getElementById('exercise-stage').innerHTML = `
-    <div class="daily-exercise-complete">
-      <h2>${title}</h2>
-      <p>${score}</p>
-      <button class="action-button daily-exercise-continue" id="dailyExerciseContinue">${label}</button>
-    </div>`;
-
-  document.getElementById('dailyExerciseContinue').onclick = dailyAdvanceExercise;
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
-
-function dailyAdvanceExercise() {
-  const state = window.dailyExerciseState;
-  if (!state.waitingForAdvance) return;
-  state.waitingForAdvance = false;
 
   if (state.index < state.order.length) {
     dailyShowExercise(state.order[state.index]);
   } else {
     dailyShowFinalScreen();
   }
+
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function dailyAdvanceExercise() {
+  const state = window.dailyExerciseState;
+  if (!state.waitingForAdvance) return;
+
+  state.waitingForAdvance = false;
+  state.index++;
+
+  if (state.index < state.order.length) {
+    dailyShowExercise(state.order[state.index]);
+  } else {
+    dailyShowFinalScreen();
+  }
+
+  window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 function dailySightRecordingReady(blob, example) {
-  window.dailyExerciseState.sightRecording = blob;
-  window.dailyExerciseState.sightExample = example;
-  dailyCompleteExercise('sightSinging', {
-    student: window.dailyExerciseState.student,
+  const state = window.dailyExerciseState;
+
+  state.sightRecording = blob;
+  state.sightExample = example;
+
+  state.results.sightSinging = {
+    student: state.student,
     date: new Date().toISOString().split('T')[0],
     time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}),
     exercise: 'Sight Singing',
     example: example,
     recorded: true
-  });
+  };
+
+  state.waitingForAdvance = true;
+
+  const button = document.getElementById('sightNextButton');
+  if (button) {
+    button.textContent = state.index === state.order.length - 1 ? 'Submit' : 'Next exercise';
+    button.onclick = dailyAdvanceExercise;
+  }
+
+  const actions = document.querySelector('.sight-actions');
+  if (actions) actions.classList.remove('hidden');
 }
 
 function dailyMakeExportData() {
@@ -1347,87 +1423,161 @@ async function dailyShareBoth() {
   }
 }
 
+function toggleDailyReview(row) {
+  const content = row.nextElementSibling;
+  if (!content || !content.classList.contains('daily-review-content')) return;
+
+  const isOpen = row.classList.toggle('expanded');
+  content.classList.toggle('expanded', isOpen);
+  row.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
 function dailyBuildIncorrectDetails(results) {
-  const sections = [];
+  let vocabContent = '';
+  let earContent = '';
 
   const vocab = results.vocab;
   if (vocab?.questionSet?.answers) {
-    const wrong = vocab.questionSet.answers.map((correct, i) => ({
-      number: i + 1,
-      answer: vocab.answers?.[i] || 'Blank',
-      correct
-    })).filter(item =>
-      item.answer.toLowerCase() !== item.correct.toLowerCase()
-    );
+    const wrongTerms = [];
 
-    sections.push(`
-      <div class="daily-score-card">
-        <h3>Vocab — Questions to review</h3>
-        ${wrong.length ? wrong.map(item => `
-          <div class="daily-score-row">
-            <span>Question ${item.number}: <span class="incorrect">${item.answer}</span></span>
-            <strong>Correct: ${item.correct}</strong>
-          </div>`).join('') : '<p>Perfect! No incorrect Vocab answers.</p>'}
-      </div>`);
+    vocab.questionSet.answers.forEach((correct, i) => {
+      const answer = vocab.answers?.[i] || '';
+      if (answer.toLowerCase() !== correct.toLowerCase()) {
+        wrongTerms.push(correct);
+      }
+    });
+
+    const uniqueTerms = [...new Set(wrongTerms)];
+    const reviewItems = uniqueTerms
+      .map(term => ({
+        term,
+        definition: vocabularyTerms.find(v => v.Term === term)?.Definition || 'Definition not found'
+      }))
+      .sort((a, b) => a.term.localeCompare(b.term));
+
+    vocabContent = reviewItems.length ? `
+      <div class="daily-review-heading">Terms to Review:</div>
+      ${reviewItems.map(item => `
+        <div class="daily-review-item">
+          <strong>${item.term}</strong>
+          <span>${item.definition}</span>
+        </div>
+      `).join('')}
+    ` : `
+      <div class="daily-review-empty">Perfect! No Vocab terms to review.</div>
+    `;
   }
 
   const ear = results.earTraining;
   if (ear?.questionSet?.correctAnswers) {
-    const wrong = ear.questionSet.correctAnswers.map((correct, i) => ({
-      number: i + 1,
-      answer: ear.answers?.[i] || 'Blank',
-      correct
-    })).filter(item =>
-      item.answer.toLowerCase() !== item.correct.toLowerCase()
-    );
+    const missedAnswers = [];
 
-    sections.push(`
-      <div class="daily-score-card">
-        <h3>Ear Training — Questions to review</h3>
-        ${wrong.length ? wrong.map(item => `
-          <div class="daily-score-row">
-            <span>Question ${item.number}: <span class="incorrect">${item.answer}</span></span>
-            <strong>Correct: ${item.correct}</strong>
-          </div>`).join('') : '<p>Perfect! No incorrect Ear Training answers.</p>'}
-      </div>`);
+    ear.questionSet.correctAnswers.forEach((correct, i) => {
+      const answer = ear.answers?.[i] || '';
+      if (answer.toLowerCase() !== correct.toLowerCase()) {
+        missedAnswers.push(correct);
+      }
+    });
+
+    const uniqueMissedAnswers = [...new Set(missedAnswers)]
+      .sort((a, b) => a.localeCompare(b));
+
+    earContent = uniqueMissedAnswers.length ? `
+      <div class="daily-review-heading">Ear Training to Review</div>
+      ${uniqueMissedAnswers.map(answer => `
+        <div class="daily-review-item">
+          <strong>${answer}</strong>
+        </div>
+      `).join('')}
+    ` : `
+      <div class="daily-review-empty">Perfect! No Ear Training items to review.</div>
+    `;
   }
 
-  return sections.join('');
+  return { vocabContent, earContent };
 }
+
 
 function dailyShowFinalScreen() {
   const s = window.dailyExerciseState;
   const safe = dailySafeName(s.student);
   const results = s.results;
+  const vocabScore = Number(results.vocab?.percentage ?? 0);
+    const earScore = Number(results.earTraining?.percentage ?? 0);
+    const totalPercentage = Math.round((vocabScore + earScore) / 2);
+
+    const greeting =
+    totalPercentage === 100 ? 'Wow!' :
+    totalPercentage >= 90 ? 'Great job,' :
+    totalPercentage >= 80 ? 'Good job,' :
+    'Hey,';
+
+  const reviewDetails = dailyBuildIncorrectDetails(results);
+  const progress = document.getElementById('exercise-progress');
+    if (progress) {
+    progress.style.display = 'none';
+    }
+
   document.getElementById('exercise-subtitle').textContent = 'Daily Exercises';
+
   document.getElementById('exercise-stage').innerHTML = `
     <div class="daily-final">
-      <h2>Great job, ${safe}!</h2>
+      <h2>${greeting} ${safe}!</h2>
       <p class="daily-note">Here are your scores for today's exercises:</p>
-      <div class="daily-score-card">
-        <div class="daily-score-row"><span>Vocab</span><strong>${results.vocab?.percentage ?? '—'}%</strong></div>
-        <div class="daily-score-row"><span>Ear Training</span><strong>${results.earTraining?.percentage ?? '—'}%</strong></div>
-        <div class="daily-score-row"><span>Sight Singing</span><strong>Recording complete</strong></div>
-      </div>
 
-      ${dailyBuildIncorrectDetails(results)}
+      <div class="daily-score-card">
+        <div class="daily-score-row daily-review-row" role="button" tabindex="0" aria-expanded="false" onclick="toggleDailyReview(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleDailyReview(this); }">
+          <span class="daily-review-label">
+            <span class="daily-review-arrow">▸</span>
+            <span>Vocab</span>
+          </span>
+          <strong>${results.vocab?.percentage ?? '—'}%</strong>
+        </div>
+
+        <div class="daily-review-content">${reviewDetails.vocabContent}</div>
+
+        <div class="daily-score-row daily-review-row" role="button" tabindex="0" aria-expanded="false" onclick="toggleDailyReview(this)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleDailyReview(this); }">
+          <span class="daily-review-label">
+            <span class="daily-review-arrow">▸</span>
+            <span>Ear Training</span>
+          </span>
+          <strong>${results.earTraining?.percentage ?? '—'}%</strong>
+        </div>
+
+        <div class="daily-review-content">${reviewDetails.earContent}</div>
+
+        <div class="daily-score-row">
+          <span>Sight Singing</span>
+          <strong>Recording complete</strong>
+        </div>
+      </div>
 
       <div class="daily-final-actions">
         <button class="copy-button" id="dailyDownloadTxt">Download Scores (.txt)</button>
         <button class="copy-button" id="dailyDownloadMp3">Download Recording (.mp3)</button>
         <button class="copy-button" id="dailyShareBoth">📤 Share / AirDrop Both</button>
       </div>
+
       <audio id="dailyFinalAudio" controls style="width:100%;max-width:650px;margin:24px auto 0;"></audio>
     </div>`;
-    // <button class="copy-button" id="dailyCopyLink">📋 Copy Score Link</button>
+
   document.getElementById('exercise-style').textContent += `
-    .daily-final audio { display:block; }`;
+    .daily-final audio { display:block; }
+    .daily-review-heading {
+      padding: 12px 0;
+      text-align: center;
+      font-weight: bold;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+  `;
+
   const audio = document.getElementById('dailyFinalAudio');
   audio.src = URL.createObjectURL(s.sightRecording);
-//   document.getElementById('dailyCopyLink').onclick = function(){ dailyCopyLink(this); };
+
   document.getElementById('dailyDownloadTxt').onclick = () => dailyDownloadFile(dailyTextFile());
   document.getElementById('dailyDownloadMp3').onclick = () => dailyDownloadFile(dailyRecordingFile());
   document.getElementById('dailyShareBoth').onclick = dailyShareBoth;
+
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
@@ -1975,6 +2125,23 @@ function scrollWordBankToButton(button, behavior = 'smooth') {
             behavior
         });
     }
+}
+
+function resetWordBankScrollFreedom() {
+    const container = document.querySelector('.word-bank-container');
+    const bank = document.getElementById('word-bank');
+
+    if (!container || !bank) return;
+
+    if (container._wordBankScrollAnimation) {
+        cancelAnimationFrame(container._wordBankScrollAnimation);
+        container._wordBankScrollAnimation = null;
+    }
+
+    container.scrollTop = 0;
+    container.classList.remove('word-bank-scroll-expanded');
+    bank.style.removeProperty('--word-bank-spacer-top');
+    bank.style.removeProperty('--word-bank-spacer-bottom');
 }
 
 
@@ -3324,13 +3491,16 @@ function dailyVocabPrepareResultData() {
 
         function dailyEarPrepareResultData() {
             const allCorrect = sections.flatMap(sec => dailyEarQuestionBank[dailyEarStudent][sec].answers);
-            const termsToReview = [];
+            const missedAnswers = [];
 
             studentAnswers.forEach((ans, i) => {
                 if (ans.toLowerCase() !== allCorrect[i].toLowerCase()) {
-                    termsToReview.push({ item: `Q${i+1}`, correct: allCorrect[i] });
+                    missedAnswers.push(allCorrect[i]);
                 }
             });
+
+            const termsToReview = [...new Set(missedAnswers)]
+                .map(correct => ({ item: correct, correct }));
 
             const correctCount = studentAnswers.filter((a, i) => 
                 a.toLowerCase() === allCorrect[i].toLowerCase()
@@ -3474,21 +3644,41 @@ function dailyBeginSightSinging() {
 
 function dailySightUpdateCountdown() {
   if (!dailySightStartedAt) return;
+
+  const el = document.getElementById('sightCountdown');
+
+  if (!el) {
+    if (dailySightCountdownTimer) {
+      clearInterval(dailySightCountdownTimer);
+      dailySightCountdownTimer = null;
+    }
+    return;
+  }
+
   const elapsed = Date.now() - dailySightStartedAt;
   const remaining = Math.max(0, 180000 - elapsed);
   const minutes = Math.floor(remaining / 60000);
   const seconds = Math.floor((remaining % 60000) / 1000);
-  const el = document.getElementById('sightCountdown');
+
   if (remaining > 0) {
     el.textContent = `${minutes}:${seconds.toString().padStart(2,'0')} remaining`;
   } else {
     el.textContent = "Time's up!";
+
     clearInterval(dailySightCountdownTimer);
     dailySightCountdownTimer = null;
+
     if (!dailySightIsRecording && !dailySightHasRecorded) {
-      document.getElementById('recordButton').disabled = true;
-      document.getElementById('recordingNotice').style.display = 'none';
-      document.getElementById('recordStatus').textContent = 'The 3-minute sight-singing window has ended.';
+      const recordButton = document.getElementById('recordButton');
+      const recordingNotice = document.getElementById('recordingNotice');
+      const recordStatus = document.getElementById('recordStatus');
+
+      if (recordButton) recordButton.disabled = true;
+      if (recordingNotice) recordingNotice.style.display = 'none';
+      if (recordStatus) {
+        recordStatus.textContent =
+          'The 3-minute sight-singing window has ended.';
+      }
     }
   }
 }
@@ -3534,7 +3724,7 @@ async function dailyToggleSightRecording() {
           stream.getTracks().forEach(track => track.stop());
           document.getElementById('visualizer').style.display = 'none';
           cancelAnimationFrame(dailySightAnimationId);
-          document.getElementById('recordStatus').textContent = 'Recording saved. Moving to the next exercise…';
+          document.getElementById('recordStatus').textContent = 'Recording complete.';
           dailySightRecordingReady(mp3Blob, dailySightExample);
         } catch (err) {
           console.error('MP3 conversion error:', err);
