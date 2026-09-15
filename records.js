@@ -2254,4 +2254,100 @@ const records = [
         exercise: "Ear Training – All Intervals",
         termsToReview: [{"item":"Q7","correct":"Minor 3rd"},{"item":"Q10","correct":"Minor 7th"}]
     },
+    {
+        student: "Maggie",
+        date: "2026-09-15",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-15",
+        time: "10:46 AM",
+        percentage: 80,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Major 6th","correct":"Major 6th"}]
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-15",
+        time: "上午10:48",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-15",
+        time: "上午10:51",
+        percentage: 70,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Perfect 5th","correct":"Perfect 5th"}]
+    },
+    {
+        student: "Alex",
+        date: "2026-09-15",
+        time: "10:51 am",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-15",
+        time: "10:51 am",
+        percentage: 100,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-15",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-15",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-15",
+        time: "上午10:46",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-15",
+        time: "上午10:57",
+        percentage: 80,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Minor 7th","correct":"Minor 7th"}]
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-15",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-15",
+        time: "10:50 AM",
+        percentage: 40,
+        exercise: "Ear Training – All Intervals",
+        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 7th","correct":"Major 7th"}]
+    },
 ];
