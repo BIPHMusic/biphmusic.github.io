@@ -960,7 +960,7 @@ function dailyGetAccessState(now = new Date()) {
   if (minutes >= endMinutes) {
     target.setDate(target.getDate() + 1);
   }
-  target.setHours(10, 45, 0, 0);
+  target.setHours(10, 40, 0, 0);
 
   return {
     allowed: false,
@@ -1507,7 +1507,7 @@ function dailyShowFinalScreen() {
     const totalPercentage = Math.round((vocabScore + earScore) / 2);
 
     const greeting =
-    totalPercentage === 100 ? 'Wow!' :
+    totalPercentage === 100 ? 'Wow,' :
     totalPercentage >= 90 ? 'Great job,' :
     totalPercentage >= 80 ? 'Good job,' :
     'Hey,';
