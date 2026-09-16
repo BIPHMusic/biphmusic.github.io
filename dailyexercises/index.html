@@ -215,11 +215,83 @@
 .sight-status { min-height:24px; margin: 5px 0 14px; color:rgba(255,255,255,.78); }
 #sightCountdown { min-height: 28px; }
 
+
+/* ==================== NAVIGATION WARNING MODAL ==================== */
+#daily-navigation-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  background: rgba(0,0,0,.72);
+}
+#daily-navigation-modal.visible { display: flex; }
+.daily-navigation-dialog {
+  width: min(92vw, 500px);
+  box-sizing: border-box;
+  padding: 28px 30px 24px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 12px;
+  background: rgba(35,55,95,.98);
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 20px 70px rgba(0,0,0,.45);
+}
+.daily-navigation-dialog h2 {
+  margin: 0 0 12px;
+  font-size: 1.35rem;
+}
+.daily-navigation-dialog p {
+  margin: 0;
+  line-height: 1.55;
+  color: rgba(255,255,255,.86);
+}
+.daily-navigation-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.daily-navigation-actions button {
+  min-width: 130px;
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,.3);
+  color: #fff;
+  background: rgba(255,255,255,.14);
+  cursor: pointer;
+  font-size: 1rem;
+}
+.daily-navigation-actions button:hover {
+  background: rgba(255,255,255,.25);
+}
+.daily-navigation-actions .daily-navigation-leave {
+  background: rgba(244,67,54,.72);
+}
+.daily-navigation-actions .daily-navigation-leave:hover {
+  background: rgba(244,67,54,.9);
+}
 </style>
 <style id="exercise-style"></style>
 </head>
 <body>
 <div id="shared-menu"></div>
+
+<div id="daily-navigation-modal" aria-hidden="true">
+  <div class="daily-navigation-dialog" role="dialog" aria-modal="true"
+       aria-labelledby="daily-navigation-title" aria-describedby="daily-navigation-message">
+    <h2 id="daily-navigation-title">Leave Daily Exercises?</h2>
+    <p id="daily-navigation-message">If you leave this page, your current progress may be lost.</p>
+    <div class="daily-navigation-actions">
+      <button type="button" id="dailyNavigationStay">Stay</button>
+      <button type="button" id="dailyNavigationLeave" class="daily-navigation-leave">Leave</button>
+    </div>
+  </div>
+</div>
 <div id="main-content" style="display:none;">
   <div class="background"></div>
   <div class="overlay"></div>
@@ -945,7 +1017,197 @@ const DAILY_EXERCISE_STYLES = {
 `
 };
 
+
 let dailyAccessTimer = null;
+
+/* ==================== IN-PAGE NAVIGATION / LEAVE PROTECTION ==================== */
+let dailyNavigationAllowPop = false;
+let dailyNavigationAllowUnload = false;
+let dailyNavigationModalOpen = false;
+let dailyNavigationPendingAction = null;
+let dailyNavigationHistoryInitialized = false;
+
+function dailyShouldWarnOnLeave() {
+  const s = window.dailyExerciseState;
+  return !!(s && s.student && s.sessionReady);
+}
+
+function dailyShowNavigationModal(pendingAction) {
+  const modal = document.getElementById('daily-navigation-modal');
+  if (!modal) return;
+  dailyNavigationPendingAction = pendingAction || null;
+  dailyNavigationModalOpen = true;
+  modal.classList.add('visible');
+  modal.setAttribute('aria-hidden', 'false');
+  document.getElementById('dailyNavigationStay')?.focus();
+}
+
+function dailyHideNavigationModal() {
+  const modal = document.getElementById('daily-navigation-modal');
+  if (!modal) return;
+  dailyNavigationModalOpen = false;
+  dailyNavigationPendingAction = null;
+  modal.classList.remove('visible');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function dailyConfirmNavigationAway() {
+  const action = dailyNavigationPendingAction;
+  dailyHideNavigationModal();
+
+  if (typeof dailyStopSightRecordingForNavigation === 'function') {
+    dailyStopSightRecordingForNavigation();
+  }
+
+  dailyNavigationAllowUnload = true;
+
+  if (typeof action === 'function') {
+    action();
+  }
+}
+
+function dailyInitializeNavigationHistory() {
+  if (dailyNavigationHistoryInitialized) return;
+  dailyNavigationHistoryInitialized = true;
+
+  const s = window.dailyExerciseState;
+  const current = history.state;
+  history.replaceState(
+    { ...(current || {}), dailyExercises: true, dailyExerciseIndex: 0, dailyExerciseRoot: true },
+    '',
+    location.href
+  );
+}
+
+function dailyPushExerciseHistory(index) {
+  dailyInitializeNavigationHistory();
+  history.pushState(
+    { dailyExercises: true, dailyExerciseIndex: index },
+    '',
+    location.href
+  );
+}
+
+function dailyHandlePopState(e) {
+  const s = window.dailyExerciseState;
+  if (!dailyShouldWarnOnLeave()) return;
+
+  if (dailyNavigationAllowPop) {
+    dailyNavigationAllowPop = false;
+    return;
+  }
+
+  const state = e.state;
+
+  if (state && state.dailyExercises && Number.isInteger(state.dailyExerciseIndex)) {
+    const targetIndex = state.dailyExerciseIndex;
+
+    if (targetIndex >= 0 && targetIndex < s.order.length) {
+      if (targetIndex === s.index) return;
+      if (typeof dailyStopSightRecordingForNavigation === 'function') {
+        dailyStopSightRecordingForNavigation();
+      }
+      s.index = targetIndex;
+      dailyShowExercise(s.order[targetIndex], true);
+      return;
+    }
+  }
+
+  // The browser has reached a page outside this Daily Exercises session.
+  // Put the current session entry back, then ask using our own modal.
+  history.pushState(
+    { dailyExercises: true, dailyExerciseIndex: s.index },
+    '',
+    location.href
+  );
+
+  dailyShowNavigationModal(() => {
+    dailyNavigationAllowPop = true;
+    history.back();
+  });
+}
+
+window.addEventListener('popstate', dailyHandlePopState);
+
+window.addEventListener('beforeunload', e => {
+  // Browsers intentionally require their own native beforeunload UI here.
+  // This is the only reliable browser-level protection for refresh/close/tab/window exit.
+  if (dailyNavigationAllowUnload || !dailyShouldWarnOnLeave()) return;
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+document.addEventListener('click', e => {
+  if (!dailyShouldWarnOnLeave() || dailyNavigationModalOpen) return;
+
+  const anchor = e.target.closest?.('a[href]');
+  if (!anchor) return;
+
+  // Do not hijack modified clicks, downloads, hash-only links, or new-tab behavior.
+  if (
+    e.defaultPrevented ||
+    e.button !== 0 ||
+    e.metaKey ||
+    e.ctrlKey ||
+    e.shiftKey ||
+    e.altKey ||
+    anchor.target === '_blank' ||
+    anchor.hasAttribute('download')
+  ) return;
+
+  const href = anchor.href;
+  if (!href || href === location.href) return;
+
+  e.preventDefault();
+  dailyShowNavigationModal(() => {
+    window.location.href = href;
+  });
+}, true);
+
+document.addEventListener('keydown', e => {
+  if (!dailyShouldWarnOnLeave() || dailyNavigationModalOpen) return;
+
+  // Browser back/forward shortcuts. The actual history movement is handled by popstate.
+  const isBack =
+    (e.metaKey && e.key === '[') ||
+    (e.ctrlKey && e.key === '[') ||
+    (e.altKey && e.key === 'ArrowLeft');
+
+  if (isBack) {
+    // Let the browser generate popstate. We do not call preventDefault here because
+    // some browsers will otherwise suppress the history traversal entirely.
+    return;
+  }
+
+  // Prevent common forward shortcuts from bypassing the virtual exercise history.
+  const isForward =
+    (e.metaKey && e.key === ']') ||
+    (e.ctrlKey && e.key === ']') ||
+    (e.altKey && e.key === 'ArrowRight');
+
+  if (isForward) return;
+}, true);
+
+
+document.addEventListener('keydown', e => {
+  if (!dailyNavigationModalOpen) return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    dailyHideNavigationModal();
+  }
+});
+document.addEventListener('DOMContentLoaded', () => {
+  const stay = document.getElementById('dailyNavigationStay');
+  const leave = document.getElementById('dailyNavigationLeave');
+
+  stay?.addEventListener('click', dailyHideNavigationModal);
+  leave?.addEventListener('click', dailyConfirmNavigationAway);
+
+  document.getElementById('daily-navigation-modal')?.addEventListener('click', e => {
+    if (e.target.id === 'daily-navigation-modal') dailyHideNavigationModal();
+  });
+});
+
 
 function dailyGetAccessState(now = new Date()) {
   const minutes = now.getHours() * 60 + now.getMinutes();
@@ -1133,6 +1395,8 @@ function dailyPrepareExercisesForAccessWindow() {
   state.sightExample = null;
 
   document.getElementById('exercise-progress').textContent = 'Exercise 1 of 3';
+  dailyInitializeNavigationHistory();
+  dailyPushExerciseHistory(state.index);
   dailyShowExercise(state.order[state.index]);
   dailyStartAccessOverlayFade();
 }
@@ -1195,7 +1459,7 @@ function dailySetProgress() {
   el.textContent = `Exercise ${done + 1} of 3`;
 }
 
-function dailyShowExercise(type) {
+function dailyShowExercise(type, fromHistory = false) {
   const state = window.dailyExerciseState;
 
 
@@ -1277,6 +1541,7 @@ function dailyCompleteExercise(type, resultData) {
   state.index++;
 
   if (state.index < state.order.length) {
+    dailyPushExerciseHistory(state.index);
     dailyShowExercise(state.order[state.index]);
   } else {
     dailyShowFinalScreen();
@@ -1293,6 +1558,7 @@ function dailyAdvanceExercise() {
   state.index++;
 
   if (state.index < state.order.length) {
+    dailyPushExerciseHistory(state.index);
     dailyShowExercise(state.order[state.index]);
   } else {
     dailyShowFinalScreen();
@@ -3609,6 +3875,7 @@ let dailySightAnimationId = null;
 let dailySightCountdownTimer = null;
 let dailySightStartedAt = null;
 let dailySightExample = null;
+let dailySightTimeExpired = false;
 
 function dailyInitSightSinging() {
   const startDate = new Date('2024-11-04');
@@ -3624,6 +3891,11 @@ function dailyInitSightSinging() {
   dailySightIsRecording = false;
   dailySightHasRecorded = false;
   dailySightStartedAt = null;
+  dailySightTimeExpired = false;
+  if (dailySightCountdownTimer) {
+    clearInterval(dailySightCountdownTimer);
+    dailySightCountdownTimer = null;
+  }
   document.getElementById('exerciseImage').classList.remove('revealed');
   document.getElementById('beginSightButton').disabled = false;
   document.getElementById('recordButton').disabled = true;
@@ -3632,8 +3904,10 @@ function dailyInitSightSinging() {
 }
 
 function dailyBeginSightSinging() {
-  if (dailySightStartedAt || dailySightHasRecorded) return;
+  if (dailySightStartedAt || dailySightHasRecorded || dailySightTimeExpired) return;
+
   dailySightStartedAt = Date.now();
+  dailySightTimeExpired = false;
   document.getElementById('beginSightButton').disabled = true;
   document.getElementById('exerciseImage').classList.add('revealed');
   document.getElementById('recordButton').disabled = false;
@@ -3668,39 +3942,89 @@ function dailySightUpdateCountdown() {
     clearInterval(dailySightCountdownTimer);
     dailySightCountdownTimer = null;
 
-    if (!dailySightIsRecording && !dailySightHasRecorded) {
-      const recordButton = document.getElementById('recordButton');
-      const recordingNotice = document.getElementById('recordingNotice');
-      const recordStatus = document.getElementById('recordStatus');
+    dailySightTimeExpired = true;
 
-      if (recordButton) recordButton.disabled = true;
-      if (recordingNotice) recordingNotice.style.display = 'none';
-      if (recordStatus) {
-        recordStatus.textContent =
-          'The 3-minute sight-singing window has ended.';
+    const recordButton = document.getElementById('recordButton');
+    const recordingNotice = document.getElementById('recordingNotice');
+    const recordStatus = document.getElementById('recordStatus');
+
+    // Disable the button immediately, even if the microphone/recorder is in
+    // the middle of an async operation.
+    if (recordButton) recordButton.disabled = true;
+    if (recordingNotice) recordingNotice.style.display = 'none';
+
+    if (dailySightIsRecording && dailySightMediaRecorder) {
+      // Force-stop the active recording exactly at the time limit.
+      try {
+        if (dailySightMediaRecorder.state !== 'inactive') {
+          dailySightMediaRecorder.stop();
+        }
+      } catch (err) {
+        console.error('Could not stop expired sight-singing recording:', err);
       }
+
+      dailySightIsRecording = false;
+      dailySightHasRecorded = true;
+      document.getElementById('recordIcon')?.classList.remove('recording');
+    } else if (recordStatus) {
+      recordStatus.textContent =
+        'The 3-minute sight-singing window has ended.';
     }
   }
 }
 
 async function dailyToggleSightRecording() {
   const recordButton = document.getElementById('recordButton');
+  if (!recordButton) return;
+
+  // Hard gate: once the countdown has expired, recording is permanently locked
+  // for this sight-singing attempt.
+  if (dailySightTimeExpired || !dailySightStartedAt ||
+      Date.now() - dailySightStartedAt >= 180000) {
+    dailySightUpdateCountdown();
+    recordButton.disabled = true;
+    return;
+  }
+
   if (!dailySightIsRecording) {
-    if (dailySightHasRecorded) return;
+    if (dailySightHasRecorded || dailySightTimeExpired) return;
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+
+      // The microphone permission prompt is asynchronous. The 3-minute timer
+      // may expire while it is open, so check the hard deadline again before
+      // starting MediaRecorder.
+      if (
+        dailySightTimeExpired ||
+        !dailySightStartedAt ||
+        Date.now() - dailySightStartedAt >= 180000
+      ) {
+        stream.getTracks().forEach(track => track.stop());
+        dailySightUpdateCountdown();
+        return;
+      }
+
       const audioContext = new AudioContext();
       const source = audioContext.createMediaStreamSource(stream);
       dailySightAnalyser = audioContext.createAnalyser();
       source.connect(dailySightAnalyser);
+
       dailySightMediaRecorder = new MediaRecorder(stream);
       dailySightAudioChunks = [];
+
       document.getElementById('visualizer').style.display = 'block';
       dailySightDrawVisualization();
-      dailySightMediaRecorder.ondataavailable = e => dailySightAudioChunks.push(e.data);
+
+      dailySightMediaRecorder.ondataavailable = e => {
+        if (e.data && e.data.size) dailySightAudioChunks.push(e.data);
+      };
+
       dailySightMediaRecorder.onstop = async () => {
         try {
-          const webmBlob = new Blob(dailySightAudioChunks, {type: dailySightMediaRecorder.mimeType || 'audio/webm'});
+          const webmBlob = new Blob(dailySightAudioChunks, {
+            type: dailySightMediaRecorder.mimeType || 'audio/webm'
+          });
           const arrayBuffer = await webmBlob.arrayBuffer();
           const audioCtx = new AudioContext();
           const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
@@ -3709,40 +4033,87 @@ async function dailyToggleSightRecording() {
           const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, 128);
           const sampleBlockSize = 1152;
           const mp3Data = [];
-          for (let i=0; i<samples.length; i+=sampleBlockSize) {
-            const chunk = samples.subarray(i, i+sampleBlockSize);
+
+          for (let i = 0; i < samples.length; i += sampleBlockSize) {
+            const chunk = samples.subarray(i, i + sampleBlockSize);
             const int16 = new Int16Array(chunk.length);
-            for (let j=0; j<chunk.length; j++) {
+            for (let j = 0; j < chunk.length; j++) {
               int16[j] = Math.max(-32768, Math.min(32767, chunk[j] * 32768));
             }
             const buf = mp3encoder.encodeBuffer(int16);
             if (buf.length) mp3Data.push(buf);
           }
+
           const flushed = mp3encoder.flush();
           if (flushed.length) mp3Data.push(flushed);
+
           const mp3Blob = new Blob(mp3Data, {type:'audio/mp3'});
+
           stream.getTracks().forEach(track => track.stop());
+          try { await audioContext.close(); } catch (_) {}
+          try { await audioCtx.close(); } catch (_) {}
+
           document.getElementById('visualizer').style.display = 'none';
-          cancelAnimationFrame(dailySightAnimationId);
-          document.getElementById('recordStatus').textContent = 'Recording complete.';
+          if (dailySightAnimationId) cancelAnimationFrame(dailySightAnimationId);
+          dailySightAnimationId = null;
+
+          document.getElementById('recordIcon')?.classList.remove('recording');
+
+          if (dailySightTimeExpired) {
+            document.getElementById('recordStatus').textContent =
+              'Time expired. Recording stopped automatically.';
+          } else {
+            document.getElementById('recordStatus').textContent =
+              'Recording complete.';
+          }
+
           dailySightRecordingReady(mp3Blob, dailySightExample);
         } catch (err) {
           console.error('MP3 conversion error:', err);
-          document.getElementById('recordStatus').textContent = 'Could not finish the recording.';
-          recordButton.disabled = false;
+          document.getElementById('visualizer').style.display = 'none';
+          if (dailySightAnimationId) cancelAnimationFrame(dailySightAnimationId);
+          dailySightAnimationId = null;
+          document.getElementById('recordIcon')?.classList.remove('recording');
+          document.getElementById('recordStatus').textContent =
+            'Could not finish the recording.';
+          if (!dailySightTimeExpired) recordButton.disabled = false;
         }
       };
+
+      // Check one final time immediately before starting the recorder.
+      if (
+        dailySightTimeExpired ||
+        Date.now() - dailySightStartedAt >= 180000
+      ) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
+
       dailySightMediaRecorder.start();
       dailySightIsRecording = true;
       recordButton.disabled = false;
       document.getElementById('recordIcon').classList.add('recording');
-      document.getElementById('recordingNotice').textContent = 'Recording… press the button again to stop.';
+      document.getElementById('recordingNotice').style.display = 'block';
+      document.getElementById('recordingNotice').textContent =
+        'Recording… press the button again to stop.';
     } catch (err) {
       console.error('Microphone error:', err);
-      alert('Microphone access is required for the sight-singing recording.');
+      if (!dailySightTimeExpired) {
+        document.getElementById('recordStatus').textContent =
+          'Microphone access is required for the sight-singing recording.';
+      }
     }
-   } else {
-    dailySightMediaRecorder.stop();
+  } else {
+    if (dailySightTimeExpired) {
+      // The countdown handler owns stopping an expired recording.
+      return;
+    }
+
+    if (dailySightMediaRecorder &&
+        dailySightMediaRecorder.state !== 'inactive') {
+      dailySightMediaRecorder.stop();
+    }
+
     dailySightIsRecording = false;
     dailySightHasRecorded = true;
     recordButton.disabled = true;
@@ -3755,14 +4126,37 @@ async function dailyToggleSightRecording() {
     }
 
     const countdown = document.getElementById('sightCountdown');
-    if (countdown) {
-      countdown.style.display = 'none';
-    }
+    if (countdown) countdown.style.display = 'none';
 
     const beginButton = document.getElementById('beginSightButton');
-    if (beginButton) {
-      beginButton.style.display = 'none';
+    if (beginButton) beginButton.style.display = 'none';
+  }
+}
+
+function dailyStopSightRecordingForNavigation() {
+  if (dailySightCountdownTimer) {
+    clearInterval(dailySightCountdownTimer);
+    dailySightCountdownTimer = null;
+  }
+
+  if (dailySightMediaRecorder &&
+      dailySightMediaRecorder.state !== 'inactive') {
+    try {
+      dailySightMediaRecorder.stop();
+    } catch (err) {
+      console.error('Could not stop recording during navigation:', err);
     }
+  }
+
+  dailySightIsRecording = false;
+
+  if (typeof dailySightAnimationId !== 'undefined' && dailySightAnimationId) {
+    cancelAnimationFrame(dailySightAnimationId);
+    dailySightAnimationId = null;
+  }
+
+  if (typeof dailySightAnalyser !== 'undefined') {
+    dailySightAnalyser = null;
   }
 }
 
