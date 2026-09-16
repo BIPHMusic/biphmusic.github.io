@@ -69,7 +69,7 @@
   position: fixed !important;
   z-index: 3 !important;
   box-sizing: border-box !important;
-  filter: blur(18px) !important;
+  filter: blur(30px) !important;
   opacity: 1 !important;
   margin: 0 !important;
   text-align: center !important;
@@ -175,6 +175,50 @@
   margin-top: 20px;
   margin-bottom: 30px;
 }
+
+.daily-completed-feedback {
+  width: 92%;
+  max-width: 850px;
+  margin: 35px auto;
+  text-align: center;
+}
+.daily-completed-feedback h2 { margin-bottom: 18px; }
+.daily-feedback-score {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 18px;
+  margin: 0 auto 20px;
+  max-width: 600px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 8px;
+  text-align: left;
+}
+.daily-feedback-review {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 18px 22px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px;
+  text-align: left;
+}
+.daily-feedback-review h3 { margin-top: 0; text-align: center; }
+.daily-feedback-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px 0;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.daily-feedback-item span { color: rgba(255,255,255,.78); line-height: 1.45; }
+.daily-feedback-complete {
+  margin: 10px 0 24px;
+  font-size: 1.15rem;
+  color: rgba(255,255,255,.88);
+}
+.daily-sight-completed-feedback .action-button { margin-top: 5px; }
 
 .daily-final {
   width: 92%;
@@ -298,7 +342,6 @@
   <div class="overlay2"></div>
   <h1 class="Title" id="exercise-title">BIPH Music</h1>
   <h1 class="Subtitle" id="exercise-subtitle" style="margin-top: 10px;">Daily Exercises</h1>
-  <div class="daily-exercise-progress" id="exercise-progress"></div>
   <div id="exercise-stage"></div>
   <div class="logocontainer">
     <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
@@ -1211,7 +1254,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function dailyGetAccessState(now = new Date()) {
   const minutes = now.getHours() * 60 + now.getMinutes();
-  const startMinutes = 10 * 60 + 45;
+  const startMinutes = 10 * 60 + 40;
   const endMinutes = 11 * 60 + 35;
 
   if (minutes >= startMinutes && minutes < endMinutes) {
@@ -1394,7 +1437,6 @@ function dailyPrepareExercisesForAccessWindow() {
   state.sightRecording = null;
   state.sightExample = null;
 
-  document.getElementById('exercise-progress').textContent = 'Exercise 1 of 3';
   dailyInitializeNavigationHistory();
   dailyPushExerciseHistory(state.index);
   dailyShowExercise(state.order[state.index]);
@@ -1450,29 +1492,34 @@ function dailyShuffle(array) {
   return a;
 }
 
-function dailySetProgress() {
-  const el = document.getElementById('exercise-progress');
-  if (!el) return;
-
-  el.style.display = '';
-  const done = window.dailyExerciseState.index;
-  el.textContent = `Exercise ${done + 1} of 3`;
-}
+function dailySetProgress() {}
 
 function dailyShowExercise(type, fromHistory = false) {
   const state = window.dailyExerciseState;
 
-
   state.active = type;
   state.waitingForAdvance = false;
 
-  document.getElementById('exercise-stage').innerHTML = DAILY_EXERCISE_TEMPLATES[type];
-  document.getElementById('exercise-style').textContent = DAILY_EXERCISE_STYLES[type];
+  document.getElementById('exercise-stage').innerHTML = '';
+  document.getElementById('exercise-style').textContent = DAILY_EXERCISE_STYLES[type] || '';
   document.getElementById('exercise-subtitle').textContent =
     type === 'vocab' ? 'Daily Vocab' :
     type === 'earTraining' ? 'Daily Ear Training' :
     'Daily Sight Singing';
-  dailySetProgress();
+
+  // Going backward through browser history should show the completed exercise
+  // feedback rather than generating a brand-new quiz.
+  if (fromHistory && state.results[type]) {
+    if (type === 'sightSinging') {
+      dailyShowCompletedSightSinging();
+    } else {
+      dailyShowCompletedExerciseFeedback(type, state.results[type]);
+    }
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    return;
+  }
+
+  document.getElementById('exercise-stage').innerHTML = DAILY_EXERCISE_TEMPLATES[type];
 
   if (type === 'vocab') {
     dailyVocabStudent = state.student.toLowerCase();
@@ -1483,9 +1530,7 @@ function dailyShowExercise(type, fromHistory = false) {
     if (actions) actions.classList.remove('hidden');
 
     const actionButton = document.querySelector('.quiz-actions .action-button');
-    if (actionButton) {
-      actionButton.textContent = state.index === state.order.length - 1 ? 'Submit' : 'Next exercise';
-    }
+    if (actionButton) actionButton.textContent = 'Next exercise';
   } else if (type === 'earTraining') {
     dailyEarStudent = state.student;
     dailyEarInitQuiz();
@@ -1494,12 +1539,98 @@ function dailyShowExercise(type, fromHistory = false) {
 
     const button = document.getElementById('sightNextButton');
     if (button) {
-      button.textContent = state.index === state.order.length - 1 ? 'Submit' : 'Next exercise';
+      button.textContent = 'Next exercise';
       button.onclick = dailyAdvanceExercise;
     }
   }
 
   window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function dailyEscapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function dailyShowCompletedExerciseFeedback(type, resultData) {
+  const title = type === 'vocab' ? 'Vocab Complete' : 'Ear Training Complete';
+  const score = Number(resultData?.percentage ?? 0);
+  const answers = Array.isArray(resultData?.answers) ? resultData.answers : [];
+  const correctAnswers = Array.isArray(resultData?.questionSet?.answers)
+    ? resultData.questionSet.answers
+    : Array.isArray(resultData?.questionSet?.correctAnswers)
+      ? resultData.questionSet.correctAnswers
+      : [];
+
+  const correctCount = correctAnswers.reduce((count, correct, i) => {
+    const answer = answers[i] || '';
+    return count + (answer && String(answer).toLowerCase() === String(correct).toLowerCase() ? 1 : 0);
+  }, 0);
+  const total = correctAnswers.length || answers.length;
+
+  let reviewHtml = '';
+
+  if (type === 'vocab') {
+    const reviewItems = Array.isArray(resultData?.termsToReview)
+      ? resultData.termsToReview
+      : [];
+
+    reviewHtml = reviewItems.length
+      ? `
+        <div class="daily-feedback-review">
+          <h3>Words to Review</h3>
+          ${reviewItems.map(item => `
+            <div class="daily-feedback-item">
+              <strong>${dailyEscapeHtml(item.term)}</strong>
+              <span>${dailyEscapeHtml(item.definition || 'Definition not found')}</span>
+            </div>
+          `).join('')}
+        </div>`
+      : `<div class="daily-feedback-review"><h3>Words to Review</h3><p class="daily-note">Perfect! No words to review.</p></div>`;
+  } else {
+    const reviewItems = Array.isArray(resultData?.termsToReview)
+      ? resultData.termsToReview
+      : [];
+
+    reviewHtml = reviewItems.length
+      ? `
+        <div class="daily-feedback-review">
+          <h3>Things to Review</h3>
+          ${reviewItems.map(item => `
+            <div class="daily-feedback-item">
+              <strong>${dailyEscapeHtml(item.correct || item.item)}</strong>
+            </div>
+          `).join('')}
+        </div>`
+      : `<div class="daily-feedback-review"><h3>Things to Review</h3><p class="daily-note">Perfect! No intervals to review.</p></div>`;
+  }
+
+  document.getElementById('exercise-stage').innerHTML = `
+    <div class="daily-completed-feedback">
+      <h2>${title}</h2>
+      <div class="daily-feedback-score">
+        <span>Score</span>
+        <strong>${correctCount}/${total} (${score}%)</strong>
+      </div>
+      ${reviewHtml}
+    </div>`;
+}
+
+function dailyShowCompletedSightSinging() {
+  document.getElementById('exercise-stage').innerHTML = `
+    <div class="daily-completed-feedback daily-sight-completed-feedback">
+      <h2>Sight Singing</h2>
+      <p class="daily-feedback-complete">Recording complete.</p>
+      <button class="action-button" type="button" id="completedSightNextButton">Next exercise</button>
+    </div>`;
+
+  const button = document.getElementById('completedSightNextButton');
+  if (button) button.onclick = dailyAdvanceExercise;
+  window.dailyExerciseState.waitingForAdvance = true;
 }
 
 function dailyCompleteExercise(type, resultData) {
@@ -1529,11 +1660,6 @@ function dailyCompleteExercise(type, resultData) {
 
     const actions = document.querySelector('.sight-actions');
     if (actions) actions.classList.remove('hidden');
-
-    document.getElementById('exercise-progress').textContent =
-      state.index === state.order.length - 1
-        ? 'Final exercise'
-        : `Exercise ${state.index + 1} of ${state.order.length}`;
 
     return;
   }
@@ -3373,9 +3499,29 @@ function dailyVocabPrepareResultData() {
         let currentAudio = null;
         let playsLeft = 2;
 
-        // Pull from the loaded QUIZ_CONFIG
-        const sections = QUIZ_CONFIG.sections;
-        const sectionTitles = QUIZ_CONFIG.sectionTitles;
+        // Use the shared ear-training configuration when it loaded successfully.
+        // If quiz-intervals-all.js is unavailable, keep Daily Exercises functional
+        // with the same four ear-training categories and a safe default question count.
+        // quiz-intervals-all.js is the source of truth for this Daily Ear Training quiz.
+        // It currently defines one section: 10 interval questions.
+        const dailyEarQuizConfig = (() => {
+            try {
+                if (typeof QUIZ_CONFIG !== 'undefined' && QUIZ_CONFIG) {
+                    return QUIZ_CONFIG;
+                }
+            } catch (_) {}
+
+            // Safe fallback if the external configuration cannot be loaded.
+            return {
+                name: 'Ear Training – All Intervals',
+                sections: ['intervals'],
+                sectionTitles: ['Intervals'],
+                questionsPerSection: [10]
+            };
+        })();
+
+        const dailyEarSections = dailyEarQuizConfig.sections;
+        const dailyEarSectionTitles = dailyEarQuizConfig.sectionTitles;
 
         
 
@@ -3614,9 +3760,9 @@ function dailyVocabPrepareResultData() {
             let pool = [...audioFiles[section]];
 
             // Apply difficulty filter if present
-            if (QUIZ_CONFIG.allowedAnswers && QUIZ_CONFIG.allowedAnswers[section]) {
+            if (dailyEarQuizConfig.allowedAnswers && dailyEarQuizConfig.allowedAnswers[section]) {
                 pool = pool.filter(item => 
-                    QUIZ_CONFIG.allowedAnswers[section].includes(item.answer)
+                    dailyEarQuizConfig.allowedAnswers[section].includes(item.answer)
                 );
             }
 
@@ -3631,8 +3777,8 @@ function dailyVocabPrepareResultData() {
 
         function dailyEarInitQuiz() {
             dailyEarQuestionBank[dailyEarStudent] = {};
-            sections.forEach((sec, i) => {
-                const n = QUIZ_CONFIG.questionsPerSection[i];
+            dailyEarSections.forEach((sec, i) => {
+                const n = dailyEarQuizConfig.questionsPerSection[i];
                 dailyEarQuestionBank[dailyEarStudent][sec] = dailyEarGenerateQuestionSet(sec, n);
             });
 
@@ -3653,9 +3799,9 @@ function dailyVocabPrepareResultData() {
             const options = fullOrdered[section] || [];
 
             // Filter to only the answers allowed by the current difficulty
-            if (QUIZ_CONFIG.allowedAnswers && QUIZ_CONFIG.allowedAnswers[section]) {
+            if (dailyEarQuizConfig.allowedAnswers && dailyEarQuizConfig.allowedAnswers[section]) {
                 return options.filter(opt => 
-                    QUIZ_CONFIG.allowedAnswers[section].includes(opt)
+                    dailyEarQuizConfig.allowedAnswers[section].includes(opt)
                 );
             }
             return options;
@@ -3665,12 +3811,12 @@ function dailyVocabPrepareResultData() {
             const container = document.getElementById('quiz-questions');
             container.innerHTML = '';
 
-            const sectionKey = sections[currentSectionIndex];
-            const numQs = QUIZ_CONFIG.questionsPerSection[currentSectionIndex];
+            const sectionKey = dailyEarSections[currentSectionIndex];
+            const numQs = dailyEarQuizConfig.questionsPerSection[currentSectionIndex];
 
             const header = document.createElement('div');
             header.className = 'section-header';
-            header.innerHTML = `<strong>Part ${currentSectionIndex + 1}: ${sectionTitles[currentSectionIndex]}</strong><br>Question ${currentQuestionIndex + 1}/${numQs}`;
+            header.innerHTML = `<strong>Part ${currentSectionIndex + 1}: ${dailyEarSectionTitles[currentSectionIndex]}</strong><br>Question ${currentQuestionIndex + 1}/${numQs}`;
             container.appendChild(header);
 
             const box = document.createElement('div');
@@ -3712,7 +3858,7 @@ function dailyVocabPrepareResultData() {
             const playBtn = document.querySelector('.play-button');
             
             if (!currentAudio) {
-                const sectionKey = sections[currentSectionIndex];
+                const sectionKey = dailyEarSections[currentSectionIndex];
                 const url = dailyEarQuestionBank[dailyEarStudent][sectionKey].urls[currentQuestionIndex];
                 currentAudio = new Audio(url);
             }
@@ -3738,12 +3884,12 @@ function dailyVocabPrepareResultData() {
             }
             studentAnswers.push(answer);
 
-            const numQs = QUIZ_CONFIG.questionsPerSection[currentSectionIndex];
+            const numQs = dailyEarQuizConfig.questionsPerSection[currentSectionIndex];
 
             if (currentQuestionIndex < numQs - 1) {
                 currentQuestionIndex++;
                 dailyEarRenderCurrentQuestion();
-            } else if (currentSectionIndex < sections.length - 1) {
+            } else if (currentSectionIndex < dailyEarSections.length - 1) {
                 currentSectionIndex++;
                 currentQuestionIndex = 0;
                 dailyEarRenderCurrentQuestion();
@@ -3756,7 +3902,7 @@ function dailyVocabPrepareResultData() {
         
 
         function dailyEarPrepareResultData() {
-            const allCorrect = sections.flatMap(sec => dailyEarQuestionBank[dailyEarStudent][sec].answers);
+            const allCorrect = dailyEarSections.flatMap(sec => dailyEarQuestionBank[dailyEarStudent][sec].answers);
             const missedAnswers = [];
 
             studentAnswers.forEach((ans, i) => {
@@ -3778,7 +3924,7 @@ function dailyVocabPrepareResultData() {
                 student: dailyEarCapitalizeName(dailyEarStudent),
                 date: new Date().toISOString().split('T')[0],
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
-                exercise: QUIZ_CONFIG.name || "Ear Training",
+                exercise: dailyEarQuizConfig.name || "Ear Training",
                 answers: studentAnswers,
                 questionSet: { correctAnswers: allCorrect },
                 termsToReview: termsToReview,
@@ -3845,7 +3991,7 @@ function dailyVocabPrepareResultData() {
 
             // ARROW KEYS - Navigate dropdown
             if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isQuizActive && answerSelect) {
-                const sectionKey = sections[currentSectionIndex];
+                const sectionKey = dailyEarSections[currentSectionIndex];
                 const options = dailyEarGetOrderedOptions(sectionKey);
                 if (options.length === 0) return;
 
