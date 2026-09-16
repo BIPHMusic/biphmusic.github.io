@@ -42,7 +42,7 @@
   background: rgb(45, 70, 119);
   opacity: 1;
   pointer-events: auto;
-  transition: opacity 3s ease;
+  transition: opacity 1s ease;
 }
 
 .daily-access-overlay.daily-access-ending {
@@ -1440,7 +1440,6 @@ function dailyPrepareExercisesForAccessWindow() {
   dailyInitializeNavigationHistory();
   dailyPushExerciseHistory(state.index);
   dailyShowExercise(state.order[state.index]);
-  dailyStartAccessOverlayFade();
 }
 
 function dailyBeginExercisesAfterAccessWindow() {
@@ -1453,6 +1452,7 @@ function dailyBeginExercisesAfterAccessWindow() {
   dailyStartAccessOverlayFade();
 }
 
+
 function dailyUpdateAccessWindow() {
   const state = window.dailyExerciseState;
   if (!state.student) return;
@@ -1460,22 +1460,22 @@ function dailyUpdateAccessWindow() {
   const accessState = dailyGetAccessState();
 
   if (accessState.allowed) {
+    // Once 10:40 has actually arrived, prepare the exercises exactly once
+    // and begin the fade. Do NOT continue updating the countdown overlay.
     if (!state.sessionReady) {
       dailyPrepareExercisesForAccessWindow();
+    } else {
+      dailyStartAccessOverlayFade();
     }
 
-    dailyStartAccessOverlayFade();
     return;
   }
 
+  // Before 10:40, keep showing the countdown.
+  // Do not prepare the exercises early and do not begin the fade early.
   dailyShowAccessBlocker(accessState);
-
-  const remaining = accessState.target - new Date();
-
-  if (remaining <= 3000 && !state.sessionReady) {
-    dailyPrepareExercisesForAccessWindow();
-  }
 }
+
 
 function dailyStartAccessWindowWatcher() {
   if (dailyAccessTimer) clearInterval(dailyAccessTimer);
