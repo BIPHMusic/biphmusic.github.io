@@ -2350,4 +2350,60 @@ const records = [
         exercise: "Ear Training – All Intervals",
         termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 7th","correct":"Major 7th"}]
     },
+    {
+        student: "Maggie",
+        date: "2026-09-15",
+        time: "11:37 AM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-15",
+        time: "11:38 AM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-15",
+        time: "11:38 AM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-15",
+        time: "11:38 AM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-15",
+        time: "11:38 AM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-15",
+        time: "11:38 AM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-15",
+        time: "11:39 AM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
 ];
