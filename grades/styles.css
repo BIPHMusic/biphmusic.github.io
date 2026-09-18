@@ -1657,3 +1657,616 @@ body.file-drag-active::after {
     pointer-events: none;
     z-index: 9999;
 }
+
+/* ============================================================
+   INDEX3 INLINE STYLES — merged here so index.html needs no <style> block
+   These rules intentionally come after the original stylesheet rules
+   to preserve the existing cascade and overrides.
+   ============================================================ */
+.major-assessment-table .major-assessment-toggle {
+    text-align: left;
+    transition: background .15s ease;
+}
+.major-assessment-table .major-assessment-toggle:hover {
+    background: rgba(255,255,255,0.08);
+}
+.major-assessment-table .major-assessment-toggle .major-expand-icon {
+    display: inline-block;
+    width: 1.1em;
+    transform: rotate(0deg) !important;
+    transform-origin: 50% 50%;
+    transition: transform .15s ease;
+}
+.major-assessment-table .major-assessment-toggle[aria-expanded="true"] .major-expand-icon {
+    transform: rotate(90deg) !important;
+}
+
+/* Keep the Assignment column compact while allowing the table to scroll. */
+#assignment-dashboard .assignment-table {
+    width: 100%;
+    max-width: 100%;
+}
+#assignment-dashboard .table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+}
+#assignment-dashboard .assignment-table th,
+#assignment-dashboard .assignment-table td {
+    min-width: 0;
+}
+#assignment-dashboard .assignment-table th:first-child,
+#assignment-dashboard .assignment-table td:first-child {
+    width: clamp(110px, 16vw, 165px);
+    min-width: 0;
+    max-width: 165px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
+    /* Freeze the first column during horizontal scrolling. */
+    position: sticky;
+    left: 0;
+    z-index: 2;
+}
+#assignment-dashboard .assignment-table th:first-child {
+    z-index: 4;
+}
+#assignment-dashboard .assignment-table td:first-child {
+    z-index: 3;
+}
+
+#assignment-dashboard .assignment-table th:first-child {
+    padding-left: .45rem;
+    padding-right: .45rem;
+}
+
+/*
+ * All three teacher student-search bars use the +Minor bar as the
+ * visual model.  The clear button is part of that shared treatment.
+ * The small upward translation moves the bars closer to the grade tabs.
+ */
+.teacher-search-container,
+.score-entry-search-container {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    transform: translateY(-6px);
+}
+#teacher-student-search,
+#score-search-bar,
+#major-student-search-bar {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+#teacher-clear-button,
+#score-search-clear,
+#major-student-search-clear {
+    box-sizing: border-box !important;
+}
+#teacher-clear-button.score-search-clear,
+#score-search-clear,
+#major-student-search-clear {
+    position: absolute;
+}
+
+/* Do not show the browser's focus ring on teacher grade tabs. */
+#teacher-tabs .grades-tab:focus,
+#teacher-tabs .grades-tab:focus-visible,
+#teacher-tabs .grades-tab:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* The prediction sits on top of the Assessment Name input's text box. */
+#major-assessment-name {
+    position: relative;
+    z-index: 2;
+    background: transparent;
+}
+.major-assessment-ghost {
+    position: absolute;
+    pointer-events: none;
+    white-space: pre;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+/*
+ * Student roster buttons: keep the comfortable desktop sizing, but
+ * allow them to shrink more aggressively on narrow viewports.
+ */
+.teacher-roster {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+.teacher-roster-student {
+    min-width: 0;
+    max-width: 100%;
+    flex: 0 1 auto;
+    padding-left: .7rem;
+    padding-right: .7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(.82rem, 1.65vw, 1rem);
+}
+
+@media (max-width: 700px) {
+    #assignment-dashboard .assignment-table th:first-child,
+    #assignment-dashboard .assignment-table td:first-child {
+        width: 125px;
+        max-width: 125px;
+        padding-left: .45rem;
+        padding-right: .45rem;
+    }
+
+    .teacher-roster-student {
+        padding-left: .35rem;
+        padding-right: .35rem;
+        font-size: clamp(.58rem, 2vw, .82rem);
+    }
+}
+
+@media (max-width: 500px) {
+    #assignment-dashboard .assignment-table th:first-child,
+    #assignment-dashboard .assignment-table td:first-child {
+        width: 110px;
+        max-width: 110px;
+    }
+
+    .teacher-roster-student {
+        padding-left: .25rem;
+        padding-right: .25rem;
+        font-size: clamp(.52rem, 2.2vw, .72rem);
+    }
+}
+
+.major-detail-row > td {
+    text-align: left;
+}
+.major-detail-row > td:nth-child(3) {
+    text-align: center;
+    vertical-align: top;
+}
+.major-detail-row .major-detail-list {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    column-gap: 18px;
+    row-gap: 4px;
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto;
+    text-align: left;
+}
+.major-detail-row .major-detail-item-name {
+    text-align: left;
+}
+.major-detail-row .major-detail-item-score {
+    text-align: right;
+    white-space: nowrap;
+}
+.assignment-table .exercise-row {
+    --exercise-bg: rgba(255,255,255,0.08);
+    --exercise-bg-hover: rgba(255,255,255,0.16);
+}
+
+/*
+ * Final responsive teacher-interface adjustments.
+ * These intentionally come after the base rules so they win over
+ * the older roster/search definitions above.
+ */
+
+/* Slightly wider student-name buttons in the normal desktop view. */
+.teacher-roster-student {
+    min-width: 0;
+    max-width: 180px;
+    flex: 0 1 160px;
+    padding-left: .9rem;
+    padding-right: .9rem;
+}
+
+/* Keep the narrow-viewport behavior that was working well. */
+@media (max-width: 700px) {
+    .teacher-roster-student {
+        max-width: 150px;
+        flex-basis: 125px;
+        padding-left: .35rem;
+        padding-right: .35rem;
+        font-size: clamp(.58rem, 2vw, .82rem);
+    }
+}
+
+@media (max-width: 500px) {
+    .teacher-roster-student {
+        max-width: 125px;
+        flex-basis: 105px;
+        padding-left: .25rem;
+        padding-right: .25rem;
+        font-size: clamp(.52rem, 2.2vw, .72rem);
+    }
+}
+
+/*
+ * Students is now the search-bar model.
+ * Its original 90% / 420px sizing is restored, with the
+ * previously requested upward shift. The sync function copies
+ * this geometry to + Minor and + Major.
+ */
+#teacher-weekly-tab .teacher-search-container,
+#teacher-manual-tab .score-entry-search-container,
+#teacher-major-tab .score-entry-search-container {
+    position: relative !important;
+    width: 90% !important;
+    max-width: 420px !important;
+    box-sizing: border-box !important;
+    margin: 0 auto 14px !important;
+    transform: translateY(-6px) !important;
+}
+
+/*
+ * The frozen Assignment column is fully opaque and uses the requested
+ * category-specific colors.
+ */
+#assignment-dashboard .assignment-table th:first-child,
+#assignment-dashboard .assignment-table td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+}
+
+#assignment-dashboard .assignment-table th:first-child {
+    z-index: 5 !important;
+    background: #2c3a67 !important;
+}
+
+#assignment-dashboard .assignment-table td:first-child {
+    z-index: 4 !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row td:first-child {
+    background: #263b68 !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.vocab-row th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.vocab-row td:first-child {
+    background: #233e6b !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.mcqs-row th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.mcqs-row td:first-child {
+    background: #404559 !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.ear-training-row th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.ear-training-row td:first-child {
+    background: #263b68 !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.ear-training-row:hover th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.ear-training-row:hover td:first-child {
+    background: #2a4766 !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.vocab-row:hover th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.vocab-row:hover td:first-child {
+    background: #274271 !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.mcqs-row:hover th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.mcqs-row:hover td:first-child {
+    background: #504f55 !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.sight-singing-row th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.sight-singing-row td:first-child {
+    background: #303263 !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.sight-singing-row:hover th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.sight-singing-row:hover td:first-child {
+    background: #4d3d6b !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.major-assessment-row th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.major-assessment-row td:first-child {
+    background: #808dad !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.major-assessment-row:hover th:first-child,
+#assignment-dashboard .assignment-table tr.exercise-row.major-assessment-row:hover td:first-child {
+    background: #8f99b4 !important;
+}
+
+/* Make every assignment-table cell fully opaque, using the same
+ * category colors as the frozen first column. Hover colors match
+ * the frozen-column hover timing and appearance. */
+#assignment-dashboard .assignment-table tr.exercise-row th,
+#assignment-dashboard .assignment-table tr.exercise-row td {
+    background: #263b68 !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row.vocab-row th,
+#assignment-dashboard .assignment-table tr.exercise-row.vocab-row td {
+    background: #233e6b !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row.ear-training-row th,
+#assignment-dashboard .assignment-table tr.exercise-row.ear-training-row td {
+    background: #263b68 !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row.mcqs-row th,
+#assignment-dashboard .assignment-table tr.exercise-row.mcqs-row td {
+    background: #404559 !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row.sight-singing-row th,
+#assignment-dashboard .assignment-table tr.exercise-row.sight-singing-row td {
+    background: #303263 !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row.major-assessment-row th,
+#assignment-dashboard .assignment-table tr.exercise-row.major-assessment-row td {
+    background: #9aa6c2 !important;
+    border-top: 1px solid rgba(255,255,255,0.45) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.45) !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row:hover th,
+#assignment-dashboard .assignment-table tr.exercise-row:hover td {
+    background: #263b68 !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row.vocab-row:hover th,
+#assignment-dashboard .assignment-table tr.exercise-row.vocab-row:hover td {
+    background: #274271 !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row.ear-training-row:hover th,
+#assignment-dashboard .assignment-table tr.exercise-row.ear-training-row:hover td {
+    background: #2a4766 !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row.mcqs-row:hover th,
+#assignment-dashboard .assignment-table tr.exercise-row.mcqs-row:hover td {
+    background: #504f55 !important;
+}
+#assignment-dashboard .assignment-table tr.exercise-row.sight-singing-row:hover th,
+#assignment-dashboard .assignment-table tr.exercise-row.sight-singing-row:hover td {
+    background: #4d3d6b !important;
+}
+
+#assignment-dashboard .assignment-table tr.exercise-row.major-assessment-row:hover th,
+#assignment-dashboard .assignment-table tr.exercise-row.major-assessment-row:hover td {
+    background: #b0bad2 !important;
+    border-top-color: rgba(255,255,255,0.65) !important;
+    border-bottom-color: rgba(255,255,255,0.65) !important;
+}
+
+/* Keep every teacher search clear button visible and vertically centered. */
+#teacher-weekly-tab .teacher-clear-button,
+#teacher-manual-tab .score-search-clear,
+#teacher-major-tab .score-search-clear {
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    right: 10px !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+}
+
+#teacher-weekly-tab .teacher-search-container,
+#teacher-manual-tab .score-entry-search-container,
+#teacher-major-tab .score-entry-search-container {
+    z-index: 1000 !important;
+}
+
+#teacher-weekly-tab .teacher-predictions,
+#teacher-manual-tab .score-predictions,
+#teacher-major-tab .score-predictions {
+    z-index: 1001 !important;
+}
+
+/* Hide the visible scrollbar on assignment tables while preserving horizontal scrolling. */
+#assignment-dashboard .table-wrapper {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+#assignment-dashboard .table-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+/* Use the Students-tab placeholder appearance everywhere. */
+#teacher-weekly-tab .teacher-search-container input::placeholder,
+#teacher-manual-tab .score-entry-search-container input::placeholder,
+#teacher-major-tab .score-entry-search-container input::placeholder {
+    color: rgba(255,255,255,0.62) !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.62) !important;
+}
+
+/* Keep the clear controls centered in all three shared search bars. */
+#teacher-weekly-tab #teacher-clear-button,
+#teacher-manual-tab #score-search-clear,
+#teacher-major-tab #major-student-search-clear {
+    display: block !important;
+    top: 50% !important;
+    right: 10px !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+}
+
+/* All student-name prediction menus must sit above neighboring content. */
+#teacher-weekly-tab #teacher-predictions,
+#teacher-manual-tab #score-predictions,
+#teacher-major-tab #major-student-predictions {
+    position: absolute !important;
+    z-index: 1002 !important;
+}
+
+/* The Major Assessment ghost moves 2px right from the previous alignment. */
+#teacher-major-tab .major-assessment-ghost {
+    transform: translateX(2px);
+}
+
+/* Keep the brighter exercise accent attached to the frozen
+ * first column, so it stays fixed while the table scrolls. */
+#assignment-dashboard .assignment-table th:first-child,
+#assignment-dashboard .assignment-table td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    isolation: isolate;
+}
+
+/* Keep the brighter exercise accent attached to the frozen
+ * first column, flush with the table's left edge. */
+#assignment-dashboard .assignment-table tr.exercise-row
+    th:first-child::before,
+#assignment-dashboard .assignment-table tr.exercise-row
+    td:first-child::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--exercise-color) !important;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Students use the same hover treatment as the top tabs: no scaling
+ * and no change in font weight when selected. */
+.teacher-roster-student {
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+.teacher-roster-student:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: none !important;
+}
+.teacher-roster-student.active {
+    font-weight: inherit !important;
+}
+
+/* Show the same human-friendly date/time format for records that are
+ * present only in the browser cache. */
+
+
+/* Major assessments on Assignments are prominent, single-line, and expandable. */
+#assignment-dashboard .assignment-table th:first-child,
+#assignment-dashboard .assignment-table td:first-child {
+    min-width: 250px;
+    width: 250px;
+    white-space: nowrap;
+}
+#assignment-dashboard .major-assessment-row {
+    cursor: default;
+    outline: 1px solid rgba(255,255,255,.95);
+    outline-offset: -1px;
+}
+
+#assignment-dashboard .major-assessment-row th:first-child {
+    cursor: pointer;
+}
+#assignment-dashboard .major-assessment-row th,
+#assignment-dashboard .major-assessment-row td {
+    background: #aeb7c8 !important;
+    border-top: 1px solid rgba(255,255,255,.9) !important;
+    border-bottom: 1px solid rgba(255,255,255,.9) !important;
+}
+#assignment-dashboard .major-assessment-row:hover th,
+#assignment-dashboard .major-assessment-row:hover td {
+    background: #c6ccd8 !important;
+}
+#assignment-dashboard .major-assessment-detail-row { display:none; }
+#assignment-dashboard .major-assessment-detail-row.visible { display:table-row; }
+#assignment-dashboard .major-assessment-detail-row > td { padding:.75rem; background:rgba(255,255,255,.08) !important; }
+.major-cohort-detail { overflow-x:auto; }
+.major-cohort-copy-row { display:flex; justify-content:flex-end; margin:0 0 8px; }
+.major-cohort-detail table { width:100%; min-width:520px; border-collapse:collapse; }
+.major-cohort-detail th, .major-cohort-detail td { padding:7px 9px; border:1px solid rgba(255,255,255,.18); text-align:center; white-space:nowrap; }
+.major-cohort-detail th:first-child, .major-cohort-detail td:first-child { text-align:left; position:sticky; left:0; background:#2c3a67; }
+
+/* Cohort Weeks uses the same transposed/expandable grade-table treatment as Students. */
+.cohort-weekly-navigation { display:flex; align-items:center; justify-content:center; gap:12px; margin:0 0 14px; }
+.cohort-weekly-label { min-width:190px; text-align:center; color:#fff; font-size:1.45rem; line-height:1.1; }
+.cohort-weekly-label strong { display:block; font-weight:800; }
+.cohort-weekly-label .week-sub { display:block; margin-top:4px; font-size:.72rem; font-weight:500; opacity:.78; }
+.cohort-weekly-toolbar { display:flex; align-items:center; justify-content:flex-end; margin:0 0 8px; }
+.cohort-weekly-table { width:max-content; min-width:100%; }
+.cohort-weekly-table th, .cohort-weekly-table td { text-align:center; min-width:90px; }
+.cohort-weekly-table th { white-space:nowrap; }
+.cohort-weekly-table .row-header { text-align:left; }
+.cohort-weekly-table .avg-cell { font-weight:800; }
+.cohort-weekly-table .exercise-row { cursor:default; }
+.cohort-weekly-table .exercise-row .row-header.expandable { cursor:pointer; }
+
+
+/* ============================================================
+   INDEX4 ASSIGNMENTS FIXES
+   ============================================================ */
+
+/* All assignment-day tables share one JS-measured first-column width. */
+#assignment-dashboard .assignment-table {
+    table-layout: fixed;
+}
+#assignment-dashboard .assignment-table th:first-child,
+#assignment-dashboard .assignment-table td:first-child {
+    width: var(--assignment-first-column-width, 250px) !important;
+    min-width: var(--assignment-first-column-width, 250px) !important;
+    max-width: var(--assignment-first-column-width, 250px) !important;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: clip;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+}
+
+/* Assignments-tab Major Assessment rows. */
+#assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row th,
+#assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row td {
+    background: #9aa6c25a !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.25) !important;
+    outline: none !important;
+}
+#assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row:hover th,
+#assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row:hover td {
+    background: #ffffff57 !important;
+}
+#assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row {
+    outline: 1px solid rgba(255,255,255,.95);
+    outline-offset: -1px;
+}
+
+/* The Assignments-tab arrow is controlled by aria-expanded. */
+#assignment-dashboard .major-assessment-assignment-toggle .major-expand-icon {
+    display: inline-block;
+    width: 1.1em;
+    transform: rotate(0deg);
+    transform-origin: 50% 50%;
+    transition: transform .15s ease;
+}
+#assignment-dashboard .major-assessment-assignment-toggle[aria-expanded="true"] .major-expand-icon {
+    transform: rotate(90deg);
+}
+
+/* The mobile layouts keep the same shared column width instead of
+   reverting each day's first column to a different fixed width. */
+@media (max-width: 700px) {
+    #assignment-dashboard .assignment-table th:first-child,
+    #assignment-dashboard .assignment-table td:first-child {
+        width: var(--assignment-first-column-width, 125px) !important;
+        min-width: var(--assignment-first-column-width, 125px) !important;
+        max-width: var(--assignment-first-column-width, 125px) !important;
+    }
+}
+@media (max-width: 500px) {
+    #assignment-dashboard .assignment-table th:first-child,
+    #assignment-dashboard .assignment-table td:first-child {
+        width: var(--assignment-first-column-width, 110px) !important;
+        min-width: var(--assignment-first-column-width, 110px) !important;
+        max-width: var(--assignment-first-column-width, 110px) !important;
+    }
+}
