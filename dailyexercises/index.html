@@ -41,7 +41,7 @@
   box-sizing: border-box;
   background: rgb(45, 70, 119);
   opacity: 1;
-  pointer-events: auto;
+  pointer-events: none;
   transition: opacity 1s ease;
 }
 
@@ -949,6 +949,12 @@ const DAILY_EXERCISE_STYLES = {
             text-align: center;
         }
 
+        #sightCountdown.warning {
+            color: #ff3333;
+            font-weight: bold;
+            font-size: 1.6rem;
+        }
+
         .image-container {
             position: relative;
             width: 90%;
@@ -1283,17 +1289,13 @@ function dailyFormatCountdown(milliseconds) {
 }
 
 function dailyEnsureMenuAboveAccessBlocker() {
-  const sharedMenu = document.getElementById('shared-menu');
-  if (sharedMenu) {
-    sharedMenu.style.position = sharedMenu.style.position || 'relative';
-    sharedMenu.style.zIndex = '10000';
-  }
+  const hamburger = document.querySelector('#shared-menu .hamburger-menu');
 
-  document.querySelectorAll('[id*="menu"], [class*="menu"], [id*="hamburger"], [class*="hamburger"]').forEach(el => {
-    if (el !== document.getElementById('main-content')) {
-      el.style.zIndex = '10000';
-    }
-  });
+  if (hamburger) {
+    // Keep the normal absolute positioning from menu.js.
+    // Only raise the menu above the access overlay.
+    hamburger.style.zIndex = '10001';
+  }
 }
 
 function dailyPositionAccessOverlayTitles() {
@@ -1530,7 +1532,10 @@ function dailyShowExercise(type, fromHistory = false) {
     if (actions) actions.classList.remove('hidden');
 
     const actionButton = document.querySelector('.quiz-actions .action-button');
-    if (actionButton) actionButton.textContent = 'Next exercise';
+    if (actionButton) {
+      const isLastExercise = state.index === state.order.length - 1;
+      actionButton.textContent = isLastExercise ? 'Submit' : 'Next exercise';
+    }
   } else if (type === 'earTraining') {
     dailyEarStudent = state.student;
     dailyEarInitQuiz();
@@ -1539,7 +1544,8 @@ function dailyShowExercise(type, fromHistory = false) {
 
     const button = document.getElementById('sightNextButton');
     if (button) {
-      button.textContent = 'Next exercise';
+      const isLastExercise = state.index === state.order.length - 1;
+      button.textContent = isLastExercise ? 'Submit' : 'Next exercise';
       button.onclick = dailyAdvanceExercise;
     }
   }
@@ -3856,23 +3862,29 @@ function dailyVocabPrepareResultData() {
 
         function dailyEarPlayCurrentAudio() {
             const playBtn = document.querySelector('.play-button');
-            
-            if (!currentAudio) {
-                const sectionKey = dailyEarSections[currentSectionIndex];
-                const url = dailyEarQuestionBank[dailyEarStudent][sectionKey].urls[currentQuestionIndex];
-                currentAudio = new Audio(url);
+
+            if (playsLeft <= 0) return;
+
+            const sectionKey = dailyEarSections[currentSectionIndex];
+            const url = dailyEarQuestionBank[dailyEarStudent][sectionKey].urls[currentQuestionIndex];
+
+            // Create a fresh Audio object for every playback.
+            // This avoids the second-playback silence issue.
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
             }
 
-            if (playsLeft > 0) {
-                currentAudio.currentTime = 0;
-                currentAudio.play().catch(e => console.error(e));
-                
-                playsLeft--;
-                document.getElementById('play-count').textContent = `Plays remaining: ${playsLeft}`;
+            currentAudio = new Audio(url);
 
-                if (playsLeft === 0 && playBtn) {
-                    playBtn.disabled = true;
-                }
+            currentAudio.play().catch(e => console.error('Audio playback error:', e));
+
+            playsLeft--;
+            document.getElementById('play-count').textContent =
+                `Plays remaining: ${playsLeft}`;
+
+            if (playsLeft === 0 && playBtn) {
+                playBtn.disabled = true;
             }
         }
 
@@ -4082,8 +4094,15 @@ function dailySightUpdateCountdown() {
 
   if (remaining > 0) {
     el.textContent = `${minutes}:${seconds.toString().padStart(2,'0')} remaining`;
+
+    if (remaining < 60000) {
+        el.classList.add('warning');
+    } else {
+        el.classList.remove('warning');
+    }
   } else {
     el.textContent = "Time's up!";
+    el.classList.remove('warning');
 
     clearInterval(dailySightCountdownTimer);
     dailySightCountdownTimer = null;
