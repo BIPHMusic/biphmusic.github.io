@@ -2161,13 +2161,9 @@ body.file-drag-active::after {
     white-space: nowrap;
 }
 #assignment-dashboard .major-assessment-row {
-    cursor: default;
+    cursor: pointer;
     outline: 1px solid rgba(255,255,255,.95);
     outline-offset: -1px;
-}
-
-#assignment-dashboard .major-assessment-row th:first-child {
-    cursor: pointer;
 }
 #assignment-dashboard .major-assessment-row th,
 #assignment-dashboard .major-assessment-row td {
@@ -2226,16 +2222,17 @@ body.file-drag-active::after {
 /* Assignments-tab Major Assessment rows. */
 #assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row th,
 #assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row td {
-    background: #9aa6c25a !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
-    border-bottom: 1px solid rgba(255,255,255,0.25) !important;
+    background: #9aa6c2 !important;
+    border-top: 1px solid rgba(255,255,255,.95) !important;
+    border-bottom: 1px solid rgba(255,255,255,.95) !important;
     outline: none !important;
 }
 #assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row:hover th,
 #assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row:hover td {
-    background: #ffffff57 !important;
+    background: #c6ccd8 !important;
 }
 #assignment-dashboard .assignment-table tr.major-assessment-assignment-toggle.major-assessment-row {
+    cursor: pointer;
     outline: 1px solid rgba(255,255,255,.95);
     outline-offset: -1px;
 }
@@ -2269,4 +2266,127 @@ body.file-drag-active::after {
         min-width: var(--assignment-first-column-width, 110px) !important;
         max-width: var(--assignment-first-column-width, 110px) !important;
     }
+}
+
+
+/* ============================================================
+   SHARED DROPDOWN ARROW ANIMATION + WEEKLY CHART
+   ============================================================ */
+
+/* Use one rotating chevron treatment everywhere the transposed grade
+   tables expose expandable rows. */
+table.transposed th.row-header.expandable::after {
+    display: inline-block;
+    content: "▸";
+    width: 1em;
+    margin-left: .15em;
+    transform: rotate(0deg);
+    transform-origin: 50% 50%;
+    transition: transform .15s ease;
+}
+table.transposed th.row-header.expanded::after {
+    content: "▸";
+    transform: rotate(90deg);
+}
+
+/* Assignments uses the same animated chevron. */
+#assignment-dashboard .major-assessment-assignment-toggle .major-expand-icon {
+    display: inline-block;
+    width: 1.1em;
+    transform: rotate(0deg);
+    transform-origin: 50% 50%;
+    transition: transform .15s ease;
+}
+#assignment-dashboard .major-assessment-assignment-toggle[aria-expanded="true"] .major-expand-icon {
+    transform: rotate(90deg);
+}
+#assignment-dashboard .major-assessment-assignment-toggle {
+    cursor: default;
+}
+#assignment-dashboard .major-assessment-assignment-toggle th:first-child {
+    cursor: pointer;
+}
+
+/* Major-assessment copy button lives inside the detail panel, above the
+   detail table, aligned to that table rather than the page edge. */
+#assignment-dashboard .major-assessment-detail-row > td {
+    padding: .65rem .75rem .8rem;
+}
+#assignment-dashboard .major-cohort-detail {
+    width: min(100%, 100%);
+}
+#assignment-dashboard .major-cohort-copy-row {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 8px;
+    padding-right: 0;
+}
+#assignment-dashboard .major-cohort-copy {
+    position: static;
+    transform: none;
+}
+
+/* Weeks copy button sits directly above the table's rightmost column area. */
+#teacher-cohort-weekly-results .cohort-weekly-toolbar {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 0;
+}
+#teacher-cohort-weekly-results .cohort-weekly-copy {
+    position: static;
+    transform: none;
+}
+
+/* Experimental cohort-week bar graph. */
+#teacher-cohort-weekly-results .cohort-weekly-chart-container {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    margin: 18px 0 0;
+    background: #fff;
+    border-radius: 10px;
+
+    /* More space above and on both sides of the graph. */
+    padding: 24px 40px 20px;
+
+    box-sizing: border-box;
+}
+#teacher-cohort-weekly-results .cohort-weekly-chart-container canvas {
+    display: block;
+}
+@media (max-width: 700px) {
+    #teacher-cohort-weekly-results .cohort-weekly-chart-container {
+        height: 360px;
+        padding: 20px 22px 16px;
+    }
+}
+
+
+/* Keep the Weeks copy button attached to the table's actual right edge,
+   including when the cohort table is horizontally scrollable. */
+#teacher-cohort-weekly-results .cohort-weekly-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+#teacher-cohort-weekly-results .cohort-weekly-table-scroll::-webkit-scrollbar {
+    display: none;
+}
+#teacher-cohort-weekly-results .cohort-weekly-table-scroll > .cohort-weekly-toolbar {
+    width: max-content;
+    min-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 8px;
+}
+#teacher-cohort-weekly-results .cohort-weekly-table-scroll > .table-wrapper {
+    width: max-content;
+    min-width: 100%;
+    overflow: visible;
 }

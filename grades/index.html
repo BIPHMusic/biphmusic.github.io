@@ -3649,10 +3649,9 @@ function findRecordForAssignment(
         function attachAssignmentMajorControls(root) {
             root.querySelectorAll(".major-assessment-assignment-toggle").forEach(row => {
                 const nameCell = row.querySelector("th:first-child");
-
                 if (!nameCell) return;
-
                 nameCell.addEventListener("click", event => {
+                    event.stopPropagation();
                     const detailId = row.dataset.detailId;
                     const open = row.classList.contains("expanded");
                     root.querySelectorAll(".major-assessment-detail-row.visible").forEach(item => item.classList.remove("visible"));
@@ -3669,7 +3668,7 @@ function findRecordForAssignment(
                     });
                 });
             });
-            root.querySelectorAll(".major-assignment-copy").forEach(button => {
+            root.querySelectorAll(".major-assignment-copy, .major-cohort-copy").forEach(button => {
                 button.addEventListener("click", async event => {
                     event.stopPropagation();
                     const assessmentName = decodeURIComponent(button.dataset.assessment || "");
@@ -3677,17 +3676,6 @@ function findRecordForAssignment(
                     if (await copyText(tsv)) {
                         button.textContent = "Copied!";
                         setTimeout(() => button.textContent = "Copy", 1600);
-                    }
-                });
-            });
-            root.querySelectorAll(".major-cohort-copy").forEach(button => {
-                button.addEventListener("click", async event => {
-                    event.stopPropagation();
-                    const assessmentName = decodeURIComponent(button.dataset.assessment || "");
-                    const tsv = buildMajorAssessmentCohortTSV(assessmentName, button.dataset.date || null);
-                    if (await copyText(tsv)) {
-                        button.textContent = "Copied!";
-                        setTimeout(() => button.textContent = "Copy All Students", 1600);
                     }
                 });
             });
@@ -3710,17 +3698,7 @@ function findRecordForAssignment(
                 exercises.forEach(exercise => {
                     const isMajor = actualRecords.some(record => record.date === date && normalizeExercise(record.exercise) === "Major Assessment" && getMajorAssessmentName(record) === exercise);
                     const normalizedExercise = normalizeExercise(exercise);
-                    const exerciseClass = isMajor
-                        ? "major-assessment-row"
-                        : normalizedExercise === "Vocab"
-                            ? "vocab-row"
-                            : normalizedExercise === "MCQs"
-                                ? "mcqs-row"
-                                : normalizedExercise === "Sight Singing"
-                                    ? "sight-singing-row"
-                                    : normalizedExercise === "Ear Training"
-                                        ? "ear-training-row"
-                                        : "";
+                    const exerciseClass = isMajor ? "major-assessment-row" : normalizedExercise === "Vocab" ? "vocab-row" : normalizedExercise === "MCQs" ? "mcqs-row" : normalizedExercise === "Sight Singing" ? "sight-singing-row" : normalizedExercise === "Ear Training" ? "ear-training-row" : "";
                     const detailId = `assignment-major-detail-${Math.random().toString(36).slice(2,10)}`;
                     html += `<tr class="exercise-row ${exerciseClass}${isMajor ? " major-assessment-assignment-toggle" : ""}" ${isMajor ? `data-detail-id="${detailId}" data-assessment="${escapeHTML(encodeURIComponent(exercise))}" aria-expanded="false" aria-controls="${detailId}"` : ""} style="--exercise-color:${isMajor ? "#ffffff" : (EXERCISES[exercise] || "#ffffff")};">`;
                     html += `<th>${isMajor ? `<span class="major-expand-icon">▸</span> ` : ""}${escapeHTML(exercise)}</th>`;
@@ -3759,8 +3737,8 @@ function findRecordForAssignment(
                 maxTextWidth = Math.max(maxTextWidth, ctx.measureText(text).width + arrowWidth);
             });
             const padding = parseFloat(style.paddingLeft || 0) + parseFloat(style.paddingRight || 0) + 4;
-            const width = Math.ceil(maxTextWidth + padding);
-            root.style.setProperty("--assignment-first-column-width", `${Math.max(140, width)}px`);
+            const width = Math.max(140, Math.ceil(maxTextWidth + padding));
+            root.style.setProperty("--assignment-first-column-width", `${width}px`);
         }
         function getCohortWeeklyWeeks() {
             return WEEKS.filter(week => !isFutureWeek(week));
@@ -3774,6 +3752,135 @@ function findRecordForAssignment(
                 lines.push(row.map(tsvField).join("\t"));
             });
             return lines.join("\n");
+        }
+        function createCohortWeeklyBarChart(students, grades, week) {
+            const canvas = document.getElementById("cohortWeeklyBarChart");
+            if (!canvas) return null;
+
+            const labels = students.map(student => student);
+
+            const datasets = EXERCISE_ORDER.map(metric => ({
+                label: metric,
+                data: grades.map(grade => {
+                    const value = grade[metric];
+                    return value == null ? 0 : Number(value);
+                }),
+                backgroundColor: EXERCISES[metric],
+                borderColor: EXERCISES[metric],
+                borderWidth: 0,
+                borderRadius: 0,
+
+                // Narrower bars with more space between student groups.
+                barPercentage: 1.0,
+                categoryPercentage: 0.55,
+                grouped: true
+            }));
+
+            /*
+            * Keep the previous week's values so that when renderTeacherCohortWeekly()
+            * recreates the chart, the new bars can animate from the old values.
+            */
+            const previousData =
+                window.cohortWeeklyBarChartData || null;
+
+            const existing = Chart.getChart(canvas);
+            if (existing) {
+                existing.destroy();
+            }
+
+            const ctx = canvas.getContext("2d");
+
+            const chart = new Chart(ctx, {
+                type: "bar",
+
+                data: {
+                    labels,
+                    datasets: previousData
+                        ? previousData.map((dataset, i) => ({
+                            ...datasets[i],
+                            data: dataset.data
+                        }))
+                        : datasets
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    animation: {
+                        duration: 650,
+                        easing: "easeInOutQuart"
+                    },
+
+                    scales: {
+                        y: {
+                            display: false,
+                            beginAtZero: true,
+                            max: 100
+                        },
+
+                        x: {
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 0,
+                                minRotation: 0,
+                                padding: 12
+                            }
+                        }
+                    },
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+
+                        title: {
+                            display: true,
+                            text: `Week ${week.num} Averages`,
+                            color: "#222",
+                            font: {
+                                size: 18,
+                                weight: "700"
+                            },
+                            padding: {
+                                top: 6,
+                                bottom: 18
+                            }
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                title: context =>
+                                    context[0]?.label || "",
+
+                                label: context =>
+                                    `${context.dataset.label}: ${context.raw}%`
+                            }
+                        }
+                    }
+                }
+            });
+
+            /*
+            * If this is a week change, update from the previous week's values
+            * to the new values so the bars visibly move up/down.
+            */
+            if (previousData) {
+                chart.data.datasets = datasets;
+                chart.update();
+            }
+
+            window.cohortWeeklyBarChartData = datasets.map(dataset => ({
+                data: [...dataset.data]
+            }));
+
+            window.cohortWeeklyBarChart = chart;
+
+            return chart;
         }
         function renderTeacherCohortWeekly() {
             const container = document.getElementById("teacher-cohort-weekly-results");
@@ -3792,8 +3899,7 @@ function findRecordForAssignment(
             const grades = students.map(student => computeWeekGrades(student, week));
             const label = `<strong>Week ${week.num}</strong><span class="week-sub">${escapeHTML(weekDateRange(week))}</span>`;
             let html = `<div class="cohort-weekly-navigation"><button type="button" class="score-student-stepper" id="cohort-week-prev" tabindex="-1" ${cohortWeeklyIndex <= 0 ? "disabled" : ""}>‹</button><div class="cohort-weekly-label">${label}</div><button type="button" class="score-student-stepper" id="cohort-week-next" tabindex="-1" ${cohortWeeklyIndex >= weeks.length - 1 ? "disabled" : ""}>›</button></div>`;
-            html += `<div class="cohort-weekly-toolbar"><button type="button" class="copy-btn cohort-weekly-copy" tabindex="-1">Copy</button></div>`;
-            html += `<div class="table-wrapper"><table class="transposed cohort-weekly-table"><thead><tr><th class="student-name">Metric</th>`;
+            html += `<div class="cohort-weekly-table-scroll"><div class="cohort-weekly-toolbar"><button type="button" class="copy-btn cohort-weekly-copy" tabindex="-1">Copy</button></div><div class="table-wrapper"><table class="transposed cohort-weekly-table"><thead><tr><th class="student-name">Week ${week.num}</th>`;
             students.forEach(student => html += `<th>${escapeHTML(student)}</th>`);
             html += `</tr></thead><tbody>`;
             ALL_METRICS.forEach(metric => {
@@ -3815,11 +3921,13 @@ function findRecordForAssignment(
                     html += `</tr>`;
                 }
             });
-            html += `</tbody></table></div>`;
+            html += `</tbody></table></div></div>`;
+            html += `<div class="cohort-weekly-chart-container"><canvas id="cohortWeeklyBarChart"></canvas></div>`;
             container.innerHTML = html;
+            createCohortWeeklyBarChart(students, grades, week);
             container.querySelector(".cohort-weekly-copy")?.addEventListener("click", async event => {
                 const button = event.currentTarget;
-                if (await copyText(buildCohortWeeklyTSV(students, grades))) {
+                if (await copyText(buildCohortWeeklyTSV(students, grades, week))) {
                     button.textContent = "Copied!";
                     button.classList.add("copied");
                     setTimeout(() => { button.textContent = "Copy"; button.classList.remove("copied"); }, 1600);
