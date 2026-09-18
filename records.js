@@ -1150,6 +1150,11 @@ const records = [
         percentage: 97.2,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"24/28"},
+        criteria2: {"name":"FRQ-A","score":"10/10"},
+        criteria3: {"name":"MCQ-B","score":"28/28"},
+        criteria4: {"name":"FRQ-B","score":"5/5"},
+        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1159,6 +1164,11 @@ const records = [
         percentage: 99.2,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"27/28"},
+        criteria2: {"name":"FRQ-A","score":"10/10"},
+        criteria3: {"name":"MCQ-B","score":"28/28"},
+        criteria4: {"name":"FRQ-B","score":"5/5"},
+        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1168,6 +1178,11 @@ const records = [
         percentage: 95.6,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"25/28"},
+        criteria2: {"name":"FRQ-A","score":"10/10"},
+        criteria3: {"name":"MCQ-B","score":"25/28"},
+        criteria4: {"name":"FRQ-B","score":"5/5"},
+        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1177,6 +1192,11 @@ const records = [
         percentage: 95.6,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"23/28"},
+        criteria2: {"name":"FRQ-A","score":"10/10"},
+        criteria3: {"name":"MCQ-B","score":"27/28"},
+        criteria4: {"name":"FRQ-B","score":"5/5"},
+        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1186,6 +1206,11 @@ const records = [
         percentage: 96.4,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"24/28"},
+        criteria2: {"name":"FRQ-A","score":"10/10"},
+        criteria3: {"name":"MCQ-B","score":"27/28"},
+        criteria4: {"name":"FRQ-B","score":"5/5"},
+        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1195,6 +1220,11 @@ const records = [
         percentage: 95.8,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"24/28"},
+        criteria2: {"name":"FRQ-A","score":"10/10"},
+        criteria3: {"name":"MCQ-B","score":"26/28"},
+        criteria4: {"name":"FRQ-B","score":"5/5"},
+        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -1204,6 +1234,11 @@ const records = [
         percentage: 90.2,
         exercise: "Major Assessment",
         assessment: "Unit 1 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"25/28"},
+        criteria2: {"name":"FRQ-A","score":"10/10"},
+        criteria3: {"name":"MCQ-B","score":"23/28"},
+        criteria4: {"name":"FRQ-B","score":"4/5"},
+        criteria5: {"name":"Vocab","score":"100"},
         termsToReview: []
     },
     {
@@ -2405,5 +2440,133 @@ const records = [
         percentage: 40,
         exercise: "MCQs",
         termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-18",
+        time: "10:51 am",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-18",
+        time: "10:50 am",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-18",
+        time: "上午10:47",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-18",
+        time: "上午10:54",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-18",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-18",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-18",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-18",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-18",
+        time: "上午10:51",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-18",
+        time: "上午10:50",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-18",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-18",
+        time: "10:50 AM",
+        percentage: 70,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Minor 6th","correct":"Minor 6th"}]
+    },
+    {
+        student: "William",
+        date: "2026-09-18",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-18",
+        time: "10:52 AM",
+        percentage: 60,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor 6th","correct":"Minor 6th"}]
+    },
+    {
+        student: "William",
+        date: "2026-09-18",
+        time: "10:56 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-18",
+        time: "10:59 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Major 2nd","correct":"Major 2nd"}]
     },
 ];
