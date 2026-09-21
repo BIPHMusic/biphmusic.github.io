@@ -111,6 +111,14 @@ const unit2 = [
     "Transpose",
     "Dictation",
     "Diatonic",
+    "Non-Diatonic",
+    "Melismatic",
+    "Syllabic",
+    "Cross Rhythm",
+    "Hemiola",
+    "Compound Interval",
+    "Ostinato",
+    "Canon",
 ];
 
 const unit3 = [
@@ -238,6 +246,14 @@ const cumulative = [
     "Transpose",
     "Dictation",
     "Diatonic",
+    "Non-Diatonic",
+    "Melismatic",
+    "Syllabic",
+    "Cross Rhythm",
+    "Hemiola",
+    "Compound Interval",
+    "Ostinato",
+    "Canon",
     ];
 
     const theglossary = [
@@ -314,7 +330,8 @@ const cumulative = [
         {"Term":"Major 6","Definition":"Nine half steps between the pitches, “NBC,” “Not At All”"}, 
         {"Term":"Minor 7","Definition":"Ten half steps between the pitches, “Winnie the Pooh”"}, 
         {"Term":"Major 7","Definition":"Eleven half steps between the pitches, “Pure Imagination”"}, 
-        {"Term":"Perfect Octave","Definition":"Twelve half steps between the pitches, space of 8 notes"},
+        {"Term":"Perfect Octave","Definition":"Twelve half steps between the pitches, space of 8 notes"}, 
+        {"Term":"Timbre","Definition":"The quality or tone color of a sound"}, 
         {"Term":"Function","Definition":"The specific role (job) that a chord plays "}, 
         {"Term":"Motive","Definition":"A musical idea, piece of melody that is important to the song as a whole"}, 
         {"Term":"Anacrusis","Definition":"A pickup note that starts before the beginning of a phrase"}, 
@@ -325,7 +342,7 @@ const cumulative = [
         {"Term":"Arpeggio","Definition":"Playing a chord one note at a time instead of all at once"}, 
         {"Term":"Accompaniment","Definition":"A musical part of lesser importance, mostly serving to give the harmony"}, 
         {"Term":"Orchestration","Definition":"The selection of instruments that play a particular part (instrumentation)"}, 
-        {"Term":"Phrase","Definition":"A short segment of music with a clearly defined beginning and end"},
+        {"Term":"Phrase","Definition":"A short segment of music with a clearly defined beginning and end"}, 
         {"Term":"Maestoso","Definition":"To be played majestically, by accenting every note (bouncy)"}, 
         {"Term":"Glissando","Definition":"To quickly slide from a low note to a high note, or vice versa"}, 
         {"Term":"Octatonic Scale","Definition":"A scale using 8 notes, diminished scales"}, 
@@ -349,5 +366,13 @@ const cumulative = [
         {"Term":"Bass","Definition":"The lower male voice"}, 
         {"Term":"Transpose","Definition":"To move all the notes of a song up or down"}, 
         {"Term":"Dictation","Definition":"To write down a given melody or harmony"}, 
-        {"Term":"Diatonic","Definition":"Chords or notes that fall within the scale"},
+        {"Term":"Diatonic","Definition":"Chords or notes that fall within the scale"}, 
+        {"Term":"Non-Diatonic","Definition":"Chords or notes that fall outside of the scale"}, 
+        {"Term":"Melismatic","Definition":"To sing one syllable with many notes"}, 
+        {"Term":"Syllabic","Definition":"To sing one note per syllable"}, 
+        {"Term":"Cross Rhythm","Definition":"An overlapping of different rhythms / divisions of the beat"}, 
+        {"Term":"Hemiola","Definition":"In a 3/4 section of music, a rhythmic grouping of 2. Provides rhythmic tension."}, 
+        {"Term":"Compound Interval","Definition":"An interval that is larger than an octave"}, 
+        {"Term":"Ostinato","Definition":"A repeated musical phrase"}, 
+        {"Term":"Canon","Definition":"A polyphonic texture created by playing/singing the same melody at different times"},
     ];
