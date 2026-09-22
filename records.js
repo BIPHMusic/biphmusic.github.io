@@ -2649,4 +2649,84 @@ const records = [
         exercise: "Ear Training",
         termsToReview: []
     },
+    {
+        student: "Jocelyn",
+        date: "2026-09-22",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-22",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-22",
+        time: "10:43 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-22",
+        time: "10:46 AM",
+        percentage: 90,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"}]
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-22",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-22",
+        time: "10:47 AM",
+        percentage: 50,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Perfect 8ve","correct":"Perfect 8ve"},{"item":"Tritone","correct":"Tritone"},{"item":"Minor 6th","correct":"Minor 6th"}]
+    },
+    {
+        student: "William",
+        date: "2026-09-22",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-22",
+        time: "10:50 AM",
+        percentage: 60,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 2nd","correct":"Major 2nd"},{"item":"Minor 6th","correct":"Minor 6th"}]
+    },
+    {
+        student: "Alex",
+        date: "2026-09-22",
+        time: "10:51 am",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-22",
+        time: "10:51 am",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
 ];
