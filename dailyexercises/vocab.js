@@ -426,5 +426,53 @@ const scrambledVocabularyTerms = [
   {
     "Term": "RmRxcnE=",
     "Definition": "RCBzcm9ic2tycWxmIHdoYXd4dWggZnVoZHdoZyBlYiBzb2RibHFqL3ZscWpscWogd2toIHZkcGggcGhvcmdiIGR3IGdsaWlodWhxdyB3bHBodg=="
+  },
+  {
+    "Term": "Vmh0eGhxZmg=",
+    "Definition": "RCB1aHNod2x3bHJxIHJpIGQgcHh2bGZkbyBza3VkdmggZHcgZCBrbGpraHUgcnUgb3J6aHUgc2x3Zmsgc3JscXc="
+  },
+  {
+    "Term": "V3JxZG8gVmh0eGhxZmg=",
+    "Definition": "RCB2aHR4aHFmaCB3a2R3IHZ3ZGJ2IGxxIHdraCB2ZHBoIG5oYiwgZCBnbGR3cnFsZiB2aHR4aHFmaA=="
+  },
+  {
+    "Term": "VWhkbyBWaHR4aHFmaA==",
+    "Definition": "RCB2aHR4aHFmaCB3a2R3IG5oaHN2IHdraCBoYWRmdyBscXdodXlkb2xmIHVob2R3bHJxdmtsc3YgbHF3ZGZ3LCB4dnhkb29iIHJ4d3ZsZ2ggcmkgd2toIG5oYg=="
+  },
+  {
+    "Term": "UGhvcmdsZiBMcXlodXZscnE=",
+    "Definition": "V3IgaW9scyBkIHBob3JnYiB5aHV3bGZkb29iLCB3ciBzb2RiIGx3IHhzdmxnaCBncnpx"
+  },
+  {
+    "Term": "UGhvcmdsZiBVaHd1cmp1ZGdo",
+    "Definition": "V3IgaW9scyBkIHBob3JnYiBrcnVsY3Jxd2Rvb2IsIHdyIHNvZGIgbHcgZWRmbnpkdWd2"
+  },
+  {
+    "Term": "SXVkanBocXdkd2xycQ==",
+    "Definition": "V2RubHFqIHZwZG9vIHNsaGZodiByaSBkIHBob3JnYiBkcWcgeHZscWogbHcgd3IgenVsd2ggcndraHV2"
+  },
+  {
+    "Term": "V2tocGg=",
+    "Definition": "V2toIHBkbHEgcGhvcmdsZiB2eGVtaGZ3IHJpIGQgc2xoZmg="
+  },
+  {
+    "Term": "THBsd2R3bHJx",
+    "Definition": "V2toIGRmdyByaSBwbHBsZm5scWogcGhvcmdsaHYgbHEgd2toIHZkcGggZnJwc3J2bHdscnE="
+  },
+  {
+    "Term": "VWtid2twbGYgR2xwbHF4d2xycQ==",
+    "Definition": "VmtydXdocWxxaiB3a2ggb2hxandrdiByaSBkb28gcXJ3aHYgbHEgZCBza3VkdmggKGdyeGVvbHFqIHdraCB2c2hoZyk="
+  },
+  {
+    "Term": "VWtid2twbGYgRHhqcGhxd2R3bHJx",
+    "Definition": "T2hxandraHFscWogd2toIG9ocWp3a3YgcmkgZG9vIHFyd2h2IGxxIGQgc2t1ZHZoICh2b3J6diB3a2ggdnNoaGcgYTIp"
+  },
+  {
+    "Term": "T2hsd3Byd2xp",
+    "Definition": "V2toIHN1ZGZ3bGZoIHJpIGR2dmxqcWxxaiB3a2hwaHYgZHFnIHBob3JnbGh2IHdyIHZzaGZsaWxmIGZrZHVkZndodXY="
+  },
+  {
+    "Term": "WmRvbmxxaiBFZHZ2",
+    "Definition": "RCBlZHZ2b2xxaCB3a2R3IGR2ZmhxZ3YgZHFnIGdodmZocWd2LCB2ZmRveG9kdW9i"
   }
 ];
