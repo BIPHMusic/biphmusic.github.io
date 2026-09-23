@@ -13,7 +13,7 @@
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
 
     <!-- Confetti library -->
-    <script src="https\://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <style>
         /* SHARED STYLES */
@@ -112,7 +112,7 @@
             transition: opacity 0.3s ease;
         }
 
-        .hidden-mode .term-card:hover .reveal-btn {
+        .hidden-mode .term-card .reveal-btn {
             display: block;
             opacity: 0.7;
         }
@@ -481,13 +481,12 @@
         function revealTerm(button) {
             const card = button.closest('.term-card');
             const termEl = card.querySelector('.term');
+
             termEl.style.filter = 'blur(0px)';
-            button.style.display = 'none';
 
             setTimeout(() => {
                 if (hiddenMode && card.isConnected) {
                     termEl.style.filter = 'blur(50px)';
-                    button.style.display = 'block';
                 }
             }, 2000);
         }
