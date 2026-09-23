@@ -555,7 +555,7 @@ const records = [
         student: "William",
         date: "2026-08-31",
         time: "9:45 PM",
-        percentage: 67,
+        percentage: 100, //from a 67
         exercise: "MCQs",
         termsToReview: []
     },
@@ -955,7 +955,7 @@ const records = [
         student: "William",
         date: "2026-09-03",
         time: "10:33 PM",
-        percentage: 40,
+        percentage: 60, //from a 40
         exercise: "MCQs",
         termsToReview: []
     },
@@ -971,7 +971,7 @@ const records = [
         student: "Jocelyn",
         date: "2026-09-03",
         time: "10:34 PM",
-        percentage: 60,
+        percentage: 100, //from a 60
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1003,7 +1003,7 @@ const records = [
         student: "Maggie",
         date: "2026-09-04",
         time: "10:34 PM",
-        percentage: 60,
+        percentage: 100, //from a 60
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1459,7 +1459,7 @@ const records = [
         student: "Jocelyn",
         date: "2026-09-08",
         time: "2:20 PM",
-        percentage: 80,
+        percentage: 100, //from an 80
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1491,7 +1491,7 @@ const records = [
         student: "Maggie",
         date: "2026-09-09",
         time: "2:21 PM",
-        percentage: 75,
+        percentage: 100, //from a 60
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1515,7 +1515,7 @@ const records = [
         student: "Jocelyn",
         date: "2026-09-09",
         time: "8:16 PM",
-        percentage: 50,
+        percentage: 60, //from a 50
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1531,15 +1531,7 @@ const records = [
         student: "William",
         date: "2026-09-09",
         time: "8:17 PM",
-        percentage: 75,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Maggie",
-        date: "2026-09-09",
-        time: "2:21 PM",
-        percentage: 60,
+        percentage: 100, //from a 75
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1987,7 +1979,7 @@ const records = [
         student: "Jocelyn",
         date: "2026-09-10",
         time: "2:11 PM",
-        percentage: 60,
+        percentage: 100, //from a 60
         exercise: "MCQs",
         termsToReview: []
     },
@@ -1995,7 +1987,7 @@ const records = [
         student: "Maggie",
         date: "2026-09-10",
         time: "2:11 PM",
-        percentage: 60,
+        percentage: 80, //from a 60
         exercise: "MCQs",
         termsToReview: []
     },
@@ -2011,7 +2003,7 @@ const records = [
         student: "Calvin",
         date: "2026-09-10",
         time: "2:11 PM",
-        percentage: 40,
+        percentage: 80, //from a 40
         exercise: "MCQs",
         termsToReview: []
     },
@@ -2019,7 +2011,7 @@ const records = [
         student: "William",
         date: "2026-09-10",
         time: "2:11 PM",
-        percentage: 40,
+        percentage: 80, //from a 40
         exercise: "MCQs",
         termsToReview: []
     },
@@ -2051,7 +2043,7 @@ const records = [
         student: "William",
         date: "2026-09-11",
         time: "9:11 PM",
-        percentage: 60,
+        percentage: 100, //from a 60
         exercise: "MCQs",
         termsToReview: []
     },
@@ -2877,7 +2869,7 @@ const records = [
         student: "Maggie",
         date: "2026-09-21",
         time: "8:33 PM",
-        percentage: 75,
+        percentage: 100, //from a 75
         exercise: "MCQs",
         termsToReview: []
     },
@@ -2893,7 +2885,7 @@ const records = [
         student: "Jocelyn",
         date: "2026-09-21",
         time: "8:34 PM",
-        percentage: 50,
+        percentage: 100, //from a 50
         exercise: "MCQs",
         termsToReview: []
     },
@@ -2909,7 +2901,7 @@ const records = [
         student: "Calvin",
         date: "2026-09-22",
         time: "8:52 PM",
-        percentage: 50,
+        percentage: 100, //from a 50
         exercise: "MCQs",
         termsToReview: []
     },
