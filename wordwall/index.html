@@ -4,18 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Wall</title>
-       
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="BIPH Band">
-    <link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
-    
+    <link rel="apple-touch-icon" href="https\://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
     <link rel="icon" href="../icons/BGicon.png">
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
 
     <!-- Confetti library -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="https\://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <style>
         /* SHARED STYLES */
@@ -37,7 +35,7 @@
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%278%27 viewBox=%270 0 12 8%27 fill=%27white%27><polygon points=%276,8 0,0 12,0%27/></svg>');
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns=%27http\://www.w3.org/2000/svg%27 width=%2712%27 height=%278%27 viewBox=%270 0 12 8%27 fill=%27white%27><polygon points=%276,8 0,0 12,0%27/></svg>');
             background-repeat: no-repeat;
             background-position: right 12px center;
             padding-right: 32px;
@@ -63,6 +61,7 @@
             border-radius: 15px;
             padding: 15px;
             cursor: pointer;
+            touch-action: manipulation;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
@@ -105,6 +104,7 @@
             background: none;
             border: none;
             cursor: pointer;
+            touch-action: manipulation;
             width: 38px;
             height: 38px;
             z-index: 15;
@@ -132,6 +132,7 @@
             font-size: 19px;
             color: rgba(255, 255, 255, 0.65);
             cursor: pointer;
+            touch-action: manipulation;
             z-index: 20;
         }
         .close-btn:hover { color: white; }
@@ -397,6 +398,22 @@
                 if (!hiddenMode) removeCard(card);
             });
 
+            card.addEventListener('pointerdown', (e) => {
+                const revealButton = e.target.closest('.reveal-btn');
+                const closeButton = e.target.closest('.close-btn');
+                if (revealButton) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    revealTerm(revealButton);
+                    return;
+                }
+                if (closeButton) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removeCard(card);
+                }
+            });
+
             return card;
         }
 
@@ -405,7 +422,6 @@
             const icon = document.getElementById('hiddenModeIcon');
             icon.src = hiddenMode ? "../icons/hidden-on.png" : "../icons/hidden-off.png";
             document.body.classList.toggle('hidden-mode', hiddenMode);
-            
             setTimeout(() => {
                 renderCurrentCards();
             }, 500);
@@ -465,7 +481,6 @@
         function revealTerm(button) {
             const card = button.closest('.term-card');
             const termEl = card.querySelector('.term');
-            
             termEl.style.filter = 'blur(0px)';
             button.style.display = 'none';
 
@@ -689,6 +704,11 @@
                 const celeb = document.getElementById('celebration');
                 if (celeb) celeb.classList.remove('show');
             }
+        });
+
+        // Disable the browser context menu.
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
         });
 
         // Initialize
