@@ -131,6 +131,11 @@ const unit2 = [
     "Rhythmic Augmentation",
     "Leitmotif",
     "Walking Bass",
+    "Agogic Accent",
+    "Doubling",
+    "Counterpoint",
+    "Basso Continuo",
+    "Rhythm Section",
 ];
 
 const unit3 = [
@@ -278,6 +283,11 @@ const cumulative = [
     "Rhythmic Augmentation",
     "Leitmotif",
     "Walking Bass",
+    "Agogic Accent",
+    "Doubling",
+    "Counterpoint",
+    "Basso Continuo",
+    "Rhythm Section",
     ];
 
     const theglossary = [
@@ -411,4 +421,9 @@ const cumulative = [
         {"Term":"Rhythmic Augmentation","Definition":"Lengthening the lengths of all notes in a phrase (slows the speed x2)"}, 
         {"Term":"Leitmotif","Definition":"The practice of assigning themes and melodies to specific characters"}, 
         {"Term":"Walking Bass","Definition":"A bassline that ascends and descends, scalularly"},
+        {"Term":"Agogic Accent","Definition":"To lengthen or slightly delay a note to add further emphasis to it"}, 
+        {"Term":"Doubling","Definition":"Playing the same notes as another instrument (can be transposed up/down by octave)"}, 
+        {"Term":"Counterpoint","Definition":"The art of writing multiple melodies"}, 
+        {"Term":"Basso Continuo","Definition":"The instrument(s) responsible for providing accompaniment in baroque music"}, 
+        {"Term":"Rhythm Section","Definition":"The instrument(s) responsible for providing accompaniment in jazz music"},
     ];
