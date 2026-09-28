@@ -3577,4 +3577,100 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-09-28",
+        time: "10:50 am",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-28",
+        time: "10:52 am",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-28",
+        time: "上午10:46",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-28",
+        time: "上午10:56",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-28",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-28",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-28",
+        time: "10:52 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-28",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-28",
+        time: "上午10:46",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-28",
+        time: "上午10:53",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-28",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-28",
+        time: "10:56 AM",
+        percentage: 50,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Minor 7th","correct":"Minor 7th"}]
+    },
 ];
