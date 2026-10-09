@@ -69,7 +69,7 @@ const scrambledVocabularyTerms = [
   },
   {
     "Term": "UWR3eHVkbw==",
-    "Definition": "VWh3eHVxdiBkIHFyd2ggd3IgbHcndiBxZHd4dWRvIHZ3ZHdoLCBmZHFmaG9scWogZHFiIGRmZmxnaHF3ZG92"
+    "Definition": "VWh3eHVxdiBkIHFyd2ggd3IgbHfigJl2IHFkd3h1ZG8gdndkd2gsIGZkcWZob2xxaiBkcWIgZGZmbGdocXdkb3Y="
   },
   {
     "Term": "SHFrZHVwcnFsZg==",
@@ -248,6 +248,50 @@ const scrambledVocabularyTerms = [
     "Definition": "UXIgZ2x2d2RxZmggZWh3emhocSB3a2ggc2x3Zmtodjsgd2toIHZkcGggcXJ3aA=="
   },
   {
+    "Term": "UGxxcnUgMg==",
+    "Definition": "UnFoIGtkb2kgdndocyBlaHd6aGhxIHdraCBzbHdma2h2LCDigJxNZHp24oCd"
+  },
+  {
+    "Term": "UGRtcnUgMg==",
+    "Definition": "V3pyIGtkb2kgdndoc3YgZWh3emhocSB3a2ggc2x3Zmtodiwg4oCcR3ItdWjigJ0="
+  },
+  {
+    "Term": "UGxxcnUgMw==",
+    "Definition": "V2t1aGgga2RvaSB2d2hzdiBlaHd6aGhxIHdraCBzbHdma2h2LCDigJxJeHFodWRvIFBkdWZr4oCd"
+  },
+  {
+    "Term": "UGRtcnUgMw==",
+    "Definition": "SXJ4dSBrZG9pIHZ3aHN2IGVod3poaHEgd2toIHNsd2ZraHYsIOKAnFBkdWxy4oCd"
+  },
+  {
+    "Term": "U2h1aWhmdyA0",
+    "Definition": "SWx5aCBrZG9pIHZ3aHN2IGVod3poaHEgd2toIHNsd2ZraHYsIOKAnEtodWggZnJwaHYgd2toIGV1bGdoLOKAnSDigJzotbfmnaXigJ0="
+  },
+  {
+    "Term": "V3Vsd3JxaA==",
+    "Definition": "VmxhIGtkb2kgdndoc3YgZWh3emhocSB3a2ggc2x3Zmtodiwg4oCcV2toIFZscHN2cnF24oCd"
+  },
+  {
+    "Term": "U2h1aWhmdyA1",
+    "Definition": "Vmh5aHEga2RvaSB2d2hzdiBlaHd6aGhxIHdraCBzbHdma2h2LCDigJxWd2R1IFpkdXbigJ0="
+  },
+  {
+    "Term": "UGxxcnUgNg==",
+    "Definition": "SGxqa3cga2RvaSB2d2hzdiBlaHd6aGhxIHdraCBzbHdma2h2LCDigJxVcnBkcWZoLOKAnSDigJxFZGcgVXJwZHFmaOKAnQ=="
+  },
+  {
+    "Term": "UGRtcnUgNg==",
+    "Definition": "UWxxaCBrZG9pIHZ3aHN2IGVod3poaHEgd2toIHNsd2ZraHYsIOKAnFFFRizigJ0g4oCcUXJ3IER3IERvb+KAnQ=="
+  },
+  {
+    "Term": "UGxxcnUgNw==",
+    "Definition": "V2hxIGtkb2kgdndoc3YgZWh3emhocSB3a2ggc2x3Zmtodiwg4oCcWmxxcWxoIHdraCBTcnJr4oCd"
+  },
+  {
+    "Term": "UGRtcnUgNw==",
+    "Definition": "SG9oeWhxIGtkb2kgdndoc3YgZWh3emhocSB3a2ggc2x3Zmtodiwg4oCcU3h1aCBMcGRqbHFkd2xyceKAnQ=="
+  },
+  {
     "Term": "U2h1aWhmdyBSZndkeWg=",
     "Definition": "V3pob3loIGtkb2kgdndoc3YgZWh3emhocSB3a2ggc2x3ZmtodiwgdnNkZmggcmkgOCBxcndodg=="
   },
@@ -257,7 +301,7 @@ const scrambledVocabularyTerms = [
   },
   {
     "Term": "SXhxZndscnE=",
-    "Definition": "V2toIHZzaGZsaWxmIHVyb2ggKG1yZSkgd2tkdyBkIGZrcnVnIHNvZGJ2"
+    "Definition": "V2toIHZzaGZsaWxmIHVyb2ggKG1yZSkgd2tkdyBkIGZrcnVnIHNvZGJ2IA=="
   },
   {
     "Term": "UHJ3bHlo",
@@ -494,5 +538,53 @@ const scrambledVocabularyTerms = [
   {
     "Term": "VWtid2twIFZoZndscnE=",
     "Definition": "V2toIGxxdnd1eHBocXcodikgdWh2c3Jxdmxlb2ggaXJ1IHN1cnlsZ2xxaiBkZmZycHNkcWxwaHF3IGxxIG1kY2MgcHh2bGY="
+  },
+  {
+    "Term": "RmtydWc=",
+    "Definition": "UHhvd2xzb2ggcXJ3aHYgdnJ4cWdoZyB2bHB4b3dkcWhyeHZvYiwgd3VsZGd2LCBod2Yu"
+  },
+  {
+    "Term": "V3VsZGc=",
+    "Definition": "ZCB3a3VoaCBxcndoIGZrcnVnOiAxLDMsNQ=="
+  },
+  {
+    "Term": "UGRtcnUgV3VsZGc=",
+    "Definition": "MSBQMyBTNSwgICAoMSAgICAzICAgIDUp"
+  },
+  {
+    "Term": "UGxxcnUgV3VsZGc=",
+    "Definition": "MSBwMyBTNSwgICAoMSDima0zICAgIDUp"
+  },
+  {
+    "Term": "R2xwbHFsdmtoZyBXdWxkZw==",
+    "Definition": "MSBwMyBnNSwgICAoMSDima0zIOKZrTUp"
+  },
+  {
+    "Term": "RHhqcGhxd2hnIFd1bGRn",
+    "Definition": "MSBQMyBENSwgICgxICAgIDMgICAjNSk="
+  },
+  {
+    "Term": "VXJydw==",
+    "Definition": "V2toIHdycWxmICgxKSByaSBkIGpseWhxIGZrcnVn"
+  },
+  {
+    "Term": "VXJydyBTcnZsd2xycQ==",
+    "Definition": "V2toIHVycncgcmkgd2toIGZrcnVnIGx2IHJxIHdraCBlcnd3cnA="
+  },
+  {
+    "Term": "THF5aHV2bHJx",
+    "Definition": "RCB5cmxmbHFqIHJpIGQgZmtydWcgemtodWggd2toIHVycncgbHYgcXJ3IHJxIGVyd3dycA=="
+  },
+  {
+    "Term": "SWx1dncgTHF5aHV2bHJx",
+    "Definition": "RCBma3J1ZyB6bHdrIHdraCAzdWcgcnEgd2toIGVyd3dycCwgZGVldS4gNg=="
+  },
+  {
+    "Term": "VmhmcnFnIExxeWh1dmxycQ==",
+    "Definition": "RCBma3J1ZyB6bHdrIHdraCA1d2sgcnEgd2toIGVyd3dycCwgZGVldS4gNjQ="
+  },
+  {
+    "Term": "SWxqeHVoZyBFZHZ2",
+    "Definition": "V2toIHN1ZGZ3bGZoIHJpIHJxb2IgenVsd2xxaiB3a2ggZWR2diBxcndoIGRxZyBscXlodXZscnEgdmJwZXJvdg=="
   }
 ];
