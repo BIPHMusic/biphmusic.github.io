@@ -4025,4 +4025,164 @@ const records = [
         exercise: "Ear Training",
         termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Minor Triad","correct":"Minor Triad"}]
     },
+    {
+        student: "Alex",
+        date: "2026-09-29",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-29",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-29",
+        time: "10:55 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-29",
+        time: "10:49 AM",
+        percentage: 70,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Major 7th","correct":"Major 7th"}]
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-30",
+        time: "10:52 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-30",
+        time: "10:49 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Tritone","correct":"Tritone"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-29",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-29",
+        time: "10:49 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Tritone","correct":"Tritone"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-30",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-30",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-29",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-29",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-30",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-30",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-29",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-29",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-30",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-30",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-30",
+        time: "10:52 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-30",
+        time: "10:49 AM",
+        percentage: 60,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Tritone","correct":"Tritone"},{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Minor 7th","correct":"Minor 7th"}]
+    },
 ];
