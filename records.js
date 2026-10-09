@@ -3787,7 +3787,7 @@ const records = [
     },
     {
         student: "Calvin",
-        date: "2026-08-08",
+        date: "2026-10-08",
         time: "2:40 PM",
         percentage: 40,
         exercise: "MCQs",
@@ -3795,7 +3795,7 @@ const records = [
     },
     {
         student: "Teresa",
-        date: "2026-08-08",
+        date: "2026-10-08",
         time: "2:40 PM",
         percentage: 60,
         exercise: "MCQs",
@@ -3803,7 +3803,7 @@ const records = [
     },
     {
         student: "Maggie",
-        date: "2026-08-08",
+        date: "2026-10-08",
         time: "2:40 PM",
         percentage: 100,
         exercise: "MCQs",
@@ -3811,7 +3811,7 @@ const records = [
     },
     {
         student: "Alex",
-        date: "2026-08-08",
+        date: "2026-10-08",
         time: "2:40 PM",
         percentage: 100,
         exercise: "MCQs",
@@ -3819,7 +3819,7 @@ const records = [
     },
     {
         student: "William",
-        date: "2026-08-08",
+        date: "2026-10-08",
         time: "2:40 PM",
         percentage: 80,
         exercise: "MCQs",
@@ -3827,7 +3827,7 @@ const records = [
     },
     {
         student: "Jocelyn",
-        date: "2026-08-08",
+        date: "2026-10-08",
         time: "2:40 PM",
         percentage: 80,
         exercise: "MCQs",
