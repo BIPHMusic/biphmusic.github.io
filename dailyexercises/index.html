@@ -349,15 +349,93 @@
 </div>
 
 <script src="../apstudents.js"></script>
-<script src="../login-screen.js"></script>
 <script src="../menu.js"></script>
 <script src="../mymenu.js"></script>
-<script src="vocab.js"></script>
-<script src="quiz-intervals-triads.js"></script>
+<script src="../scrambled-vocab.js"></script>
+<!-- <script src="quiz-intervals-triads.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
 
 
 <script>
+// -------------------------
+// EAR TRAINING DIFFICULTY LEVELS
+// -------------------------
+
+
+// const QUIZ_CONFIG = {
+//   name: "Ear Training – Intervals (Major & Minor 2nds)",
+//   sections: ['intervals'],
+//   sectionTitles: ['Intervals'],
+//   questionsPerSection: [10],
+//   allowedAnswers: {
+//     intervals: ['Minor 2nd', 'Major 2nd']
+//   }
+// };
+
+
+// const QUIZ_CONFIG = {
+//   name: "Ear Training – Intervals (2nds & 3rds)",
+//   sections: ['intervals'],
+//   sectionTitles: ['Intervals'],
+//   questionsPerSection: [10],
+//   allowedAnswers: {
+//     intervals: ['Minor 2nd', 'Major 2nd', 'Minor 3rd', 'Major 3rd']
+//   }
+// };
+
+
+// const QUIZ_CONFIG = {
+//   name: "Ear Training – Intervals (2nds–5ths)",
+//   sections: ['intervals'],
+//   sectionTitles: ['Intervals'],
+//   questionsPerSection: [10],
+//   allowedAnswers: {
+//     intervals: [
+//       'Minor 2nd', 'Major 2nd',
+//       'Minor 3rd', 'Major 3rd',
+//       'Perfect 4th', 'Tritone', 'Perfect 5th'
+//     ]
+//   }
+// };
+
+
+// const QUIZ_CONFIG = {
+//   name: "Ear Training – All Intervals",
+//   sections: ['intervals'],
+//   sectionTitles: ['Intervals'],
+//   questionsPerSection: [10]
+// };
+
+
+const QUIZ_CONFIG = {
+  name: "Ear Training – Intervals + Triads",
+  sections: ['intervals', 'triads'],
+  sectionTitles: ['Intervals', 'Triads'],
+  questionsPerSection: [8, 7]
+};
+
+
+// const QUIZ_CONFIG = {
+//   name: "Ear Training – Intervals + Triads + Seventh Chords",
+//   sections: ['intervals', 'triads', 'seventhChords'],
+//   sectionTitles: ['Intervals', 'Triads', 'Seventh Chords'],
+//   questionsPerSection: [5, 5, 5]
+// };
+
+
+// const QUIZ_CONFIG = {
+//   name: "Ear Training – Full (Intervals, Chords & Modes)",
+//   sections: ['intervals', 'triads', 'seventhChords', 'modes'],
+//   sectionTitles: ['Intervals', 'Triads', 'Seventh Chords', 'Modes'],
+//   questionsPerSection: [5, 5, 5, 5]
+// };
+
+
+
+
+
+
+
 window.dailyExerciseState = {
   active: null,
   student: '',
@@ -3505,26 +3583,7 @@ function dailyVocabPrepareResultData() {
         let currentAudio = null;
         let playsLeft = 2;
 
-        // Use the shared ear-training configuration when it loaded successfully.
-        // If quiz-intervals-all.js is unavailable, keep Daily Exercises functional
-        // with the same four ear-training categories and a safe default question count.
-        // quiz-intervals-all.js is the source of truth for this Daily Ear Training quiz.
-        // It currently defines one section: 10 interval questions.
-        const dailyEarQuizConfig = (() => {
-            try {
-                if (typeof QUIZ_CONFIG !== 'undefined' && QUIZ_CONFIG) {
-                    return QUIZ_CONFIG;
-                }
-            } catch (_) {}
-
-            // Safe fallback if the external configuration cannot be loaded.
-            return {
-                name: 'Ear Training – All Intervals',
-                sections: ['intervals'],
-                sectionTitles: ['Intervals'],
-                questionsPerSection: [10]
-            };
-        })();
+        const dailyEarQuizConfig = QUIZ_CONFIG;
 
         const dailyEarSections = dailyEarQuizConfig.sections;
         const dailyEarSectionTitles = dailyEarQuizConfig.sectionTitles;
