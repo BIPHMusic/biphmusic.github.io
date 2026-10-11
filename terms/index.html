@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>AP Terms</title>
+<link rel="icon" href="../icons/BGicon.png">
+<link rel="stylesheet" href="../common-styles.css">
+<link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+
+<style>
+    :root {
+        --panel: rgba(10, 27, 61, 0.72);
+        --panel-border: rgba(255, 255, 255, 0.18);
+        --muted: rgba(255, 255, 255, 0.72);
+        --accent: #a9d7ff;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: left;
+    }
+
+    .page-heading {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .toolbar,
+    .panel {
+        text-align: left;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 14px;
+        padding: 18px;
+        margin: 16px 0;
+        backdrop-filter: blur(15px);
+    }
+
+    .toolbar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 160px;
+    }
+
+    .field label {
+        font-size: 0.9rem;
+        color: var(--muted);
+    }
+
+    select,
+    textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 12px;
+        border: 1px solid rgba(255,255,255,.25);
+        border-radius: 7px;
+        background: rgba(255,255,255,.95);
+        color: #202633;
+        font: inherit;
+    }
+
+    /* Scoped styles leave the shared hamburger menu untouched. */
+    .action-button {
+        border: 1px solid rgba(255,255,255,.22);
+        border-radius: 7px;
+        padding: 10px 14px;
+        font: inherit;
+        cursor: pointer;
+        transition: transform .12s ease, background .12s ease;
+    }
+
+    .action-button:hover:not(:disabled) {
+        transform: translateY(-1px);
+    }
+
+    .action-button:disabled {
+        opacity: 0.4;
+        cursor: default;
+    }
+
+    .primary {
+        background: #b7ddff;
+        color: #132847;
+        font-weight: 650;
+    }
+
+    .secondary {
+        background: rgba(255,255,255,.12);
+        color: white;
+    }
+
+    .unit-panel-heading {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        text-align: center;
+    }
+
+    .unit-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .stepper-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        min-height: 42px;
+        padding: 8px 12px;
+        font-size: 1.4rem;
+        line-height: 1;
+    }
+
+    .term-list {
+        display: grid;
+        gap: 9px;
+    }
+
+    .term-card {
+        position: relative;
+        text-align: left;
+        padding: 15px 42px 15px 16px;
+        border: 1px solid var(--panel-border);
+        border-radius: 9px;
+        background: rgba(255,255,255,.07);
+        transition: border-color .25s ease, background-color .25s ease,
+                    transform .4s ease, opacity .4s ease;
+    }
+
+    .term-name {
+        font-weight: 700;
+        font-size: 1.3rem;
+        line-height: 1.4;
+        color: #fbe179;
+        overflow-wrap: anywhere;
+        transition: filter .5s ease;
+    }
+
+    .definition {
+        margin-top: 8px;
+        color: rgba(255,255,255,.94);
+        font-size: 1.15rem;
+        line-height: 1.55;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .term-card.new-term-highlight {
+        border-color: #ffe66d;
+        background-color: rgba(255,255,255,.16);
+        box-shadow: 0 0 16px rgba(255,230,109,.18);
+    }
+
+    .term-remove,
+    .reveal-btn {
+        position: absolute;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 0;
+        background: transparent;
+        z-index: 2;
+    }
+
+    .term-remove {
+        top: 5px;
+        right: 6px;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        color: rgba(255,255,255,.75);
+        font-size: 1rem;
+        border-radius: 6px;
+    }
+
+    .term-remove:hover {
+        color: white;
+        background: rgba(255,255,255,.16);
+    }
+
+    .reveal-btn {
+        display: none;
+        top: 12px;
+        left: 12px;
+        width: 32px;
+        height: 32px;
+        padding: 4px;
+    }
+
+    .reveal-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    body.hidden-mode .term-card:not(.term-revealed) .term-name {
+        filter: blur(20px) opacity(50%);
+        user-select: none;
+    }
+
+    body.hidden-mode .term-card .reveal-btn {
+        display: inline-flex;
+    }
+
+    body.hidden-mode .term-card.term-revealed .reveal-btn {
+        display: none;
+    }
+
+    .bottom-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-top: 18px;
+        text-align: center;
+    }
+
+    .bottom-downloads {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .count {
+        white-space: pre-line;
+        text-align: center;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .hidden-mode-toggle,
+    .shuffle-button {
+        position: absolute;
+        left: 11px;
+        background: none;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        width: 60px;
+        height: 50px;
+        z-index: 10;
+    }
+
+    .hidden-mode-toggle {
+        top: 50px;
+    }
+
+    .shuffle-button {
+        top: 95px;
+        opacity: .7;
+    }
+
+    .hidden-mode-toggle img,
+    .shuffle-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    #hotkey-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(0,0,0,.65);
+    }
+
+    #hotkey-modal.show {
+        display: flex;
+    }
+
+    .hotkey-box {
+        width: min(360px, 100%);
+        padding: 24px;
+        border-radius: 14px;
+        background: #f7f9fc;
+        color: #1b2940;
+        box-shadow: 0 15px 50px rgba(0,0,0,.35);
+    }
+
+    .hotkey-box h2 {
+        margin-top: 0;
+    }
+
+    .hotkey-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin: 12px 0;
+    }
+
+    .hotkey-key {
+        background: #e8eef5;
+        border: 1px solid #c5d0e0;
+        border-radius: 6px;
+        padding: 3px 10px;
+        font-family: monospace;
+        font-size: .95rem;
+        font-weight: 600;
+        min-width: 28px;
+        text-align: center;
+    }
+
+    .hotkey-hint {
+        margin-top: 20px;
+        font-size: .85rem;
+        opacity: .75;
+        text-align: center;
+    }
+
+    .empty {
+        color: var(--muted);
+        text-align: center;
+        padding: 35px 12px;
+    }
+
+    .count {
+        color: var(--muted);
+        font-size: .9rem;
+        margin: 12px 2px 0;
+    }
+
+    /* Add-terms modal */
+    #addDialog {
+        position: fixed;
+        inset: 0;
+        margin: auto;
+        width: min(560px, calc(100% - 36px));
+        max-height: 88vh;
+        overflow: auto;
+        border: 1px solid rgba(255,255,255,.25);
+        border-radius: 14px;
+        padding: 0;
+        color: white;
+        background: #182e55;
+        box-shadow: 0 20px 70px rgba(0,0,0,.45);
+    }
+
+    #addDialog::backdrop {
+        background: rgba(0,0,0,.65);
+        backdrop-filter: blur(3px);
+    }
+
+    .dialog-inner {
+        padding: 22px;
+    }
+
+    .dialog-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 16px;
+    }
+
+    .dialog-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: white;
+        font-size: 1.8rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .dialog-close:hover {
+        background: rgba(255,255,255,.12);
+    }
+
+    #pastedTerms {
+        min-height: 220px;
+        resize: vertical;
+        user-select: text;
+        -webkit-user-select: text;
+        white-space: pre;
+        overflow-wrap: normal;
+    }
+
+    .import-count {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: .9rem;
+        text-align: center;
+        min-height: 1.3em;
+    }
+
+    .dialog-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 18px;
+    }
+
+    #downloadUpdated {
+        min-width: 230px;
+    }
+
+    [hidden] {
+    display: none !important;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            padding: 12px;
+        }
+
+        .unit-panel-heading {
+            gap: 8px;
+        }
+
+        .unit-title {
+            font-size: 1.1rem;
+        }
+
+        .stepper-button {
+            min-width: 38px;
+            min-height: 38px;
+        }
+
+        .dialog-inner {
+            padding: 18px;
+        }
+
+        #downloadUpdated {
+            width: 100%;
+            min-width: 0;
+        }
+    }
+</style>
+</head>
+
+<body>
+<div id="shared-menu"></div>
+<div class="background"></div>
+<div class="overlay"></div>
+<div class="overlay2"></div>
+
+<button class="hidden-mode-toggle" id="hiddenModeToggle" type="button"
+        aria-label="Toggle Hidden Mode" title="Toggle Hidden Mode">
+    <img src="../icons/hidden-off.png" alt="" id="hiddenModeIcon">
+</button>
+<button class="shuffle-button" id="shuffleButton" type="button"
+        aria-label="Shuffle terms" title="Shuffle terms">
+    <img src="../icons/shuffle.png" alt="">
+</button>
+
+<div class="page-heading">
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">AP Terms</h1>
+</div>
+
+<div class="container">
+
+    <section class="panel" aria-label="Music terms">
+        <div class="unit-panel-heading">
+            <button
+                class="action-button secondary stepper-button"
+                id="previousUnit"
+                type="button"
+                aria-label="Previous unit"
+                title="Previous unit"
+            >&#8592;</button>
+
+            <h2 class="unit-title" id="unitTitle">Unit</h2>
+
+            <button
+                class="action-button secondary stepper-button"
+                id="nextUnit"
+                type="button"
+                aria-label="Next unit"
+                title="Next unit"
+            >&#8594;</button>
+        </div>
+
+        <div id="termList" class="term-list" aria-live="polite"></div>
+
+        <div class="bottom-controls">
+            <p id="termCount" class="count"></p>
+            
+            <button class="action-button primary" id="addTermsButton" type="button" hidden>
+                ＋ Add New Terms
+            </button>
+            <div class="bottom-downloads" hidden>
+                <button class="action-button secondary" id="downloadUpdated" type="button">
+                    Download terms.js
+                </button>
+                <button class="action-button secondary" id="downloadScrambled" type="button">
+                    Download scrambled vocab.js
+                </button>
+            </div>
+            <a
+                id="quizYourselfButton"
+                class="action-button primary"
+                href="https://biphmusic.github.io/vocabquiz/"
+                target="_self"
+                hidden
+                style="text-decoration: none; text-align: center;"
+            >
+                Quiz Yourself
+            </a>
+            <p class="import-count" id="pageStatus" aria-live="polite"></p>
+        </div>
+    </section>
+
+</div>
+
+<div class="logocontainer">
+    <img
+        src="../icons/Full Logo White on Transparent.png"
+        alt="BASIS Logo"
+        class="logo"
+    >
+</div>
+
+<dialog id="addDialog">
+    <div class="dialog-inner">
+
+        <div class="dialog-header">
+            <button
+                class="dialog-close"
+                id="closeAdd"
+                type="button"
+                aria-label="Close"
+                title="Close"
+            >&times;</button>
+        </div>
+
+        <div class="field">
+            <label for="addUnit">Add terms to</label>
+            <select id="addUnit">
+                <option value="unit1">Unit 1</option>
+                <option value="unit2">Unit 2</option>
+                <option value="unit3">Unit 3</option>
+                <option value="unit4">Unit 4</option>
+                <option value="unit5">Unit 5</option>
+            </select>
+        </div>
+
+        <div class="field" style="margin-top: 16px;">
+            <label for="pastedTerms">Terms and definitions</label>
+            <textarea
+                id="pastedTerms"
+                spellcheck="false"
+                placeholder="Paste tab-separated term/definition rows here"
+            ></textarea>
+        </div>
+
+        <p class="import-count" id="importCount" aria-live="polite"></p>
+
+        <div class="dialog-actions" style="gap: 10px; flex-wrap: wrap;">
+            <button class="action-button primary" id="confirmTerms" type="button">
+                Confirm &amp; Add Terms
+            </button>
+            <button class="action-button secondary" id="cancelTerms" type="button">
+                Cancel
+            </button>
+        </div>
+
+    </div>
+</dialog>
+
+<script src="../apstudents.js"></script>
+<script src="../menu.js"></script>
+<script src="../mymenu.js"></script>
+
+<script>
+(() => {
+    "use strict";
+
+    const unitKeys = ["unit1", "unit2", "unit3", "unit4", "unit5"];
+
+    const unitLabels = {
+        unit1: "Unit 1",
+        unit2: "Unit 2",
+        unit3: "Unit 3",
+        unit4: "Unit 4",
+        unit5: "Unit 5",
+        cumulative: "Cumulative"
+    };
+
+    const unitTitle = document.getElementById("unitTitle");
+    const previousUnit = document.getElementById("previousUnit");
+    const nextUnit = document.getElementById("nextUnit");
+    const addUnit = document.getElementById("addUnit");
+    const termList = document.getElementById("termList");
+    const termCount = document.getElementById("termCount");
+
+    const addTermsButton = document.getElementById("addTermsButton");
+    const addDialog = document.getElementById("addDialog");
+    const closeAdd = document.getElementById("closeAdd");
+    const pastedTerms = document.getElementById("pastedTerms");
+    const importCount = document.getElementById("importCount");
+    const pageStatus = document.getElementById("pageStatus");
+    const downloadUpdated = document.getElementById("downloadUpdated");
+    const downloadScrambled = document.getElementById("downloadScrambled");
+    const confirmTerms = document.getElementById("confirmTerms");
+    const cancelTerms = document.getElementById("cancelTerms");
+    const hiddenModeToggle = document.getElementById("hiddenModeToggle");
+    const shuffleButton = document.getElementById("shuffleButton");
+
+    let hiddenMode = false;
+    let currentOrder = [];
+    const typingTimers = new Set();
+    const highlightedTerms = new Set();
+
+
+
+let isTeacher = false;
+let isStudent = false;
+
+const quizYourselfButton = document.getElementById("quizYourselfButton");
+const bottomDownloads = document.querySelector(".bottom-downloads");
+
+function updateRoleButtons() {
+    const storedName = localStorage.getItem("biph_student_name");
+    const userRole = localStorage.getItem("biph_user_role");
+
+    // Update the shared variables so the rest of the page can use them.
+    isTeacher = !!storedName && userRole === "teacher";
+    isStudent = !!storedName && userRole === "student";
+
+    addTermsButton.hidden = !isTeacher;
+    bottomDownloads.hidden = !isTeacher;
+    quizYourselfButton.hidden = !isStudent;
+}
+
+// Set the correct buttons immediately.
+updateRoleButtons();
+
+// Update them if the login changes in this tab.
+window.addEventListener("biph-login-changed", updateRoleButtons);
+
+// Update them if localStorage changes in another tab.
+window.addEventListener("storage", updateRoleButtons);
+
+
+
+    let termsByUnit = Object.fromEntries(unitKeys.map(key => [key, []]));
+    let cumulative = [];
+    let glossary = [];
+    let visibleUnits = [];
+    let selectedUnit = "unit1";
+    let latestUnit = "unit1";
+
+    function parseStringArray(source, name) {
+        const match = source.match(
+            new RegExp("\\bconst\\s+" + name + "\\s*=\\s*\\[([\\s\\S]*?)\\]\\s*;")
+        );
+
+        if (!match) return [];
+
+        return [...match[1].matchAll(/"((?:\\.|[^"\\])*)"/g)].map(m => {
+            try {
+                return JSON.parse('"' + m[1] + '"');
+            } catch (_) {
+                return m[1];
+            }
+        });
+    }
+
+    function parseGlossary(source) {
+        const match = source.match(
+            /\bconst\s+theglossary\s*=\s*\[([\s\S]*?)\]\s*;/
+        );
+
+        if (!match) return [];
+
+        const items = [];
+        const objectPattern =
+            /\{\s*"Term"\s*:\s*"((?:\\.|[^"\\])*)"\s*,\s*"Definition"\s*:\s*"((?:\\.|[^"\\])*)"\s*\}/g;
+
+        for (const m of match[1].matchAll(objectPattern)) {
+            try {
+                items.push({
+                    Term: JSON.parse('"' + m[1] + '"'),
+                    Definition: JSON.parse('"' + m[2] + '"')
+                });
+            } catch (_) {
+                items.push({
+                    Term: m[1],
+                    Definition: m[2]
+                });
+            }
+        }
+
+        return items;
+    }
+
+    async function loadTerms() {
+        try {
+            const response = await fetch("../terms.js", {
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error("HTTP " + response.status);
+            }
+
+            const source = await response.text();
+
+            for (const key of unitKeys) {
+                termsByUnit[key] = parseStringArray(source, key);
+            }
+
+            cumulative = parseStringArray(source, "cumulative");
+            glossary = parseGlossary(source);
+
+            if (
+                !unitKeys.some(key => termsByUnit[key].length) &&
+                !glossary.length
+            ) {
+                throw new Error("Couldn't find the expected arrays in terms.js.");
+            }
+
+            refreshVisibleUnits();
+            selectedUnit = latestUnit;
+            render();
+        } catch (error) {
+            termList.replaceChildren();
+
+            const message = document.createElement("div");
+            message.className = "empty";
+            message.textContent =
+                "Couldn't load ../terms.js. Open this site through a local web server or hosted website (not directly as a file), and check that the file path is correct. " +
+                error.message;
+
+            termList.appendChild(message);
+        }
+    }
+
+    function unique(values) {
+        const seen = new Set();
+
+        return values.filter(value => {
+            const normalized = value.trim().toLocaleLowerCase();
+
+            if (!normalized || seen.has(normalized)) {
+                return false;
+            }
+
+            seen.add(normalized);
+            return true;
+        });
+    }
+
+    function termsForUnit(key) {
+        if (key === "cumulative") {
+            return unique(cumulative);
+        }
+
+        return termsByUnit[key] || [];
+    }
+
+    function refreshVisibleUnits() {
+        visibleUnits = unitKeys.filter(key => termsByUnit[key].length > 0);
+
+        if (cumulative.length > 0) {
+            visibleUnits.push("cumulative");
+        }
+
+        if (visibleUnits.length === 0) {
+            visibleUnits = [...unitKeys, "cumulative"];
+        }
+
+        latestUnit =
+            [...unitKeys].reverse().find(key => termsByUnit[key].length > 0) ||
+            (cumulative.length > 0 ? "cumulative" : "unit1");
+
+        if (!visibleUnits.includes(selectedUnit)) {
+            selectedUnit = latestUnit;
+        }
+
+        addUnit.value =
+            [...unitKeys].reverse().find(key => termsByUnit[key].length > 0) ||
+            "unit1";
+    }
+
+    function moveUnit(direction) {
+        if (visibleUnits.length < 2) return;
+
+        const currentIndex = visibleUnits.indexOf(selectedUnit);
+        const safeIndex = currentIndex < 0 ? 0 : currentIndex;
+
+        selectedUnit =
+            visibleUnits[
+                (safeIndex + direction + visibleUnits.length) %
+                visibleUnits.length
+            ];
+
+        render();
+    }
+
+    function render() {
+        refreshVisibleUnits();
+
+        const selectedTerms = termsForUnit(selectedUnit);
+        const glossaryMap = new Map(
+            glossary.map(item => [item.Term.toLocaleLowerCase(), item.Definition])
+        );
+
+        termList.replaceChildren();
+        unitTitle.textContent = unitLabels[selectedUnit] || "Unit";
+        previousUnit.disabled = visibleUnits.length < 2;
+        nextUnit.disabled = visibleUnits.length < 2;
+
+        if (!selectedTerms.length) {
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            empty.textContent = "There are no terms in this unit yet.";
+            termList.appendChild(empty);
+        } else {
+            for (const term of selectedTerms) {
+                const card = document.createElement("article");
+                
+                card.className = "term-card";
+
+                if (highlightedTerms.has(term.toLocaleLowerCase())) {
+                    card.classList.add("new-term-highlight");
+                }
+
+                card.dataset.term = term;
+
+                const name = document.createElement("div");
+                name.className = "term-name";
+                name.textContent = term;
+                card.appendChild(name);
+
+                const definition = document.createElement("div");
+                definition.className = "definition";
+                definition.textContent =
+                    glossaryMap.get(term.toLocaleLowerCase()) ||
+                    "Definition not entered yet.";
+                card.appendChild(definition);
+
+                if (isTeacher) {
+                    const remove = document.createElement("button");
+                    remove.className = "term-remove";
+                    remove.type = "button";
+                    remove.textContent = "×";
+                    remove.setAttribute("aria-label", `Remove ${term}`);
+                    remove.title = `Remove ${term}`;
+                    remove.addEventListener("click", () =>
+                        removeTermFromUnit(term, selectedUnit)
+                    );
+                    card.appendChild(remove);
+                }
+
+                const reveal = document.createElement("button");
+                reveal.className = "reveal-btn";
+                reveal.type = "button";
+                reveal.setAttribute("aria-label", "Reveal term temporarily");
+                reveal.innerHTML = '<img src="../icons/magnifying-glass.png" alt="">';
+                reveal.addEventListener("click", event => {
+                    event.stopPropagation();
+                    revealTerm(reveal);
+                });
+                card.appendChild(reveal);
+                termList.appendChild(card);
+            }
+        }
+
+        const unitLabel = unitLabels[selectedUnit] || "Unit";
+        const totalTerms = unique(unitKeys.flatMap(key => termsByUnit[key])).length;
+        termCount.textContent =
+            `${selectedTerms.length} terms in ${unitLabel}\n${totalTerms} terms total`;
+
+        document.body.classList.toggle("hidden-mode", hiddenMode);
+    }
+
+    
+function clearNewTermHighlight() {
+    typingTimers.forEach(timer => clearTimeout(timer));
+    typingTimers.clear();
+    highlightedTerms.clear();
+
+    document.querySelectorAll(".term-card.new-term-highlight").forEach(card => {
+        card.classList.remove("new-term-highlight");
+
+        const name = card.querySelector(".term-name");
+        const definition = card.querySelector(".definition");
+
+        if (name?.dataset.fullText !== undefined) {
+            name.textContent = name.dataset.fullText;
+            delete name.dataset.fullText;
+            name.classList.remove("typing");
+        }
+
+        if (definition?.dataset.fullText !== undefined) {
+            definition.textContent = definition.dataset.fullText;
+            delete definition.dataset.fullText;
+            definition.classList.remove("typing");
+        }
+
+        if (definition) {
+            definition.style.visibility = "";
+        }
+    });
+}
+
+function typeText(element, value, onComplete, delay = 24) {
+    if (!element) {
+        onComplete?.();
+        return;
+    }
+
+    // The definition stays invisible until its typing animation starts.
+    element.style.visibility = "visible";
+    element.textContent = "";
+    element.classList.add("typing");
+
+    let index = 0;
+
+    function nextCharacter() {
+        if (!element.isConnected) {
+            onComplete?.();
+            return;
+        }
+
+        if (index >= value.length) {
+            element.textContent = value;
+            element.classList.remove("typing");
+            onComplete?.();
+            return;
+        }
+
+        element.textContent += value[index++];
+
+        const timer = setTimeout(() => {
+            typingTimers.delete(timer);
+            nextCharacter();
+        }, delay);
+
+        typingTimers.add(timer);
+    }
+
+    nextCharacter();
+}
+
+function animateNewTerms(addedTerms) {
+    const names = new Set(
+        addedTerms.map(term => term.toLocaleLowerCase())
+    );
+
+    termList.querySelectorAll(".term-card").forEach(card => {
+        const name = card.querySelector(".term-name");
+        const definition = card.querySelector(".definition");
+
+        if (
+            !name ||
+            !definition ||
+            !names.has(name.textContent.toLocaleLowerCase())
+        ) {
+            return;
+        }
+
+        const fullName = name.textContent;
+        const fullDefinition = definition.textContent;
+        const key = fullName.toLocaleLowerCase();
+
+        highlightedTerms.add(key);
+        card.classList.add("new-term-highlight");
+
+        name.dataset.fullText = fullName;
+        definition.dataset.fullText = fullDefinition;
+
+        // Hide the complete definition until the term has finished typing.
+        definition.style.visibility = "hidden";
+
+        typeText(name, fullName, () => {
+            typeText(definition, fullDefinition);
+        });
+    });
+}
+
+    function removeTermFromUnit(term, unitKey) {
+        clearNewTermHighlight();
+
+        if (unitKey === "cumulative") {
+            for (const key of unitKeys) {
+                termsByUnit[key] = termsByUnit[key].filter(
+                    value => value.toLocaleLowerCase() !== term.toLocaleLowerCase()
+                );
+            }
+        } else if (termsByUnit[unitKey]) {
+            termsByUnit[unitKey] = termsByUnit[unitKey].filter(
+                value => value.toLocaleLowerCase() !== term.toLocaleLowerCase()
+            );
+        }
+
+        const stillUsed = unitKeys.some(key =>
+            termsByUnit[key].some(value =>
+                value.toLocaleLowerCase() === term.toLocaleLowerCase()
+            )
+        );
+
+        if (!stillUsed) {
+            glossary = glossary.filter(item =>
+                item.Term.toLocaleLowerCase() !== term.toLocaleLowerCase()
+            );
+        }
+
+        cumulative = unique(unitKeys.flatMap(key => termsByUnit[key]));
+        render();
+    }
+
+    
+    
+    function revealTerm(button) {
+        const card = button.closest(".term-card");
+        if (!card) return;
+
+        card.classList.add("term-revealed");
+        button.style.display = "none";
+
+        const cards = Array.from(termList.querySelectorAll(".term-card"));
+
+        if (
+            hiddenMode &&
+            cards.length > 0 &&
+            cards.every(item => item.classList.contains("term-revealed"))
+        ) {
+            hiddenMode = false;
+            document.body.classList.remove("hidden-mode");
+
+            const icon = document.getElementById("hiddenModeIcon");
+            if (icon) {
+                icon.src = "../icons/hidden-off.png";
+            }
+        }
+    }
+
+
+    function toggleHiddenMode() {
+        hiddenMode = !hiddenMode;
+
+        const icon = document.getElementById("hiddenModeIcon");
+
+        if (hiddenMode) {
+        
+        document.querySelectorAll(".term-card").forEach(card => {
+            card.classList.remove("term-revealed");
+
+            const revealButton = card.querySelector(".reveal-btn");
+            if (revealButton) {
+                revealButton.style.display = "";
+            }
+        });
+
+            document.body.classList.add("hidden-mode");
+
+            if (icon) {
+                icon.src = "../icons/hidden-on.png";
+            }
+        } else {
+            document.body.classList.remove("hidden-mode");
+
+            if (icon) {
+                icon.src = "../icons/hidden-off.png";
+            }
+        }
+    }
+
+    function shuffleCards() {
+        clearNewTermHighlight();
+        const cards = Array.from(termList.querySelectorAll(".term-card"));
+        if (cards.length < 2) return;
+
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+
+        cards.forEach(card => termList.appendChild(card));
+        const positions = cards.map(card => {
+            const rect = card.getBoundingClientRect();
+            return {
+                left: termList.clientWidth / 1.778 - rect.left - rect.width / 2,
+                top: termList.clientHeight / 3.57 - rect.top - rect.height / 2
+            };
+        });
+
+        cards.forEach((card, index) => {
+            card.style.transition = "transform .4s ease, opacity .4s ease";
+            card.style.transform = `translate(${positions[index].left}px, ${positions[index].top}px)`;
+            card.style.opacity = ".15";
+        });
+
+        setTimeout(() => {
+            cards.forEach(card => {
+                card.style.transition = "";
+                card.style.transform = "";
+                card.style.opacity = "1";
+            });
+        }, 400);
+    }
+
+    function showHotkeyModal() {
+        let modal = document.getElementById("hotkey-modal");
+        if (!modal) {
+            modal = document.createElement("div");
+            modal.id = "hotkey-modal";
+            modal.innerHTML = `
+                <div class="hotkey-box">
+                    <h2>Keyboard Shortcuts</h2>
+                    <div class="hotkey-row"><span>Shuffle terms</span><span class="hotkey-key">S</span></div>
+                    <div class="hotkey-row"><span>Toggle Hidden Mode</span><span class="hotkey-key">H</span></div>
+                    <div class="hotkey-hint">Click outside or press Esc to close</div>
+                </div>`;
+            document.body.appendChild(modal);
+            modal.addEventListener("click", event => {
+                if (event.target === modal) modal.classList.remove("show");
+            });
+        }
+        modal.classList.add("show");
+    }
+
+    /*
+     * Each nonempty line is one pair.
+     * The FIRST TAB separates the term from its definition.
+     * Additional tabs remain part of the definition.
+     */
+    function parsePastedPairs(text) {
+        const lines = text
+            .replace(/\r\n?/g, "\n")
+            .split("\n")
+            .filter(line => line.trim() !== "");
+
+        const pairs = [];
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const tabIndex = line.indexOf("\t");
+
+            if (tabIndex === -1) {
+                throw new Error(
+                    `Line ${i + 1} has no tab separator.`
+                );
+            }
+
+            const term = line.slice(0, tabIndex).trim();
+            const definition = line.slice(tabIndex + 1).trim();
+
+            if (!term || !definition) {
+                throw new Error(
+                    `Line ${i + 1} is missing a term or definition.`
+                );
+            }
+
+            pairs.push({
+                Term: term,
+                Definition: definition
+            });
+        }
+
+        return pairs;
+    }
+
+    function updateImportCount() {
+        const text = pastedTerms.value;
+        if (!text.trim()) {
+            importCount.textContent = "";
+            confirmTerms.disabled = true;
+            return;
+        }
+
+        try {
+            const pairs = parsePastedPairs(text);
+            importCount.textContent =
+                `${pairs.length} ${pairs.length === 1 ? "term" : "terms"} ready to add`;
+            confirmTerms.disabled = false;
+        } catch (error) {
+            importCount.textContent = error.message;
+            confirmTerms.disabled = true;
+        }
+    }
+
+    function escapeJsString(value) {
+        return JSON.stringify(String(value));
+    }
+
+    function buildTermsJs(units, cumulativeTerms, glossaryItems) {
+        const arrayBlock = (name, values) =>
+            `const ${name} = [\n${values
+                .map(value => `    ${escapeJsString(value)},`)
+                .join("\n")}\n];\n`;
+
+        const glossaryBlock =
+            `const theglossary = [\n${glossaryItems
+                .map(item =>
+                    `    {"Term":${escapeJsString(item.Term)},"Definition":${escapeJsString(item.Definition)}},`
+                )
+                .join("\n")}\n];\n`;
+
+        return [
+            arrayBlock("unit1", units.unit1),
+            arrayBlock("unit2", units.unit2),
+            arrayBlock("unit3", units.unit3),
+            arrayBlock("unit4", units.unit4),
+            arrayBlock("unit5", units.unit5),
+            arrayBlock("cumulative", cumulativeTerms),
+            glossaryBlock
+        ].join("\n");
+    }
+
+    function closeModal() {
+        if (addDialog.open) {
+            addDialog.close();
+        }
+    }
+
+    addTermsButton.addEventListener("click", () => {
+        clearNewTermHighlight();
+        refreshVisibleUnits();
+        addUnit.value =
+            [...unitKeys].reverse().find(key => termsByUnit[key].length > 0) ||
+            "unit1";
+        pastedTerms.value = "";
+        importCount.textContent = "";
+        confirmTerms.disabled = true;
+        addDialog.showModal();
+        pastedTerms.focus();
+    });
+
+    closeAdd.addEventListener("click", closeModal);
+    cancelTerms.addEventListener("click", closeModal);
+
+    addDialog.addEventListener("click", event => {
+        if (event.target === addDialog) closeModal();
+    });
+
+    pastedTerms.addEventListener("input", updateImportCount);
+    addUnit.addEventListener("change", () => {
+        try {
+            localStorage.setItem("musicTerms.addUnit", addUnit.value);
+        } catch (_) {}
+    });
+
+    previousUnit.addEventListener("click", () => {
+        clearNewTermHighlight();
+        moveUnit(-1);
+    });
+    nextUnit.addEventListener("click", () => {
+        clearNewTermHighlight();
+        moveUnit(1);
+    });
+
+    function confirmAndAddTerms() {
+        let pairs;
+        try {
+            pairs = parsePastedPairs(pastedTerms.value);
+        } catch (error) {
+            importCount.textContent = error.message;
+            return;
+        }
+        if (!pairs.length) {
+            importCount.textContent = "Paste at least one term and definition.";
+            return;
+        }
+
+        clearNewTermHighlight();
+        const target = addUnit.value;
+        const existing = new Set(
+            termsByUnit[target].map(term => term.toLocaleLowerCase())
+        );
+        const known = new Map(
+            glossary.map(item => [item.Term.toLocaleLowerCase(), item])
+        );
+        const addedTerms = [];
+
+        for (const pair of pairs) {
+            const key = pair.Term.toLocaleLowerCase();
+
+            if (!existing.has(key)) {
+                termsByUnit[target].push(pair.Term);
+                existing.add(key);
+                addedTerms.push(pair.Term);
+            }
+
+            if (known.has(key)) {
+                const oldItem = known.get(key);
+                if (!oldItem.Definition.trim() && pair.Definition.trim()) {
+                    oldItem.Definition = pair.Definition;
+                }
+            } else {
+                const item = { Term: pair.Term, Definition: pair.Definition };
+                glossary.push(item);
+                known.set(key, item);
+            }
+        }
+
+        cumulative = unique(unitKeys.flatMap(key => termsByUnit[key]));
+        selectedUnit = target;
+        try {
+            localStorage.setItem("musicTerms.addUnit", target);
+        } catch (_) {}
+
+        render();
+        closeModal();
+        animateNewTerms(addedTerms);
+        pageStatus.textContent =
+            `${addedTerms.length} new ${addedTerms.length === 1 ? "term" : "terms"} added. Download terms.js to save the updated list.`;
+        pastedTerms.value = "";
+        confirmTerms.disabled = true;
+    }
+
+    confirmTerms.addEventListener("click", confirmAndAddTerms);
+
+    // Enter submits immediately; Shift+Enter remains available for editing.
+    pastedTerms.addEventListener("keydown", event => {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            if (!confirmTerms.disabled) confirmAndAddTerms();
+        }
+    });
+
+    function downloadTextFile(filename, content) {
+        const blob = new Blob([content], { type: "text/javascript;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    downloadUpdated.addEventListener("click", () => {
+        clearNewTermHighlight();
+        cumulative = unique(unitKeys.flatMap(key => termsByUnit[key]));
+        downloadTextFile(
+            "terms.js",
+            buildTermsJs(termsByUnit, cumulative, glossary)
+        );
+        // pageStatus.textContent = "Downloaded terms.js.";
+    });
+
+    function shiftString(str, shift) {
+        return String(str).split("").map(char => {
+            if (/[a-zA-Z]/.test(char)) {
+                const code = char.charCodeAt(0);
+                const base = char >= "a" ? 97 : 65;
+                return String.fromCharCode((code - base + shift) % 26 + base);
+            }
+            return char;
+        }).join("");
+    }
+
+    function toBase64(str) {
+        return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function buildScrambledVocabJs(glossaryItems) {
+        const scrambledData = glossaryItems.map(item => ({
+            Term: toBase64(shiftString(item.Term, 3)),
+            Definition: toBase64(shiftString(item.Definition, 3))
+        }));
+        return `const scrambledVocabularyTerms = ${JSON.stringify(scrambledData, null, 2)};`;
+    }
+
+    downloadScrambled.addEventListener("click", () => {
+        clearNewTermHighlight();
+        if (!glossary.length) {
+            pageStatus.textContent = "There are no vocabulary terms to scramble.";
+            return;
+        }
+        downloadTextFile("scrambled-vocab.js", buildScrambledVocabJs(glossary));
+    });
+
+    hiddenModeToggle.addEventListener("click", toggleHiddenMode);
+    shuffleButton.addEventListener("click", shuffleCards);
+
+    document.addEventListener("keydown", event => {
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+        const target = event.target;
+        if (
+            target instanceof HTMLInputElement ||
+            target instanceof HTMLTextAreaElement ||
+            target instanceof HTMLSelectElement ||
+            target.isContentEditable
+        ) return;
+
+        if (addDialog.open) return;
+
+        const key = event.key.toLowerCase();
+        if (key === "s") {
+            event.preventDefault();
+            shuffleCards();
+        } else if (key === "h") {
+            event.preventDefault();
+            toggleHiddenMode();
+        } else if (key === "?" || (event.shiftKey && key === "/")) {
+            event.preventDefault();
+            showHotkeyModal();
+        } else if (key === "escape") {
+            document.getElementById("hotkey-modal")?.classList.remove("show");
+        } else if (key === "arrowleft" || key === "arrowright") {
+            event.preventDefault();
+            clearNewTermHighlight();
+            moveUnit(key === "arrowleft" ? -1 : 1);
+        }
+    });
+
+    loadTerms();
+})();
+</script>
+</body>
+</html>
