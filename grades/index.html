@@ -138,8 +138,8 @@
                                 title="Previous student"
                                 tabindex="-1"
                             >‹</button>
-                            <div class="selected-student" id="score-selected-name">
-                                Select a student
+                            <div class="selected-student" id="major-selected-student-name" style="opacity: 0.5;">
+                                 (Select a student)
                             </div>
                             <button
                                 type="button"
@@ -167,13 +167,6 @@
                                 tabindex="0"
                             >
                         </div>
-                            <div class="score-hint">
-                                Keys:
-                                <kbd>V</kbd> Vocab ·
-                                <kbd>S</kbd> Sight Singing ·
-                                <kbd>M</kbd> MCQs ·
-                                <kbd>E</kbd> Ear Training · arrows
-                            </div>
                         </div>
                         <div class="score-field">
                             <label for="score-input">Score</label>
@@ -183,10 +176,6 @@
                                 placeholder="e.g. 85 · 85% · 17/20"
                                 autocomplete="off"
                             >
-                            <div class="score-hint">
-                                Integer or % = percentage · fraction = correct/total
-                                · <kbd>Enter</kbd> submits
-                            </div>
                             <div
                                 class="percentage-preview"
                                 id="score-pct-preview"
@@ -236,7 +225,7 @@
                     </div>
                     <div class="score-form-card major-form-card">
                         <h2 style="color: #fff; text-align: center; margin-top: 0;">
-                            Major Assessment
+                            Enter Score
                         </h2>
                         <div class="selected-student-stepper">
                             <button
@@ -247,8 +236,8 @@
                                 title="Previous student"
                                 tabindex="-1"
                             >‹</button>
-                            <div class="selected-student" id="major-selected-student-name">
-                                Select a student
+                            <div class="selected-student" id="major-selected-student-name" style="opacity: 0.5;">
+                                (Select a student)
                             </div>
                             <button
                                 type="button"
@@ -272,9 +261,6 @@
                                 autocomplete="off"
                             >
                             <div id="major-assessment-predictions" class="major-predictions"></div>
-                            <div class="score-hint">
-                                Assessment names are remembered for future grading.
-                            </div>
                         </div>
                         <div class="major-criteria-header">
                             <div>Criteria</div>
@@ -342,7 +328,6 @@
     </div>
     <div class="copy-toast" id="copy-toast">Copied!</div>
     <script src="../apstudents.js"></script>
-    <script src="../login-screen.js"></script>
     <script src="../menu.js"></script>
     <script src="../mymenu.js"></script>
     <script src="../records.js"></script>
@@ -3436,23 +3421,75 @@
                     }
                 );
             });
+
 document.addEventListener("keydown", event => {
-            const activeTab = document.querySelector("#teacher-tabs .grades-tab.active")?.dataset.tab;
-            if (activeTab !== "cohort-weekly") return;
-            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-            const target = event.target;
-            if (target && (target.matches("input, textarea, select") || target.isContentEditable)) return;
-            const weeks = getCohortWeeklyWeeks();
-            if (!weeks.length) return;
-            const direction = event.key === "ArrowRight" ? 1 : -1;
-            if (cohortWeeklyIndex === null) cohortWeeklyIndex = weeks.length - 1;
-            const next = Math.max(0, Math.min(weeks.length - 1, cohortWeeklyIndex + direction));
-            if (next !== cohortWeeklyIndex) {
-                event.preventDefault();
-                cohortWeeklyIndex = next;
-                renderTeacherCohortWeekly();
-            }
-        });
+    const activeTab = document.querySelector(
+        "#teacher-tabs .grades-tab.active"
+    )?.dataset.tab;
+
+    if (
+        event.key !== "ArrowLeft" &&
+        event.key !== "ArrowRight"
+    ) {
+        return;
+    }
+
+    const target = event.target;
+
+    if (
+        target &&
+        (
+            target.matches("input, textarea, select") ||
+            target.isContentEditable
+        )
+    ) {
+        return;
+    }
+
+    const direction =
+        event.key === "ArrowRight" ? 1 : -1;
+
+    // + Minor: use the same student-cycling logic as the steppers.
+    if (activeTab === "manual") {
+        event.preventDefault();
+        cycleScoreStudent(direction);
+        return;
+    }
+
+    // + Major: use the same student-cycling logic as the steppers.
+    if (activeTab === "major") {
+        event.preventDefault();
+        cycleMajorStudent(direction);
+        return;
+    }
+
+    // Preserve the existing Weeks-tab navigation.
+    if (activeTab !== "cohort-weekly") {
+        return;
+    }
+
+    const weeks = getCohortWeeklyWeeks();
+    if (!weeks.length) return;
+
+    if (cohortWeeklyIndex === null) {
+        cohortWeeklyIndex = weeks.length - 1;
+    }
+
+    const next = Math.max(
+        0,
+        Math.min(
+            weeks.length - 1,
+            cohortWeeklyIndex + direction
+        )
+    );
+
+    if (next !== cohortWeeklyIndex) {
+        event.preventDefault();
+        cohortWeeklyIndex = next;
+        renderTeacherCohortWeekly();
+    }
+});
+
 function getAssignmentDates() {
     const dates = new Set();
     actualRecords.forEach(record => {
@@ -4184,6 +4221,7 @@ function findRecordForAssignment(
             `;
             return html;
         }
+
         function buildTeacherRoster() {
             const roster =
                 document.getElementById(
@@ -4232,6 +4270,7 @@ function findRecordForAssignment(
             });
             updateTeacherStudentSteppers();
         }
+
         function updateTeacherStudentSteppers() {
             const students = getStudentsForTeacher();
             const prev = document.getElementById("teacher-roster-prev");
@@ -4258,6 +4297,69 @@ function findRecordForAssignment(
                     : null;
             }
         }
+
+
+function updateStudentEntryFormAvailability() {
+    const forms = [
+        {
+            card: document.querySelector(
+                "#teacher-manual-tab .score-form-card"
+            ),
+            selected: !!scoreSelectedStudent,
+            sections: [
+                ".score-field",
+                ".score-btn-row"
+            ]
+        },
+        {
+            card: document.querySelector(
+                "#teacher-major-tab .major-form-card"
+            ),
+            selected: !!majorSelectedStudent,
+            sections: [
+                ".score-field",
+                ".major-criteria-header",
+                ".major-criteria-list",
+                ".major-criteria-actions",
+                ".major-composite-row",
+                ".score-btn-row"
+            ]
+        }
+    ];
+
+    forms.forEach(({ card, selected, sections }) => {
+        if (!card) return;
+
+        sections.forEach(selector => {
+            card.querySelectorAll(selector).forEach(section => {
+                section.style.opacity = selected ? "1" : "0.2";
+                section.style.pointerEvents = selected ? "" : "none";
+                section.setAttribute(
+                    "aria-disabled",
+                    String(!selected)
+                );
+
+                section.querySelectorAll(
+                    "input, select, textarea, button"
+                ).forEach(control => {
+                    if (!("disabled" in control)) return;
+
+                    // Preserve each control's original disabled state.
+                    if (!control.dataset.studentGateInitialized) {
+                        control.dataset.studentGateDisabled =
+                            String(control.disabled);
+                        control.dataset.studentGateInitialized = "true";
+                    }
+
+                    control.disabled = !selected ||
+                        control.dataset.studentGateDisabled === "true";
+                });
+            });
+        });
+    });
+}
+
+
         function cycleTeacherStudent(direction) {
             const students =
                 getStudentsForTeacher();
@@ -5754,103 +5856,82 @@ function setupTeacherStudentSearch() {
                 });
             updateScoreSubmitState();
         }
-        function selectScoreStudent(
-            student
-        ) {
-            scoreSelectedStudent =
-                student;
-            scoreSelectedName.textContent =
-                student;
-            scoreSearchBar.value =
-                student;
-            scorePredictions.classList.remove(
-                "show"
-            );
+        
+        function selectScoreStudent(student) {
+            scoreSelectedStudent = student;
+            scoreSelectedName.textContent = student;
+            scoreSearchBar.value = student;
+            scorePredictions.classList.remove("show");
+
             /*
-             * Keep the teacher's chosen date when moving
-             * from student to student. Only initialize it
-             * to today the first time the form is opened.
-             */
+            * Keep the teacher's chosen date when moving
+            * from student to student. Only initialize it
+            * to today the first time the form is opened.
+            */
             if (!scoreRememberedDate) {
                 scoreRememberedDate =
-                    scoreDateInput.value ||
-                    todayISO();
+                    scoreDateInput.value || todayISO();
             }
-            scoreDateInput.value =
-                scoreRememberedDate;
-            scoreInput.value =
-                "";
-            scoreComputedPercentage =
-                null;
-            scorePctPreview.textContent =
-                "";
-            scorePctPreview.classList.remove(
-                "error"
-            );
-            scoreSelectedExercise =
-                null;
-            importedTermsToReview =
-                [];
+
+            scoreDateInput.value = scoreRememberedDate;
+            scoreInput.value = "";
+            scoreComputedPercentage = null;
+            scorePctPreview.textContent = "";
+            scorePctPreview.classList.remove("error");
+
+            scoreSelectedExercise = null;
+            importedTermsToReview = [];
+
             document
                 .querySelectorAll(
                     "#score-exercise-options .exercise-btn"
                 )
-                .forEach(button =>
-                    button.classList.remove(
-                        "selected"
-                    )
-                );
+                .forEach(button => {
+                    button.classList.remove("selected");
+                });
+
             updateScoreSubmitState();
             updateScoreStudentSteppers();
+            updateStudentEntryFormAvailability();
         }
+
+
         function resetScoreForm() {
-            scoreSelectedStudent =
-                null;
-            scoreSelectedExercise =
-                null;
-            scoreComputedPercentage =
-                null;
-            importedTermsToReview =
-                [];
-            scoreSelectedName.textContent =
-                "Select a student";
-            scoreSearchBar.value =
-                "";
-            scoreInput.value =
-                "";
-            scorePctPreview.textContent =
-                "";
-            scorePctPreview.classList.remove(
-                "error"
-            );
-            scorePredictions.classList.remove(
-                "show"
-            );
+            scoreSelectedStudent = null;
+            scoreSelectedExercise = null;
+            scoreComputedPercentage = null;
+            importedTermsToReview = [];
+
+            scoreSelectedName.textContent = "Select a student";
+            scoreSearchBar.value = "";
+            scoreInput.value = "";
+            scorePctPreview.textContent = "";
+            scorePctPreview.classList.remove("error");
+            scorePredictions.classList.remove("show");
+
             document
                 .querySelectorAll(
                     "#score-exercise-options .exercise-btn"
                 )
-                .forEach(button =>
-                    button.classList.remove(
-                        "selected"
-                    )
-                );
+                .forEach(button => {
+                    button.classList.remove("selected");
+                });
+
             /*
-             * Intentionally do NOT clear scoreRememberedDate.
-             * Clear resets the grade entry, but the selected
-             * assignment date is a useful working-state preference.
-             */
+            * Keep the remembered date when clearing the form.
+            */
             if (!scoreRememberedDate) {
                 scoreRememberedDate =
-                    scoreDateInput.value ||
-                    todayISO();
+                    scoreDateInput.value || todayISO();
             }
-            scoreDateInput.value =
-                scoreRememberedDate;
-            scoreBtnSubmit.disabled =
-                true;
+
+            scoreDateInput.value = scoreRememberedDate;
+            scoreBtnSubmit.disabled = true;
+
             updateScoreStudentSteppers();
+            updateStudentEntryFormAvailability();
         }
+
         function updateScoreStudentSteppers() {
             const students =
                 getStudentsForTeacher();
@@ -5966,6 +6047,7 @@ function setupTeacherStudentSearch() {
             }
             scoreDateInput.value =
                 scoreRememberedDate;
+            updateStudentEntryFormAvailability();
             updateScoreStudentSteppers();
             if (
                 scoreSearchBar.dataset.ready
@@ -7038,46 +7120,39 @@ function setupTeacherStudentSearch() {
                 }
             });
         }
-                function selectMajorStudent(
-            student
-        ) {
-            majorSelectedStudent =
-                student;
-            majorSelectedStudentName.textContent =
-                student;
-            majorStudentSearchBar.value =
-                student;
-            majorStudentPredictions.classList.remove(
-                "show"
-            );
+        
+        function selectMajorStudent(student) {
+            majorSelectedStudent = student;
+            majorSelectedStudentName.textContent = student;
+            majorStudentSearchBar.value = student;
+            majorStudentPredictions.classList.remove("show");
+
             if (!majorRememberedDate) {
                 majorRememberedDate =
-                    majorDateInput.value ||
-                    todayISO();
+                    majorDateInput.value || todayISO();
             }
-            majorDateInput.value =
-                majorRememberedDate;
+
+            majorDateInput.value = majorRememberedDate;
+
             majorCriteriaList
-                .querySelectorAll(
-                    ".major-criterion-score"
-                )
+                .querySelectorAll(".major-criterion-score")
                 .forEach(score => {
                     score.value = "";
                 });
+
             majorCriteriaList
-                .querySelectorAll(
-                    ".major-criterion-percentage"
-                )
+                .querySelectorAll(".major-criterion-percentage")
                 .forEach(preview => {
                     preview.textContent = "";
-                    preview.classList.remove(
-                        "error"
-                    );
+                    preview.classList.remove("error");
                 });
+
             updateMajorCompositeScore();
             updateMajorStudentSteppers();
             updateMajorSubmitState();
+            updateStudentEntryFormAvailability();
         }
+
         function cycleMajorStudent(
             direction
         ) {
@@ -7282,33 +7357,33 @@ function setupTeacherStudentSearch() {
                     )?.focus();
             }
         }
-        function resetMajorForm(
-            keepStudent = true
-        ) {
+        
+        function resetMajorForm(keepStudent = true) {
             if (!keepStudent) {
-                majorSelectedStudent =
-                    null;
+                majorSelectedStudent = null;
                 majorSelectedStudentName.textContent =
                     "Select a student";
-                majorStudentSearchBar.value =
-                    "";
+                majorStudentSearchBar.value = "";
             }
+
             majorAssessmentNameInput.value = "";
             majorAssessmentDefinition = null;
-            majorAssessmentPredictions.classList.remove(
-                "show"
-            );
+            majorAssessmentPredictions.classList.remove("show");
+
             renderMajorCriteria([""]);
+
             if (!majorRememberedDate) {
                 majorRememberedDate =
-                    majorDateInput.value ||
-                    todayISO();
+                    majorDateInput.value || todayISO();
             }
-            majorDateInput.value =
-                majorRememberedDate;
+
+            majorDateInput.value = majorRememberedDate;
+
             updateMajorStudentSteppers();
             updateMajorSubmitState();
+            updateStudentEntryFormAvailability();
         }
+
         function initializeMajorEntry() {
             if (!majorDateInput.value) {
                 majorDateInput.value =
@@ -7318,6 +7393,7 @@ function setupTeacherStudentSearch() {
             majorRememberedDate =
                 majorRememberedDate ||
                 majorDateInput.value;
+            updateStudentEntryFormAvailability();    
             updateMajorStudentSteppers();
             if (majorStudentSearchBar.dataset.ready) {
                 return;
