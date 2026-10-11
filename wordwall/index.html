@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="BIPH Band">
-    <link rel="apple-touch-icon" href="https\://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+    <link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
     <link rel="icon" href="../icons/BGicon.png">
     <link rel="stylesheet" href="../common-styles.css">
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
@@ -17,8 +17,9 @@
 
     <style>
         /* SHARED STYLES */
-        /* Loaded from common-styles.css - Do not duplicate/edit: */
-        /* body, h1, .Subtitle, .background, .overlay, .overlay2, .logo */
+        /* Loaded from common-styles.css - Do not duplicate/edit:
+           body, h1, .Subtitle, .background, .overlay, .overlay2, .logo
+        */
 
         #unitSelector {
             display: block;
@@ -69,11 +70,11 @@
             flex-direction: column;
             height: 130px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0);
+            border: 1px solid rgba(255, 255, 255, 0);
         }
 
         .term-card:hover {
-            border: 1px solid rgba(255,255,255,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 5px 50px rgba(255, 255, 255, 0.05);
         }
 
@@ -135,7 +136,10 @@
             touch-action: manipulation;
             z-index: 20;
         }
-        .close-btn:hover { color: white; }
+
+        .close-btn:hover {
+            color: white;
+        }
 
         .poof {
             position: absolute;
@@ -149,6 +153,7 @@
             opacity: 0;
             pointer-events: none;
         }
+
         .poof::before,
         .poof::after {
             content: '';
@@ -156,12 +161,14 @@
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
         }
+
         .poof::before {
             width: 80px;
             height: 80px;
             top: -20px;
             left: -20px;
         }
+
         .poof::after {
             width: 60px;
             height: 60px;
@@ -174,6 +181,7 @@
                 transform: translate(-50%, -50%) scale(0);
                 opacity: 0.6;
             }
+
             100% {
                 transform: translate(-50%, -50%) scale(3.2);
                 opacity: 0;
@@ -191,6 +199,7 @@
             width: 60px;
             height: 50px;
         }
+
         .shuffle-button {
             position: absolute;
             top: 95px;
@@ -203,7 +212,9 @@
             width: 60px;
             height: 50px;
         }
-        .hidden-mode-toggle img, .shuffle-button img {
+
+        .hidden-mode-toggle img,
+        .shuffle-button img {
             width: 100%;
             height: 100%;
         }
@@ -233,11 +244,11 @@
 
         #celebration .congrats-text {
             font-family: 'Zapfino', cursive;
-            font-size: clamp(1.9rem, 5.2vw, 3.1rem);   /* smaller */
+            font-size: clamp(1.9rem, 5.2vw, 3.1rem);
             font-weight: normal;
             margin: 0 0 6px 0;
             line-height: 1.1;
-            text-shadow: 0 4px 22px rgba(0,0,0,0.55);
+            text-shadow: 0 4px 22px rgba(0, 0, 0, 0.55);
         }
 
         #celebration .cleared-text {
@@ -280,7 +291,7 @@
             padding: 28px 32px;
             max-width: 340px;
             width: 90%;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
             font-family: Arial, sans-serif;
         }
 
@@ -329,25 +340,17 @@
         }
     </style>
 </head>
+
 <body>
     <div class="background"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
-
 
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Word Wall</h1>
 
     <select id="unitSelector" onchange="filterTerms()" style="margin-top: -20px;">
         <option value="Cumulative">Cumulative</option>
-        <option value="Unit1">Unit 1</option>
-        <option value="Unit2">Unit 2</option>
-        <!-- <option value="Unit3">Unit 3</option> -->
-        <!-- <option value="Unit4">Unit 4</option> -->
-        <!-- <option value="Unit5">Unit 5</option> -->
-        <!-- <option value="Unit5">Unit 6</option> -->
-        <!-- <option value="Unit5">Unit 7</option> -->
-        <!-- <option value="Unit5">Unit 8</option> -->         
     </select>
 
     <button class="hidden-mode-toggle" onclick="toggleHiddenMode()">
@@ -360,24 +363,94 @@
 
     <div id="glossary"></div>
 
-    <div class="logocontainer">        
+    <div class="logocontainer">
         <img src="../icons/Full Logo White on Transparent.png" alt="BASIS Logo" class="logo">
     </div>
 
     <div id="shared-menu"></div>
+
     <script src="../apstudents.js"></script>
-    <script src="../login-screen.js"></script>
     <script src="../menu.js"></script>
     <script src="../mymenu.js"></script>
     <script src="../terms.js"></script>
 
-
-
     <script>
-
         let hiddenMode = false;
         let currentOrder = [];
         let initialWordCount = 0;
+
+        /*
+         * Return a unit array by its name.
+         *
+         * Important: top-level const declarations in a classic script
+         * are available through the global lexical environment, but
+         * they are NOT properties of window. Therefore, direct
+         * window.unit3 lookups are not sufficient for your terms.js.
+         *
+         * This function uses eval-free explicit access through a
+         * registry populated below from the known unit arrays.
+         */
+        function getAvailableUnitArrays() {
+            const units = [];
+
+            /*
+             * Add a unit here only if it is declared in terms.js.
+             * Empty arrays are automatically omitted below.
+             *
+             * For future units, this list can be extended, or you
+             * can use the globalThis-based registry approach described
+             * after this code.
+             */
+            const candidates = [
+                { number: 1, terms: typeof unit1 !== 'undefined' ? unit1 : [] },
+                { number: 2, terms: typeof unit2 !== 'undefined' ? unit2 : [] },
+                { number: 3, terms: typeof unit3 !== 'undefined' ? unit3 : [] },
+                { number: 4, terms: typeof unit4 !== 'undefined' ? unit4 : [] },
+                { number: 5, terms: typeof unit5 !== 'undefined' ? unit5 : [] },
+                { number: 6, terms: typeof unit6 !== 'undefined' ? unit6 : [] },
+                { number: 7, terms: typeof unit7 !== 'undefined' ? unit7 : [] },
+                { number: 8, terms: typeof unit8 !== 'undefined' ? unit8 : [] },
+                { number: 9, terms: typeof unit9 !== 'undefined' ? unit9 : [] },
+                { number: 10, terms: typeof unit10 !== 'undefined' ? unit10 : [] },
+                { number: 11, terms: typeof unit11 !== 'undefined' ? unit11 : [] },
+                { number: 12, terms: typeof unit12 !== 'undefined' ? unit12 : [] },
+                { number: 13, terms: typeof unit13 !== 'undefined' ? unit13 : [] },
+                { number: 14, terms: typeof unit14 !== 'undefined' ? unit14 : [] },
+                { number: 15, terms: typeof unit15 !== 'undefined' ? unit15 : [] },
+                { number: 16, terms: typeof unit16 !== 'undefined' ? unit16 : [] },
+                { number: 17, terms: typeof unit17 !== 'undefined' ? unit17 : [] },
+                { number: 18, terms: typeof unit18 !== 'undefined' ? unit18 : [] },
+                { number: 19, terms: typeof unit19 !== 'undefined' ? unit19 : [] },
+                { number: 20, terms: typeof unit20 !== 'undefined' ? unit20 : [] }
+            ];
+
+            candidates.forEach(unit => {
+                if (Array.isArray(unit.terms) && unit.terms.length > 0) {
+                    units.push(unit);
+                }
+            });
+
+            return units;
+        }
+
+        function populateUnitSelector() {
+            const selector = document.getElementById('unitSelector');
+
+            // Preserve Cumulative and remove all existing unit options.
+            selector.innerHTML = '<option value="Cumulative">Cumulative</option>';
+
+            const units = getAvailableUnitArrays();
+
+            units.forEach(unit => {
+                const option = document.createElement('option');
+                option.value = `Unit${unit.number}`;
+                option.textContent = `Unit ${unit.number}`;
+                selector.appendChild(option);
+            });
+
+            // Cumulative is always selected on page load.
+            selector.value = 'Cumulative';
+        }
 
         function createTermCard(term) {
             const card = document.createElement('div');
@@ -401,12 +474,14 @@
             card.addEventListener('pointerdown', (e) => {
                 const revealButton = e.target.closest('.reveal-btn');
                 const closeButton = e.target.closest('.close-btn');
+
                 if (revealButton) {
                     e.preventDefault();
                     e.stopPropagation();
                     revealTerm(revealButton);
                     return;
                 }
+
                 if (closeButton) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -419,9 +494,14 @@
 
         function toggleHiddenMode() {
             hiddenMode = !hiddenMode;
+
             const icon = document.getElementById('hiddenModeIcon');
-            icon.src = hiddenMode ? "../icons/hidden-on.png" : "../icons/hidden-off.png";
+            icon.src = hiddenMode
+                ? "../icons/hidden-on.png"
+                : "../icons/hidden-off.png";
+
             document.body.classList.toggle('hidden-mode', hiddenMode);
+
             setTimeout(() => {
                 renderCurrentCards();
             }, 500);
@@ -442,38 +522,59 @@
             }
         }
 
+        function getUnitTerms(unitNumber) {
+            switch (unitNumber) {
+                case 1: return typeof unit1 !== 'undefined' ? unit1 : [];
+                case 2: return typeof unit2 !== 'undefined' ? unit2 : [];
+                case 3: return typeof unit3 !== 'undefined' ? unit3 : [];
+                case 4: return typeof unit4 !== 'undefined' ? unit4 : [];
+                case 5: return typeof unit5 !== 'undefined' ? unit5 : [];
+                case 6: return typeof unit6 !== 'undefined' ? unit6 : [];
+                case 7: return typeof unit7 !== 'undefined' ? unit7 : [];
+                case 8: return typeof unit8 !== 'undefined' ? unit8 : [];
+                case 9: return typeof unit9 !== 'undefined' ? unit9 : [];
+                case 10: return typeof unit10 !== 'undefined' ? unit10 : [];
+                case 11: return typeof unit11 !== 'undefined' ? unit11 : [];
+                case 12: return typeof unit12 !== 'undefined' ? unit12 : [];
+                case 13: return typeof unit13 !== 'undefined' ? unit13 : [];
+                case 14: return typeof unit14 !== 'undefined' ? unit14 : [];
+                case 15: return typeof unit15 !== 'undefined' ? unit15 : [];
+                case 16: return typeof unit16 !== 'undefined' ? unit16 : [];
+                case 17: return typeof unit17 !== 'undefined' ? unit17 : [];
+                case 18: return typeof unit18 !== 'undefined' ? unit18 : [];
+                case 19: return typeof unit19 !== 'undefined' ? unit19 : [];
+                case 20: return typeof unit20 !== 'undefined' ? unit20 : [];
+                default: return [];
+            }
+        }
+
         function filterTerms() {
             const selected = document.getElementById('unitSelector').value;
             let termList;
 
-            switch (selected) {
-                case 'Unit1':
-                    termList = unit1;
-                    break;
-                case 'Unit2':
-                    termList = unit2;
-                    break;
-                case 'Unit3':
-                    termList = unit3;
-                    break;
-                case 'Unit4':
-                    termList = unit4;
-                    break;
-                case 'Unit5':
-                    termList = unit5;
-                    break;
-                case 'Cumulative':
-                    termList = cumulative;
-                    break;
-                default:
-                    termList = cumulative;
+            if (selected === 'Cumulative') {
+                termList = cumulative;
+            } else {
+                const match = selected.match(/^Unit(\d+)$/);
+                const unitNumber = match ? Number(match[1]) : 0;
+                termList = getUnitTerms(unitNumber);
+            }
+
+            if (!Array.isArray(termList)) {
+                termList = [];
             }
 
             const glossary = document.getElementById('glossary');
             glossary.innerHTML = '';
 
-            const filtered = theglossary.filter(term => termList.includes(term.Term));
-            filtered.forEach(term => glossary.appendChild(createTermCard(term)));
+            const filtered = theglossary.filter(term =>
+                termList.includes(term.Term)
+            );
+
+            filtered.forEach(term => {
+                glossary.appendChild(createTermCard(term));
+            });
+
             currentOrder = filtered.map(t => t.Term);
             initialWordCount = filtered.length;
         }
@@ -514,7 +615,7 @@
             const glossary = document.getElementById('glossary');
             let cards = Array.from(glossary.children);
 
-            // Fisher-Yates shuffle
+            // Fisher-Yates shuffle.
             for (let i = cards.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [cards[i], cards[j]] = [cards[j], cards[i]];
@@ -525,6 +626,7 @@
 
             const positions = cards.map(card => {
                 const rect = card.getBoundingClientRect();
+
                 return {
                     left: glossary.clientWidth / 2 - rect.left - rect.width / 2,
                     top: glossary.clientHeight / 2 - rect.top - rect.height / 2
@@ -533,7 +635,8 @@
 
             cards.forEach((card, i) => {
                 card.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
-                card.style.transform = `translate(${positions[i].left}px, ${positions[i].top}px)`;
+                card.style.transform =
+                    `translate(${positions[i].left}px, ${positions[i].top}px)`;
                 card.style.opacity = '0.15';
             });
 
@@ -549,6 +652,7 @@
         }
 
         // ---------- Celebration ----------
+
         function getUserName() {
             return localStorage.getItem('biph_student_name') || null;
         }
@@ -609,6 +713,7 @@
             }, 1100);
 
             let celeb = document.getElementById('celebration');
+
             if (!celeb) {
                 celeb = document.createElement('div');
                 celeb.id = 'celebration';
@@ -616,8 +721,10 @@
             }
 
             const name = getUserName();
-            // Comma only when a name is present
-            const title = name ? `Congratulations, ${name}!` : 'Congratulations!';
+            const title = name
+                ? `Congratulations, ${name}!`
+                : 'Congratulations!';
+
             const now = new Date();
             const dateTimeStr = now.toLocaleString(undefined, {
                 weekday: 'short',
@@ -644,31 +751,40 @@
         }
 
         // ---------- Hotkeys ----------
+
         function showHotkeyModal() {
             let modal = document.getElementById('hotkey-modal');
+
             if (!modal) {
                 modal = document.createElement('div');
                 modal.id = 'hotkey-modal';
+
                 modal.innerHTML = `
                     <div class="hotkey-box">
                         <h2>Keyboard Shortcuts</h2>
+
                         <div class="hotkey-row">
                             <span class="hotkey-desc">Shuffle cards</span>
                             <span class="hotkey-key">S</span>
                         </div>
+
                         <div class="hotkey-row">
                             <span class="hotkey-desc">Toggle Hidden Mode</span>
                             <span class="hotkey-key">H</span>
                         </div>
 
-                        <div class="hotkey-hint">Click anywhere outside or press Esc to close</div>
+                        <div class="hotkey-hint">
+                            Click anywhere outside or press Esc to close
+                        </div>
                     </div>
                 `;
+
                 document.body.appendChild(modal);
 
-                // Click outside the box closes it
                 modal.addEventListener('click', (e) => {
-                    if (e.target === modal) hideHotkeyModal();
+                    if (e.target === modal) {
+                        hideHotkeyModal();
+                    }
                 });
             }
 
@@ -677,12 +793,19 @@
 
         function hideHotkeyModal() {
             const modal = document.getElementById('hotkey-modal');
-            if (modal) modal.classList.remove('show');
+
+            if (modal) {
+                modal.classList.remove('show');
+            }
         }
 
         document.addEventListener('keydown', (e) => {
-            // Ignore if user is typing in an input / select
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+            // Ignore shortcuts when the user is typing in a form control.
+            if (
+                e.target.tagName === 'INPUT' ||
+                e.target.tagName === 'TEXTAREA' ||
+                e.target.tagName === 'SELECT'
+            ) {
                 return;
             }
 
@@ -699,9 +822,11 @@
                 showHotkeyModal();
             } else if (key === 'escape') {
                 hideHotkeyModal();
-                // also close celebration if open
+
                 const celeb = document.getElementById('celebration');
-                if (celeb) celeb.classList.remove('show');
+                if (celeb) {
+                    celeb.classList.remove('show');
+                }
             }
         });
 
@@ -710,14 +835,11 @@
             e.preventDefault();
         });
 
-        // Initialize
+        // Initialize after terms.js and the page have loaded.
         document.addEventListener('DOMContentLoaded', () => {
-            const unitSelector = document.getElementById('unitSelector');
-            unitSelector.value = unitSelector.options[unitSelector.options.length - 1].value;
+            populateUnitSelector();
             filterTerms();
         });
-
-
     </script>
 </body>
 </html>
