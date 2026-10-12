@@ -4449,4 +4449,116 @@ const records = [
         exercise: "Sight Singing",
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-10-12",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-12",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-12",
+        time: "10:54 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-12",
+        time: "10:53 AM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-12",
+        time: "10:56 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-12",
+        time: "10:52 AM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-12",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-12",
+        time: "10:54 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-12",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-12",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-12",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-12",
+        time: "10:55 AM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 7th","correct":"Major 7th"}]
+    },
+    {
+        student: "William",
+        date: "2026-10-12",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-12",
+        time: "10:49 AM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+    },
 ];
