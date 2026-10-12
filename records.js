@@ -3787,7 +3787,7 @@ const records = [
     },
     {
         student: "Calvin",
-        date: "2026-10-08",
+        date: "2026-08-08",
         time: "2:40 PM",
         percentage: 40,
         exercise: "MCQs",
@@ -3795,7 +3795,7 @@ const records = [
     },
     {
         student: "Teresa",
-        date: "2026-10-08",
+        date: "2026-08-08",
         time: "2:40 PM",
         percentage: 60,
         exercise: "MCQs",
@@ -3803,7 +3803,7 @@ const records = [
     },
     {
         student: "Maggie",
-        date: "2026-10-08",
+        date: "2026-08-08",
         time: "2:40 PM",
         percentage: 100,
         exercise: "MCQs",
@@ -3811,7 +3811,7 @@ const records = [
     },
     {
         student: "Alex",
-        date: "2026-10-08",
+        date: "2026-08-08",
         time: "2:40 PM",
         percentage: 100,
         exercise: "MCQs",
@@ -3819,7 +3819,7 @@ const records = [
     },
     {
         student: "William",
-        date: "2026-10-08",
+        date: "2026-08-08",
         time: "2:40 PM",
         percentage: 80,
         exercise: "MCQs",
@@ -3827,7 +3827,7 @@ const records = [
     },
     {
         student: "Jocelyn",
-        date: "2026-10-08",
+        date: "2026-08-08",
         time: "2:40 PM",
         percentage: 80,
         exercise: "MCQs",
@@ -4184,5 +4184,269 @@ const records = [
         percentage: 60,
         exercise: "Ear Training",
         termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Tritone","correct":"Tritone"},{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Minor 7th","correct":"Minor 7th"}]
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-21",
+        time: "2:18 PM",
+        percentage: 91,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-22",
+        time: "2:19 PM",
+        percentage: 89,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-23",
+        time: "2:19 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-24",
+        time: "2:19 PM",
+        percentage: 83,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-21",
+        time: "2:52 PM",
+        percentage: 59,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-22",
+        time: "2:53 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-23",
+        time: "2:55 PM",
+        percentage: 77,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-09-24",
+        time: "2:59 PM",
+        percentage: 50,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-21",
+        time: "3:14 PM",
+        percentage: 41,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-22",
+        time: "3:15 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-23",
+        time: "3:17 PM",
+        percentage: 68,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-24",
+        time: "3:19 PM",
+        percentage: 61,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-21",
+        time: "3:58 PM",
+        percentage: 64,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-22",
+        time: "3:58 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-23",
+        time: "4:00 PM",
+        percentage: 77,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-09-24",
+        time: "4:02 PM",
+        percentage: 83,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-21",
+        time: "4:10 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-22",
+        time: "4:10 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-23",
+        time: "4:11 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-24",
+        time: "4:12 PM",
+        percentage: 78,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-22",
+        time: "4:23 PM",
+        percentage: 89,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-23",
+        time: "4:27 PM",
+        percentage: 50,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-21",
+        time: "4:31 PM",
+        percentage: 50,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-21",
+        time: "4:40 PM",
+        percentage: 73,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-22",
+        time: "4:41 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-23",
+        time: "4:43 PM",
+        percentage: 82,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-24",
+        time: "4:45 PM",
+        percentage: 94,
+        exercise: "Sight Singing",
+        termsToReview: []
     },
 ];
