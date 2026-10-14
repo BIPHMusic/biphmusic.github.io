@@ -3434,17 +3434,20 @@ document.addEventListener("keydown", event => {
         return;
     }
 
-    const target = event.target;
 
-    if (
-        target &&
-        (
-            target.matches("input, textarea, select") ||
-            target.isContentEditable
-        )
-    ) {
-        return;
-    }
+const target = event.target;
+
+if (
+    target &&
+    (
+        target.matches("input, textarea, select") ||
+        target.isContentEditable ||
+        target.closest("#score-exercise-options")
+    )
+) {
+    return;
+}
+
 
     const direction =
         event.key === "ArrowRight" ? 1 : -1;
