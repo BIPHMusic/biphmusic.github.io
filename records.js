@@ -75,7 +75,7 @@ const records = [
         student: "Calvin",
         date: "2026-08-26",
         time: "12:22 PM",
-        percentage: 50,
+        percentage: 100, //from 50%
         exercise: "MCQs",
         termsToReview: []
     },
@@ -2035,7 +2035,7 @@ const records = [
         student: "Calvin",
         date: "2026-09-11",
         time: "9:11 PM",
-        percentage: 60,
+        percentage: 100, //from a 60
         exercise: "MCQs",
         termsToReview: []
     },
