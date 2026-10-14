@@ -14,6 +14,40 @@
     <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<style>
+.progress-chart-name { display:block; line-height:1.15; }
+.progress-chart-kind { display:block; margin-top:2px; font-size:0.82em; font-weight:400; line-height:1.15; }
+#student-chart-container { min-height:420px; }
+#student-chart-container > div[style*="position: relative"] { height: calc(100% - 48px) !important; }
+.teacher-student-chart-container { height:400px !important; }
+/* Keep the logo above the page background but behind every page element. */
+#main-content {
+    position: relative;
+    isolation: isolate;
+}
+.logocontainer {
+    z-index: -1 !important;
+    pointer-events: none;
+}
+
+/* Apply the frosted-glass effect only to visible content surfaces,
+   not large layout wrappers or empty gaps between components. */
+#main-content table,
+#student-chart-container,
+.teacher-student-chart-container,
+.cohort-weekly-chart-container,
+.quarter-score-summary,
+.cache-status-card,
+.major-form-card,
+.score-form-card,
+.score-entry-panel {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+.table-wrapper {
+    position: relative;
+}
+</style>
 </head>
 <body>
     <div id="shared-menu"></div>
@@ -25,7 +59,7 @@
         <h1 class="Subtitle" id="page-subtitle">Grades</h1>
         <div id="student-view" class="student-dashboard">
 <div id="student-chart-container">
-                <div id="student-chart-title">My Progress</div>
+                <div id="student-chart-title" style="text-align:center;line-height:1.15;">My Progress</div>
                 <div style="position: relative; height: calc(100% - 60px);">
                     <canvas id="studentProgressChart"></canvas>
                 </div>
@@ -139,7 +173,7 @@
                                 tabindex="-1"
                             >‹</button>
                             <div class="selected-student" id="score-selected-name" style="opacity: 0.5;">
-                                (Select a student)
+                                 (Select a student)
                             </div>
                             <button
                                 type="button"
@@ -385,6 +419,7 @@
         let allStudents = [];
         let importedRecord = null;
         let studentChart = null;
+        const progressChartWeeklyMode = { student: false, teacher: false };
         let studentFocusedIndex = null;
         let studentSelectedQuarter = getCurrentQuarter();
         let teacherStudentChart = null;
@@ -1321,166 +1356,134 @@
             });
             return grouped;
         }
-                function createProgressChart(recordsSource, studentName, canvasId, titleId, mode = "student") {
-            const grouped = groupStudentRecords(recordsSource);
+        function getProgressChartTitle(studentName, mode) {
+            const name = mode === "student" ? "" : String(studentName || "");
+            const heading = progressChartWeeklyMode[mode]
+                ? "Weekly Averages"
+                : "Individual Assignments";
+            const titleMarkup = `<span class="progress-chart-kind">${heading}</span>`;
+            return name ? `<span class="progress-chart-name">${escapeHTML(name)}</span>${titleMarkup}` : titleMarkup;
+        }
+        function createProgressChart(recordsSource, studentName, canvasId, titleId, mode = "student") {
             const canvas = document.getElementById(canvasId);
             const title = document.getElementById(titleId);
             if (!canvas) return null;
             const ctx = canvas.getContext("2d");
-            const oldChart =
-                mode === "teacher"
-                    ? teacherStudentChart
-                    : studentChart;
-            if (oldChart) {
-                oldChart.destroy();
-            }
+            const oldChart = mode === "teacher" ? teacherStudentChart : studentChart;
+            if (oldChart) oldChart.destroy();
+
+            const weeklyMode = !!progressChartWeeklyMode[mode];
+            const grouped = groupStudentRecords(recordsSource);
             const datasets = [];
-            Object.keys(grouped)
-                .filter(exercise =>
-                    normalizeExercise(exercise) !==
-                    "Major Assessment"
-                )
-                .forEach(exercise => {
-                const dataPoints = grouped[exercise];
-                datasets.push({
-                    label: exercise,
-                    data: dataPoints.map(
-                        item => Number(item.percentage)
-                    ),
-                    dates: dataPoints.map(
-                        item => item.date
-                    ),
-                    times: dataPoints.map(
-                        item => item.time || ""
-                    ),
-                    recordIdentities:
-                        dataPoints.map(
-                            item => getRecordIdentity(item)
-                        ),
-                    borderColor:
-                        getExerciseColor(exercise),
-                    borderWidth: 3,
-                    tension: 0,
-                    pointRadius:
-                        dataPoints.map(item =>
-                            importedRecord &&
-                            getRecordIdentity(item) ===
-                                getRecordIdentity(
-                                    importedRecord
-                                )
-                                ? 8
-                                : 4
-                        ),
-                    pointHoverRadius: 9,
-                    pointBackgroundColor:
-                        dataPoints.map(item =>
-                            importedRecord &&
-                            getRecordIdentity(item) ===
-                                getRecordIdentity(
-                                    importedRecord
-                                )
-                                ? "#fff"
-                                : getExerciseColor(
-                                      exercise
-                                  )
-                        ),
-                    pointBorderWidth:
-                        dataPoints.map(item =>
-                            importedRecord &&
-                            getRecordIdentity(item) ===
-                                getRecordIdentity(
-                                    importedRecord
-                                )
-                                ? 3
-                                : 1
-                        ),
-                    hidden: false
-                });
-            });
-            const maxAttempts =
-                Math.max(
-                    ...Object.values(grouped).map(
-                        arr => arr.length
-                    ),
-1
+            EXERCISE_ORDER.forEach(exercise => {
+                const exerciseRecords = (grouped[exercise] || []).filter(item =>
+                    normalizeExercise(item.exercise) !== "Major Assessment"
                 );
+                if (!weeklyMode) {
+                    if (!exerciseRecords.length) return;
+                    datasets.push({
+                        label: exercise,
+                        data: exerciseRecords.map(item => Number(item.percentage)),
+                        dates: exerciseRecords.map(item => item.date),
+                        times: exerciseRecords.map(item => item.time || ""),
+                        recordIdentities: exerciseRecords.map(item => getRecordIdentity(item)),
+                        borderColor: getExerciseColor(exercise),
+                        borderWidth: 3,
+                        tension: 0,
+                        pointRadius: exerciseRecords.map(item => importedRecord && getRecordIdentity(item) === getRecordIdentity(importedRecord) ? 8 : 4),
+                        pointHoverRadius: 9,
+                        pointBackgroundColor: exerciseRecords.map(item => importedRecord && getRecordIdentity(item) === getRecordIdentity(importedRecord) ? "#fff" : getExerciseColor(exercise)),
+                        pointBorderWidth: exerciseRecords.map(item => importedRecord && getRecordIdentity(item) === getRecordIdentity(importedRecord) ? 3 : 1),
+                        hidden: false
+                    });
+                } else {
+                    if (!exerciseRecords.length) return;
+                    const weeksWithRecords = WEEKS.filter(week =>
+                        !isFutureWeek(week) && recordsSource.some(record =>
+                            normalizeExercise(record.exercise) !== "Major Assessment" &&
+                            week.days.some(day => day.date === record.date)
+                        )
+                    );
+                    if (!weeksWithRecords.length) return;
+                    const values = weeksWithRecords.map(week => {
+                        const weekValues = exerciseRecords.filter(record =>
+                            week.days.some(day => day.date === record.date)
+                        ).map(record => Number(record.percentage)).filter(Number.isFinite);
+                        return weekValues.length ? Math.round(weekValues.reduce((a,b) => a+b, 0) / weekValues.length * 10) / 10 : null;
+                    });
+                    datasets.push({
+                        label: exercise,
+                        data: values,
+                        dates: weeksWithRecords.map(week => `${week.start.date} – ${week.end.date}`),
+                        times: weeksWithRecords.map(() => ""),
+                        recordIdentities: weeksWithRecords.map(() => ""),
+                        borderColor: getExerciseColor(exercise),
+                        borderWidth: 3,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: getExerciseColor(exercise),
+                        pointBorderWidth: 1,
+                        spanGaps: false,
+                        hidden: false
+                    });
+                }
+            });
+            const labels = weeklyMode
+                ? WEEKS.filter(week => !isFutureWeek(week) && recordsSource.some(record =>
+                    normalizeExercise(record.exercise) !== "Major Assessment" && week.days.some(day => day.date === record.date)
+                )).map(week => `Week ${week.num}`)
+                : Array.from({ length: Math.max(1, ...datasets.map(dataset => dataset.data.length)) }, (_, i) => `Attempt ${i + 1}`);
+
             if (title) {
-                title.textContent =
-                    `My Progress — ${studentName}`;
+                title.innerHTML = getProgressChartTitle(studentName, mode);
+                title.style.cursor = "pointer";
+                title.removeAttribute("role");
+                title.removeAttribute("tabindex");
+                title.removeAttribute("aria-label");
+                title.onclick = () => {
+                    progressChartWeeklyMode[mode] = !progressChartWeeklyMode[mode];
+                    createProgressChart(recordsSource, studentName, canvasId, titleId, mode);
+                };
+                title.onkeydown = null;
+                title.style.userSelect = "none";
+                title.style.webkitUserSelect = "none";
+                title.style.outline = "none";
             }
             const chart = new Chart(ctx, {
                 type: "line",
-                data: {
-                    labels: Array.from(
-                        { length: maxAttempts },
-                        (_, i) =>
-                            `Attempt ${i + 1}`
-                    ),
-                    datasets
-                },
+                data: { labels, datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
-                        duration: 300,
-                        easing: "easeInOutQuart"
-                    },
+                    animation: { duration: 300, easing: "easeInOutQuart" },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                stepSize: 20
-                            }
-                        }
+                        y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } }
                     },
                     plugins: {
                         legend: {
                             position: "top",
-                            onClick: (
-                                event,
-                                legendItem
-                            ) => {
-                                toggleProgressFocus(
-                                    mode,
-                                    legendItem.datasetIndex
-                                );
-                            }
+                            onClick: (event, legendItem) => toggleProgressFocus(mode, legendItem.datasetIndex)
                         },
                         tooltip: {
                             callbacks: {
-                                title: context =>
-                                    context[0].label,
+                                title: context => context[0].label,
                                 label: context => {
-                                    const dataset =
-                                        context.dataset;
-                                    const date =
-                                        dataset.dates[
-                                            context.dataIndex
-                                        ];
-                                    const time =
-                                        dataset.times[
-                                            context.dataIndex
-                                        ];
-                                    return `${formatDate(
-                                        date
-                                    )} ${time} ${dataset.label}: ${context.parsed.y}%`;
+                                    const dataset = context.dataset;
+                                    const date = dataset.dates[context.dataIndex];
+                                    const time = dataset.times[context.dataIndex];
+                                    const value = context.parsed.y;
+                                    if (value == null) return `${dataset.label}: No score`;
+                                    return weeklyMode
+                                        ? `${dataset.label}: ${value}% (${date})`
+                                        : `${formatDate(date)} ${time} ${dataset.label}: ${value}%`;
                                 }
                             }
                         }
                     },
-                    onClick: (
-                        event,
-                        elements
-                    ) => {
-                        if (elements.length) {
-                            toggleProgressFocus(
-                                mode,
-                                elements[0].datasetIndex
-                            );
-                        } else {
-                            resetProgressFocus(mode);
-                        }
+                    onClick: (event, elements) => {
+                        if (elements.length) toggleProgressFocus(mode, elements[0].datasetIndex);
+                        else resetProgressFocus(mode);
                     }
                 }
             });
@@ -1602,11 +1605,10 @@
                     titleId
                 );
             if (title) {
-                title.textContent =
-                    state.chart.data.datasets[
-                        index
-                    ]?.label ||
-                    "My Progress";
+                title.innerHTML = getProgressChartTitle(
+                    mode === "teacher" ? teacherSelectedStudent : getCurrentStudentName(),
+                    mode
+                );
             }
             state.chart.update();
         }
@@ -1657,8 +1659,7 @@
                     ? teacherSelectedStudent
                     : getCurrentStudentName();
             if (title) {
-                title.textContent =
-                    `My Progress — ${studentName}`;
+                title.innerHTML = getProgressChartTitle(studentName, mode);
             }
             state.chart.update();
         }
@@ -1710,9 +1711,9 @@
             );
             document.getElementById(
                 "student-chart-title"
-            ).textContent =
-                studentChart.data.datasets[index]
-                    .label;
+            ).innerHTML = getProgressChartTitle(
+                getCurrentStudentName(), "student"
+            );
             studentChart.update();
         }
         function resetStudentFocus() {
@@ -1722,8 +1723,9 @@
                 getCurrentStudentName();
             document.getElementById(
                 "student-chart-title"
-            ).textContent =
-                `My Progress — ${studentName}`;
+            ).innerHTML = getProgressChartTitle(
+                studentName, "student"
+            );
             studentChart.data.datasets.forEach(
                 dataset => {
                     const original =
@@ -3434,20 +3436,17 @@ document.addEventListener("keydown", event => {
         return;
     }
 
+    const target = event.target;
 
-const target = event.target;
-
-if (
-    target &&
-    (
-        target.matches("input, textarea, select") ||
-        target.isContentEditable ||
-        target.closest("#score-exercise-options")
-    )
-) {
-    return;
-}
-
+    if (
+        target &&
+        (
+            target.matches("input, textarea, select") ||
+            target.isContentEditable
+        )
+    ) {
+        return;
+    }
 
     const direction =
         event.key === "ArrowRight" ? 1 : -1;
@@ -3798,8 +3797,7 @@ function findRecordForAssignment(
             if (!canvas) return null;
 
             const labels = students.map(student => student);
-
-            const datasets = EXERCISE_ORDER.map(metric => ({
+            const targetDatasets = EXERCISE_ORDER.map(metric => ({
                 label: metric,
                 data: grades.map(grade => {
                     const value = grade[metric];
@@ -3809,117 +3807,72 @@ function findRecordForAssignment(
                 borderColor: EXERCISES[metric],
                 borderWidth: 0,
                 borderRadius: 0,
-
-                // Narrower bars with more space between student groups.
                 barPercentage: 1.0,
                 categoryPercentage: 0.55,
                 grouped: true
             }));
 
-            /*
-            * Keep the previous week's values so that when renderTeacherCohortWeekly()
-            * recreates the chart, the new bars can animate from the old values.
-            */
-            const previousData =
-                window.cohortWeeklyBarChartData || null;
+            // Keep the same Chart.js instance and canvas between weeks. Updating the
+            // existing dataset elements lets Chart.js interpolate from the bars'
+            // currently rendered heights to their new values.
+            let chart = Chart.getChart(canvas);
 
-            const existing = Chart.getChart(canvas);
-            if (existing) {
-                existing.destroy();
-            }
-
-            const ctx = canvas.getContext("2d");
-
-            const chart = new Chart(ctx, {
-                type: "bar",
-
-                data: {
-                    labels,
-                    datasets: previousData
-                        ? previousData.map((dataset, i) => ({
-                            ...datasets[i],
-                            data: dataset.data
-                        }))
-                        : datasets
-                },
-
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-
-                    animation: {
-                        duration: 650,
-                        easing: "easeInOutQuart"
-                    },
-
-                    scales: {
-                        y: {
-                            display: false,
-                            beginAtZero: true,
-                            max: 100
+            if (chart) {
+                chart.data.labels = labels;
+                targetDatasets.forEach((dataset, i) => {
+                    if (!chart.data.datasets[i]) {
+                        chart.data.datasets[i] = { ...dataset, data: [...dataset.data] };
+                    } else {
+                        const current = chart.data.datasets[i];
+                        current.label = dataset.label;
+                        current.data = [...dataset.data];
+                        current.backgroundColor = dataset.backgroundColor;
+                        current.borderColor = dataset.borderColor;
+                        current.borderWidth = dataset.borderWidth;
+                        current.borderRadius = dataset.borderRadius;
+                        current.barPercentage = dataset.barPercentage;
+                        current.categoryPercentage = dataset.categoryPercentage;
+                        current.grouped = dataset.grouped;
+                    }
+                });
+                chart.data.datasets.length = targetDatasets.length;
+                chart.options.animation = { duration: 650, easing: "easeInOutQuart" };
+                chart.options.plugins.title.text = `Week ${week.num} Averages`;
+                chart.update();
+            } else {
+                chart = new Chart(canvas.getContext("2d"), {
+                    type: "bar",
+                    data: { labels, datasets: targetDatasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 650, easing: "easeInOutQuart" },
+                        scales: {
+                            y: { display: false, beginAtZero: true, max: 100 },
+                            x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 0, minRotation: 0, padding: 12 } }
                         },
-
-                        x: {
-                            grid: {
-                                display: false
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: `Week ${week.num} Averages`,
+                                color: "#222",
+                                font: { size: 18, weight: "700" },
+                                padding: { top: 6, bottom: 18 }
                             },
-
-                            ticks: {
-                                autoSkip: false,
-                                maxRotation: 0,
-                                minRotation: 0,
-                                padding: 12
-                            }
-                        }
-                    },
-
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-
-                        title: {
-                            display: true,
-                            text: `Week ${week.num} Averages`,
-                            color: "#222",
-                            font: {
-                                size: 18,
-                                weight: "700"
-                            },
-                            padding: {
-                                top: 6,
-                                bottom: 18
-                            }
-                        },
-
-                        tooltip: {
-                            callbacks: {
-                                title: context =>
-                                    context[0]?.label || "",
-
-                                label: context =>
-                                    `${context.dataset.label}: ${context.raw}%`
+                            tooltip: {
+                                callbacks: {
+                                    title: context => context[0]?.label || "",
+                                    label: context => `${context.dataset.label}: ${context.raw}%`
+                                }
                             }
                         }
                     }
-                }
-            });
-
-            /*
-            * If this is a week change, update from the previous week's values
-            * to the new values so the bars visibly move up/down.
-            */
-            if (previousData) {
-                chart.data.datasets = datasets;
-                chart.update();
+                });
             }
 
-            window.cohortWeeklyBarChartData = datasets.map(dataset => ({
-                data: [...dataset.data]
-            }));
-
+            window.cohortWeeklyBarChartData = targetDatasets.map(dataset => ({ data: [...dataset.data] }));
             window.cohortWeeklyBarChart = chart;
-
             return chart;
         }
         function renderTeacherCohortWeekly() {
@@ -3963,7 +3916,19 @@ function findRecordForAssignment(
             });
             html += `</tbody></table></div></div>`;
             html += `<div class="cohort-weekly-chart-container"><canvas id="cohortWeeklyBarChart"></canvas></div>`;
+            // Preserve the entire chart container, not just the canvas. Chart.js attaches
+            // its responsive resize observer to the canvas parent; replacing that parent
+            // can leave the reused chart blank after a week change.
+            const existingChartContainer = container.querySelector(".cohort-weekly-chart-container");
+            if (existingChartContainer) existingChartContainer.remove();
+
             container.innerHTML = html;
+
+            const generatedChartContainer = container.querySelector(".cohort-weekly-chart-container");
+            if (existingChartContainer && generatedChartContainer) {
+                generatedChartContainer.replaceWith(existingChartContainer);
+            }
+
             createCohortWeeklyBarChart(students, grades, week);
             container.querySelector(".cohort-weekly-copy")?.addEventListener("click", async event => {
                 const button = event.currentTarget;
@@ -4023,7 +3988,8 @@ function findRecordForAssignment(
                             text-align:center;
                             color:#222;
                             font-weight:700;
-                            margin:0 0 8px;
+                            line-height:1.15;
+                            margin:0 0 5px;
                         "
                     >
                         My Progress —
