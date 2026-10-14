@@ -4561,4 +4561,196 @@ const records = [
         exercise: "Ear Training",
         termsToReview: [{"item":"Tritone","correct":"Tritone"}]
     },
+    {
+        student: "Alex",
+        date: "2026-10-13",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-13",
+        time: "10:43 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-14",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-14",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-13",
+        time: "10:41 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-13",
+        time: "10:46 AM",
+        percentage: 67,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Minor Triad","correct":"Minor Triad"}]
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-14",
+        time: "上午10:55",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-14",
+        time: "上午10:55",
+        percentage: 73,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Augmented Triad","correct":"Augmented Triad"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-13",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-13",
+        time: "10:43 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-14",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-14",
+        time: "10:48 AM",
+        percentage: 87,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-13",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-13",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-14",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-14",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-13",
+        time: "10:44 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-13",
+        time: "10:43 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-13",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-13",
+        time: "10:50 AM",
+        percentage: 67,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Perfect 8ve","correct":"Perfect 8ve"},{"item":"Tritone","correct":"Tritone"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Augmented Triad","correct":"Augmented Triad"}]
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-14",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-14",
+        time: "10:49 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Tritone","correct":"Tritone"},{"item":"Diminished Triad","correct":"Diminished Triad"}]
+    },
+    {
+        student: "William",
+        date: "2026-10-13",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-13",
+        time: "10:55 AM",
+        percentage: 67,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor Triad","correct":"Minor Triad"}]
+    },
 ];
