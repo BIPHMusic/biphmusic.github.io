@@ -4753,4 +4753,92 @@ const records = [
         exercise: "Ear Training",
         termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor Triad","correct":"Minor Triad"}]
     },
+    {
+        student: "Thomas",
+        date: "2026-10-08",
+        time: "2:52 PM",
+        percentage: 20,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-24",
+        time: "2:54 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-08-31",
+        time: "2:56 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-09-11",
+        time: "2:57 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-11",
+        time: "2:57 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-09-23",
+        time: "2:57 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-28",
+        time: "2:59 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-09-28",
+        time: "2:59 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-09-29",
+        time: "2:59 PM",
+        percentage: 20,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-09-30",
+        time: "3:00 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-08",
+        time: "3:01 PM",
+        percentage: 20,
+        exercise: "MCQs",
+        termsToReview: []
+    },
 ];
