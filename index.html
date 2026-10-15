@@ -135,11 +135,11 @@
             <div class="countdown" id="upcoming-dates">
                 <h2 class="fade-in" id="dates-title">Dates of Importance</h2>
                 <p class="fade-in" id="mock-exam">
-                    <strong>Mock Exam</strong>: February 18th, 2027
+                    <strong>Mock Exam</strong>: February 17th & 18th
                     <span class="days-left" id="mock-countdown"></span>
                 </p>
                 <p class="fade-in" id="ap-exam">
-                    <strong>AP Exam</strong>: May 10, 2027
+                    <strong>AP Exam</strong>: May 10th
                     <span class="days-left" id="ap-countdown"></span>
                 </p>
             </div>
@@ -211,7 +211,7 @@
             const mockEl = document.getElementById('mock-countdown');
             const apEl = document.getElementById('ap-countdown');
 
-            if (mockEl) mockEl.textContent = daysUntil(2027, 2, 18);
+            if (mockEl) mockEl.textContent = daysUntil(2027, 2, 17);
             if (apEl) apEl.textContent = daysUntil(2027, 5, 10);
         }
 
