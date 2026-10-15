@@ -4945,4 +4945,20 @@ const records = [
         exercise: "Ear Training",
         termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Diminished Triad","correct":"Diminished Triad"}]
     },
+    {
+        student: "William",
+        date: "2026-10-14",
+        time: "2:36 PM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-14",
+        time: "2:36 PM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
 ];
