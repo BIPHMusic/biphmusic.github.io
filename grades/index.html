@@ -3451,8 +3451,13 @@ document.addEventListener("keydown", event => {
     const direction =
         event.key === "ArrowRight" ? 1 : -1;
 
-    // + Minor: use the same student-cycling logic as the steppers.
+    // + Minor: cycle students only when navigating outside
+    // the assignment selector.
     if (activeTab === "manual") {
+        if (target?.closest("#score-exercise-options")) {
+            return;
+        }
+
         event.preventDefault();
         cycleScoreStudent(direction);
         return;
