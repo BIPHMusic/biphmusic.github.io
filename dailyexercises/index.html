@@ -352,7 +352,6 @@
 <script src="../menu.js"></script>
 <script src="../mymenu.js"></script>
 <script src="../scrambled-vocab.js"></script>
-<!-- <script src="quiz-intervals-triads.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
 
 
@@ -407,20 +406,20 @@
 // };
 
 
-const QUIZ_CONFIG = {
-  name: "Ear Training – Intervals + Triads",
-  sections: ['intervals', 'triads'],
-  sectionTitles: ['Intervals', 'Triads'],
-  questionsPerSection: [8, 7]
-};
-
-
 // const QUIZ_CONFIG = {
-//   name: "Ear Training – Intervals + Triads + Seventh Chords",
-//   sections: ['intervals', 'triads', 'seventhChords'],
-//   sectionTitles: ['Intervals', 'Triads', 'Seventh Chords'],
-//   questionsPerSection: [5, 5, 5]
+//   name: "Ear Training – Intervals + Triads",
+//   sections: ['intervals', 'triads'],
+//   sectionTitles: ['Intervals', 'Triads'],
+//   questionsPerSection: [8, 7]
 // };
+
+
+const QUIZ_CONFIG = {
+  name: "Ear Training – Intervals + Triads + Seventh Chords",
+  sections: ['intervals', 'triads', 'seventhChords'],
+  sectionTitles: ['Intervals', 'Triads', 'Seventh Chords'],
+  questionsPerSection: [5, 5, 5]
+};
 
 
 // const QUIZ_CONFIG = {
@@ -4147,14 +4146,14 @@ function dailySightUpdateCountdown() {
   }
 
   const elapsed = Date.now() - dailySightStartedAt;
-  const remaining = Math.max(0, 180000 - elapsed);
+  const remaining = Math.max(0, 120000 - elapsed);
   const minutes = Math.floor(remaining / 60000);
   const seconds = Math.floor((remaining % 60000) / 1000);
 
   if (remaining > 0) {
     el.textContent = `${minutes}:${seconds.toString().padStart(2,'0')} remaining`;
 
-    if (remaining < 60000) {
+    if (remaining < 45000) {
         el.classList.add('warning');
     } else {
         el.classList.remove('warning');
@@ -4192,7 +4191,7 @@ function dailySightUpdateCountdown() {
       document.getElementById('recordIcon')?.classList.remove('recording');
     } else if (recordStatus) {
       recordStatus.textContent =
-        'The 3-minute sight-singing window has ended.';
+        'The 2-minute sight-singing window has ended.';
     }
   }
 }
@@ -4204,7 +4203,7 @@ async function dailyToggleSightRecording() {
   // Hard gate: once the countdown has expired, recording is permanently locked
   // for this sight-singing attempt.
   if (dailySightTimeExpired || !dailySightStartedAt ||
-      Date.now() - dailySightStartedAt >= 180000) {
+      Date.now() - dailySightStartedAt >= 120000) {
     dailySightUpdateCountdown();
     recordButton.disabled = true;
     return;
@@ -4216,13 +4215,13 @@ async function dailyToggleSightRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({audio:true});
 
-      // The microphone permission prompt is asynchronous. The 3-minute timer
+      // The microphone permission prompt is asynchronous. The 2-minute timer
       // may expire while it is open, so check the hard deadline again before
       // starting MediaRecorder.
       if (
         dailySightTimeExpired ||
         !dailySightStartedAt ||
-        Date.now() - dailySightStartedAt >= 180000
+        Date.now() - dailySightStartedAt >= 120000
       ) {
         stream.getTracks().forEach(track => track.stop());
         dailySightUpdateCountdown();
@@ -4307,7 +4306,7 @@ async function dailyToggleSightRecording() {
       // Check one final time immediately before starting the recorder.
       if (
         dailySightTimeExpired ||
-        Date.now() - dailySightStartedAt >= 180000
+        Date.now() - dailySightStartedAt >= 120000
       ) {
         stream.getTracks().forEach(track => track.stop());
         return;
