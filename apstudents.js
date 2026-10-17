@@ -30,8 +30,8 @@ globalThis.studentPasswordCredentials["alex"] = {
 };
 globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
 globalThis.studentPasswordCredentials["william"] = {
-    salt: "70e6b55b84fd27e06a876ba3e1b88478",
-    hash: "029af3e3bdab25d77114ec2506aeb530b6817da55e2ee53ea22aa17d9ffbaa27"
+   salt: "fdb83e43fe1f4acc039bcc656288b63d",
+   hash: "deb512f54de1b6c1ee377840bb5f505b0f781621ec2e88068c5ab1e1b376a051"
 };
 globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
 globalThis.studentPasswordCredentials["thomas"] = {
