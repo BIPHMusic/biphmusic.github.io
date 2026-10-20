@@ -1,0 +1,530 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>8-Ball</title>
+    <link rel="icon" href="../icons/BGicon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+    <link rel="preload" href="../fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 16px 40px;
+            text-align: center;
+        }
+
+        /* QUESTION BUTTONS */
+
+        .question-pair {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: 16px;
+            max-width: 680px;
+            min-height: 100px;
+            margin: 25px auto 30px;
+        }
+
+        .question-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 20px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font: inherit;
+            font-size: 1rem;
+            line-height: 1.5;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .question-button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.13);
+            border-color: rgba(255, 255, 255, 0.65);
+        }
+
+        .question-button:focus-visible {
+            outline: 3px solid white;
+            outline-offset: 4px;
+        }
+
+        .question-button:disabled {
+            cursor: default;
+        }
+
+        .question-button.disappearing {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .question-button.selected {
+            position: absolute;
+            z-index: 2;
+            flex: none;
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.42);
+            border-color: rgba(255, 255, 255, 0.45);
+        }
+
+        /* MAGIC 8-BALL */
+
+        .ball-area {
+            padding: 5px 0 25px;
+        }
+
+        .ball {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: min(290px, 72vw);
+            aspect-ratio: 1;
+            margin: 0 auto;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            background:
+                radial-gradient(
+                    circle at 32% 23%,
+                    #555565 0%,
+                    #292934 17%,
+                    #111117 44%,
+                    #050507 72%,
+                    #22222c 86%,
+                    #050507 100%
+                );
+            box-shadow:
+                inset -12px -15px 28px rgba(0, 0, 0, 0.9),
+                inset 5px 6px 15px rgba(255, 255, 255, 0.12),
+                0 0 30px rgba(130, 100, 255, 0.18),
+                0 20px 45px rgba(0, 0, 0, 0.4);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .ball-window {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44%;
+            aspect-ratio: 1;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            background:
+                radial-gradient(
+                    circle at 35% 25%,
+                    #343b65,
+                    #171d3d 48%,
+                    #080b1e 100%
+                );
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+
+        .ball-symbol {
+            color: #dedcff;
+            font-family: Georgia, serif;
+            font-size: clamp(4rem, 15vw, 6rem);
+            font-weight: bold;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(180, 175, 255, 0.65);
+        }
+
+        .ball-symbol.thumb {
+            font-family: sans-serif;
+            font-size: clamp(3rem, 11vw, 4.5rem);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .ball.thinking {
+            animation: shake 0.12s infinite alternate;
+            box-shadow:
+                inset -12px -15px 28px rgba(0, 0, 0, 0.9),
+                0 0 45px rgba(140, 120, 255, 0.55),
+                0 0 90px rgba(100, 110, 255, 0.3);
+        }
+
+        .ball.thinking .ball-window {
+            animation: glow 0.5s infinite alternate;
+        }
+
+        .ball.reveal .ball-symbol {
+            animation: reveal 0.55s ease-out;
+        }
+
+        @keyframes shake {
+            from { transform: rotate(-2deg) scale(1.01); }
+            to   { transform: rotate(2deg) scale(1.035); }
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            }
+            to {
+                box-shadow: inset 0 0 28px rgba(120, 135, 255, 0.8);
+            }
+        }
+
+        @keyframes reveal {
+            0%   { opacity: 0; transform: scale(0.2); }
+            65%  { opacity: 1; transform: scale(1.25); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .speech-note {
+            min-height: 20px;
+            margin: 18px 0 0;
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 480px) {
+            .question-pair {
+                gap: 10px;
+                min-height: 120px;
+                margin-top: 20px;
+            }
+
+            .question-button {
+                padding: 15px 10px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ball.thinking,
+            .ball.thinking .ball-window,
+            .ball.reveal .ball-symbol {
+                animation: none;
+            }
+
+            .question-button {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="shared-menu"></div>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">8-Ball</h1>
+
+    <div class="container">
+
+        <div id="questionPair" class="question-pair">
+            <button class="question-button" type="button"></button>
+            <button class="question-button" type="button"></button>
+        </div>
+
+        <div class="ball-area">
+            <div id="magicBall" class="ball">
+                <div class="ball-window">
+                    <span id="ballSymbol" class="ball-symbol">8</span>
+                </div>
+            </div>
+
+            <p id="speechNote" class="speech-note" aria-live="polite"></p>
+        </div>
+
+    </div>
+
+    <div class="logocontainer">
+        <img
+            src="../icons/Full Logo White on Transparent.png"
+            alt="BASIS Logo"
+            class="logo"
+        >
+    </div>
+
+    <script src="../apstudents.js"></script>
+    <script src="../menu.js"></script>
+    <script src="../mymenu.js"></script>
+
+    <script>
+        // ============================================================
+        // EDIT YOUR QUESTIONS HERE
+        //
+        // answer: "yes" or "no"
+        // The questions are randomly paired.
+        // ============================================================
+
+        const eightBallQuestions = [
+            // YES
+            { question: "Is Mr. Tubbs nice?", answer: "yes" },
+            { question: "Is Mr. Tubbs the best teacher ever?", answer: "yes" },
+            { question: "Will I get a 5 on the AP exam?", answer: "yes" },
+            { question: "Am I the smartest student in the class?", answer: "yes" },
+            { question: "Will today be awesome?", answer: "yes" },
+            { question: "Is AP music theory the best subject at BIPH?", answer: "yes" },
+            { question: "Will Mr. Tubbs say ''Ohai'' today?", answer: "yes" },
+            { question: "Will I absolutely crush this assignment?", answer: "yes" },
+            { question: "Is music the highlight of the school day?", answer: "yes" },
+            { question: "Will I survive this semester?", answer: "yes" },
+            { question: "Should Mr. Tubbs get a standing ovation?", answer: "yes" },
+            { question: "Is Mr. Tubbs secretly a genius?", answer: "yes" },
+
+            // NO
+            { question: "Can we drink Starbucks, pleeeease?", answer: "no" },
+            { question: "Will we have a pizza party tomorrow?", answer: "no" },
+            { question: "Can we watch a movie?", answer: "no" },
+            { question: "Will BASIS cancel all exams forever?", answer: "no" },
+            { question: "Will Mr. Tubbs give everyone 100% automatically?", answer: "no" },
+            { question: "Can I play video games during the entire lesson?", answer: "no" },
+            { question: "Can we replace the final exam with karaoke?", answer: "no" },
+            { question: "Will Mr. Tubbs buy the whole class a new MacBook?", answer: "no" }
+        ];
+
+        // ============================================================
+        // END OF EDITABLE QUESTIONS
+        // ============================================================
+
+        const questionPair = document.getElementById("questionPair");
+        const magicBall = document.getElementById("magicBall");
+        const ballSymbol = document.getElementById("ballSymbol");
+        const speechNote = document.getElementById("speechNote");
+
+        let currentPair = [];
+        let isBusy = false;
+        let roundTimer = null;
+        let lastPairKey = "";
+        let roundNumber = 0;
+
+        const questionButtons = Array.from(
+            questionPair.querySelectorAll(".question-button")
+        );
+
+        // Get two different questions for each round.
+        // Avoid repeating the exact same pair consecutively.
+        function getNextPair() {
+            if (eightBallQuestions.length < 2) {
+                return [];
+            }
+
+            let pair;
+            let pairKey;
+            let attempts = 0;
+
+            do {
+                pair = [...eightBallQuestions]
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, 2);
+
+                pairKey = pair
+                    .map(item => item.question)
+                    .sort()
+                    .join("|");
+
+                attempts++;
+            } while (
+                pairKey === lastPairKey &&
+                attempts < 20
+            );
+
+            lastPairKey = pairKey;
+            return pair;
+        }
+
+        // Show a fresh pair of question buttons.
+        function showNextPair() {
+            clearTimeout(roundTimer);
+
+            currentPair = getNextPair();
+
+            if (currentPair.length !== 2) {
+                speechNote.textContent =
+                    "Add at least two questions to the configuration.";
+                return;
+            }
+
+            magicBall.classList.remove("thinking", "reveal");
+            ballSymbol.classList.remove("thumb");
+            ballSymbol.textContent = "8";
+
+            speechNote.textContent = "";
+
+            questionButtons.forEach((button, index) => {
+                button.className = "question-button";
+                button.disabled = false;
+                button.textContent = currentPair[index].question;
+                button.style.display = "";
+                button.style.left = "";
+                button.style.top = "";
+                button.style.transform = "";
+                button.style.width = "";
+                button.style.height = "";
+                button.style.opacity = "";
+                button.style.transition = "";
+                button.style.position = "";
+                button.style.margin = "";
+            });
+
+            questionPair.style.minHeight = "";
+            questionPair.style.height = "";
+
+            isBusy = false;
+        }
+
+        // Move the selected question to the center while the other vanishes.
+        function centerSelectedQuestion(selectedButton, otherButton) {
+            const startRect = selectedButton.getBoundingClientRect();
+
+            selectedButton.disabled = true;
+            otherButton.disabled = true;
+            otherButton.classList.add("disappearing");
+
+            const containerRect = questionPair.getBoundingClientRect();
+
+            // Reserve the original row height so the layout doesn't jump.
+            questionPair.style.height = containerRect.height + "px";
+            questionPair.style.minHeight = containerRect.height + "px";
+
+            selectedButton.classList.add("selected");
+
+            // Hide the unselected question from the layout.
+            otherButton.style.display = "none";
+
+            // Let the selected question occupy the centered row.
+            selectedButton.style.position = "absolute";
+            selectedButton.style.left = "0";
+            selectedButton.style.top = "0";
+            selectedButton.style.width = "100%";
+            selectedButton.style.height = "100%";
+            selectedButton.style.margin = "0";
+
+            const endRect = selectedButton.getBoundingClientRect();
+
+            // Animate from the original position into the centered position.
+            const dx = startRect.left - endRect.left;
+            const dy = startRect.top - endRect.top;
+            const sx = startRect.width / endRect.width;
+            const sy = startRect.height / endRect.height;
+
+            selectedButton.animate(
+                [
+                    {
+                        transform:
+                            `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
+                    },
+                    {
+                        transform: "translate(0, 0) scale(1, 1)"
+                    }
+                ],
+                {
+                    duration: 450,
+                    easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+                    fill: "none"
+                }
+            );
+        }
+
+        // Speak the answer and advance when the voice finishes.
+        function speakAnswer(answer) {
+            if (!("speechSynthesis" in window)) {
+                speechNote.textContent = "";
+                roundTimer = setTimeout(showNextPair, 1800);
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(answer);
+
+            utterance.lang = "en-US";
+            utterance.rate = 0.85;
+            utterance.pitch = 0.85;
+            utterance.volume = 1;
+
+            const voices = window.speechSynthesis.getVoices();
+
+            const preferredVoice = voices.find(voice =>
+                voice.lang === "en-US" &&
+                /Samantha|Google US English|Alex/i.test(voice.name)
+            );
+
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+
+            let finished = false;
+
+            function finishSpeaking() {
+                if (finished) return;
+                finished = true;
+
+                // Keep the thumb visible briefly after the spoken answer.
+                roundTimer = setTimeout(showNextPair, 900);
+            }
+
+            utterance.onend = finishSpeaking;
+            utterance.onerror = finishSpeaking;
+
+            // A fallback in case the browser doesn't fire onend.
+            roundTimer = setTimeout(finishSpeaking, 5000);
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Run a round after the student selects one of the two questions.
+        function askQuestion(index) {
+            if (isBusy) return;
+
+            isBusy = true;
+
+            const selectedQuestion = currentPair[index];
+            const selectedButton = questionButtons[index];
+            const otherButton = questionButtons[1 - index];
+
+            centerSelectedQuestion(selectedButton, otherButton);
+
+            // Start the ball animation after the question starts centering.
+            roundTimer = setTimeout(() => {
+                magicBall.classList.add("thinking");
+
+                // Dramatic pause.
+                roundTimer = setTimeout(() => {
+                    magicBall.classList.remove("thinking");
+
+                    // Display the appropriate thumb inside the ball.
+                    ballSymbol.classList.add("thumb");
+                    ballSymbol.textContent =
+                        selectedQuestion.answer === "yes" ? "👍" : "👎";
+
+                    magicBall.classList.add("reveal");
+
+                    // Speak only the answer, never the question.
+                    speakAnswer(selectedQuestion.answer);
+
+                }, 1600);
+
+            }, 400);
+        }
+
+        questionButtons.forEach((button, index) => {
+            button.addEventListener("click", () => askQuestion(index));
+        });
+
+        // Start with two questions immediately.
+        showNextPair();
+    </script>
+
+</body>
+</html>
