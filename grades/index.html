@@ -47,6 +47,296 @@
 .table-wrapper {
     position: relative;
 }
+
+        #teacher-curve-tab .container{
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 16px 40px;
+        }
+
+        /* Summary cards */
+
+        #teacher-curve-tab .summary{
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        #teacher-curve-tab .summary-card{
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            text-align: center;
+        }
+
+        #teacher-curve-tab .summary-number{
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #teacher-curve-tab .summary-label{
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
+
+        /* Filter */
+
+        #teacher-curve-tab .filter-container{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        #teacher-curve-tab #filter{
+            width: 100%;
+            max-width: 320px;
+            padding: 11px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            border-radius: 8px;
+            background: rgba(243, 247, 255, 0.818);
+            color: #203746;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            color-scheme: light;
+        }
+
+        #teacher-curve-tab #filter:focus{
+            outline: 2px solid rgba(173, 216, 230, 0.8);
+            outline-offset: 3px;
+        }
+
+        #teacher-curve-tab #filter option{
+            background: #f3f7ff;
+            color: #203746;
+        }
+
+        /* Curve button */
+
+        #teacher-curve-tab #curve-button{
+            width: 100%;
+            max-width: 320px;
+            padding: 12px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            border-radius: 8px;
+            background: rgba(243, 247, 255, 0.818);
+            color: #203746;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+        #teacher-curve-tab #curve-button:hover{
+            background: #dceaff;
+        }
+
+        #teacher-curve-tab #curve-button:active{
+            transform: scale(0.98);
+        }
+
+        #teacher-curve-tab #curve-button:disabled{
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        #teacher-curve-tab #curve-button[hidden]{
+            display: none;
+        }
+
+        #teacher-curve-tab #action-message{
+            max-width: 600px;
+            margin: 0 auto 18px;
+            text-align: center;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        /* Assessment cards */
+
+        #teacher-curve-tab .assessment{
+            margin: 14px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        #teacher-curve-tab .assessment:hover{
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        #teacher-curve-tab .assessment.curve-candidate{
+            border: 2px solid #ffbd59;
+            background: rgba(255, 189, 89, 0.10);
+        }
+
+        #teacher-curve-tab .assessment.curve-candidate:hover{
+            background: rgba(255, 189, 89, 0.16);
+        }
+
+        #teacher-curve-tab .assessment-header{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 10px;
+            padding: 20px 16px;
+        }
+
+        #teacher-curve-tab .assessment-title{
+            font-size: 1.15rem;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        #teacher-curve-tab .assessment-date{
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        #teacher-curve-tab .assessment-stats{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            font-size: 0.9rem;
+        }
+
+        #teacher-curve-tab .stat{
+            padding: 5px 9px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Student scores */
+
+        #teacher-curve-tab .student-list{
+            display: none;
+            padding: 0 16px 16px;
+            cursor: default;
+        }
+
+        #teacher-curve-tab .assessment.expanded .student-list{
+            display: block;
+        }
+
+        #teacher-curve-tab .student-table-header, #teacher-curve-tab .student-row{
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 85px 100px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #teacher-curve-tab .student-table-header{
+            padding: 10px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 0.8rem;
+            opacity: 0.8;
+            font-weight: bold;
+        }
+
+        #teacher-curve-tab .student-row{
+            padding: 11px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+            font-size: 0.95rem;
+        }
+
+        #teacher-curve-tab .student-row:last-child{
+            border-bottom: none;
+        }
+
+        #teacher-curve-tab .student-name{
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        #teacher-curve-tab .student-score, #teacher-curve-tab .student-curved-score{
+            text-align: right;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        #teacher-curve-tab .student-curved-score{
+            color: #b9e6ff;
+        }
+
+        #teacher-curve-tab .student-terms{
+            margin-top: 4px;
+            font-size: 0.82rem;
+            opacity: 0.75;
+            font-weight: normal;
+        }
+
+        #teacher-curve-tab .empty-state{
+            padding: 30px 16px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #teacher-curve-tab .error{
+            color: #ffb3b3;
+            padding: 16px;
+            border: 1px solid rgba(255, 100, 100, 0.5);
+            border-radius: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 550px) {
+            #teacher-curve-tab .summary{
+                gap: 8px;
+            }
+
+            #teacher-curve-tab .summary-card{
+                padding: 12px 5px;
+            }
+
+            #teacher-curve-tab .summary-number{
+                font-size: 1.5rem;
+            }
+
+            #teacher-curve-tab .summary-label{
+                font-size: 0.75rem;
+            }
+
+            #teacher-curve-tab .assessment-header{
+                padding: 18px 12px;
+            }
+
+            #teacher-curve-tab .assessment-title{
+                font-size: 1.05rem;
+            }
+
+            #teacher-curve-tab .student-list{
+                padding: 0 10px 12px;
+            }
+
+            #teacher-curve-tab .student-table-header, #teacher-curve-tab .student-row{
+                grid-template-columns: minmax(0, 1fr) 65px 80px;
+                gap: 6px;
+                font-size: 0.82rem;
+            }
+
+            #teacher-curve-tab .student-table-header{
+                font-size: 0.7rem;
+            }
+        }
+    
 </style>
 </head>
 <body>
@@ -334,6 +624,7 @@
                     </div>
                 </div>
             </section>
+
             <section id="teacher-cache-tab" class="teacher-panel hidden">
                 <div class="cache-panel" id="cache-panel"></div>
             </section>
@@ -5332,6 +5623,7 @@ function setupTeacherStudentSearch() {
             let html = `
                 <div class="cache-status-card">
                     <h3>Records Cache</h3>
+                    <div id="cache-curve-tools"></div>
                     <div class="cache-status ${statusClass}">
                         ${escapeHTML(statusText)}
                     </div>
@@ -5461,6 +5753,7 @@ function setupTeacherStudentSearch() {
                 </div>
             `;
             container.innerHTML = html;
+            window.renderCacheCurveTools?.();
             // Delete individual cache entries
             container
                 .querySelectorAll(
@@ -9092,5 +9385,300 @@ function setupTeacherStudentSearch() {
             }
         );
     </script>
+<script>
+(function () {
+    const TOOL_ID = "cache-curve-tools";
+    const round1 = value => Math.round((Number(value) + Number.EPSILON) * 10) / 10;
+    const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+    const formatPercentage = value => {
+        const rounded = round1(value);
+        return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)}%`;
+    };
+    const validScore = record => {
+        const value = Number(record?.percentage);
+        return record?.percentage !== null && record?.percentage !== undefined &&
+            record?.percentage !== "" && Number.isFinite(value) && value >= 0 && value <= 100
+            ? value : null;
+    };
+    const assessmentKey = record => JSON.stringify([String(record?.date ?? ""), String(record?.exercise ?? "")]);
+    const duplicateKey = record => JSON.stringify([
+        String(record?.student ?? "").trim().toLocaleLowerCase(),
+        String(record?.date ?? "").trim(),
+        String(record?.exercise ?? "").trim().toLocaleLowerCase()
+    ]);
+
+    function getAssessments(source) {
+        const groups = new Map();
+        source.forEach((record, index) => {
+            if (!record || !record.date || !record.exercise) return;
+            const key = assessmentKey(record);
+            if (!groups.has(key)) groups.set(key, {
+                key, date: String(record.date), exercise: String(record.exercise), students: [], scores: []
+            });
+            const group = groups.get(key);
+            group.students.push({ record, index });
+            const score = validScore(record);
+            if (score !== null) group.scores.push(score);
+        });
+        return Array.from(groups.values()).map(group => {
+            const highest = group.scores.length ? Math.max(...group.scores) : null;
+            const average = group.scores.length
+                ? round1(group.scores.reduce((sum, score) => sum + score, 0) / group.scores.length)
+                : null;
+            const curveAmount = highest !== null && highest < 100 ? round1(100 - highest) : 0;
+            return { ...group, highest, average, curveAmount,
+                candidate: highest !== null && highest < 100 };
+        }).filter(group => group.candidate)
+          .sort((a, b) => b.date.localeCompare(a.date) || a.exercise.localeCompare(b.exercise));
+    }
+
+    function getDuplicateGroups(source) {
+        const groups = new Map();
+        source.forEach((record, index) => {
+            if (!record || !record.student || !record.date || !record.exercise) return;
+            const key = duplicateKey(record);
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push({ record, index });
+        });
+        return Array.from(groups.entries())
+            .filter(([, entries]) => entries.length > 1)
+            .map(([key, entries]) => ({ key, entries }))
+            .sort((a, b) => String(a.entries[0].record.date).localeCompare(String(b.entries[0].record.date)) ||
+                String(a.entries[0].record.student).localeCompare(String(b.entries[0].record.student)));
+    }
+
+    function recordChoiceLabel(entry, number) {
+        const record = entry.record;
+        const score = validScore(record);
+        const extras = Object.entries(record)
+            .filter(([key, value]) => !["student", "date", "exercise", "percentage"].includes(key) &&
+                value !== null && value !== undefined && value !== "")
+            .slice(0, 2)
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : String(value)}`)
+            .join("; ");
+        return `Record ${number} — ${score === null ? "No valid score" : formatPercentage(score)}${extras ? ` — ${extras}` : ""}`;
+    }
+
+    function render() {
+        const host = document.getElementById(TOOL_ID);
+        if (!host || !Array.isArray(cachedRecords)) return;
+        const candidates = getAssessments(cachedRecords);
+        const duplicates = getDuplicateGroups(cachedRecords);
+        if (!candidates.length && !duplicates.length) {
+            host.innerHTML = "";
+            return;
+        }
+        let html = `<div class="cache-curve-tools" style="margin: 14px 0 20px; padding: 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 12px; background: rgba(255,255,255,.045);">`;
+        if (candidates.length) {
+            html += `<h3 style="margin:0 0 10px;">${candidates.length} assignment${candidates.length === 1 ? "" : "s"} can be curved</h3>
+                <div class="cache-curve-assessments" style="display:grid; gap:8px;">`;
+            html += candidates.map((assessment, i) => {
+                const rows = assessment.students.slice().sort((a, b) => {
+                    const sa = validScore(a.record), sb = validScore(b.record);
+                    if (sa === null && sb === null) return String(a.record.student ?? "").localeCompare(String(b.record.student ?? ""));
+                    if (sa === null) return 1; if (sb === null) return -1;
+                    return sb - sa || String(a.record.student ?? "").localeCompare(String(b.record.student ?? ""));
+                }).map(({record}) => {
+                    const score = validScore(record);
+                    const curved = score === null ? null : round1(Math.min(100, score + assessment.curveAmount));
+                    return `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.1);align-items:center;">
+                        <span>${escapeHTML(record.student || "Unknown student")}</span>
+                        <span style="text-align:right;opacity:.8;">${score === null ? "N/A" : formatPercentage(score)}</span>
+                        <strong style="text-align:right;color:#ffbd59;">${curved === null ? "N/A" : formatPercentage(curved)}</strong>
+                    </div>`;
+                }).join("");
+                return `<details style="border:1px solid rgba(255,255,255,.15);border-radius:9px;overflow:hidden;">
+                    <summary style="cursor:pointer;padding:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
+                        <span><strong>${escapeHTML(assessment.exercise)}</strong> <span style="opacity:.75;">— ${escapeHTML(assessment.date)}</span></span>
+                        <span style="font-size:.9em;opacity:.85;">+${formatPercentage(assessment.curveAmount)} · ${assessment.students.length} records</span>
+                    </summary>
+                    <div style="padding:0 12px 10px;">
+                        <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;padding:5px 0;font-size:.7em;opacity:.7;"><span>Student</span><span>Original</span><span>Curved</span></div>
+                        ${rows}
+                    </div>
+                </details>`;
+            }).join("");
+            html += `</div><button type="button" id="cache-curve-button" ${duplicates.length ? "disabled title=\"Resolve duplicate assignment records first.\"" : ""} style="margin-top:12px;padding:10px 18px;border:0;border-radius:8px;background:#ffbd59;color:#17202a;font-weight:700;cursor:pointer;${duplicates.length ? "opacity:.55;cursor:not-allowed;" : ""}">Curve 'em!</button>
+                <div id="cache-curve-message" role="status" aria-live="polite" style="margin-top:8px;">${duplicates.length ? "Resolve duplicate records below before applying curves." : ""}</div>`;
+        }
+        if (duplicates.length) {
+            html += `<div style="margin-top:${candidates.length ? "22px" : "0"};"><h3 style="margin:0 0 6px;">Duplicate assignment records</h3>
+                <p style="margin:0 0 10px;opacity:.8;">Each student should have one record per assignment and date. Select the record to keep for each group; the others will be removed from the cache.</p>
+                <div style="display:grid;gap:10px;">`;
+            html += duplicates.map((group, i) => {
+                const first = group.entries[0].record;
+                return `<div style="padding:12px;border:1px solid rgba(255,120,120,.35);border-radius:9px;">
+                    <div style="font-weight:700;margin-bottom:8px;">${escapeHTML(first.student)} · ${escapeHTML(first.exercise)} · ${escapeHTML(first.date)}</div>
+                    <div style="display:flex;flex-wrap:nowrap;gap:8px;align-items:stretch;width:100%;">
+                        ${group.entries.map((entry, j) => {
+                            const score = validScore(entry.record);
+                            const label = score === null ? "No valid score" : formatPercentage(score);
+                            return `<button type="button" data-keep-duplicate="${i}" data-keep-entry="${j}" title="${escapeHTML(recordChoiceLabel(entry, j + 1))}" style="flex:1 1 0;min-width:0;padding:10px 6px;border:1px solid rgba(255,255,255,.24);border-radius:7px;cursor:pointer;white-space:normal;overflow-wrap:anywhere;background:rgba(255,255,255,.08);color:inherit;font-weight:700;">${escapeHTML(label)}</button>`;
+                        }).join("")}
+                    </div>
+                </div>`;
+            }).join("");
+            html += `</div></div>`;
+        }
+        html += `</div>`;
+        host.innerHTML = html;
+
+        const curveButton = host.querySelector("#cache-curve-button");
+        if (curveButton) curveButton.addEventListener("click", curveEm);
+        host.querySelectorAll("[data-keep-duplicate]").forEach(button => {
+            button.addEventListener("click", () => {
+                const groupIndex = Number(button.dataset.keepDuplicate);
+                const entryIndex = Number(button.dataset.keepEntry);
+                const groupsNow = getDuplicateGroups(cachedRecords);
+                const group = groupsNow[groupIndex];
+                if (!group || !group.entries[entryIndex]) return;
+                const keepIndex = group.entries[entryIndex].index;
+                const removeIndexes = group.entries.map(entry => entry.index).filter(index => index !== keepIndex);
+                removeIndexes.sort((a, b) => b - a).forEach(index => cachedRecords.splice(index, 1));
+                saveCachedRecords();
+                renderCachePanel();
+            });
+        });
+    }
+
+    function createPDF(lines) {
+        // A small self-contained PDF writer avoids opening tabs or relying on external libraries.
+        const pageLines = [];
+        let page = [];
+        lines.forEach(line => {
+            const wrapped = wrapPDFLine(String(line), 84);
+            wrapped.forEach(part => {
+                if (page.length >= 48) { pageLines.push(page); page = []; }
+                page.push(part);
+            });
+        });
+        if (page.length || !pageLines.length) pageLines.push(page);
+        const objects = [];
+        const add = value => { objects.push(value); return objects.length; };
+        const catalogId = add("");
+        const pagesId = add("");
+        const fontId = add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+        const pageIds = [];
+        pageLines.forEach((pageContent, index) => {
+            let stream = "BT\n/F1 10 Tf\n50 790 Td\n14 TL\n";
+            pageContent.forEach((line, i) => {
+                if (i) stream += "T*\n";
+                stream += `(${pdfEscape(line)}) Tj\n`;
+            });
+            stream += "ET";
+            const contentId = add(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+            const pageId = add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 ${fontId} 0 R >> >> /Contents ${contentId} 0 R >>`);
+            pageIds.push(pageId);
+        });
+        objects[catalogId - 1] = `<< /Type /Catalog /Pages ${pagesId} 0 R >>`;
+        objects[pagesId - 1] = `<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>`;
+        let output = "%PDF-1.4\n%âãÏÓ\n";
+        const offsets = [0];
+        objects.forEach((object, i) => { offsets.push(output.length); output += `${i + 1} 0 obj\n${object}\nendobj\n`; });
+        const xrefOffset = output.length;
+        output += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+        offsets.slice(1).forEach(offset => { output += `${String(offset).padStart(10, "0")} 00000 n \n`; });
+        output += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+        return new Blob([output], { type: "application/pdf" });
+    }
+    function asciiText(value) {
+        return String(value ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, "?");
+    }
+    function pdfEscape(value) { return asciiText(value).replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)"); }
+    function wrapPDFLine(value, maxLength) {
+        const text = asciiText(value);
+        if (text.length <= maxLength) return [text];
+        const words = text.split(/\s+/);
+        const lines = []; let current = "";
+        words.forEach(word => {
+            if (current && (current + " " + word).length > maxLength) { lines.push(current); current = word; }
+            else current = current ? current + " " + word : word;
+        });
+        if (current) lines.push(current);
+        return lines;
+    }
+    function localDateStamp() {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+    }
+    function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url; link.download = filename;
+        document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+    function curveEm() {
+        const button = document.getElementById("cache-curve-button");
+        const message = document.getElementById("cache-curve-message");
+        if (!Array.isArray(cachedRecords)) return;
+        if (getDuplicateGroups(cachedRecords).length) {
+            if (message) message.textContent = "Resolve duplicate assignment records before applying curves.";
+            return;
+        }
+        const candidates = getAssessments(cachedRecords);
+        if (!candidates.length) { if (message) message.textContent = "There are no eligible assignments to curve."; return; }
+        if (button) button.disabled = true;
+        try {
+            const candidateMap = new Map(candidates.map(assessment => [assessment.key, assessment]));
+            const reports = new Map();
+            cachedRecords = cachedRecords.map(record => {
+                if (!record || !record.date || !record.exercise) return record;
+                const assessment = candidateMap.get(assessmentKey(record));
+                if (!assessment) return record;
+                const previousScore = validScore(record);
+                if (previousScore === null) return record;
+                const newScore = round1(Math.min(100, previousScore + assessment.curveAmount));
+                if (!reports.has(record.student || "Unknown student")) reports.set(record.student || "Unknown student", []);
+                reports.get(record.student || "Unknown student").push({
+                    date: record.date, exercise: record.exercise, previousScore,
+                    pointsAdded: round1(newScore - previousScore), newScore
+                });
+                return { ...record, percentage: newScore };
+            });
+            saveCachedRecords();
+            renderCachePanel();
+
+            const stamp = localDateStamp();
+            let downloaded = 0;
+            for (const [studentName, entries] of reports) {
+                const lines = [
+                    "BIPH Music - Curve Report",
+                    `Student: ${studentName}`,
+                    `Report date: ${stamp}`,
+                    `${entries.length} assessment${entries.length === 1 ? "" : "s"} curved`,
+                    ""
+                ];
+                entries.sort((a,b) => String(a.date).localeCompare(String(b.date)) || String(a.exercise).localeCompare(String(b.exercise)));
+                entries.forEach((entry, index) => {
+                    lines.push(`${index + 1}. ${entry.exercise}`);
+                    lines.push(`   Date: ${entry.date}`);
+                    lines.push(`   Previous score: ${formatPercentage(entry.previousScore)}`);
+                    lines.push(`   Points added: +${formatPercentage(entry.pointsAdded)}`);
+                    lines.push(`   New grade: ${formatPercentage(entry.newScore)}`);
+                    lines.push("");
+                });
+                const safeName = String(studentName).replace(/[\\/:*?"<>|]/g, "-").trim() || "Student";
+                downloadBlob(createPDF(lines), `Curve Report - ${safeName} - ${stamp}.pdf`);
+                downloaded++;
+            }
+            const successMessage = `Updated the browser cache for ${candidates.length} assignment${candidates.length === 1 ? "" : "s"} and downloaded ${downloaded} student Curve Report PDF${downloaded === 1 ? "" : "s"}. The updated records.js has not been downloaded; use Export Records or Copy Records when ready.`;
+            const currentMessage = document.getElementById("cache-curve-message");
+            if (currentMessage) currentMessage.textContent = successMessage;
+            else if (typeof showToast === "function") showToast(successMessage);
+        } catch (error) {
+            console.error("Error while applying curves:", error);
+            const currentMessage = document.getElementById("cache-curve-message");
+            if (currentMessage) currentMessage.textContent = "Something went wrong while generating the curved records. Check the browser console for details.";
+        } finally {
+            const currentButton = document.getElementById("cache-curve-button");
+            if (currentButton) currentButton.disabled = false;
+        }
+    }
+    window.renderCacheCurveTools = render;
+})();
+</script>
 </body>
 </html>
