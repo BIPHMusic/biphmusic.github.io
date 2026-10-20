@@ -72,6 +72,14 @@ const records = [
         termsToReview: []
     },
     {
+        student: "Calvin",
+        date: "2026-08-26",
+        time: "12:22 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
         student: "William",
         date: "2026-08-26",
         time: "12:23 PM",
@@ -2024,6 +2032,14 @@ const records = [
         termsToReview: []
     },
     {
+        student: "Calvin",
+        date: "2026-09-11",
+        time: "9:11 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
         student: "William",
         date: "2026-09-11",
         time: "9:11 PM",
@@ -3770,54 +3786,6 @@ const records = [
         termsToReview: []
     },
     {
-        student: "Calvin",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 40,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Teresa",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 60,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Maggie",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 100,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Alex",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 100,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "William",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 80,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Jocelyn",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 80,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
         student: "Alex",
         date: "2026-10-08",
         time: "10:48 AM",
@@ -4171,17 +4139,49 @@ const records = [
     },
     {
         student: "Calvin",
-        date: "2026-08-26",
-        time: "12:22 PM",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-08",
+        time: "2:40 PM",
         percentage: 100,
         exercise: "MCQs",
         termsToReview: []
     },
     {
-        student: "Calvin",
-        date: "2026-09-11",
-        time: "9:11 PM",
+        student: "Alex",
+        date: "2026-10-08",
+        time: "2:40 PM",
         percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 80,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -5583,6 +5583,97 @@ const records = [
         time: "10:37 AM",
         percentage: 80,
         exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-20",
+        time: "12:15 PM",
+        percentage: 91,
+        exercise: "Major Assessment",
+        assessment: "Unit 2 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"85.7"},
+        criteria2: {"name":"FRQ-A","score":"100"},
+        criteria3: {"name":"MCQ-B","score":"78"},
+        criteria4: {"name":"FRQ-B","score":"100"},
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-20",
+        time: "12:15 PM",
+        percentage: 98.5,
+        exercise: "Major Assessment",
+        assessment: "Unit 2 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"94.2"},
+        criteria2: {"name":"FRQ-A","score":"100"},
+        criteria3: {"name":"MCQ-B","score":"100"},
+        criteria4: {"name":"FRQ-B","score":"100"},
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-20",
+        time: "12:15 PM",
+        percentage: 92.5,
+        exercise: "Major Assessment",
+        assessment: "Unit 2 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"100"},
+        criteria2: {"name":"FRQ-A","score":"75"},
+        criteria3: {"name":"MCQ-B","score":"95"},
+        criteria4: {"name":"FRQ-B","score":"100"},
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-20",
+        time: "12:15 PM",
+        percentage: 92.5,
+        exercise: "Major Assessment",
+        assessment: "Unit 2 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"80"},
+        criteria2: {"name":"FRQ-A","score":"95"},
+        criteria3: {"name":"MCQ-B","score":"95"},
+        criteria4: {"name":"FRQ-B","score":"100"},
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-20",
+        time: "12:16 PM",
+        percentage: 89.3,
+        exercise: "Major Assessment",
+        assessment: "Unit 2 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"82.5"},
+        criteria2: {"name":"FRQ-A","score":"85"},
+        criteria3: {"name":"MCQ-B","score":"89"},
+        criteria4: {"name":"FRQ-B","score":"100"},
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-20",
+        time: "12:16 PM",
+        percentage: 93.8,
+        exercise: "Major Assessment",
+        assessment: "Unit 2 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"80"},
+        criteria2: {"name":"FRQ-A","score":"100"},
+        criteria3: {"name":"MCQ-B","score":"95"},
+        criteria4: {"name":"FRQ-B","score":"100"},
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-20",
+        time: "12:16 PM",
+        percentage: 85,
+        exercise: "Major Assessment",
+        assessment: "Unit 2 Progress Check",
+        criteria1: {"name":"MCQ-A","score":"74.2"},
+        criteria2: {"name":"FRQ-A","score":"80"},
+        criteria3: {"name":"MCQ-B","score":"86"},
+        criteria4: {"name":"FRQ-B","score":"100"},
         termsToReview: []
     },
 ];
