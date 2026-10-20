@@ -72,14 +72,6 @@ const records = [
         termsToReview: []
     },
     {
-        student: "Calvin",
-        date: "2026-08-26",
-        time: "12:22 PM",
-        percentage: 100,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
         student: "William",
         date: "2026-08-26",
         time: "12:23 PM",
@@ -2032,14 +2024,6 @@ const records = [
         termsToReview: []
     },
     {
-        student: "Calvin",
-        date: "2026-09-11",
-        time: "9:11 PM",
-        percentage: 100,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
         student: "William",
         date: "2026-09-11",
         time: "9:11 PM",
@@ -3786,6 +3770,54 @@ const records = [
         termsToReview: []
     },
     {
+        student: "Calvin",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-08",
+        time: "2:40 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
         student: "Alex",
         date: "2026-10-08",
         time: "10:48 AM",
@@ -4139,49 +4171,17 @@ const records = [
     },
     {
         student: "Calvin",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 40,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Teresa",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 60,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Maggie",
-        date: "2026-10-08",
-        time: "2:40 PM",
+        date: "2026-08-26",
+        time: "12:22 PM",
         percentage: 100,
         exercise: "MCQs",
         termsToReview: []
     },
     {
-        student: "Alex",
-        date: "2026-10-08",
-        time: "2:40 PM",
+        student: "Calvin",
+        date: "2026-09-11",
+        time: "9:11 PM",
         percentage: 100,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "William",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 80,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Jocelyn",
-        date: "2026-10-08",
-        time: "2:40 PM",
-        percentage: 80,
         exercise: "MCQs",
         termsToReview: []
     },
@@ -5303,6 +5303,286 @@ const records = [
         time: "10:14 PM",
         percentage: 83,
         exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-12",
+        time: "10:29 AM",
+        percentage: 20,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-12",
+        time: "10:30 AM",
+        percentage: 20,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-12",
+        time: "10:30 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-12",
+        time: "10:30 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-12",
+        time: "10:30 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-12",
+        time: "10:30 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-12",
+        time: "10:30 AM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-13",
+        time: "10:31 AM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-13",
+        time: "10:31 AM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-13",
+        time: "10:31 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-13",
+        time: "10:31 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-13",
+        time: "10:31 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-13",
+        time: "10:31 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-13",
+        time: "10:31 AM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-14",
+        time: "10:34 AM",
+        percentage: 75,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-14",
+        time: "10:34 AM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-14",
+        time: "10:34 AM",
+        percentage: 75,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-14",
+        time: "10:35 AM",
+        percentage: 50,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-14",
+        time: "10:35 AM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-14",
+        time: "10:35 AM",
+        percentage: 75,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-14",
+        time: "10:35 AM",
+        percentage: 25,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-15",
+        time: "10:36 AM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-15",
+        time: "10:36 AM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-15",
+        time: "10:36 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-15",
+        time: "10:36 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-15",
+        time: "10:36 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-15",
+        time: "10:36 AM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-15",
+        time: "10:36 AM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-16",
+        time: "10:37 AM",
+        percentage: 20,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-16",
+        time: "10:37 AM",
+        percentage: 20,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-16",
+        time: "10:37 AM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-16",
+        time: "10:37 AM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-16",
+        time: "10:37 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-16",
+        time: "10:37 AM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-16",
+        time: "10:37 AM",
+        percentage: 80,
+        exercise: "MCQs",
         termsToReview: []
     },
 ];
