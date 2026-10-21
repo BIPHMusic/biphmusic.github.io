@@ -1689,14 +1689,21 @@
                     });
                 } else {
                     if (!exerciseRecords.length) return;
-                    const weeksWithRecords = WEEKS.filter(week =>
-                        !isFutureWeek(week) && recordsSource.some(record =>
+                    // Keep every week between the student's first and last
+                    // recorded week on the timeline, including gaps. Null values
+                    // are bridged with a dotted segment instead of being omitted.
+                    const availableWeeks = WEEKS.filter(week => !isFutureWeek(week));
+                    const weeksWithAnyRecords = availableWeeks
+                        .map((week, index) => ({ week, index }))
+                        .filter(({ week }) => recordsSource.some(record =>
                             normalizeExercise(record.exercise) !== "Major Assessment" &&
                             week.days.some(day => day.date === record.date)
-                        )
-                    );
-                    if (!weeksWithRecords.length) return;
-                    const values = weeksWithRecords.map(week => {
+                        ));
+                    if (!weeksWithAnyRecords.length) return;
+                    const firstRecordedWeek = weeksWithAnyRecords[0].index;
+                    const lastRecordedWeek = weeksWithAnyRecords[weeksWithAnyRecords.length - 1].index;
+                    const pastWeeks = availableWeeks.slice(firstRecordedWeek, lastRecordedWeek + 1);
+                    const values = pastWeeks.map(week => {
                         const weekValues = exerciseRecords.filter(record =>
                             week.days.some(day => day.date === record.date)
                         ).map(record => Number(record.percentage)).filter(Number.isFinite);
@@ -1705,25 +1712,29 @@
                     datasets.push({
                         label: exercise,
                         data: values,
-                        dates: weeksWithRecords.map(week => `${week.start.date} – ${week.end.date}`),
-                        times: weeksWithRecords.map(() => ""),
-                        recordIdentities: weeksWithRecords.map(() => ""),
+                        dates: pastWeeks.map(week => `${week.start.date} – ${week.end.date}`),
+                        times: pastWeeks.map(() => ""),
+                        recordIdentities: pastWeeks.map(() => ""),
                         borderColor: getExerciseColor(exercise),
                         borderWidth: 3,
                         tension: 0.3,
-                        pointRadius: 4,
+                        pointRadius: values.map(value => value == null ? 0 : 4),
                         pointHoverRadius: 8,
                         pointBackgroundColor: getExerciseColor(exercise),
                         pointBorderWidth: 1,
-                        spanGaps: false,
+                        spanGaps: true,
+                        segment: {
+                            borderDash: context =>
+                                context.p1DataIndex - context.p0DataIndex > 1
+                                    ? [6, 5]
+                                    : undefined
+                        },
                         hidden: false
                     });
                 }
             });
             const labels = weeklyMode
-                ? WEEKS.filter(week => !isFutureWeek(week) && recordsSource.some(record =>
-                    normalizeExercise(record.exercise) !== "Major Assessment" && week.days.some(day => day.date === record.date)
-                )).map(week => `Week ${week.num}`)
+                ? WEEKS.filter(week => !isFutureWeek(week)).map(week => `Week ${week.num}`)
                 : Array.from({ length: Math.max(1, ...datasets.map(dataset => dataset.data.length)) }, (_, i) => `Attempt ${i + 1}`);
 
             if (title) {
@@ -9495,7 +9506,12 @@ function setupTeacherStudentSearch() {
                         <span style="font-size:.9em;opacity:.85;">+${formatPercentage(assessment.curveAmount)} · ${assessment.students.length} records</span>
                     </summary>
                     <div style="padding:0 12px 10px;">
-                        <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;padding:5px 0;font-size:.7em;opacity:.7;"><span>Student</span><span>Original</span><span>Curved</span></div>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px;">
+                            <span style="padding:6px 9px;border-radius:7px;background:rgba(255,255,255,.07);font-size:.88em;">Highest original score: <strong>${assessment.highest === null ? "N/A" : formatPercentage(assessment.highest)}</strong></span>
+                            <span style="padding:6px 9px;border-radius:7px;background:rgba(255,255,255,.07);font-size:.88em;">Average original score: <strong>${assessment.average === null ? "N/A" : formatPercentage(assessment.average)}</strong></span>
+                            <span style="padding:6px 9px;border-radius:7px;background:rgba(255,255,255,.07);font-size:.88em;">Curve applied: <strong>+${formatPercentage(assessment.curveAmount)}</strong></span>
+                        </div>
+                        <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;padding:5px 0;font-size:.82em;opacity:.7;"><span>Student</span><span>Original score</span><span>Curved score</span></div>
                         ${rows}
                     </div>
                 </details>`;
