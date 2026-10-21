@@ -969,6 +969,9 @@
             }
             cachedRecords.push(cloneRecords([record])[0]);
             saveCachedRecords();
+            if (document.getElementById("cache-panel")) {
+                renderCachePanel();
+            }
             return {
                 added: true,
                 duplicate: false
@@ -9559,73 +9562,112 @@ function setupTeacherStudentSearch() {
         });
     }
 
-    function createPDF(lines) {
-        // A small self-contained PDF writer avoids opening tabs or relying on external libraries.
-        const pageLines = [];
-        let page = [];
-        lines.forEach(line => {
-            const wrapped = wrapPDFLine(String(line), 84);
-            wrapped.forEach(part => {
-                if (page.length >= 48) { pageLines.push(page); page = []; }
-                page.push(part);
-            });
-        });
-        if (page.length || !pageLines.length) pageLines.push(page);
-        const objects = [];
-        const add = value => { objects.push(value); return objects.length; };
-        const catalogId = add("");
-        const pagesId = add("");
-        const fontId = add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
-        const pageIds = [];
-        pageLines.forEach((pageContent, index) => {
-            let stream = "BT\n/F1 10 Tf\n50 790 Td\n14 TL\n";
-            pageContent.forEach((line, i) => {
-                if (i) stream += "T*\n";
-                stream += `(${pdfEscape(line)}) Tj\n`;
-            });
-            stream += "ET";
-            const contentId = add(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
-            const pageId = add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 ${fontId} 0 R >> >> /Contents ${contentId} 0 R >>`);
-            pageIds.push(pageId);
-        });
-        objects[catalogId - 1] = `<< /Type /Catalog /Pages ${pagesId} 0 R >>`;
-        objects[pagesId - 1] = `<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>`;
-        let output = "%PDF-1.4\n%âãÏÓ\n";
-        const offsets = [0];
-        objects.forEach((object, i) => { offsets.push(output.length); output += `${i + 1} 0 obj\n${object}\nendobj\n`; });
-        const xrefOffset = output.length;
-        output += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-        offsets.slice(1).forEach(offset => { output += `${String(offset).padStart(10, "0")} 00000 n \n`; });
-        output += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-        return new Blob([output], { type: "application/pdf" });
+    function createStudentReport(studentName, entries) {
+        const stylesheetURL = new URL("../common-styles.css", window.location.href).href;
+        const iconURL = new URL("../icons/BGicon.png", window.location.href).href;
+        const logoURL = new URL("../icons/Full Logo White on Transparent.png", window.location.href).href;
+
+        const assessmentRows = entries.length
+            ? entries.map(entry => `
+                <div class="assessment">
+                    <div class="assessment-title">${escapeHTML(entry.exercise)}</div>
+                    <div class="assessment-date">${escapeHTML(entry.date)}</div>
+                    <div class="score-grid">
+                        <div class="score-box">
+                            <div class="score-label">Previous Score</div>
+                            <div class="score-value">${formatPercentage(entry.previousScore)}</div>
+                        </div>
+                        <div class="score-box">
+                            <div class="score-label">Points Added</div>
+                            <div class="score-value added">+${formatPercentage(entry.pointsAdded)}</div>
+                        </div>
+                        <div class="score-box">
+                            <div class="score-label">New Grade</div>
+                            <div class="score-value new-grade">${formatPercentage(entry.newScore)}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join("")
+            : `<div class="empty-state">No assessments required a curve.</div>`;
+
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curve Report - ${escapeHTML(studentName)}</title>
+    <link rel="icon" href="${escapeHTML(iconURL)}">
+    <link rel="stylesheet" href="${escapeHTML(stylesheetURL)}">
+    <style>
+        .container { max-width:800px; margin:0 auto; padding:0 16px 40px; }
+        .summary-card { padding:18px; border:1px solid rgba(255,255,255,.2); border-radius:12px; background:rgba(255,255,255,.08); text-align:center; margin-bottom:26px; }
+        .summary-number { font-size:1.8rem; font-weight:bold; margin-bottom:5px; }
+        .summary-label { font-size:.9rem; opacity:.85; }
+        .assessment { margin:14px 0; padding:18px; border:2px solid #ffbd59; border-radius:12px; background:rgba(255,189,89,.10); }
+        .assessment-title { text-align:center; font-size:1.1rem; font-weight:bold; overflow-wrap:anywhere; }
+        .assessment-date { text-align:center; margin-top:6px; font-size:.9rem; opacity:.8; }
+        .score-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:18px; }
+        .score-box { padding:12px 5px; border-radius:8px; background:rgba(255,255,255,.08); text-align:center; min-width:0; }
+        .score-label { font-size:.78rem; opacity:.8; margin-bottom:8px; }
+        .score-value { font-size:1.2rem; font-weight:bold; overflow-wrap:anywhere; }
+        .added { color:#ffbd59; }
+        .new-grade { color:#b9e6ff; }
+        .empty-state { padding:30px 16px; text-align:center; border:1px solid rgba(255,255,255,.2); border-radius:12px; background:rgba(255,255,255,.05); }
+        @media (max-width:450px) { .score-grid { gap:6px; } .score-label { font-size:.68rem; } .score-value { font-size:1rem; } .assessment { padding:12px 8px; } }
+        @page { size:auto; margin:0; }
+        @media screen { .container { width:auto; max-width:800px; margin:0 auto; padding:0 16px 40px; box-sizing:content-box; } }
+        @media print {
+            html, body { width:100% !important; margin:0 !important; padding:0 !important; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+            .overlay, .overlay2 { display:none !important; }
+            .Title, .Subtitle { break-after:avoid; page-break-after:avoid; }
+            .container { width:100% !important; max-width:none !important; margin:0 !important; padding:0 8mm 8mm !important; box-sizing:border-box !important; }
+            .summary-card, .assessment, .score-grid, .score-box { break-inside:avoid; page-break-inside:avoid; }
+            .assessment { margin:4mm 0 !important; }
+            .logocontainer, .logo-container { position:static !important; display:block !important; right:auto !important; bottom:auto !important; z-index:auto !important; width:auto !important; height:auto !important; padding:0 1mm 1mm 0 !important; margin:0 !important; opacity:1 !important; transition:none !important; text-align:right; break-inside:avoid; page-break-inside:avoid; }
+            .logocontainer .logo, .logo-container .logo { position:static !important; display:inline-block !important; right:auto !important; bottom:auto !important; width:25vh !important; max-width:100% !important; height:auto !important; z-index:auto !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div><div class="overlay"></div><div class="overlay2"></div>
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">Curve Report</h1>
+    <div class="container">
+        <h2 style="text-align:center;overflow-wrap:anywhere">${escapeHTML(studentName)}</h2>
+        <div class="summary-card"><div class="summary-number">${entries.length}</div><div class="summary-label">Assessments Curved</div></div>
+        ${assessmentRows}
+    </div>
+    <div class="logocontainer"><img src="${escapeHTML(logoURL)}" alt="BASIS Logo" class="logo"></div>
+</body>
+</html>`;
     }
-    function asciiText(value) {
-        return String(value ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, "?");
+
+    function openAndPrintStudentReport(studentName, entries) {
+        const reportTab = window.open("", "_blank");
+        if (!reportTab) return false;
+
+        let printStarted = false;
+        const printReport = () => {
+            if (printStarted || reportTab.closed) return;
+            printStarted = true;
+            // Give linked stylesheets and the logo a moment to finish loading.
+            reportTab.setTimeout(() => {
+                if (!reportTab.closed) {
+                    reportTab.focus();
+                    reportTab.print();
+                }
+            }, 900);
+        };
+
+        reportTab.addEventListener("load", printReport, { once: true });
+        reportTab.document.open();
+        reportTab.document.write(createStudentReport(studentName, entries));
+        reportTab.document.close();
+        // Fallback for browsers where document.write doesn't dispatch a useful load event.
+        reportTab.setTimeout(printReport, 1400);
+        return true;
     }
-    function pdfEscape(value) { return asciiText(value).replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)"); }
-    function wrapPDFLine(value, maxLength) {
-        const text = asciiText(value);
-        if (text.length <= maxLength) return [text];
-        const words = text.split(/\s+/);
-        const lines = []; let current = "";
-        words.forEach(word => {
-            if (current && (current + " " + word).length > maxLength) { lines.push(current); current = word; }
-            else current = current ? current + " " + word : word;
-        });
-        if (current) lines.push(current);
-        return lines;
-    }
-    function localDateStamp() {
-        const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
-    }
-    function downloadBlob(blob, filename) {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url; link.download = filename;
-        document.body.appendChild(link); link.click(); link.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-    }
+
     function curveEm() {
         const button = document.getElementById("cache-curve-button");
         const message = document.getElementById("cache-curve-message");
@@ -9635,7 +9677,10 @@ function setupTeacherStudentSearch() {
             return;
         }
         const candidates = getAssessments(cachedRecords);
-        if (!candidates.length) { if (message) message.textContent = "There are no eligible assignments to curve."; return; }
+        if (!candidates.length) {
+            if (message) message.textContent = "There are no eligible assignments to curve.";
+            return;
+        }
         if (button) button.disabled = true;
         try {
             const candidateMap = new Map(candidates.map(assessment => [assessment.key, assessment]));
@@ -9647,47 +9692,36 @@ function setupTeacherStudentSearch() {
                 const previousScore = validScore(record);
                 if (previousScore === null) return record;
                 const newScore = round1(Math.min(100, previousScore + assessment.curveAmount));
-                if (!reports.has(record.student || "Unknown student")) reports.set(record.student || "Unknown student", []);
-                reports.get(record.student || "Unknown student").push({
-                    date: record.date, exercise: record.exercise, previousScore,
-                    pointsAdded: round1(newScore - previousScore), newScore
+                const studentName = record.student || "Unknown student";
+                if (!reports.has(studentName)) reports.set(studentName, []);
+                reports.get(studentName).push({
+                    date: record.date,
+                    exercise: record.exercise,
+                    previousScore,
+                    pointsAdded: round1(newScore - previousScore),
+                    newScore
                 });
                 return { ...record, percentage: newScore };
             });
             saveCachedRecords();
             renderCachePanel();
 
-            const stamp = localDateStamp();
-            let downloaded = 0;
+            let opened = 0;
+            let blocked = 0;
             for (const [studentName, entries] of reports) {
-                const lines = [
-                    "BIPH Music - Curve Report",
-                    `Student: ${studentName}`,
-                    `Report date: ${stamp}`,
-                    `${entries.length} assessment${entries.length === 1 ? "" : "s"} curved`,
-                    ""
-                ];
-                entries.sort((a,b) => String(a.date).localeCompare(String(b.date)) || String(a.exercise).localeCompare(String(b.exercise)));
-                entries.forEach((entry, index) => {
-                    lines.push(`${index + 1}. ${entry.exercise}`);
-                    lines.push(`   Date: ${entry.date}`);
-                    lines.push(`   Previous score: ${formatPercentage(entry.previousScore)}`);
-                    lines.push(`   Points added: +${formatPercentage(entry.pointsAdded)}`);
-                    lines.push(`   New grade: ${formatPercentage(entry.newScore)}`);
-                    lines.push("");
-                });
-                const safeName = String(studentName).replace(/[\\/:*?"<>|]/g, "-").trim() || "Student";
-                downloadBlob(createPDF(lines), `Curve Report - ${safeName} - ${stamp}.pdf`);
-                downloaded++;
+                entries.sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.exercise).localeCompare(String(b.exercise)));
+                if (openAndPrintStudentReport(studentName, entries)) opened++;
+                else blocked++;
             }
-            const successMessage = `Updated the browser cache for ${candidates.length} assignment${candidates.length === 1 ? "" : "s"} and downloaded ${downloaded} student Curve Report PDF${downloaded === 1 ? "" : "s"}. The updated records.js has not been downloaded; use Export Records or Copy Records when ready.`;
+
+            const successMessage = `Updated the browser cache for ${candidates.length} assignment${candidates.length === 1 ? "" : "s"}. Opened ${opened} formatted student report tab${opened === 1 ? "" : "s"} and requested printing to PDF. In each print dialog, choose “Save as PDF.”${blocked ? ` ${blocked} report tab${blocked === 1 ? " was" : "s were"} blocked by the browser; allow pop-ups and try again if needed.` : ""} The updated records.js has not been downloaded; use Export Records or Copy Records when ready.`;
             const currentMessage = document.getElementById("cache-curve-message");
             if (currentMessage) currentMessage.textContent = successMessage;
             else if (typeof showToast === "function") showToast(successMessage);
         } catch (error) {
             console.error("Error while applying curves:", error);
             const currentMessage = document.getElementById("cache-curve-message");
-            if (currentMessage) currentMessage.textContent = "Something went wrong while generating the curved records. Check the browser console for details.";
+            if (currentMessage) currentMessage.textContent = "Something went wrong while generating the curved reports. Check the browser console for details.";
         } finally {
             const currentButton = document.getElementById("cache-curve-button");
             if (currentButton) currentButton.disabled = false;
