@@ -5764,4 +5764,20 @@ const records = [
         exercise: "Ear Training",
         termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
     },
+    {
+        student: "William",
+        date: "2026-10-22",
+        time: "11:01 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-22",
+        time: "10:58 AM",
+        percentage: 67,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
 ];
