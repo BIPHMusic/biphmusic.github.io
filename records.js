@@ -5684,4 +5684,84 @@ const records = [
         exercise: "Ear Training",
         termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Major 7th","correct":"Major 7th"}]
     },
+    {
+        student: "Alex",
+        date: "2026-10-22",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-22",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-22",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-22",
+        time: "10:47 AM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-22",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-22",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-22",
+        time: "10:43 AM",
+        percentage: 80,
+        exercise: "Vocab",
+        termsToReview: [{"term":"Counterpoint","definition":"The art of writing multiple melodies"},{"term":"Leitmotif","definition":"The practice of assigning themes and melodies to specific characters"}]
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-22",
+        time: "10:48 AM",
+        percentage: 87,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Tritone","correct":"Tritone"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-22",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-22",
+        time: "10:53 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
 ];

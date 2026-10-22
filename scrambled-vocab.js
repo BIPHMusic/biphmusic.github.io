@@ -586,5 +586,65 @@ const scrambledVocabularyTerms = [
   {
     "Term": "SWxqeHVoZyBFZHZ2",
     "Definition": "V2toIHN1ZGZ3bGZoIHJpIHJxb2IgenVsd2xxaiB3a2ggZWR2diBxcndoIGRxZyBscXlodXZscnEgdmJwZXJvdg=="
+  },
+  {
+    "Term": "RmRnaHF3bGRvIDY0",
+    "Definition": "TDY0LCBZLCBM"
+  },
+  {
+    "Term": "U2xmZHVnYiBXa2x1Zw==",
+    "Definition": "RCB1aHZyb3h3bHJxIGR3IHdraCBocWcgcmkgZCBwbHFydSB2cnFqIHdrZHcgaWxxbHZraHYgcnEgZCBwZG1ydSBM"
+  },
+  {
+    "Term": "RmRnaHFmaA==",
+    "Definition": "RCB1aHZ3bHFqIHNybHF3IGR3IHdraCBocWcgcmkgZCBweHZsZmRvIHNrdWR2aA=="
+  },
+  {
+    "Term": "RHh3a2hxd2xmIEZkZ2hxZmg=",
+    "Definition": "RCBmZGdocWZoIGl1cnAgd2toIGdycGxxZHF3IChZKSB3ciB3cnFsZiAoTCBydSBsKQ=="
+  },
+  {
+    "Term": "R2hmaHN3bHloIEZkZ2hxZmg=",
+    "Definition": "RCBmZGdocWZoIGl1cnAgWSB3ciB5bCAocGRtcnUpIHJ1IFkgd3IgWUwgKHBscXJ1KQ=="
+  },
+  {
+    "Term": "U29kamRvIEZkZ2hxZmg=",
+    "Definition": "RCBmZGdocWZoIGl1cnAgd2toIHZ4ZWdycGxxZHF3IChMWSkgd3Igd3JxbGYgKEwp"
+  },
+  {
+    "Term": "S2RvaSBGZGdocWZo",
+    "Definition": "RCBmZGdocWZoIHdrZHcgaHFndiBycSB3a2ggZ3JwbHFkcXc="
+  },
+  {
+    "Term": "U2h1aWhmdyBEeHdraHF3bGYgRmRnaHFmaA==",
+    "Definition": "RHEgZHh3a2hxd2xmIGZkZ2hxZmggei8gZXJ3ayBma3J1Z3YgbHEgdXJydyBzcnZsd2xycSwgdnJzdWRxciBocWd2IHJxIHdycWxm"
+  },
+  {
+    "Term": "THBzaHVpaGZ3IER4d2tocXdsZiBGZGdocWZo",
+    "Definition": "RHEgRHh3a2hxd2xmIGZkZ2hxZmggei8gbHF5aHV2bHJxdiBydSBxcnEtd3JxbGYgbHEgd2toIHZyc3VkcXIgeXJsZmg="
+  },
+  {
+    "Term": "U2h1bHJn",
+    "Definition": "RCB2aHcgcmkgd3pyIHNrdWR2aHYsIHJxaCBocWdscWogbHEgZCBLRiBkcWcgd2toIHZoZnJxZyBocWdscWogbHEgZCBERg=="
+  },
+  {
+    "Term": "U2R1ZG9vaG8gU2h1bHJn",
+    "Definition": "RCBzaHVscmcgbHEgemtsZmsgZXJ3ayBza3Vkdmh2IHZ3ZHV3IHpsd2sgd2toIHZkcGggcGR3aHVsZG8="
+  },
+  {
+    "Term": "RnJxd3VkdndscWogU2h1bHJn",
+    "Definition": "RCBzaHVscmcgbHEgemtsZmsgZXJ3ayBza3Vkdmh2IHZ3ZHV3IHpsd2sgZ2xpaWh1aHF3IHBkd2h1bGRv"
+  },
+  {
+    "Term": "RHVzaGpqbGR3bHFqIDY0",
+    "Definition": "RCA2NCBscSB6a2xmayB3a2gga2R1cHJxYiB2d2RidiB3a2ggdmRwaCwgZXh3IHdraCBlZHZ2IGZrZHFqaHY="
+  },
+  {
+    "Term": "U2R2dmxxaiA2NA==",
+    "Definition": "RCA2NCB3a2R3IGx2IHNkdnZoZyB3a3VyeGprIHdyIGRxcndraHUga2R1cHJxYg=="
+  },
+  {
+    "Term": "U2hnZG8gNjQ=",
+    "Definition": "RCA2NCBscSB6a2xmayB3a2ggZWR2diB2d2RidiB3a2ggdmRwaCwgZXh3IHdraCBrZHVwcnFiIGZrZHFqaHY="
   }
 ];
