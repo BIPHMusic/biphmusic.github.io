@@ -6052,4 +6052,84 @@ const records = [
         exercise: "Sight Singing",
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-10-23",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-23",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-23",
+        time: "10:54 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-23",
+        time: "10:49 AM",
+        percentage: 87,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Augmented Triad","correct":"Augmented Triad"}]
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-23",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-23",
+        time: "10:52 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Diminished 7","correct":"Diminished 7"}]
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-23",
+        time: "10:55 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-23",
+        time: "11:02 AM",
+        percentage: 87,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
+    {
+        student: "William",
+        date: "2026-10-23",
+        time: "10:43 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-23",
+        time: "10:47 AM",
+        percentage: 53,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Minor 7","correct":"Minor 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"},{"item":"Dominant 7","correct":"Dominant 7"},{"item":"Diminished 7","correct":"Diminished 7"}]
+    },
 ];
