@@ -866,6 +866,19 @@
                 JSON.stringify(getMajorCriteriaEntriesFromRecord(record))
             ].join("|");
         }
+
+        function getRecordBaseIdentity(record) {
+            if (!record) return "";
+
+            return [
+                String(record.student || "").trim().toLowerCase(),
+                String(record.date || "").trim(),
+                String(record.time || "").trim(),
+                normalizeExercise(record.exercise),
+                String(record.assessment || "").trim()
+            ].join("|");
+        }
+
         function getLooseRecordIdentity(record) {
             if (!record) return "";
             return [
@@ -979,17 +992,28 @@
         }
         function mergeActualRecordsIntoCache() {
             let added = 0;
+
             actualRecords.forEach(record => {
-                if (!recordExists(cachedRecords, record)) {
+                const baseIdentity = getRecordBaseIdentity(record);
+
+                // Don't restore an outdated version of a record
+                // that's already in the cache.
+                const alreadyExists = cachedRecords.some(existing =>
+                    getRecordBaseIdentity(existing) === baseIdentity
+                );
+
+                if (!alreadyExists) {
                     cachedRecords.push(
                         cloneRecords([record])[0]
                     );
                     added++;
                 }
             });
+
             if (added > 0) {
                 saveCachedRecords();
             }
+
             return added;
         }
         function overwriteCacheWithActualRecords() {
