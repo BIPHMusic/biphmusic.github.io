@@ -414,11 +414,19 @@
 // };
 
 
+// const QUIZ_CONFIG = {
+//   name: "Ear Training – Intervals + Triads + Seventh Chords",
+//   sections: ['intervals', 'triads', 'seventhChords'],
+//   sectionTitles: ['Intervals', 'Triads', 'Seventh Chords'],
+//   questionsPerSection: [5, 5, 5]
+// };
+
 const QUIZ_CONFIG = {
-  name: "Ear Training – Intervals + Triads + Seventh Chords",
-  sections: ['intervals', 'triads', 'seventhChords'],
-  sectionTitles: ['Intervals', 'Triads', 'Seventh Chords'],
-  questionsPerSection: [5, 5, 5]
+    name: "Ear Training – Harmonic Intervals + Triads + Seventh Chords",
+    sections: ['intervals', 'triads', 'seventhChords'],
+    sectionTitles: ['Intervals', 'Triads', 'Seventh Chords'],
+    questionsPerSection: [5, 5, 5],
+    harmonicIntervals: true
 };
 
 
@@ -3699,6 +3707,42 @@ function dailyVocabPrepareResultData() {
                 { file: 'Tritone-9.mp3', answer: 'Tritone' },
                 { file: 'Tritone-10.mp3', answer: 'Tritone' }
             ],
+
+            harmonicIntervals: Object.entries({
+                Major2: 9,
+                Major3: 10,
+                Major6: 12,
+                Major7: 14,
+                Minor2: 14,
+                Minor3: 12,
+                Minor6: 12,
+                Minor7: 7,
+                Perfect4: 12,
+                Perfect5: 10,
+                Perfect8: 7,
+                Tritone: 10
+            }).flatMap(([prefix, count]) => {
+                const answers = {
+                    Major2: 'Major 2nd',
+                    Major3: 'Major 3rd',
+                    Major6: 'Major 6th',
+                    Major7: 'Major 7th',
+                    Minor2: 'Minor 2nd',
+                    Minor3: 'Minor 3rd',
+                    Minor6: 'Minor 6th',
+                    Minor7: 'Minor 7th',
+                    Perfect4: 'Perfect 4th',
+                    Perfect5: 'Perfect 5th',
+                    Perfect8: 'Perfect 8ve',
+                    Tritone: 'Tritone'
+                };
+
+                return Array.from({ length: count }, (_, i) => ({
+                    file: `H-${prefix}-${i + 1}.aif`,
+                    answer: answers[prefix]
+                }));
+            }),
+
             triads: [
                 { file: 'Augmented1.mp3', answer: 'Augmented Triad' },
                 { file: 'Augmented2.mp3', answer: 'Augmented Triad' },
@@ -3821,7 +3865,14 @@ function dailyVocabPrepareResultData() {
 
         // ====================== QUIZ LOGIC ======================
         function dailyEarGenerateQuestionSet(section, num) {
-            let pool = [...audioFiles[section]];
+            const source = (
+                section === 'intervals' &&
+                dailyEarQuizConfig.harmonicIntervals === true
+            )
+                ? audioFiles.harmonicIntervals
+                : audioFiles[section];
+
+            let pool = [...source];
 
             // Apply difficulty filter if present
             if (dailyEarQuizConfig.allowedAnswers && dailyEarQuizConfig.allowedAnswers[section]) {
