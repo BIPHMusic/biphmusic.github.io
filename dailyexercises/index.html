@@ -3709,38 +3709,38 @@ function dailyVocabPrepareResultData() {
             ],
 
             harmonicIntervals: Object.entries({
-                Major2: 9,
-                Major3: 10,
-                Major6: 12,
-                Major7: 14,
-                Minor2: 14,
-                Minor3: 12,
-                Minor6: 12,
-                Minor7: 7,
-                Perfect4: 12,
-                Perfect5: 10,
-                Perfect8: 7,
-                Tritone: 10
+              Major2: 9,
+              Major3: 9,
+              Major6: 12,
+              Major7: 11,
+              Minor2: 13,
+              Minor3: 12,
+              Minor6: 12,
+              Minor7: 9,
+              Perfect4: 12,
+              Perfect5: 10,
+              Perfect8: 7,
+              Tritone: 10
             }).flatMap(([prefix, count]) => {
-                const answers = {
-                    Major2: 'Major 2nd',
-                    Major3: 'Major 3rd',
-                    Major6: 'Major 6th',
-                    Major7: 'Major 7th',
-                    Minor2: 'Minor 2nd',
-                    Minor3: 'Minor 3rd',
-                    Minor6: 'Minor 6th',
-                    Minor7: 'Minor 7th',
-                    Perfect4: 'Perfect 4th',
-                    Perfect5: 'Perfect 5th',
-                    Perfect8: 'Perfect 8ve',
-                    Tritone: 'Tritone'
-                };
+              const answers = {
+                Major2: 'Major 2nd',
+                Major3: 'Major 3rd',
+                Major6: 'Major 6th',
+                Major7: 'Major 7th',
+                Minor2: 'Minor 2nd',
+                Minor3: 'Minor 3rd',
+                Minor6: 'Minor 6th',
+                Minor7: 'Minor 7th',
+                Perfect4: 'Perfect 4th',
+                Perfect5: 'Perfect 5th',
+                Perfect8: 'Perfect 8ve',
+                Tritone: 'Tritone'
+              };
 
-                return Array.from({ length: count }, (_, i) => ({
-                    file: `H-${prefix}-${i + 1}.aif`,
-                    answer: answers[prefix]
-                }));
+              return Array.from({ length: count }, (_, i) => ({
+                file: `H-${prefix}-${i + 1}.mp3`,
+                answer: answers[prefix]
+              }));
             }),
 
             triads: [
