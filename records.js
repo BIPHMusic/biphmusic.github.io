@@ -6436,4 +6436,116 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "Calvin",
+        date: "2026-10-26",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-26",
+        time: "10:50 AM",
+        percentage: 73,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Major 6th","correct":"Major 6th"}]
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-26",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-10-26",
+        time: "10:50 AM",
+        percentage: 60,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"},{"item":"Minor 7","correct":"Minor 7"}]
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-26",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-10-26",
+        time: "10:53 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Diminished 7","correct":"Diminished 7"}]
+    },
+    {
+        student: "William",
+        date: "2026-10-26",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-10-26",
+        time: "10:54 AM",
+        percentage: 67,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor 2nd","correct":"Minor 2nd"}]
+    },
+    {
+        student: "Alex",
+        date: "2026-10-26",
+        time: "10:52 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-26",
+        time: "10:55 AM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 7th","correct":"Major 7th"}]
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-26",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-10-26",
+        time: "10:55 AM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Dominant 7","correct":"Dominant 7"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-26",
+        time: "10:53 AM",
+        percentage: 80,
+        exercise: "Vocab",
+        termsToReview: [{"term":"Perfect Authentic Cadence","definition":"An authentic cadence w/ both chords in root position, soprano ends on tonic"},{"term":"Plagal Cadence","definition":"A cadence from the subdominant (IV) to tonic (I)"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-26",
+        time: "10:56 AM",
+        percentage: 87,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Perfect 8ve","correct":"Perfect 8ve"}]
+    },
 ];
