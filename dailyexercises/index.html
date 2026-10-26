@@ -258,6 +258,20 @@
 .sight-begin-button { margin: 5px auto 18px; display:block; }
 .sight-status { min-height:24px; margin: 5px 0 14px; color:rgba(255,255,255,.78); }
 #sightCountdown { min-height: 28px; }
+.sight-prompt {
+  display: none;
+  white-space: pre-line;
+  font-size: 1.1rem;
+  line-height: 1.55;
+  margin: 8px auto 16px;
+  transition: color .2s ease, font-size .2s ease;
+}
+.sight-prompt .sight-subnote { display:block; font-size:.68em; font-weight:400; }
+.sight-prompt.official-phase {
+  color: #ff3333;
+  font-size: 1.65rem;
+  font-weight: 800;
+}
 
 
 /* ==================== NAVIGATION WARNING MODAL ==================== */
@@ -480,13 +494,12 @@ const DAILY_EXERCISE_TEMPLATES = {
   sightSinging: `
 <div class="sight-container">
   <div id="sightCountdown" class="time-restriction">Press Begin! when you're ready.</div>
+  <div id="sightPrompt" class="sight-prompt" aria-live="polite"></div>
   <button id="beginSightButton" class="action-button sight-begin-button">Begin!</button>
   <div class="image-container">
     <img id="exerciseImage" alt="Sight Singing Exercise" draggable="false">
   </div>
-  <div id="recordingNotice" class="recording-notice">
-    You may record once. Your recording will be available after all three exercises are complete.
-  </div>
+
   <button id="recordButton" class="action-btn" disabled aria-label="Record">
     <div id="recordIcon"></div>
   </button>
@@ -1042,9 +1055,10 @@ const DAILY_EXERCISE_STYLES = {
 
         .image-container {
             position: relative;
-            width: 90%;
-            max-width: 720px;
+            width: 96%;
+            max-width: 1100px;
             margin: 15px auto 10px;
+            box-sizing: border-box;
         }
 
         #exerciseImage {
@@ -1128,7 +1142,7 @@ const DAILY_EXERCISE_STYLES = {
         }
     
 
-.sight-container { width:90%; max-width:800px; margin:30px auto; text-align:center; }
+.sight-container { width:96%; max-width:1200px; margin:30px auto; text-align:center; }
 .sight-container .reminders {
   width:400px; max-width:90%; border-radius:10px; margin:30px auto;
   border:solid #6ec5d9a5; background-color:rgba(49,129,125,.543);
@@ -1136,7 +1150,7 @@ const DAILY_EXERCISE_STYLES = {
 }
 .sight-container .reminders h2 { font-size:1.2rem; text-align:center; }
 .sight-container .reminders h3 { font-size:.95rem; font-weight:300; line-height:1.45; }
-.sight-container .image-container { position:relative; width:90%; max-width:720px; margin:15px auto 10px; }
+.sight-container .image-container { position:relative; width:96%; max-width:1100px; margin:15px auto 10px; box-sizing:border-box; }
 .sight-container #exerciseImage { width:100%; height:auto; margin-bottom:25px; filter:blur(10px); transition:filter .6s ease; }
 .sight-container #exerciseImage.revealed { filter:blur(0); }
 .sight-container .recording-notice { color:#ff9800; font-size:15px; margin-top:-8px; margin-bottom:22px; display:none; }
@@ -1163,7 +1177,9 @@ let dailyNavigationHistoryInitialized = false;
 
 function dailyShouldWarnOnLeave() {
   const s = window.dailyExerciseState;
-  return !!(s && s.student && s.sessionReady);
+  // Protect the page as soon as a student session begins, including while waiting
+  // for the access window or while an exercise is being prepared.
+  return !!(s && s.student);
 }
 
 function dailyShowNavigationModal(pendingAction) {
@@ -1344,6 +1360,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function dailyGetAccessState(now = new Date()) {
+  // Teachers can always access exercises, regardless of the student time window.
+  if (window.biphIsTeacher === true) {
+    return { allowed: true, target: null, label: '' };
+  }
+
   const minutes = now.getHours() * 60 + now.getMinutes();
   const startMinutes = 10 * 60 + 40;
   const endMinutes = 11 * 60 + 35;
@@ -4143,31 +4164,125 @@ let dailySightCountdownTimer = null;
 let dailySightStartedAt = null;
 let dailySightExample = null;
 let dailySightTimeExpired = false;
+let dailySightOfficialStarted = false;
+let dailySightToneContext = null;
+
+// AP examples are retained for future cohorts, but are intentionally disabled
+// for the current cohort because all AP examples have already been used.
+// const DAILY_AP_SIGHT_EXAMPLES = [
+//   'AP-1.jpg', 'AP-2.jpg', 'AP-3.jpg', 'AP-4.jpg', 'AP-5.jpg',
+//   'AP-6.jpg', 'AP-7.jpg', 'AP-8.jpg', 'AP-9.jpg', 'AP-10.jpg',
+//   'AP-11.jpg', 'AP-12.jpg', 'AP-13.jpg', 'AP-14.jpg', 'AP-15.jpg',
+//   'AP-16.jpg', 'AP-17.jpg', 'AP-18.jpg', 'AP-19.jpg', 'AP-20.jpg',
+//   'AP-21.jpg', 'AP-22.jpg', 'AP-23.jpg', 'AP-24.jpg', 'AP-25.jpg',
+//   'AP-26.jpg', 'AP-27.jpg', 'AP-28.jpg', 'AP-29.jpg', 'AP-30.jpg',
+//   'AP-31.jpg', 'AP-32.jpg', 'AP-33.jpg', 'AP-34.jpg', 'AP-35.jpg',
+//   'AP-36.jpg', 'AP-37.jpg', 'AP-38.jpg', 'AP-39.jpg'
+// ];
+
+// Custom examples are presented in sequence, one per listed school day.
+// When you add more images later, extend DAILY_CUSTOM_SIGHT_EXAMPLES.
+const DAILY_CUSTOM_SIGHT_EXAMPLES = [
+  'custom-1.jpg', 'custom-2.jpg', 'custom-3.jpg', 'custom-4.jpg', 'custom-5.jpg',
+  'custom-6.jpg', 'custom-7.jpg', 'custom-8.jpg', 'custom-9.jpg', 'custom-10.jpg',
+  'custom-11.jpg', 'custom-12.jpg', 'custom-13.jpg', 'custom-14.jpg', 'custom-15.jpg',
+  'custom-16.jpg', 'custom-17.jpg', 'custom-18.jpg', 'custom-19.jpg', 'custom-20.jpg',
+  'custom-21.jpg', 'custom-22.jpg', 'custom-23.jpg', 'custom-24.jpg', 'custom-25.jpg',
+  'custom-26.jpg', 'custom-27.jpg', 'custom-28.jpg', 'custom-29.jpg'
+];
+
+// Dates are local school-calendar dates in YYYY-MM-DD format.
+// November 18 appeared twice in the supplied list, so it is included once.
+const DAILY_SIGHT_SCHOOL_DAYS = [
+  '2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30',
+  '2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06',
+  '2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13',
+  '2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19',
+  '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-30',
+  '2026-12-01', '2026-12-02', '2026-12-03', '2026-12-04',
+  '2026-12-07', '2026-12-08', '2026-12-09', '2026-12-10', '2026-12-11',
+  '2026-12-14', '2026-12-15', '2026-12-16', '2026-12-17', '2026-12-18',
+  '2027-01-04', '2027-01-05', '2027-01-06', '2027-01-07', '2027-01-08',
+  '2027-01-11', '2027-01-12', '2027-01-13', '2027-01-14', '2027-01-15',
+  '2027-01-18', '2027-01-19', '2027-01-20', '2027-01-21', '2027-01-22',
+  '2027-01-25', '2027-01-26', '2027-01-27', '2027-01-28', '2027-01-29',
+  '2027-02-15', '2027-02-16', '2027-02-17', '2027-02-18', '2027-02-19',
+  '2027-02-22', '2027-02-23', '2027-02-24', '2027-02-25', '2027-02-26',
+  '2027-03-01', '2027-03-02', '2027-03-03', '2027-03-04', '2027-03-05',
+  '2027-03-08', '2027-03-09', '2027-03-10', '2027-03-11',
+  '2027-03-15', '2027-03-16', '2027-03-17', '2027-03-18', '2027-03-19',
+  '2027-03-22', '2027-03-23', '2027-03-24', '2027-03-25', '2027-03-26',
+  '2027-03-29', '2027-03-30', '2027-03-31',
+  '2027-04-01', '2027-04-02', '2027-04-07', '2027-04-08', '2027-04-09',
+  '2027-04-12', '2027-04-13', '2027-04-14', '2027-04-15', '2027-04-16',
+  '2027-04-19', '2027-04-20', '2027-04-21', '2027-04-22', '2027-04-23',
+  '2027-04-26', '2027-04-27', '2027-04-28', '2027-04-29',
+  '2027-05-03', '2027-05-04', '2027-05-05', '2027-05-06', '2027-05-07',
+  '2027-05-10', '2027-05-11', '2027-05-12', '2027-05-13', '2027-05-14',
+  '2027-05-17', '2027-05-18', '2027-05-19', '2027-05-20', '2027-05-21',
+  '2027-05-24', '2027-05-25', '2027-05-26', '2027-05-27', '2027-05-28',
+  '2027-05-31', '2027-06-01', '2027-06-02', '2027-06-03', '2027-06-04',
+  '2027-06-07', '2027-06-08', '2027-06-09', '2027-06-10'
+];
 
 function dailyInitSightSinging() {
-  const startDate = new Date('2024-11-04');
+  const image = document.getElementById('exerciseImage');
+  const beginButton = document.getElementById('beginSightButton');
+  const countdown = document.getElementById('sightCountdown');
   const today = new Date();
-  let differenceInDays = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-  const completeWeeks = Math.floor(differenceInDays / 7);
-  differenceInDays -= completeWeeks * 2;
-  const currentDay = today.getDay();
-  if (currentDay === 0) differenceInDays -= 2;
-  if (currentDay === 6) differenceInDays -= 1;
-  dailySightExample = (differenceInDays % 30) + 1;
-  document.getElementById('exerciseImage').src = `examples/${dailySightExample}.jpg`;
+  // Use the browser's local calendar date, not UTC, to avoid date-boundary shifts.
+  const dateKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const schoolDayIndex = DAILY_SIGHT_SCHOOL_DAYS.indexOf(dateKey);
+
+  dailySightExample = null;
   dailySightIsRecording = false;
   dailySightHasRecorded = false;
   dailySightStartedAt = null;
   dailySightTimeExpired = false;
+  dailySightOfficialStarted = false;
+  if (dailySightToneContext) {
+    try { dailySightToneContext.close(); } catch (_) {}
+    dailySightToneContext = null;
+  }
+  const prompt = document.getElementById('sightPrompt');
+  if (prompt) {
+    prompt.textContent = '';
+    prompt.classList.remove('official-phase');
+    prompt.style.display = 'none';
+  }
   if (dailySightCountdownTimer) {
     clearInterval(dailySightCountdownTimer);
     dailySightCountdownTimer = null;
   }
-  document.getElementById('exerciseImage').classList.remove('revealed');
-  document.getElementById('beginSightButton').disabled = false;
+
+  image.removeAttribute('src');
+  image.classList.remove('revealed');
+  beginButton.disabled = true;
   document.getElementById('recordButton').disabled = true;
-  document.getElementById('recordingNotice').style.display = 'none';
   document.getElementById('recordStatus').textContent = '';
+  document.getElementById('visualizer').style.display = 'none';
+
+  if (schoolDayIndex === -1) {
+    countdown.textContent = 'No sight-singing example is scheduled for today. Please return on a listed school day.';
+    return;
+  }
+
+  if (schoolDayIndex >= DAILY_CUSTOM_SIGHT_EXAMPLES.length) {
+    countdown.textContent = 'All currently available custom sight-singing examples have been used. More examples will be added later.';
+    return;
+  }
+
+  dailySightExample = DAILY_CUSTOM_SIGHT_EXAMPLES[schoolDayIndex];
+  image.src = `sightsinging/custom-sightsinging/${dailySightExample}`;
+  image.onerror = () => {
+    beginButton.disabled = true;
+    countdown.textContent = `Could not load ${dailySightExample}. Please check the file and folder names.`;
+  };
+  image.onload = () => {
+    // Enable Begin only after a valid scheduled image has loaded.
+    beginButton.disabled = false;
+    countdown.textContent = "Press Begin! when you're ready.";
+  };
 }
 
 function dailyBeginSightSinging() {
@@ -4175,12 +4290,76 @@ function dailyBeginSightSinging() {
 
   dailySightStartedAt = Date.now();
   dailySightTimeExpired = false;
+  dailySightOfficialStarted = false;
+
   document.getElementById('beginSightButton').disabled = true;
   document.getElementById('exerciseImage').classList.add('revealed');
-  document.getElementById('recordButton').disabled = false;
-  document.getElementById('recordingNotice').style.display = 'block';
+
+  // Show the visualizer immediately when the student presses Begin!
+  const visualizer = document.getElementById('visualizer');
+  if (visualizer) visualizer.style.display = 'block';
+
+  const recordButton = document.getElementById('recordButton');
+  if (recordButton) recordButton.disabled = true;
+
+  const prompt = document.getElementById('sightPrompt');
+  if (prompt) {
+    prompt.innerHTML =
+      'Practice out loud, at full volume.' +
+      '<span class="sight-subnote">' +
+      '(Your official recording starts when there are 45 seconds remaining)' +
+      '</span>';
+
+    prompt.classList.remove('official-phase');
+    prompt.style.display = 'block';
+  }
+
+  // Prepare audio from the user's click so the alert tone can play
+  // when the official phase begins.
+  try {
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    if (AudioContextClass) {
+      dailySightToneContext = new AudioContextClass();
+      dailySightToneContext.resume().catch(() => {});
+    }
+  } catch (err) {
+    console.warn(
+      'Could not prepare the sight-singing alert tone:',
+      err
+    );
+  }
+
+  // Start the countdown and recording immediately.
   dailySightUpdateCountdown();
-  dailySightCountdownTimer = setInterval(dailySightUpdateCountdown, 250);
+  dailySightCountdownTimer =
+    setInterval(dailySightUpdateCountdown, 250);
+
+  dailyToggleSightRecording();
+}
+
+
+function dailySightPlayOfficialTone() {
+  try {
+    const ctx = dailySightToneContext;
+    if (!ctx || ctx.state === 'closed') return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.9, ctx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.9, ctx.currentTime + 0.75);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.15);
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 1.16);
+  } catch (err) {
+    console.warn('Could not play the sight-singing alert tone:', err);
+  }
 }
 
 function dailySightUpdateCountdown() {
@@ -4204,6 +4383,19 @@ function dailySightUpdateCountdown() {
   if (remaining > 0) {
     el.textContent = `${minutes}:${seconds.toString().padStart(2,'0')} remaining`;
 
+    if (remaining <= 45000 && !dailySightOfficialStarted) {
+      dailySightOfficialStarted = true;
+      const prompt = document.getElementById('sightPrompt');
+      if (prompt) {
+        prompt.textContent = 'Sing confidently. Do not restart.';
+        prompt.classList.add('official-phase');
+      }
+      dailySightPlayOfficialTone();
+      // The recording is already running; enable the student to stop it from now on.
+      const recordButton = document.getElementById('recordButton');
+      if (recordButton) recordButton.disabled = false;
+    }
+
     if (remaining < 45000) {
         el.classList.add('warning');
     } else {
@@ -4212,6 +4404,8 @@ function dailySightUpdateCountdown() {
   } else {
     el.textContent = "Time's up!";
     el.classList.remove('warning');
+    const prompt = document.getElementById('sightPrompt');
+    if (prompt) prompt.textContent = 'Time is up. Your official recording has ended.';
 
     clearInterval(dailySightCountdownTimer);
     dailySightCountdownTimer = null;
@@ -4219,13 +4413,11 @@ function dailySightUpdateCountdown() {
     dailySightTimeExpired = true;
 
     const recordButton = document.getElementById('recordButton');
-    const recordingNotice = document.getElementById('recordingNotice');
     const recordStatus = document.getElementById('recordStatus');
 
     // Disable the button immediately, even if the microphone/recorder is in
     // the middle of an async operation.
     if (recordButton) recordButton.disabled = true;
-    if (recordingNotice) recordingNotice.style.display = 'none';
 
     if (dailySightIsRecording && dailySightMediaRecorder) {
       // Force-stop the active recording exactly at the time limit.
@@ -4290,15 +4482,23 @@ async function dailyToggleSightRecording() {
       document.getElementById('visualizer').style.display = 'block';
       dailySightDrawVisualization();
 
+      dailySightMediaRecorder.onerror = e => {
+        console.error('Sight-singing recorder error:', e.error || e);
+        const status = document.getElementById('recordStatus');
+        if (status) status.textContent = 'Recording encountered an error. Keep this page open while recovery is attempted.';
+      };
       dailySightMediaRecorder.ondataavailable = e => {
         if (e.data && e.data.size) dailySightAudioChunks.push(e.data);
       };
 
       dailySightMediaRecorder.onstop = async () => {
+        let capturedWebmBlob = null;
         try {
           const webmBlob = new Blob(dailySightAudioChunks, {
             type: dailySightMediaRecorder.mimeType || 'audio/webm'
           });
+          capturedWebmBlob = webmBlob;
+          if (!webmBlob.size) throw new Error('No audio data was captured by the browser recorder.');
           const arrayBuffer = await webmBlob.arrayBuffer();
           const audioCtx = new AudioContext();
           const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
@@ -4348,9 +4548,23 @@ async function dailyToggleSightRecording() {
           if (dailySightAnimationId) cancelAnimationFrame(dailySightAnimationId);
           dailySightAnimationId = null;
           document.getElementById('recordIcon')?.classList.remove('recording');
-          document.getElementById('recordStatus').textContent =
-            'Could not finish the recording.';
-          if (!dailySightTimeExpired) recordButton.disabled = false;
+          // Preserve the captured original audio if MP3 conversion fails. This is
+          // preferable to discarding a student's recording entirely.
+          if (capturedWebmBlob && capturedWebmBlob.size) {
+            try {
+              dailySightRecordingReady(capturedWebmBlob, dailySightExample);
+              document.getElementById('recordStatus').textContent =
+                'Recording captured. MP3 conversion failed, so the original audio has been retained.';
+            } catch (fallbackErr) {
+              console.error('Could not retain fallback audio:', fallbackErr);
+              document.getElementById('recordStatus').textContent =
+                'Audio was captured but could not be finalized. Keep this page open and contact your teacher.';
+            }
+          } else {
+            document.getElementById('recordStatus').textContent =
+              'No audio data could be recovered. Please contact your teacher before leaving this page.';
+          }
+          if (!dailySightTimeExpired) recordButton.disabled = true;
         }
       };
 
@@ -4363,23 +4577,21 @@ async function dailyToggleSightRecording() {
         return;
       }
 
-      dailySightMediaRecorder.start();
+      dailySightMediaRecorder.start(1000);
       dailySightIsRecording = true;
-      recordButton.disabled = false;
+      recordButton.disabled = !dailySightOfficialStarted;
       document.getElementById('recordIcon').classList.add('recording');
-      document.getElementById('recordingNotice').style.display = 'block';
-      document.getElementById('recordingNotice').textContent =
-        'Recording… press the button again to stop.';
     } catch (err) {
       console.error('Microphone error:', err);
       if (!dailySightTimeExpired) {
         document.getElementById('recordStatus').textContent =
-          'Microphone access is required for the sight-singing recording.';
+          'Microphone access is required. Allow microphone access, then press the record button to retry.';
+        if (recordButton && Date.now() - dailySightStartedAt < 120000) recordButton.disabled = false;
       }
     }
   } else {
-    if (dailySightTimeExpired) {
-      // The countdown handler owns stopping an expired recording.
+    if (dailySightTimeExpired || !dailySightOfficialStarted) {
+      // Students cannot stop the recording until the official 45-second phase.
       return;
     }
 
@@ -4392,7 +4604,6 @@ async function dailyToggleSightRecording() {
     dailySightHasRecorded = true;
     recordButton.disabled = true;
     document.getElementById('recordIcon').classList.remove('recording');
-    document.getElementById('recordingNotice').style.display = 'none';
 
     if (dailySightCountdownTimer) {
       clearInterval(dailySightCountdownTimer);
