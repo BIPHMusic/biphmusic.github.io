@@ -859,7 +859,7 @@
                 String(record.student || "").trim().toLowerCase(),
                 String(record.date || "").trim(),
                 String(record.time || "").trim(),
-                String(record.percentage ?? "").trim(),
+                String(record.originalPercentage ?? record.percentage ?? "").trim(),
                 normalizeExercise(record.exercise),
                 String(record.assessment || "").trim(),
                 JSON.stringify(record.termsToReview || []),
@@ -1087,6 +1087,15 @@
                 lines.push(
                     `        percentage: ${Number(record.percentage)},`
                 );
+                if (record.originalPercentage !== undefined && record.originalPercentage !== null) {
+                    lines.push(`        originalPercentage: ${Number(record.originalPercentage)},`);
+                }
+                if (record.curvedPercentage !== undefined && record.curvedPercentage !== null) {
+                    lines.push(`        curvedPercentage: ${Number(record.curvedPercentage)},`);
+                }
+                if (record.curveApplied) {
+                    lines.push(`        curveApplied: true,`);
+                }
                 lines.push(
                     `        exercise: ${JSON.stringify(record.exercise)},`
                 );
@@ -1699,9 +1708,10 @@
                 );
                 if (!weeklyMode) {
                     if (!exerciseRecords.length) return;
-                    datasets.push({
-                        label: exercise,
-                        data: exerciseRecords.map(item => Number(item.percentage)),
+                    const hasCurves = exerciseRecords.some(item => item.curveApplied || item.curvedPercentage != null);
+                    const baseDataset = {
+                        label: hasCurves ? `${exercise} — Original` : exercise,
+                        data: exerciseRecords.map(item => Number(item.originalPercentage ?? item.percentage)),
                         dates: exerciseRecords.map(item => item.date),
                         times: exerciseRecords.map(item => item.time || ""),
                         recordIdentities: exerciseRecords.map(item => getRecordIdentity(item)),
@@ -1713,7 +1723,19 @@
                         pointBackgroundColor: exerciseRecords.map(item => importedRecord && getRecordIdentity(item) === getRecordIdentity(importedRecord) ? "#fff" : getExerciseColor(exercise)),
                         pointBorderWidth: exerciseRecords.map(item => importedRecord && getRecordIdentity(item) === getRecordIdentity(importedRecord) ? 3 : 1),
                         hidden: false
-                    });
+                    };
+                    datasets.push(baseDataset);
+                    if (hasCurves) {
+                        datasets.push({
+                            ...baseDataset,
+                            label: `${exercise} — Curved`,
+                            data: exerciseRecords.map(item => item.curveApplied || item.curvedPercentage != null ? Number(item.curvedPercentage ?? item.percentage) : null),
+                            borderColor: getExerciseColor(exercise) + "99",
+                            borderDash: [6, 4],
+                            pointRadius: exerciseRecords.map(item => item.curveApplied || item.curvedPercentage != null ? 5 : 0),
+                            pointHoverRadius: 9
+                        });
+                    }
                 } else {
                     if (!exerciseRecords.length) return;
                     // Keep every week between the student's first and last
@@ -1730,14 +1752,17 @@
                     const firstRecordedWeek = weeksWithAnyRecords[0].index;
                     const lastRecordedWeek = weeksWithAnyRecords[weeksWithAnyRecords.length - 1].index;
                     const pastWeeks = availableWeeks.slice(firstRecordedWeek, lastRecordedWeek + 1);
-                    const values = pastWeeks.map(week => {
+                    const hasCurves = exerciseRecords.some(item => item.curveApplied || item.curvedPercentage != null);
+                    const averageForWeek = (week, curvedOnly) => {
                         const weekValues = exerciseRecords.filter(record =>
-                            week.days.some(day => day.date === record.date)
-                        ).map(record => Number(record.percentage)).filter(Number.isFinite);
+                            week.days.some(day => day.date === record.date) &&
+                            (!curvedOnly || record.curveApplied || record.curvedPercentage != null)
+                        ).map(record => Number(curvedOnly ? (record.curvedPercentage ?? record.percentage) : (record.originalPercentage ?? record.percentage))).filter(Number.isFinite);
                         return weekValues.length ? Math.round(weekValues.reduce((a,b) => a+b, 0) / weekValues.length * 10) / 10 : null;
-                    });
+                    };
+                    const values = pastWeeks.map(week => averageForWeek(week, false));
                     datasets.push({
-                        label: exercise,
+                        label: hasCurves ? `${exercise} — Original` : exercise,
                         data: values,
                         dates: pastWeeks.map(week => `${week.start.date} – ${week.end.date}`),
                         times: pastWeeks.map(() => ""),
@@ -1758,6 +1783,32 @@
                         },
                         hidden: false
                     });
+                    if (hasCurves) {
+                        const curvedValues = pastWeeks.map(week => {
+                            const vals = exerciseRecords.filter(record =>
+                                week.days.some(day => day.date === record.date) &&
+                                (record.curveApplied || record.curvedPercentage != null)
+                            ).map(record => Number(record.curvedPercentage ?? record.percentage)).filter(Number.isFinite);
+                            return vals.length ? Math.round(vals.reduce((a,b) => a+b, 0) / vals.length * 10) / 10 : null;
+                        });
+                        datasets.push({
+                            label: `${exercise} — Curved`,
+                            data: curvedValues,
+                            dates: pastWeeks.map(week => `${week.start.date} – ${week.end.date}`),
+                            times: pastWeeks.map(() => ""),
+                            recordIdentities: pastWeeks.map(() => ""),
+                            borderColor: getExerciseColor(exercise) + "99",
+                            borderDash: [6, 4],
+                            borderWidth: 3,
+                            tension: 0.3,
+                            pointRadius: curvedValues.map(value => value == null ? 0 : 4),
+                            pointHoverRadius: 8,
+                            pointBackgroundColor: getExerciseColor(exercise) + "99",
+                            pointBorderWidth: 1,
+                            spanGaps: true,
+                            hidden: false
+                        });
+                    }
                 }
             });
             const labels = weeklyMode
@@ -9457,7 +9508,7 @@ function setupTeacherStudentSearch() {
             });
             const group = groups.get(key);
             group.students.push({ record, index });
-            const score = validScore(record);
+            const score = validScore({ percentage: record?.originalPercentage ?? record?.percentage });
             if (score !== null) group.scores.push(score);
         });
         return Array.from(groups.values()).map(group => {
@@ -9466,8 +9517,9 @@ function setupTeacherStudentSearch() {
                 ? round1(group.scores.reduce((sum, score) => sum + score, 0) / group.scores.length)
                 : null;
             const curveAmount = highest !== null && highest < 100 ? round1(100 - highest) : 0;
+            const alreadyCurved = group.students.some(({record}) => record.curveApplied || record.curvedPercentage != null);
             return { ...group, highest, average, curveAmount,
-                candidate: highest !== null && highest < 100 };
+                candidate: !alreadyCurved && highest !== null && highest < 100 };
         }).filter(group => group.candidate)
           .sort((a, b) => b.date.localeCompare(a.date) || a.exercise.localeCompare(b.exercise));
     }
@@ -9519,7 +9571,7 @@ function setupTeacherStudentSearch() {
                     if (sa === null) return 1; if (sb === null) return -1;
                     return sb - sa || String(a.record.student ?? "").localeCompare(String(b.record.student ?? ""));
                 }).map(({record}) => {
-                    const score = validScore(record);
+                    const score = validScore({ percentage: record?.originalPercentage ?? record?.percentage });
                     const curved = score === null ? null : round1(Math.min(100, score + assessment.curveAmount));
                     return `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.1);align-items:center;">
                         <span>${escapeHTML(record.student || "Unknown student")}</span>
@@ -9533,6 +9585,9 @@ function setupTeacherStudentSearch() {
                         <span style="font-size:.9em;opacity:.85;">+${formatPercentage(assessment.curveAmount)} · ${assessment.students.length} records</span>
                     </summary>
                     <div style="padding:0 12px 10px;">
+                        <div style="display:flex;justify-content:flex-end;margin:0 0 10px;">
+                            <button type="button" data-curve-assessment="${escapeHTML(encodeURIComponent(assessment.key))}" style="padding:7px 12px;border:1px solid rgba(255,189,89,.65);border-radius:7px;background:rgba(255,189,89,.14);color:#ffcf83;font-weight:700;cursor:pointer;">${assessment.students.some(({record}) => record.curveApplied || record.curvedPercentage != null) ? "Reapply curve" : "Curve this assignment"}</button>
+                        </div>
                         <div style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px;">
                             <span style="padding:6px 9px;border-radius:7px;background:rgba(255,255,255,.07);font-size:.88em;">Highest original score: <strong>${assessment.highest === null ? "N/A" : formatPercentage(assessment.highest)}</strong></span>
                             <span style="padding:6px 9px;border-radius:7px;background:rgba(255,255,255,.07);font-size:.88em;">Average original score: <strong>${assessment.average === null ? "N/A" : formatPercentage(assessment.average)}</strong></span>
@@ -9569,7 +9624,14 @@ function setupTeacherStudentSearch() {
         host.innerHTML = html;
 
         const curveButton = host.querySelector("#cache-curve-button");
-        if (curveButton) curveButton.addEventListener("click", curveEm);
+        if (curveButton) curveButton.addEventListener("click", () => curveEm(null));
+        host.querySelectorAll("[data-curve-assessment]").forEach(button => {
+            button.addEventListener("click", () => {
+                let key = "";
+                try { key = decodeURIComponent(button.dataset.curveAssessment || ""); } catch (_) {}
+                if (key) curveEm(key);
+            });
+        });
         host.querySelectorAll("[data-keep-duplicate]").forEach(button => {
             button.addEventListener("click", () => {
                 const groupIndex = Number(button.dataset.keepDuplicate);
@@ -9692,7 +9754,7 @@ function setupTeacherStudentSearch() {
         return true;
     }
 
-    function curveEm() {
+    function curveEm(selectedKey = null) {
         const button = document.getElementById("cache-curve-button");
         const message = document.getElementById("cache-curve-message");
         if (!Array.isArray(cachedRecords)) return;
@@ -9701,51 +9763,52 @@ function setupTeacherStudentSearch() {
             return;
         }
         const candidates = getAssessments(cachedRecords);
-        if (!candidates.length) {
-            if (message) message.textContent = "There are no eligible assignments to curve.";
+        const targets = selectedKey
+            ? candidates.filter(assessment => assessment.key === selectedKey)
+            : candidates;
+        if (!targets.length) {
+            if (message) message.textContent = selectedKey
+                ? "This assignment has no eligible scores to curve (it may already be at 100%)."
+                : "There are no eligible assignments to curve.";
             return;
         }
         if (button) button.disabled = true;
         try {
-            const candidateMap = new Map(candidates.map(assessment => [assessment.key, assessment]));
-            const reports = new Map();
+            const candidateMap = new Map(targets.map(assessment => [assessment.key, assessment]));
             cachedRecords = cachedRecords.map(record => {
                 if (!record || !record.date || !record.exercise) return record;
                 const assessment = candidateMap.get(assessmentKey(record));
                 if (!assessment) return record;
-                const previousScore = validScore(record);
+                const previousScore = validScore({
+                    percentage: record.originalPercentage ?? record.percentage
+                });
                 if (previousScore === null) return record;
                 const newScore = round1(Math.min(100, previousScore + assessment.curveAmount));
-                const studentName = record.student || "Unknown student";
-                if (!reports.has(studentName)) reports.set(studentName, []);
-                reports.get(studentName).push({
-                    date: record.date,
-                    exercise: record.exercise,
-                    previousScore,
-                    pointsAdded: round1(newScore - previousScore),
-                    newScore
-                });
-                return { ...record, percentage: newScore };
+                return {
+                    ...record,
+                    originalPercentage: previousScore,
+                    curvedPercentage: newScore,
+                    curveApplied: true,
+                    curveAmount: assessment.curveAmount,
+                    percentage: newScore
+                };
             });
             saveCachedRecords();
             renderCachePanel();
-
-            let opened = 0;
-            let blocked = 0;
-            for (const [studentName, entries] of reports) {
-                entries.sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.exercise).localeCompare(String(b.exercise)));
-                if (openAndPrintStudentReport(studentName, entries)) opened++;
-                else blocked++;
+            if (typeof renderTeacherAssignments === "function") renderTeacherAssignments();
+            if (typeof renderTeacherWeekly === "function") renderTeacherWeekly();
+            if (typeof renderTeacherCohortWeekly === "function") renderTeacherCohortWeekly();
+            if (typeof renderStudentDashboard === "function" && !isTeacher()) {
+                renderStudentDashboard(getCurrentStudentName());
             }
-
-            const successMessage = `Updated the browser cache for ${candidates.length} assignment${candidates.length === 1 ? "" : "s"}. Opened ${opened} formatted student report tab${opened === 1 ? "" : "s"} and requested printing to PDF. In each print dialog, choose “Save as PDF.”${blocked ? ` ${blocked} report tab${blocked === 1 ? " was" : "s were"} blocked by the browser; allow pop-ups and try again if needed.` : ""} The updated records.js has not been downloaded; use Export Records or Copy Records when ready.`;
             const currentMessage = document.getElementById("cache-curve-message");
-            if (currentMessage) currentMessage.textContent = successMessage;
-            else if (typeof showToast === "function") showToast(successMessage);
+            if (currentMessage) currentMessage.textContent = selectedKey
+                ? "Curve applied to this assignment. Original and curved scores have been saved separately in the cache and will be included in the exported records.js."
+                : `Curved ${targets.length} assignment${targets.length === 1 ? "" : "s"}. Original and curved scores have been saved separately in the cache and will be included in the exported records.js.`;
         } catch (error) {
             console.error("Error while applying curves:", error);
             const currentMessage = document.getElementById("cache-curve-message");
-            if (currentMessage) currentMessage.textContent = "Something went wrong while generating the curved reports. Check the browser console for details.";
+            if (currentMessage) currentMessage.textContent = "Something went wrong while applying the curve. Check the browser console for details.";
         } finally {
             const currentButton = document.getElementById("cache-curve-button");
             if (currentButton) currentButton.disabled = false;
