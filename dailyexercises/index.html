@@ -435,20 +435,38 @@
 //   questionsPerSection: [5, 5, 5]
 // };
 
+// Previous difficulty:
+// const QUIZ_CONFIG = {
+//     name: "Ear Training – Harmonic Intervals + Triads + Seventh Chords",
+//     sections: ['intervals', 'triads', 'seventhChords'],
+//     sectionTitles: ['Intervals', 'Triads', 'Seventh Chords'],
+//     questionsPerSection: [5, 5, 5],
+//     harmonicIntervals: true,
+//     harmonicTriads: false,
+//     harmonicSeventhChords: false
+// };
+
+
+
 const QUIZ_CONFIG = {
-    name: "Ear Training – Harmonic Intervals + Triads + Seventh Chords",
+    name: "Ear Training – Harmonic Intervals + Harmonic Triads + Seventh Chords",
     sections: ['intervals', 'triads', 'seventhChords'],
     sectionTitles: ['Intervals', 'Triads', 'Seventh Chords'],
     questionsPerSection: [5, 5, 5],
-    harmonicIntervals: true
+    harmonicIntervals: true,
+    harmonicTriads: true,
+    harmonicSeventhChords: false
 };
 
 
 // const QUIZ_CONFIG = {
-//   name: "Ear Training – Full (Intervals, Chords & Modes)",
-//   sections: ['intervals', 'triads', 'seventhChords', 'modes'],
-//   sectionTitles: ['Intervals', 'Triads', 'Seventh Chords', 'Modes'],
-//   questionsPerSection: [5, 5, 5, 5]
+//     name: "Ear Training – Harmonic Intervals + Harmonic Triads + Harmonic Seventh Chords",
+//     sections: ['intervals', 'triads', 'seventhChords'],
+//     sectionTitles: ['Intervals', 'Triads', 'Seventh Chords'],
+//     questionsPerSection: [5, 5, 5],
+//     harmonicIntervals: true,
+//     harmonicTriads: true,
+//     harmonicSeventhChords: true
 // };
 
 
@@ -1360,8 +1378,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function dailyGetAccessState(now = new Date()) {
-  // Teachers can always access exercises, regardless of the student time window.
-  if (window.biphIsTeacher === true) {
+  // Teachers and guest accounts can always access exercises.
+  const role = localStorage.getItem('biph_user_role');
+  if (window.biphIsTeacher === true || role === 'teacher' || role === 'guest') {
     return { allowed: true, target: null, label: '' };
   }
 
@@ -3617,261 +3636,112 @@ function dailyVocabPrepareResultData() {
         const dailyEarSectionTitles = dailyEarQuizConfig.sectionTitles;
 
         
+        function dailyBuildAudioBank(specs, options = {}) {
+            const harmonic = options.harmonic === true;
+            const separator = options.separator ?? '';
+
+            return Object.entries(specs).flatMap(([prefix, spec]) => {
+                return spec.numbers.map(number => ({
+                    file: `${harmonic ? 'H-' : ''}${prefix}${separator}${number}.mp3`,
+                    answer: spec.answer
+                }));
+            });
+        }
+
+        function dailyNumberRange(count) {
+            return Array.from({ length: count }, (_, i) => i + 1);
+        }
 
         const audioFiles = {
-            intervals: [
-                { file: 'Major2-1.mp3', answer: 'Major 2nd' },
-                { file: 'Major2-2.mp3', answer: 'Major 2nd' },
-                { file: 'Major2-3.mp3', answer: 'Major 2nd' },
-                { file: 'Major2-4.mp3', answer: 'Major 2nd' },
-                { file: 'Major2-5.mp3', answer: 'Major 2nd' },
-                { file: 'Major2-6.mp3', answer: 'Major 2nd' },
-                { file: 'Major2-7.mp3', answer: 'Major 2nd' },
-                { file: 'Major2-8.mp3', answer: 'Major 2nd' },
-                { file: 'Major2-9.mp3', answer: 'Major 2nd' },
-                { file: 'Major2-10.mp3', answer: 'Major 2nd' },
-                { file: 'Major3-1.mp3', answer: 'Major 3rd' },
-                { file: 'Major3-2.mp3', answer: 'Major 3rd' },
-                { file: 'Major3-3.mp3', answer: 'Major 3rd' },
-                { file: 'Major3-4.mp3', answer: 'Major 3rd' },
-                { file: 'Major3-5.mp3', answer: 'Major 3rd' },
-                { file: 'Major3-6.mp3', answer: 'Major 3rd' },
-                { file: 'Major3-7.mp3', answer: 'Major 3rd' },
-                { file: 'Major3-8.mp3', answer: 'Major 3rd' },
-                { file: 'Major6-1.mp3', answer: 'Major 6th' },
-                { file: 'Major6-2.mp3', answer: 'Major 6th' },
-                { file: 'Major6-3.mp3', answer: 'Major 6th' },
-                { file: 'Major6-4.mp3', answer: 'Major 6th' },
-                { file: 'Major6-5.mp3', answer: 'Major 6th' },
-                { file: 'Major6-6.mp3', answer: 'Major 6th' },
-                { file: 'Major6-7.mp3', answer: 'Major 6th' },
-                { file: 'Major6-8.mp3', answer: 'Major 6th' },
-                { file: 'Major6-9.mp3', answer: 'Major 6th' },
-                { file: 'Major7-1.mp3', answer: 'Major 7th' },
-                { file: 'Major7-2.mp3', answer: 'Major 7th' },
-                { file: 'Major7-3.mp3', answer: 'Major 7th' },
-                { file: 'Major7-4.mp3', answer: 'Major 7th' },
-                { file: 'Minor2-1.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor2-2.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor2-3.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor2-4.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor2-5.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor2-6.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor2-7.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor2-8.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor2-9.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor2-10.mp3', answer: 'Minor 2nd' },
-                { file: 'Minor3-1.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor3-2.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor3-3.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor3-4.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor3-5.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor3-6.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor3-7.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor3-8.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor3-9.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor3-10.mp3', answer: 'Minor 3rd' },
-                { file: 'Minor6-1.mp3', answer: 'Minor 6th' },
-                { file: 'Minor6-2.mp3', answer: 'Minor 6th' },
-                { file: 'Minor6-3.mp3', answer: 'Minor 6th' },
-                { file: 'Minor6-4.mp3', answer: 'Minor 6th' },
-                { file: 'Minor6-5.mp3', answer: 'Minor 6th' },
-                { file: 'Minor6-6.mp3', answer: 'Minor 6th' },
-                { file: 'Minor6-7.mp3', answer: 'Minor 6th' },
-                { file: 'Minor6-8.mp3', answer: 'Minor 6th' },
-                { file: 'Minor6-9.mp3', answer: 'Minor 6th' },
-                { file: 'Minor6-10.mp3', answer: 'Minor 6th' },
-                { file: 'Minor7-1.mp3', answer: 'Minor 7th' },
-                { file: 'Minor7-2.mp3', answer: 'Minor 7th' },
-                { file: 'Minor7-3.mp3', answer: 'Minor 7th' },
-                { file: 'Minor7-4.mp3', answer: 'Minor 7th' },
-                { file: 'Minor7-5.mp3', answer: 'Minor 7th' },
-                { file: 'Minor7-6.mp3', answer: 'Minor 7th' },
-                { file: 'Minor7-7.mp3', answer: 'Minor 7th' },
-                { file: 'Minor7-8.mp3', answer: 'Minor 7th' },
-                { file: 'Perfect4-1.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect4-2.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect4-3.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect4-4.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect4-5.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect4-6.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect4-7.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect4-8.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect4-9.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect4-10.mp3', answer: 'Perfect 4th' },
-                { file: 'Perfect5-1.mp3', answer: 'Perfect 5th' },
-                { file: 'Perfect5-2.mp3', answer: 'Perfect 5th' },
-                { file: 'Perfect5-3.mp3', answer: 'Perfect 5th' },
-                { file: 'Perfect5-4.mp3', answer: 'Perfect 5th' },
-                { file: 'Perfect5-5.mp3', answer: 'Perfect 5th' },
-                { file: 'Perfect5-6.mp3', answer: 'Perfect 5th' },
-                { file: 'Perfect5-7.mp3', answer: 'Perfect 5th' },
-                { file: 'Perfect5-8.mp3', answer: 'Perfect 5th' },
-                { file: 'Perfect5-9.mp3', answer: 'Perfect 5th' },
-                { file: 'Perfect8-1.mp3', answer: 'Perfect 8ve' },
-                { file: 'Perfect8-2.mp3', answer: 'Perfect 8ve' },
-                { file: 'Perfect8-3.mp3', answer: 'Perfect 8ve' },
-                { file: 'Perfect8-4.mp3', answer: 'Perfect 8ve' },
-                { file: 'Perfect8-5.mp3', answer: 'Perfect 8ve' },
-                { file: 'Perfect8-6.mp3', answer: 'Perfect 8ve' },
-                { file: 'Perfect8-7.mp3', answer: 'Perfect 8ve' },
-                { file: 'Perfect8-8.mp3', answer: 'Perfect 8ve' },
-                { file: 'Perfect8-9.mp3', answer: 'Perfect 8ve' },
-                { file: 'Tritone-1.mp3', answer: 'Tritone' },
-                { file: 'Tritone-2.mp3', answer: 'Tritone' },
-                { file: 'Tritone-3.mp3', answer: 'Tritone' },
-                { file: 'Tritone-4.mp3', answer: 'Tritone' },
-                { file: 'Tritone-5.mp3', answer: 'Tritone' },
-                { file: 'Tritone-6.mp3', answer: 'Tritone' },
-                { file: 'Tritone-7.mp3', answer: 'Tritone' },
-                { file: 'Tritone-8.mp3', answer: 'Tritone' },
-                { file: 'Tritone-9.mp3', answer: 'Tritone' },
-                { file: 'Tritone-10.mp3', answer: 'Tritone' }
-            ],
+            intervals: dailyBuildAudioBank({
+                Major2: { answer: 'Major 2nd', numbers: dailyNumberRange(10) },
+                Major3: { answer: 'Major 3rd', numbers: dailyNumberRange(9) },
+                Major6: { answer: 'Major 6th', numbers: dailyNumberRange(9) },
+                Major7: { answer: 'Major 7th', numbers: dailyNumberRange(4) },
+                Minor2: { answer: 'Minor 2nd', numbers: dailyNumberRange(10) },
+                Minor3: { answer: 'Minor 3rd', numbers: dailyNumberRange(10) },
+                Minor6: { answer: 'Minor 6th', numbers: dailyNumberRange(10) },
+                Minor7: { answer: 'Minor 7th', numbers: dailyNumberRange(8) },
+                Perfect4: { answer: 'Perfect 4th', numbers: dailyNumberRange(10) },
+                Perfect5: { answer: 'Perfect 5th', numbers: dailyNumberRange(9) },
+                Perfect8: { answer: 'Perfect 8ve', numbers: dailyNumberRange(9) },
+                Tritone: { answer: 'Tritone', numbers: dailyNumberRange(10) }
+            }, { separator: '-' }),
 
-            harmonicIntervals: Object.entries({
-              Major2: 9,
-              Major3: 9,
-              Major6: 12,
-              Major7: 11,
-              Minor2: 13,
-              Minor3: 12,
-              Minor6: 12,
-              Minor7: 9,
-              Perfect4: 12,
-              Perfect5: 10,
-              Perfect8: 7,
-              Tritone: 10
-            }).flatMap(([prefix, count]) => {
-              const answers = {
-                Major2: 'Major 2nd',
-                Major3: 'Major 3rd',
-                Major6: 'Major 6th',
-                Major7: 'Major 7th',
-                Minor2: 'Minor 2nd',
-                Minor3: 'Minor 3rd',
-                Minor6: 'Minor 6th',
-                Minor7: 'Minor 7th',
-                Perfect4: 'Perfect 4th',
-                Perfect5: 'Perfect 5th',
-                Perfect8: 'Perfect 8ve',
-                Tritone: 'Tritone'
-              };
+            harmonicIntervals: dailyBuildAudioBank({
+                Major2: { answer: 'Major 2nd', numbers: dailyNumberRange(9) },
+                Major3: { answer: 'Major 3rd', numbers: dailyNumberRange(9) },
+                Major6: { answer: 'Major 6th', numbers: dailyNumberRange(12) },
+                Major7: { answer: 'Major 7th', numbers: dailyNumberRange(11) },
+                Minor2: { answer: 'Minor 2nd', numbers: dailyNumberRange(13) },
+                Minor3: { answer: 'Minor 3rd', numbers: dailyNumberRange(12) },
+                Minor6: { answer: 'Minor 6th', numbers: dailyNumberRange(12) },
+                Minor7: { answer: 'Minor 7th', numbers: dailyNumberRange(9) },
+                Perfect4: { answer: 'Perfect 4th', numbers: dailyNumberRange(12) },
+                Perfect5: { answer: 'Perfect 5th', numbers: dailyNumberRange(10) },
+                Perfect8: { answer: 'Perfect 8ve', numbers: dailyNumberRange(7) },
+                Tritone: { answer: 'Tritone', numbers: dailyNumberRange(10) }
+            }, { harmonic: true, separator: '-' }),
 
-              return Array.from({ length: count }, (_, i) => ({
-                file: `H-${prefix}-${i + 1}.mp3`,
-                answer: answers[prefix]
-              }));
+            triads: dailyBuildAudioBank({
+                Augmented: { answer: 'Augmented Triad', numbers: dailyNumberRange(8) },
+                Diminished: { answer: 'Diminished Triad', numbers: dailyNumberRange(6) },
+                Major: { answer: 'Major Triad', numbers: dailyNumberRange(9) },
+                Minor: { answer: 'Minor Triad', numbers: dailyNumberRange(7) }
             }),
 
-            triads: [
-                { file: 'Augmented1.mp3', answer: 'Augmented Triad' },
-                { file: 'Augmented2.mp3', answer: 'Augmented Triad' },
-                { file: 'Augmented3.mp3', answer: 'Augmented Triad' },
-                { file: 'Augmented4.mp3', answer: 'Augmented Triad' },
-                { file: 'Augmented5.mp3', answer: 'Augmented Triad' },
-                { file: 'Augmented6.mp3', answer: 'Augmented Triad' },
-                { file: 'Augmented7.mp3', answer: 'Augmented Triad' },
-                { file: 'Augmented8.mp3', answer: 'Augmented Triad' },
-                { file: 'Diminished1.mp3', answer: 'Diminished Triad' },
-                { file: 'Diminished2.mp3', answer: 'Diminished Triad' },
-                { file: 'Diminished3.mp3', answer: 'Diminished Triad' },
-                { file: 'Diminished4.mp3', answer: 'Diminished Triad' },
-                { file: 'Diminished5.mp3', answer: 'Diminished Triad' },
-                { file: 'Diminished6.mp3', answer: 'Diminished Triad' },
-                { file: 'Major1.mp3', answer: 'Major Triad' },
-                { file: 'Major2.mp3', answer: 'Major Triad' },
-                { file: 'Major3.mp3', answer: 'Major Triad' },
-                { file: 'Major4.mp3', answer: 'Major Triad' },
-                { file: 'Major5.mp3', answer: 'Major Triad' },
-                { file: 'Major6.mp3', answer: 'Major Triad' },
-                { file: 'Major7.mp3', answer: 'Major Triad' },
-                { file: 'Major8.mp3', answer: 'Major Triad' },
-                { file: 'Major9.mp3', answer: 'Major Triad' },
-                { file: 'Minor1.mp3', answer: 'Minor Triad' },
-                { file: 'Minor2.mp3', answer: 'Minor Triad' },
-                { file: 'Minor3.mp3', answer: 'Minor Triad' },
-                { file: 'Minor4.mp3', answer: 'Minor Triad' },
-                { file: 'Minor5.mp3', answer: 'Minor Triad' },
-                { file: 'Minor6.mp3', answer: 'Minor Triad' },
-                { file: 'Minor7.mp3', answer: 'Minor Triad' }
-            ],
-            seventhChords: [
-                { file: 'Diminished7-1.mp3', answer: 'Diminished 7' },
-                { file: 'Diminished7-3.mp3', answer: 'Diminished 7' },
-                { file: 'Diminished7-4.mp3', answer: 'Diminished 7' },
-                { file: 'Diminished7-5.mp3', answer: 'Diminished 7' },
-                { file: 'Diminished7-6.mp3', answer: 'Diminished 7' },
-                { file: 'Diminished7-7.mp3', answer: 'Diminished 7' },
-                { file: 'Diminished7-8.mp3', answer: 'Diminished 7' },
-                { file: 'Dominant7-1.mp3', answer: 'Dominant 7' },
-                { file: 'Dominant7-2.mp3', answer: 'Dominant 7' },
-                { file: 'Dominant7-3.mp3', answer: 'Dominant 7' },
-                { file: 'Dominant7-4.mp3', answer: 'Dominant 7' },
-                { file: 'Dominant7-5.mp3', answer: 'Dominant 7' },
-                { file: 'Dominant7-6.mp3', answer: 'Dominant 7' },
-                { file: 'Dominant7-7.mp3', answer: 'Dominant 7' },
-                { file: 'Dominant7-8.mp3', answer: 'Dominant 7' },
-                { file: 'Dominant7-9.mp3', answer: 'Dominant 7' },
-                { file: 'HalfDiminished7-1.mp3', answer: 'Half-Diminished 7' },
-                { file: 'HalfDiminished7-2.mp3', answer: 'Half-Diminished 7' },
-                { file: 'HalfDiminished7-3.mp3', answer: 'Half-Diminished 7' },
-                { file: 'HalfDiminished7-4.mp3', answer: 'Half-Diminished 7' },
-                { file: 'HalfDiminished7-5.mp3', answer: 'Half-Diminished 7' },
-                { file: 'HalfDiminished7-6.mp3', answer: 'Half-Diminished 7' },
-                { file: 'HalfDiminished7-7.mp3', answer: 'Half-Diminished 7' },
-                { file: 'HalfDiminished7-8.mp3', answer: 'Half-Diminished 7' },
-                { file: 'HalfDiminished7-9.mp3', answer: 'Half-Diminished 7' },
-                { file: 'Major7-1.mp3', answer: 'Major 7' },
-                { file: 'Major7-2.mp3', answer: 'Major 7' },
-                { file: 'Major7-3.mp3', answer: 'Major 7' },
-                { file: 'Major7-4.mp3', answer: 'Major 7' },
-                { file: 'Major7-5.mp3', answer: 'Major 7' },
-                { file: 'Major7-6.mp3', answer: 'Major 7' },
-                { file: 'Major7-7.mp3', answer: 'Major 7' },
-                { file: 'Major7-8.mp3', answer: 'Major 7' },
-                { file: 'Major7-9.mp3', answer: 'Major 7' },
-                { file: 'Minor7-1.mp3', answer: 'Minor 7' },
-                { file: 'Minor7-2.mp3', answer: 'Minor 7' },
-                { file: 'Minor7-3.mp3', answer: 'Minor 7' },
-                { file: 'Minor7-4.mp3', answer: 'Minor 7' },
-                { file: 'Minor7-5.mp3', answer: 'Minor 7' },
-                { file: 'Minor7-6.mp3', answer: 'Minor 7' },
-                { file: 'Minor7-7.mp3', answer: 'Minor 7' },
-                { file: 'Minor7-8.mp3', answer: 'Minor 7' }
-            ],
-            modes: [
-                { file: 'Aeolian1.mp3', answer: 'Aeolian' },
-                { file: 'Aeolian2.mp3', answer: 'Aeolian' },
-                { file: 'Aeolian3.mp3', answer: 'Aeolian' },
-                { file: 'Dorian1.mp3', answer: 'Dorian' },
-                { file: 'Dorian2.mp3', answer: 'Dorian' },
-                { file: 'Dorian3.mp3', answer: 'Dorian' },
-                { file: 'Ionian1.mp3', answer: 'Ionian' },
-                { file: 'Ionian2.mp3', answer: 'Ionian' },
-                { file: 'Locrian1.mp3', answer: 'Locrian' },
-                { file: 'Locrian2.mp3', answer: 'Locrian' },
-                { file: 'Locrian3.mp3', answer: 'Locrian' },
-                { file: 'Lydian1.mp3', answer: 'Lydian' },
-                { file: 'Lydian2.mp3', answer: 'Lydian' },
-                { file: 'Lydian3.mp3', answer: 'Lydian' },
-                { file: 'Lydian4.mp3', answer: 'Lydian' },
-                { file: 'Mixolydian1.mp3', answer: 'Mixolydian' },
-                { file: 'Mixolydian2.mp3', answer: 'Mixolydian' },
-                { file: 'Mixolydian3.mp3', answer: 'Mixolydian' },
-                { file: 'Mixolydian4.mp3', answer: 'Mixolydian' },
-                { file: 'Mixolydian5.mp3', answer: 'Mixolydian' },
-                { file: 'Mixolydian6.mp3', answer: 'Mixolydian' },
-                { file: 'Mixolydian7.mp3', answer: 'Mixolydian' },
-                { file: 'Phrygian1.mp3', answer: 'Phrygian' },
-                { file: 'Phrygian2.mp3', answer: 'Phrygian' },
-                { file: 'Phrygian3.mp3', answer: 'Phrygian' },
-                { file: 'Phrygian4.mp3', answer: 'Phrygian' },
-                { file: 'Phrygian5.mp3', answer: 'Phrygian' },
-                { file: 'Phrygian6.mp3', answer: 'Phrygian' },
-                { file: 'Phrygian7.mp3', answer: 'Phrygian' },
-                { file: 'Phrygian8.mp3', answer: 'Phrygian' }
-            ]
+            harmonicTriads: dailyBuildAudioBank({
+                Augmented: { answer: 'Augmented Triad', numbers: dailyNumberRange(9) },
+                Diminished: { answer: 'Diminished Triad', numbers: dailyNumberRange(10) },
+                Major: { answer: 'Major Triad', numbers: dailyNumberRange(10) },
+                Minor: { answer: 'Minor Triad', numbers: dailyNumberRange(10) }
+            }, { harmonic: true }),
+
+            seventhChords: dailyBuildAudioBank({
+                Diminished7: {
+                    answer: 'Diminished 7',
+                    numbers: [1, 3, 4, 5, 6, 7, 8]
+                },
+                Dominant7: {
+                    answer: 'Dominant 7',
+                    numbers: dailyNumberRange(10)
+                },
+                HalfDiminished7: {
+                    answer: 'Half-Diminished 7',
+                    numbers: dailyNumberRange(9)
+                },
+                Major7: {
+                    answer: 'Major 7',
+                    numbers: dailyNumberRange(9)
+                },
+                Minor7: {
+                    answer: 'Minor 7',
+                    numbers: dailyNumberRange(8)
+                }
+            }, { separator: '-' }),
+
+            harmonicSeventhChords: dailyBuildAudioBank({
+                Diminished7: {
+                    answer: 'Diminished 7',
+                    numbers: dailyNumberRange(10)
+                },
+                Dominant7: {
+                    answer: 'Dominant 7',
+                    numbers: dailyNumberRange(12)
+                },
+                HalfDiminished7: {
+                    answer: 'Half-Diminished 7',
+                    numbers: dailyNumberRange(11)
+                },
+                Major7: {
+                    answer: 'Major 7',
+                    numbers: dailyNumberRange(12)
+                },
+                Minor7: {
+                    answer: 'Minor 7',
+                    numbers: dailyNumberRange(11)
+                }
+            }, { harmonic: true, separator: '-' }),
         };
 
         function unicodeToBase64(str) {
@@ -3886,27 +3756,58 @@ function dailyVocabPrepareResultData() {
 
         // ====================== QUIZ LOGIC ======================
         function dailyEarGenerateQuestionSet(section, num) {
-            const source = (
-                section === 'intervals' &&
-                dailyEarQuizConfig.harmonicIntervals === true
-            )
-                ? audioFiles.harmonicIntervals
-                : audioFiles[section];
+            let source;
+
+            // Select the correct audio bank based on the active difficulty.
+            if (section === 'intervals') {
+                source = dailyEarQuizConfig.harmonicIntervals
+                    ? audioFiles.harmonicIntervals
+                    : audioFiles.intervals;
+
+            } else if (section === 'triads') {
+                source = dailyEarQuizConfig.harmonicTriads
+                    ? audioFiles.harmonicTriads
+                    : audioFiles.triads;
+
+            } else if (section === 'seventhChords') {
+                source = dailyEarQuizConfig.harmonicSeventhChords
+                    ? audioFiles.harmonicSeventhChords
+                    : audioFiles.seventhChords;
+
+            } else {
+                source = audioFiles[section];
+            }
+
+            if (!Array.isArray(source) || source.length === 0) {
+                console.error(`No audio files found for section: ${section}`);
+                return {
+                    urls: [],
+                    answers: []
+                };
+            }
 
             let pool = [...source];
 
-            // Apply difficulty filter if present
-            if (dailyEarQuizConfig.allowedAnswers && dailyEarQuizConfig.allowedAnswers[section]) {
-                pool = pool.filter(item => 
+            // Apply difficulty answer filters, if configured.
+            if (
+                dailyEarQuizConfig.allowedAnswers &&
+                dailyEarQuizConfig.allowedAnswers[section]
+            ) {
+                pool = pool.filter(item =>
                     dailyEarQuizConfig.allowedAnswers[section].includes(item.answer)
                 );
             }
 
-            pool.sort(() => Math.random() - 0.5);
+            // Shuffle the available recordings.
+            pool = dailyShuffle(pool);
+
+            // Select the requested number of questions.
             const selected = pool.slice(0, num);
 
             return {
-                urls: selected.map(item => `audio/${section}/${item.file}`),
+                urls: selected.map(
+                    item => `audio/${section}/${item.file}`
+                ),
                 answers: selected.map(item => item.answer)
             };
         }
@@ -4232,7 +4133,11 @@ function dailyInitSightSinging() {
   const today = new Date();
   // Use the browser's local calendar date, not UTC, to avoid date-boundary shifts.
   const dateKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  const schoolDayIndex = DAILY_SIGHT_SCHOOL_DAYS.indexOf(dateKey);
+  let schoolDayIndex = DAILY_SIGHT_SCHOOL_DAYS.indexOf(dateKey);
+  // On non-school days, use the most recent scheduled school day's example.
+  if (schoolDayIndex === -1) {
+    schoolDayIndex = DAILY_SIGHT_SCHOOL_DAYS.findLastIndex(day => day < dateKey);
+  }
 
   dailySightExample = null;
   dailySightIsRecording = false;
@@ -4263,7 +4168,7 @@ function dailyInitSightSinging() {
   document.getElementById('visualizer').style.display = 'none';
 
   if (schoolDayIndex === -1) {
-    countdown.textContent = 'No sight-singing example is scheduled for today. Please return on a listed school day.';
+    countdown.textContent = 'No previous scheduled sight-singing example is available.';
     return;
   }
 
