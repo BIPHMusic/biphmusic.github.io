@@ -582,6 +582,7 @@ function hideLoginScreen() {
    LOGIN VALIDATION
    ========================================================= */
 
+
 async function handleLogin() {
     const input = document.getElementById('name-input');
     const passwordInput = document.getElementById('password-input');
@@ -596,7 +597,7 @@ async function handleLogin() {
     error.textContent = '';
 
     if (!rawName) {
-        error.textContent = 'Please enter your first name.';
+        error.textContent = 'Please enter your name.';
         return;
     }
 
@@ -608,6 +609,31 @@ async function handleLogin() {
     if (loginButton) loginButton.disabled = true;
 
     try {
+        /*
+         * FLEXIBLE LOGIN
+         * Any nonempty name is accepted with password TL3.1.
+         */
+
+        if (rawPassword === 'TL3.1') {
+            const displayName = capitalizeName(rawName);
+
+            storeName(displayName, 'guest');
+
+            hideLoginScreen();
+
+            if (typeof restoreNormalMenu === 'function') {
+                restoreNormalMenu();
+            }
+
+            initMyMenu(false);
+
+            if (typeof window.onSuccessfulLogin === 'function') {
+                window.onSuccessfulLogin(displayName);
+            }
+
+            return;
+        }
+
         /*
          * TEACHER LOGIN
          */
@@ -652,17 +678,17 @@ async function handleLogin() {
             return;
         }
 
-
-globalThis.studentPasswordCredentials = globalThis.studentPasswordCredentials || {};
-globalThis.studentPasswordCredentials["guest"] = {
-    salt: "ef4ee62d743d357f609a5e5f73c14a74",
-    hash: "fb5f962d4f216d08ffcf4a4f77170235fb6178c4ce5d19a37704e79f45f9f0c7"
-}; 
-
-
         /*
-         * GUEST LOGIN
+         * EXISTING GUEST LOGIN
          */
+
+        globalThis.studentPasswordCredentials =
+            globalThis.studentPasswordCredentials || {};
+
+        globalThis.studentPasswordCredentials['guest'] = {
+            salt: 'ef4ee62d743d357f609a5e5f73c14a74',
+            hash: 'fb5f962d4f216d08ffcf4a4f77170235fb6178c4ce5d19a37704e79f45f9f0c7'
+        };
 
         if (normalizeName(rawName) === 'guest') {
             const credentials =
@@ -704,20 +730,16 @@ globalThis.studentPasswordCredentials["guest"] = {
             return;
         }
 
-
-
         /*
-         * STUDENT LOGIN
+         * EXISTING STUDENT LOGIN
          */
 
         const student = findStudent(rawName);
 
         if (!student) {
             error.innerHTML = 'Name not recognized.<br>(First name only)';
-
             input.value = '';
             passwordInput.value = '';
-
             return;
         }
 
@@ -752,7 +774,6 @@ globalThis.studentPasswordCredentials["guest"] = {
                 passwordValid =
                     masterPasswordHash === teacherPasswordHash;
             }
-
         } else {
             // Existing default: normalized student name twice.
             const expectedPassword =
@@ -806,6 +827,7 @@ globalThis.studentPasswordCredentials["guest"] = {
         if (loginButton) loginButton.disabled = false;
     }
 }
+
 
 
 /* =========================================================

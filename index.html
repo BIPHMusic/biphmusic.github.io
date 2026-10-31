@@ -162,32 +162,43 @@
     <script src="mymenu.js"></script>
 
     <script>
-        function getGreeting(displayName = "") {
-            const now = new Date();
-            const hours = now.getHours();
-            let greeting = hours < 12
-                ? "Good morning"
-                : hours < 18
-                    ? "Good afternoon"
-                    : "Good evening";
+        
+function getGreeting(displayName = "") {
+    const now = new Date();
+    const hours = now.getHours();
 
-            const daysOfWeek = [
-                "Sunday", "Monday", "Tuesday", "Wednesday",
-                "Thursday", "Friday", "Saturday"
-            ];
+    let greeting = hours < 12
+        ? "Good morning"
+        : hours < 18
+            ? "Good afternoon"
+            : "Good evening";
 
-            const months = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
+    const daysOfWeek = [
+        "Sunday", "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday"
+    ];
 
-            const dayOfWeek = daysOfWeek[now.getDay()];
-            const month = months[now.getMonth()];
-            const day = now.getDate();
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
 
-            return `<span class="zapfino">${greeting}, ${displayName}!</span><br>
-                    <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
-        }
+    const dayOfWeek = daysOfWeek[now.getDay()];
+    const month = months[now.getMonth()];
+    const day = now.getDate();
+
+    const safeName = String(displayName).replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[character]);
+
+    return `<span class="zapfino">${greeting}, ${safeName}!</span><br>
+            <span class="greeting-text">Today is ${dayOfWeek}, ${month} ${day}.</span>`;
+}
+
 
         // Days-until helper (whole days remaining)
         function daysUntil(year, month, day) {
