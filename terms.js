@@ -166,10 +166,22 @@ const unit3 = [
     "Arpeggiating 64",
     "Passing 64",
     "Pedal 64",
+    "Seventh Chord",
+    "Major 7",
+    "Dominant 7",
+    "Minor 7",
+    "Half-Diminished 7",
+    "Diminished 7",
+    "Predominant",
 ];
 
 const unit4 = [
-
+    "Motion",
+    "Similar Motion",
+    "Contrary Motion",
+    "Parallel Motion",
+    "Oblique Motion",
+    "Static Motion",
 ];
 
 const unit5 = [
@@ -338,6 +350,17 @@ const cumulative = [
     "Arpeggiating 64",
     "Passing 64",
     "Pedal 64",
+    "Seventh Chord",
+    "Dominant 7",
+    "Half-Diminished 7",
+    "Diminished 7",
+    "Predominant",
+    "Motion",
+    "Similar Motion",
+    "Contrary Motion",
+    "Parallel Motion",
+    "Oblique Motion",
+    "Static Motion",
 ];
 
 const theglossary = [
@@ -503,4 +526,15 @@ const theglossary = [
     {"Term":"Arpeggiating 64","Definition":"A 64 in which the harmony stays the same, but the bass changes"},
     {"Term":"Passing 64","Definition":"A 64 that is passed through to another harmony"},
     {"Term":"Pedal 64","Definition":"A 64 in which the bass stays the same, but the harmony changes"},
+    {"Term":"Seventh Chord","Definition":"A chord containing a root, third, fifth, and seventh"},
+    {"Term":"Dominant 7","Definition":"1 M3 P5 m7 (also called major-minor)"},
+    {"Term":"Half-Diminished 7","Definition":"1 m3 d5 m7"},
+    {"Term":"Diminished 7","Definition":"1 m3 d5 d7"},
+    {"Term":"Predominant","Definition":"A harmony that precedes the V chord"},
+    {"Term":"Motion","Definition":"The movement of notes in relation to each other"},
+    {"Term":"Similar Motion","Definition":"The two voices move in the same direction, but not by the same intervals"},
+    {"Term":"Contrary Motion","Definition":"The two voices move in the opposite direction of one another"},
+    {"Term":"Parallel Motion","Definition":"The two voices move in the same direction by the same interval"},
+    {"Term":"Oblique Motion","Definition":"One voice remains the same and the other moves, in either direction"},
+    {"Term":"Static Motion","Definition":"Both voices repeat their same note, no movement"},
 ];
