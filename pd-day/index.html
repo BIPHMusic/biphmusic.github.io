@@ -10,6 +10,21 @@
     <link rel="preload" href="images/bluehouse.webp"  as="image" fetchpriority="high">
     <link rel="preload" href="images/greenhouse.webp" as="image" fetchpriority="high">
     <link rel="preload" href="images/yellowhouse.webp" as="image" fetchpriority="high">
+    <style>
+        #title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+        #title h1, #classSubtitle, #timeRange { cursor: pointer; }
+        #classSubtitle { margin-bottom: 2px; }
+        #timeRange { margin-top: 0; font-size: 1rem; font-weight: 400; }
+        #timeRange.start-countdown, #timeRange.conclusion-countdown {
+            font-size: 1rem;
+            font-weight: 400;
+        }
+    </style>
 </head>
 <body>
     <button class="search-button" onclick="toggleSearchBox()">🔍</button>
@@ -20,8 +35,9 @@
             <ul id="objectiveList"></ul>
         </div>
         <div id="title">
-            <h1>Class Name</h1>
-            <h2 id="timeRange">Time Range</h2>
+            <h1 onclick="cycleClass(1)" title="Click to switch class">PD Day 2026</h1>
+            <h2 id="classSubtitle" onclick="cycleClass(1)" title="Click to switch class">Class subtitle</h2>
+            <h3 id="timeRange" onclick="cycleClass(1)" title="Click to switch class">Time Range</h3>
             <div id="countdowns"></div>
         </div>
         <div id="date">
@@ -73,15 +89,183 @@
 
     <script>
 const masterList = [
-    { name: "Billy Bob", liveschoolName: "Billy Bob Thorton", house: "Red", birthdate: "1975-01-21", altName: "Billy", class: "PD Day 2026", addable: "yes" },
-    { name: "Jane Doe", liveschoolName: "Jane Doe", house: "Blue", birthdate: null, altName: "Jane", class: "PD Day 2026", addable: "yes" },
-    { name: "Johnny Appleseed", liveschoolName: "Johnny Appleseed", house: "Green", birthdate: null, altName: "Johnny", class: "PD Day 2026", addable: "yes" }
+{"name": "Millie", "liveschoolName": " Millie Yin", "house": "Green", "birthdate": "", "altName": "Millie", "class": "Tech Theater", "addable": "yes"},
+{"name": "Verity", "liveschoolName": " Verity Wu", "house": "Blue", "birthdate": "", "altName": "Verity", "class": "Tech Theater", "addable": "yes"},
+{"name": "Abby", "liveschoolName": "Abby Wu", "house": "Blue", "birthdate": "", "altName": "Abby", "class": "Tech Theater", "addable": "yes"},
+{"name": "Abhi", "liveschoolName": "Abhishek Singh", "house": "Green", "birthdate": "", "altName": "Ahbee", "class": "Tech Theater", "addable": "yes"},
+{"name": "Adam", "liveschoolName": "Adam Rovin", "house": "Blue", "birthdate": "", "altName": "Adam", "class": "Tech Theater", "addable": "yes"},
+{"name": "Adeline", "liveschoolName": "Adeline Su", "house": "Red", "birthdate": "", "altName": "Adeline", "class": "Tech Theater", "addable": "yes"},
+{"name": "Alaya", "liveschoolName": "Alaya Guo", "house": "Green", "birthdate": "", "altName": "Alaya", "class": "Tech Theater", "addable": "yes"},
+{"name": "Alexander", "liveschoolName": "Alexander Jiang", "house": "Yellow", "birthdate": "", "altName": "Alexander", "class": "Tech Theater", "addable": "yes"},
+{"name": "Anna", "liveschoolName": "Anna Sun", "house": "Blue", "birthdate": "", "altName": "Anna", "class": "Tech Theater", "addable": "yes"},
+{"name": "Anthony", "liveschoolName": "Anthony Elder", "house": "Green", "birthdate": "", "altName": "Anthony", "class": "Tech Theater", "addable": "yes"},
+{"name": "Anwar", "liveschoolName": "Anwar Satef ", "house": "Green", "birthdate": "", "altName": "Anwar", "class": "Tech Theater", "addable": "yes"},
+{"name": "Aoife", "liveschoolName": "Aoife Quigley", "house": "Red", "birthdate": "", "altName": "Eye Fee", "class": "Tech Theater", "addable": "yes"},
+{"name": "Ashlee", "liveschoolName": "Ashlee Lv", "house": "Blue", "birthdate": "", "altName": "Ashlee", "class": "Tech Theater", "addable": "yes"},
+{"name": "Becky", "liveschoolName": "Becky Huang", "house": "Blue", "birthdate": "", "altName": "Becky", "class": "Tech Theater", "addable": "yes"},
+{"name": "Bige", "liveschoolName": "Bige Sozen Kilic", "house": "Red", "birthdate": "", "altName": "Big-ay", "class": "Tech Theater", "addable": "yes"},
+{"name": "Brent", "liveschoolName": "Brent Kilback", "house": "Yellow", "birthdate": "", "altName": "Brent", "class": "Tech Theater", "addable": "yes"},
+{"name": "Brian", "liveschoolName": "Brian Horn", "house": "Green", "birthdate": "", "altName": "Brian", "class": "Tech Theater", "addable": "yes"},
+{"name": "Brita", "liveschoolName": "Brita Braranieski", "house": "Yellow", "birthdate": "", "altName": "Brita", "class": "Tech Theater", "addable": "yes"},
+{"name": "Campbell", "liveschoolName": "Campbell Wang", "house": "Red", "birthdate": "", "altName": "Campbell", "class": "Tech Theater", "addable": "yes"},
+{"name": "Candice", "liveschoolName": "Candice Shen", "house": "Blue", "birthdate": "", "altName": "Candice", "class": "Tech Theater", "addable": "yes"},
+{"name": "Carol", "liveschoolName": "Carol Servatius", "house": "Green", "birthdate": "", "altName": "Carol", "class": "Tech Theater", "addable": "yes"},
+{"name": "Cassie", "liveschoolName": "Cassie Ji", "house": "Blue", "birthdate": "", "altName": "Cassie", "class": "Tech Theater", "addable": "yes"},
+{"name": "Charlie", "liveschoolName": "Charlotte Ironside", "house": "Yellow", "birthdate": "", "altName": "Charlie", "class": "Tech Theater", "addable": "yes"},
+{"name": "Chengye", "liveschoolName": "Chengye", "house": "Blue", "birthdate": "", "altName": "Chung-yeah", "class": "Tech Theater", "addable": "yes"},
+{"name": "Cherisse", "liveschoolName": "Cherisse Small", "house": "Red", "birthdate": "", "altName": "Cherisse", "class": "Tech Theater", "addable": "yes"},
+{"name": "Chloe", "liveschoolName": "Chloe Shan", "house": "Blue", "birthdate": "", "altName": "Chloe", "class": "Tech Theater", "addable": "yes"},
+{"name": "Christian", "liveschoolName": "Christian Lygo", "house": "Green", "birthdate": "", "altName": "Christian", "class": "Tech Theater", "addable": "yes"},
+{"name": "Coco", "liveschoolName": "Coco Kou", "house": "Red", "birthdate": "", "altName": "Coco", "class": "Tech Theater", "addable": "yes"},
+{"name": "Cody", "liveschoolName": "Cody Kennedy", "house": "Red", "birthdate": "", "altName": "Cody", "class": "Tech Theater", "addable": "yes"},
+{"name": "Colleen", "liveschoolName": "Colleen Zhang", "house": "Yellow", "birthdate": "", "altName": "Colleen", "class": "Tech Theater", "addable": "yes"},
+{"name": "Cornelius", "liveschoolName": "Cornelius Van Schalkwyk", "house": "Blue", "birthdate": "", "altName": "Cornelius", "class": "Tech Theater", "addable": "yes"},
+{"name": "Curtis", "liveschoolName": "Curtis Westbay", "house": "Blue", "birthdate": "", "altName": "Curtis", "class": "Tech Theater", "addable": "yes"},
+{"name": "David N", "liveschoolName": "David Nicholls", "house": "Red", "birthdate": "", "altName": "David N", "class": "Tech Theater", "addable": "yes"},
+{"name": "David P", "liveschoolName": "David Phillips", "house": "Yellow", "birthdate": "", "altName": "David P", "class": "Tech Theater", "addable": "yes"},
+{"name": "Denzel", "liveschoolName": "Denzel Wright", "house": "Blue", "birthdate": "", "altName": "Denzel", "class": "Tech Theater", "addable": "yes"},
+{"name": "Diego", "liveschoolName": "Diego Considera", "house": "Blue", "birthdate": "", "altName": "Diego", "class": "Tech Theater", "addable": "yes"},
+{"name": "Dima", "liveschoolName": "Dima Mischenko", "house": "Yellow", "birthdate": "", "altName": "Dima", "class": "Tech Theater", "addable": "yes"},
+{"name": "Dora", "liveschoolName": "Dora Li", "house": "Blue", "birthdate": "", "altName": "Dora", "class": "Tech Theater", "addable": "yes"},
+{"name": "Doris", "liveschoolName": "Doris Sander", "house": "Blue", "birthdate": "", "altName": "Doris", "class": "Tech Theater", "addable": "yes"},
+{"name": "Dylan", "liveschoolName": "Dylan Robinson", "house": "Red", "birthdate": "", "altName": "Dylan", "class": "Tech Theater", "addable": "yes"},
+{"name": "Ellen", "liveschoolName": "Ellen Chen", "house": "Green", "birthdate": "", "altName": "Ellen", "class": "Tech Theater", "addable": "yes"},
+{"name": "Elsie", "liveschoolName": "Elsie Mao", "house": "Red", "birthdate": "", "altName": "Elsie", "class": "Tech Theater", "addable": "yes"},
+{"name": "Evan", "liveschoolName": "Evan Wise", "house": "Green", "birthdate": "", "altName": "Evan", "class": "Tech Theater", "addable": "yes"},
+{"name": "Freya", "liveschoolName": "Freya Zheng", "house": "Blue", "birthdate": "", "altName": "Freya", "class": "Tech Theater", "addable": "yes"},
+{"name": "Galaxy", "liveschoolName": "Galaxy Yue", "house": "Red", "birthdate": "", "altName": "Galaxy", "class": "Tech Theater", "addable": "yes"},
+{"name": "Gary", "liveschoolName": "Gary Tubbs", "house": "Blue", "birthdate": "", "altName": "Gary", "class": "Tech Theater", "addable": "yes"},
+{"name": "Gheorge", "liveschoolName": "Gheorge Ailincai", "house": "Yellow", "birthdate": "", "altName": "Gheorge", "class": "Tech Theater", "addable": "yes"},
+{"name": "Graham", "liveschoolName": "Graham Gisselquist", "house": "Green", "birthdate": "", "altName": "Graham", "class": "Tech Theater", "addable": "yes"},
+{"name": "Gregory", "liveschoolName": "Gregory Gilbert", "house": "Yellow", "birthdate": "", "altName": "Gregory", "class": "Tech Theater", "addable": "yes"},
+{"name": "Hannah", "liveschoolName": "Hannah Han", "house": "Blue", "birthdate": "", "altName": "Hannah", "class": "Tech Theater", "addable": "yes"},
+{"name": "Iain", "liveschoolName": "Iain Mcclinton", "house": "Red", "birthdate": "", "altName": "Ian", "class": "Tech Theater", "addable": "yes"},
+{"name": "Ian", "liveschoolName": "Ian Ratcliffe", "house": "Red", "birthdate": "", "altName": "Ian", "class": "Tech Theater", "addable": "yes"},
+{"name": "Inge", "liveschoolName": "Inge Rix", "house": "Yellow", "birthdate": "", "altName": "Inge", "class": "Tech Theater", "addable": "yes"},
+{"name": "Iris", "liveschoolName": "Iris Chen", "house": "Green", "birthdate": "", "altName": "Iris", "class": "Tech Theater", "addable": "yes"},
+{"name": "Ivan", "liveschoolName": "Ivan Xie", "house": "Yellow", "birthdate": "", "altName": "Ivan", "class": "Tech Theater", "addable": "yes"},
+{"name": "Jaime", "liveschoolName": "Jaime Pindur", "house": "Red", "birthdate": "", "altName": "Jaime", "class": "Tech Theater", "addable": "yes"},
+{"name": "Jane", "liveschoolName": "Jane Guo", "house": "Yellow", "birthdate": "", "altName": "Jane", "class": "Tech Theater", "addable": "yes"},
+{"name": "Jay", "liveschoolName": "Jay Cai", "house": "Green", "birthdate": "", "altName": "Jay", "class": "Tech Theater", "addable": "yes"},
+{"name": "Jaye", "liveschoolName": "Jaye Morrison", "house": "Blue", "birthdate": "", "altName": "Jay", "class": "Tech Theater", "addable": "yes"},
+{"name": "Jenaya", "liveschoolName": "Jenaya Wade", "house": "Blue", "birthdate": "", "altName": "Jenayya", "class": "Tech Theater", "addable": "yes"},
+{"name": "Jessica VS", "liveschoolName": "Jessica Van Schalkwyk", "house": "Blue", "birthdate": "", "altName": "Jessica VS", "class": "Tech Theater", "addable": "yes"},
+{"name": "Jessica M", "liveschoolName": "Jessica Mauriz", "house": "Blue", "birthdate": "", "altName": "Jessica M", "class": "Tech Theater", "addable": "yes"},
+{"name": "Jingyi", "liveschoolName": "Jingyi Cui", "house": "Green", "birthdate": "", "altName": "Jingyi", "class": "Tech Theater", "addable": "yes"},
+{"name": "John S", "liveschoolName": "John Smith", "house": "Red", "birthdate": "", "altName": "John S", "class": "Tech Theater", "addable": "yes"},
+{"name": "John Q", "liveschoolName": "John Quirk", "house": "Blue", "birthdate": "", "altName": "John Q", "class": "Tech Theater", "addable": "yes"},
+{"name": "Jonathan", "liveschoolName": "Jonathan Beeson", "house": "Green", "birthdate": "", "altName": "Jonathan", "class": "Tech Theater", "addable": "yes"},
+{"name": "Joseph", "liveschoolName": "Joseph Lotus", "house": "Green", "birthdate": "", "altName": "Joseph", "class": "Tech Theater", "addable": "yes"},
+{"name": "Julia", "liveschoolName": "Julia Yang", "house": "Yellow", "birthdate": "", "altName": "Julia", "class": "Tech Theater", "addable": "yes"},
+{"name": "Kate", "liveschoolName": "Kate Chen", "house": "Green", "birthdate": "", "altName": "Kate", "class": "Tech Theater", "addable": "yes"},
+{"name": "Kelsie", "liveschoolName": "Kelsie Han", "house": "Yellow", "birthdate": "", "altName": "Kelsie", "class": "Tech Theater", "addable": "yes"},
+{"name": "Kevin", "liveschoolName": "Kevin Watts", "house": "Red", "birthdate": "", "altName": "Kevin", "class": "Tech Theater", "addable": "yes"},
+{"name": "Kevton", "liveschoolName": "Kevton Foster", "house": "Red", "birthdate": "", "altName": "Kevton", "class": "Tech Theater", "addable": "yes"},
+{"name": "Kimmy", "liveschoolName": "Kimmy Parekh", "house": "Green", "birthdate": "", "altName": "Kimmy", "class": "Tech Theater", "addable": "yes"},
+{"name": "Koorosh", "liveschoolName": "Koorosh Amirmonazah", "house": "Yellow", "birthdate": "", "altName": "Koorosh", "class": "Tech Theater", "addable": "yes"},
+{"name": "Kyle", "liveschoolName": "Kyle Haselton", "house": "Red", "birthdate": "", "altName": "Kyle", "class": "Tech Theater", "addable": "yes"},
+{"name": "Leon", "liveschoolName": "Leon Xiao", "house": "Blue", "birthdate": "", "altName": "Leon", "class": "Tech Theater", "addable": "yes"},
+{"name": "Leslie", "liveschoolName": "Leslie Greiner", "house": "Blue", "birthdate": "", "altName": "Leslie", "class": "Tech Theater", "addable": "yes"},
+{"name": "Liana", "liveschoolName": "Liana Anthony", "house": "Red", "birthdate": "", "altName": "Liana", "class": "Tech Theater", "addable": "yes"},
+{"name": "Lorena", "liveschoolName": "Lorena Craighead", "house": "Green", "birthdate": "", "altName": "Lorena", "class": "Tech Theater", "addable": "yes"},
+{"name": "Lowry", "liveschoolName": "Lowry Cai", "house": "Green", "birthdate": "", "altName": "Laoree", "class": "Tech Theater", "addable": "yes"},
+{"name": "Luna", "liveschoolName": "Luna Sun", "house": "Blue", "birthdate": "", "altName": "Luna", "class": "Tech Theater", "addable": "yes"},
+{"name": "Lynn", "liveschoolName": "Lynn Xiao", "house": "Green", "birthdate": "", "altName": "Lynn", "class": "Tech Theater", "addable": "yes"},
+{"name": "Madalina", "liveschoolName": "Madalina Ailincai", "house": "Blue", "birthdate": "", "altName": "Madalina", "class": "Tech Theater", "addable": "yes"},
+{"name": "Mark P", "liveschoolName": "Mark Propp", "house": "Red", "birthdate": "", "altName": "Mark P", "class": "Tech Theater", "addable": "yes"},
+{"name": "Mark W", "liveschoolName": "Mark Wilkerson", "house": "Blue", "birthdate": "", "altName": "Mark W", "class": "Tech Theater", "addable": "yes"},
+{"name": "Mary", "liveschoolName": "Mary Wang", "house": "Yellow", "birthdate": "", "altName": "Mary", "class": "Tech Theater", "addable": "yes"},
+{"name": "Matt B", "liveschoolName": "Matthew Boswell", "house": "Red", "birthdate": "", "altName": "Matt B", "class": "Tech Theater", "addable": "yes"},
+{"name": "Matt R", "liveschoolName": "Matthew Ryan", "house": "Green", "birthdate": "", "altName": "Matt R", "class": "Tech Theater", "addable": "yes"},
+{"name": "Meagan", "liveschoolName": "Meagan Nomicos", "house": "Yellow", "birthdate": "", "altName": "Meagan", "class": "Tech Theater", "addable": "yes"},
+{"name": "Mehmet", "liveschoolName": "Mehmet Kilic", "house": "Red", "birthdate": "", "altName": "Mehmet", "class": "Tech Theater", "addable": "yes"},
+{"name": "Michael", "liveschoolName": "Michael Ehlers", "house": "Blue", "birthdate": "", "altName": "Michael", "class": "Tech Theater", "addable": "yes"},
+{"name": "Michelle", "liveschoolName": "Michelle Chua", "house": "Blue", "birthdate": "", "altName": "Michelle", "class": "Tech Theater", "addable": "yes"},
+{"name": "Mickey", "liveschoolName": "Mickey Lv", "house": "Red", "birthdate": "", "altName": "Mickey", "class": "Tech Theater", "addable": "yes"},
+{"name": "Mike B", "liveschoolName": "Mike Belkin", "house": "Green", "birthdate": "", "altName": "Mike B", "class": "Tech Theater", "addable": "yes"},
+{"name": "Mirek", "liveschoolName": "Mirek Zhao", "house": "Blue", "birthdate": "", "altName": "Mirek", "class": "Tech Theater", "addable": "yes"},
+{"name": "Mitchell", "liveschoolName": "Mitchell Benjamin", "house": "Blue", "birthdate": "", "altName": "Mitchell", "class": "Tech Theater", "addable": "yes"},
+{"name": "Nicoleen", "liveschoolName": "Nicoleen De Kock", "house": "Blue", "birthdate": "", "altName": "Nicoleen", "class": "Tech Theater", "addable": "yes"},
+{"name": "Olivia", "liveschoolName": "Olivia Wan", "house": "Green", "birthdate": "", "altName": "Olivia", "class": "Tech Theater", "addable": "yes"},
+{"name": "Paige", "liveschoolName": "Paige Cooksey", "house": "Red", "birthdate": "", "altName": "Paige", "class": "Tech Theater", "addable": "yes"},
+{"name": "Pan", "liveschoolName": "Pan Wang", "house": "Blue", "birthdate": "", "altName": "Pan", "class": "Tech Theater", "addable": "yes"},
+{"name": "Peter", "liveschoolName": "Peter Meng", "house": "Red", "birthdate": "", "altName": "Peter", "class": "Tech Theater", "addable": "yes"},
+{"name": "Phil", "liveschoolName": "Phil Wen", "house": "Yellow", "birthdate": "", "altName": "Phil", "class": "Tech Theater", "addable": "yes"},
+{"name": "Randi", "liveschoolName": "Randi Burdette", "house": "Red", "birthdate": "", "altName": "Randi", "class": "Tech Theater", "addable": "yes"},
+{"name": "Rebecca", "liveschoolName": "Rebecca Wu", "house": "Green", "birthdate": "", "altName": "Rebecca", "class": "Tech Theater", "addable": "yes"},
+{"name": "Rebekah", "liveschoolName": "Rebekah Spoelman", "house": "Green", "birthdate": "", "altName": "Rebekah", "class": "Tech Theater", "addable": "yes"},
+{"name": "Richard", "liveschoolName": "Richard Rix", "house": "Yellow", "birthdate": "", "altName": "Richard", "class": "Tech Theater", "addable": "yes"},
+{"name": "Robert", "liveschoolName": "Robert March", "house": "Green", "birthdate": "", "altName": "Robert", "class": "Tech Theater", "addable": "yes"},
+{"name": "Rodica", "liveschoolName": "Rodica Ocheseanu", "house": "Green", "birthdate": "", "altName": "Row dika", "class": "Tech Theater", "addable": "yes"},
+{"name": "Ronny", "liveschoolName": "Ronny Balboa", "house": "Green", "birthdate": "", "altName": "Ronny", "class": "Tech Theater", "addable": "yes"},
+{"name": "Samuel", "liveschoolName": "Samuel Barnett", "house": "Green", "birthdate": "", "altName": "Samuel", "class": "Tech Theater", "addable": "yes"},
+{"name": "Sandra", "liveschoolName": "Sandra Romero", "house": "Yellow", "birthdate": "", "altName": "Sandra", "class": "Tech Theater", "addable": "yes"},
+{"name": "Shazaib", "liveschoolName": "Shazaib Nauman", "house": "Blue", "birthdate": "", "altName": "Shazaib", "class": "Tech Theater", "addable": "yes"},
+{"name": "Stelios", "liveschoolName": "Stelios Potamitis", "house": "Green", "birthdate": "", "altName": "Stelios", "class": "Tech Theater", "addable": "yes"},
+{"name": "Suki", "liveschoolName": "Suki Li ", "house": "Green", "birthdate": "", "altName": "Suki", "class": "Tech Theater", "addable": "yes"},
+{"name": "Sylvia", "liveschoolName": "Sylvia Li", "house": "Blue", "birthdate": "", "altName": "Sylvia", "class": "Tech Theater", "addable": "yes"},
+{"name": "Tei", "liveschoolName": "Tei Jones", "house": "Yellow", "birthdate": "", "altName": "Tei", "class": "Tech Theater", "addable": "yes"},
+{"name": "Thomas", "liveschoolName": "Thomas Ryan Harper", "house": "Green", "birthdate": "", "altName": "Thomas", "class": "Tech Theater", "addable": "yes"},
+{"name": "Tom D", "liveschoolName": "Tom Davis", "house": "Yellow", "birthdate": "", "altName": "Tom", "class": "Tech Theater", "addable": "yes"},
+{"name": "Tom S", "liveschoolName": "Tom Si", "house": "Blue", "birthdate": "", "altName": "Tom", "class": "Tech Theater", "addable": "yes"},
+{"name": "Tonn", "liveschoolName": "Tonn Li", "house": "Red", "birthdate": "", "altName": "Tonn", "class": "Tech Theater", "addable": "yes"},
+{"name": "Tristin", "liveschoolName": "Tristin Liu", "house": "Yellow", "birthdate": "", "altName": "Tristin", "class": "Tech Theater", "addable": "yes"},
+{"name": "Tyler", "liveschoolName": "Tyler Duling", "house": "Yellow", "birthdate": "", "altName": "Tyler", "class": "Tech Theater", "addable": "yes"},
+{"name": "Victoria L", "liveschoolName": "Victoria Litchfield", "house": "Green", "birthdate": "", "altName": "Victoria", "class": "Tech Theater", "addable": "yes"},
+{"name": "Victoria S", "liveschoolName": "Victoria Sun", "house": "Yellow", "birthdate": "", "altName": "Victoria", "class": "Tech Theater", "addable": "yes"},
+{"name": "Victoria W", "liveschoolName": "Victoria Wilke", "house": "Yellow", "birthdate": "", "altName": "Victoria", "class": "Tech Theater", "addable": "yes"},
+{"name": "Vivi", "liveschoolName": "Vivi Liu", "house": "Red", "birthdate": "", "altName": "Vivi", "class": "Tech Theater", "addable": "yes"},
+{"name": "Waleid", "liveschoolName": "Waleid Hassan", "house": "Red", "birthdate": "", "altName": "Waleid", "class": "Tech Theater", "addable": "yes"},
+{"name": "Win", "liveschoolName": "Win Cai", "house": "Yellow", "birthdate": "", "altName": "Win", "class": "Tech Theater", "addable": "yes"},
+{"name": "Wolly", "liveschoolName": "Wolly Xiong", "house": "Green", "birthdate": "", "altName": "Wally", "class": "Tech Theater", "addable": "yes"},
+{"name": "Yexing", "liveschoolName": "Yexing Li", "house": "Yellow", "birthdate": "", "altName": "Yexing", "class": "Tech Theater", "addable": "yes"},
 ];
 
+
+// Charlie Ironside
+// Denzel Wright
+// Freya Zheng
+// Jenaya Wadefray
+// Meng Peter
+// Michael Belkin
+// Ronny Balboa
+// Tyler Duling
+// Ye Cheng
 const pdDayStudents = [
-    "Billy Bob",
-    "Jane Doe",
-    "Johnny Appleseed"
+    "Charlie",
+    "Denzel",
+    "Freya",
+    "Jenaya",
+    "Peter",
+    "Mike B",
+    "Ronny",
+    "Tyler",
+    "Chengye",
+].map(name => {
+    const studentInfo = masterList.find(s => s.name === name);
+    return {
+        name,
+        birthdate: studentInfo ? studentInfo.birthdate : null,
+        score: "EX",
+        attendance: "Absent",
+        devices: false,
+        engagement: false,
+        review: false,
+        progress: false,
+        housePoints: 0,
+        manualAdjustment: 0
+    };
+});
+
+// Bige Kilic
+// Charlie Ironside
+// Mitchell Benjamin
+// Rodica Ocheseanu
+const goalsGuidanceStudents = [
+    "Bige",
+    "Charlie",
+    "Mitchell",
+    "Rodica"
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -102,7 +286,7 @@ const pdDayStudents = [
 const STICKY_NOTES_CONFIG = [
     {
         id: 'PD DAY 2026',
-        forWhichClasses: ["PD Day, 2026"],
+        forWhichClasses: ["Goals, guidance, and feedback"],
         position: { xPercent: 10, yPercent: 25 },
         dimensions: { width: 250, height: 220 },
         textContent: 'Clearly communicates learning goals, providing students with rubrics, scoring guides, and exemplars to guide their progress towards meeting expectations.',
@@ -112,7 +296,7 @@ const STICKY_NOTES_CONFIG = [
 
         {
         id: 'PD DAY 2026-2',
-        forWhichClasses: ["PD Day, 2026"],
+        forWhichClasses: ["Vibe Coding", "Goals, guidance, and feedback"],
         position: { xPercent: 50, yPercent: 25 },
         dimensions: { width: 500, height: 75 },
         textContent: '',
@@ -151,8 +335,7 @@ function isObjectiveInputActive() {
 }
 
 function isDevicesCriteriaClass() {
-    const name = classes[currentClassIndex].name;
-    return name === "PD Day, 2026";
+    return classes[currentClassIndex].criteria.includes("devices");
 }
 
 function getMenuHotkeys() {
@@ -939,18 +1122,33 @@ function loadStickyNotes() {
     });
 }
 
+
+
 const classes = [
     {
-        name: "PD Day, 2026",
-        timeRange: "1:00 - 1:25 PM",
+        name: "Vibe Coding",
+        timeRange: "11:10–11:40 AM",
         days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-        startTime: { hours: 13, minutes: 0 },
-        endTime: { hours: 13, minutes: 25 },
+        startTime: { hours: 11, minutes: 10 },
+        endTime: { hours: 11, minutes: 40 },
         students: pdDayStudents,
         teacherModeOrder: pdDayStudents.map(s => s.name),
-        objectivesKey: "pdDay2026Objectives",
-        defaultObjectives: ["Professional Development", "Collaboration", "Next Steps"],
-        sampleObjectives: ["Professional Development", "Collaboration", "Technology", "Planning", "Reflection", "Next Steps"],
+        objectivesKey: "pdDay2026VibeCodingObjectives",
+        defaultObjectives: ["Explore vibe coding", "Experiment with AI tools", "Reflect on the process"],
+        sampleObjectives: ["Explore vibe coding", "Experiment with AI tools", "Prompting", "Prototyping", "Debugging", "Reflection"],
+        criteria: ["devices", "engagement", "review", "progress"]
+    },
+    {
+        name: "Goals, guidance, and feedback",
+        timeRange: "12:35–1:10 PM",
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        startTime: { hours: 12, minutes: 35 },
+        endTime: { hours: 13, minutes: 10 },
+        students: goalsGuidanceStudents,
+        teacherModeOrder: goalsGuidanceStudents.map(s => s.name),
+        objectivesKey: "pdDay2026GoalsGuidanceObjectives",
+        defaultObjectives: ["Clarify learning goals", "Provide guidance", "Use feedback to support progress"],
+        sampleObjectives: ["Clarify learning goals", "Provide guidance", "Success criteria", "Rubrics", "Exemplars", "Feedback and next steps"],
         criteria: ["devices", "engagement", "review", "progress"]
     }
 ];
@@ -1047,8 +1245,11 @@ function updateClassDisplay() {
             copyUNXsButton.style.display =
                 cls.name === 'Tech Theater' ? '' : 'none';
         }
-    document.querySelector('#title h1').textContent = cls.name;
-    document.querySelector('#timeRange').textContent = cls.timeRange;
+    document.querySelector('#title h1').textContent = 'PD Day 2026';
+    document.querySelector('#classSubtitle').textContent = cls.name;
+    const timeRangeElement = document.querySelector('#timeRange');
+    timeRangeElement.textContent = cls.timeRange;
+    timeRangeElement.classList.remove('start-countdown', 'conclusion-countdown');
 
     const baseStudents = cls.students.slice();
     const baseTeacherOrder = cls.teacherModeOrder.slice();
@@ -1072,7 +1273,10 @@ function updateClassDisplay() {
 function updateCountdowns() {
     const countdownContainer = document.getElementById('countdowns');
     countdownContainer.innerHTML = '';
+    const timeRangeElement = document.getElementById('timeRange');
     const currentClass = classes[currentClassIndex];
+    timeRangeElement.textContent = currentClass.timeRange;
+    timeRangeElement.classList.remove('start-countdown', 'conclusion-countdown');
     const now = new Date();
     const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
 
@@ -1101,23 +1305,15 @@ if (startDiff > 0 && startDiff <= 1800) {
 const minutes   = Math.floor(remaining / 60);
 const seconds   = remaining % 60;
 
-const startDiv = document.createElement('div');
-startDiv.className = 'start-countdown';
-
+timeRangeElement.classList.remove('conclusion-countdown');
+timeRangeElement.classList.add('start-countdown');
 if (remaining > 1) {
-    startDiv.textContent = `Class begins in ${minutes}m ${seconds}s`;
+    timeRangeElement.textContent = `Class begins in ${minutes}m ${seconds}s`;
 } else if (remaining === 1) {
-    startDiv.textContent = 'Class begins in 0m 1s';
+    timeRangeElement.textContent = 'Class begins in 0m 1s';
 } else {
-    // remaining === 0
-    startDiv.textContent = 'Begin!';
-    startDiv.style.transition = 'opacity 1s ease-out';
-    setTimeout(() => {
-        startDiv.style.opacity = '0';
-        setTimeout(() => startDiv.remove(), 1000);
-    }, 600);
+    timeRangeElement.textContent = 'Begin!';
 }
-countdownContainer.appendChild(startDiv);
 
     // Reset tracker when class/day changes
     const key = getClassAnnouncementKey();
@@ -1152,10 +1348,9 @@ countdownContainer.appendChild(startDiv);
     else if (endDiff <= 300 && endDiff >= 0) {
         const minutes = Math.floor(endDiff / 60);
         const seconds = Math.floor(endDiff % 60);
-        const conclusionDiv = document.createElement('div');
-        conclusionDiv.className = 'conclusion-countdown';
-        conclusionDiv.textContent = `Conclusion: ${minutes}m ${seconds}s`;
-        countdownContainer.appendChild(conclusionDiv);
+        timeRangeElement.classList.remove('start-countdown');
+        timeRangeElement.classList.add('conclusion-countdown');
+        timeRangeElement.textContent = `Conclusion: ${minutes}m ${seconds}s`;
         hasResetReturned = false;
     }
     else if (endDiff < 0 && endDiff > -2 && !hasCopiedScores) {
@@ -3609,7 +3804,7 @@ window.onload = function() {
             currentClassIndex = newIndex;
             updateClassDisplay();
         }
-    }, 10000);
+    }, 60000);
 
     setInterval(updateCountdowns, 1000);
 
