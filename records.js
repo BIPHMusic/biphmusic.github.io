@@ -7044,4 +7044,137 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-11-03",
+        time: "10:52 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-03",
+        time: "10:52 AM",
+        percentage: 100,
+        originalPercentage: 93,
+        curvedPercentage: 100,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Diminished Triad","correct":"Diminished Triad"}]
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-03",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-03",
+        time: "10:55 AM",
+        percentage: 80,
+        originalPercentage: 73,
+        curvedPercentage: 80,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"},{"item":"Minor 7","correct":"Minor 7"}]
+    },
+    {
+        student: "William",
+        date: "2026-11-03",
+        time: "10:52 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-03",
+        time: "10:55 AM",
+        percentage: 67,
+        originalPercentage: 60,
+        curvedPercentage: 67,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor Triad","correct":"Minor Triad"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-03",
+        time: "10:56 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-03",
+        time: "10:55 AM",
+        percentage: 87,
+        originalPercentage: 80,
+        curvedPercentage: 87,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 2nd","correct":"Major 2nd"},{"item":"Minor 7th","correct":"Minor 7th"}]
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-03",
+        time: "10:58 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-03",
+        time: "10:57 AM",
+        percentage: 80,
+        originalPercentage: 73,
+        curvedPercentage: 80,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Minor 7","correct":"Minor 7"}]
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-03",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-03",
+        time: "10:55 AM",
+        percentage: 94,
+        originalPercentage: 87,
+        curvedPercentage: 94,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Dominant 7","correct":"Dominant 7"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-03",
+        time: "10:57 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-03",
+        time: "10:57 AM",
+        percentage: 80,
+        originalPercentage: 73,
+        curvedPercentage: 80,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor Triad","correct":"Minor Triad"},{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
 ];
