@@ -182,6 +182,15 @@ const unit4 = [
     "Parallel Motion",
     "Oblique Motion",
     "Static Motion",
+    "Part Writing",
+    "Voicing",
+    "Open Voicing",
+    "Close Voicing",
+    "Keyboard Voicing",
+    "Outer Voices",
+    "Inner Voices",
+    "Active / Tendency Tones",
+    "Parallel 5ths/8ves",
 ];
 
 const unit5 = [
@@ -361,6 +370,15 @@ const cumulative = [
     "Parallel Motion",
     "Oblique Motion",
     "Static Motion",
+    "Part Writing",
+    "Voicing",
+    "Open Voicing",
+    "Close Voicing",
+    "Keyboard Voicing",
+    "Outer Voices",
+    "Inner Voices",
+    "Active / Tendency Tones",
+    "Parallel 5ths/8ves",
 ];
 
 const theglossary = [
@@ -537,4 +555,13 @@ const theglossary = [
     {"Term":"Parallel Motion","Definition":"The two voices move in the same direction by the same interval"},
     {"Term":"Oblique Motion","Definition":"One voice remains the same and the other moves, in either direction"},
     {"Term":"Static Motion","Definition":"Both voices repeat their same note, no movement"},
+    {"Term":"Part Writing","Definition":"Realizing a given harmony in four voices"},
+    {"Term":"Voicing","Definition":"The spacing of the notes of a given chord (open, close, etc.)"},
+    {"Term":"Open Voicing","Definition":"A voicing in which there are unused notes, wide spacing between pitches"},
+    {"Term":"Close Voicing","Definition":"A voicing in which neighboring voices use the next available chord tone"},
+    {"Term":"Keyboard Voicing","Definition":"Only one note is used in the bass, and the treble clef uses close voicing"},
+    {"Term":"Outer Voices","Definition":"Bass and Soprano voices"},
+    {"Term":"Inner Voices","Definition":"Alto and Tenor voices"},
+    {"Term":"Active / Tendency Tones","Definition":"Voices that should resolve in certain ways (i.e. in a V7 chord, the 7th↘︎, 3rd ↗︎)"},
+    {"Term":"Parallel 5ths/8ves","Definition":"When two voices, an octave or 5th apart move in the same direction by the same interval"},
 ];
