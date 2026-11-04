@@ -7177,4 +7177,116 @@ const records = [
         exercise: "Ear Training",
         termsToReview: [{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor Triad","correct":"Minor Triad"},{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
     },
+    {
+        student: "William",
+        date: "2026-11-04",
+        time: "10:52 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-04",
+        time: "10:54 AM",
+        percentage: 67,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 6th","correct":"Major 6th"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Dominant 7","correct":"Dominant 7"}]
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-04",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-04",
+        time: "10:53 AM",
+        percentage: 87,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Minor 7th","correct":"Minor 7th"}]
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-04",
+        time: "10:48 AM",
+        percentage: 80,
+        exercise: "Vocab",
+        termsToReview: [{"term":"Active / Tendency Tones","definition":"Voices that should resolve in certain ways (i.e. in a V7 chord, the 7th↘︎, 3rd ↗︎)"},{"term":"Glissando","definition":"To quickly slide from a low note to a high note, or vice versa"}]
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-04",
+        time: "10:53 AM",
+        percentage: 73,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 2nd","correct":"Major 2nd"},{"item":"Major 6th","correct":"Major 6th"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-04",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-04",
+        time: "10:49 AM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 6th","correct":"Major 6th"}]
+    },
+    {
+        student: "Alex",
+        date: "2026-11-04",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-04",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-04",
+        time: "10:44 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-04",
+        time: "10:48 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Major 6th","correct":"Major 6th"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-04",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-04",
+        time: "10:55 AM",
+        percentage: 73,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Diminished 7","correct":"Diminished 7"}]
+    },
 ];

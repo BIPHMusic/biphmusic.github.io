@@ -191,6 +191,14 @@ const unit4 = [
     "Inner Voices",
     "Active / Tendency Tones",
     "Parallel 5ths/8ves",
+    "Direct/Hidden 5ths",
+    "Voice Leading",
+    "Resolution",
+    "Spacing",
+    "Figured Bass",
+    "Range",
+    "Crossed Voices",
+    "Overlapping Voices",
 ];
 
 const unit5 = [
@@ -379,6 +387,13 @@ const cumulative = [
     "Inner Voices",
     "Active / Tendency Tones",
     "Parallel 5ths/8ves",
+    "Direct/Hidden 5ths",
+    "Voice Leading",
+    "Resolution",
+    "Spacing",
+    "Range",
+    "Crossed Voices",
+    "Overlapping Voices",
 ];
 
 const theglossary = [
@@ -564,4 +579,11 @@ const theglossary = [
     {"Term":"Inner Voices","Definition":"Alto and Tenor voices"},
     {"Term":"Active / Tendency Tones","Definition":"Voices that should resolve in certain ways (i.e. in a V7 chord, the 7th↘︎, 3rd ↗︎)"},
     {"Term":"Parallel 5ths/8ves","Definition":"When two voices, an octave or 5th apart move in the same direction by the same interval"},
+    {"Term":"Direct/Hidden 5ths","Definition":"When the soprano skips up/down and the bass moves in similar motion to a 5th or 8ve"},
+    {"Term":"Voice Leading","Definition":"The concept of how individual notes in a part move to the next note (ideally smoothly)"},
+    {"Term":"Resolution","Definition":"The specific direction that active tones should move, how they resolve"},
+    {"Term":"Spacing","Definition":"The intervalic distance between any two consecutive voice parts"},
+    {"Term":"Range","Definition":"The total span of notes a given instrument or voice type can play/sing"},
+    {"Term":"Crossed Voices","Definition":"When any lower voice has a note higher than the upper voice, or vice versa"},
+    {"Term":"Overlapping Voices","Definition":"When any lower voice has a note higher than the previously sung note of the upper voice, “ ”"},
 ];
