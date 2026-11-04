@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Motion Ripple Painting — Original ripple behavior</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Art Gallery">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+<link rel="icon" href="../icons/BGicon.png">
+<meta name="theme-color" content="#202124">
+
+<style>
+:root {
+  color-scheme:dark;
+  --text:#f5f5f7;
+  --secondary:#a1a1a6;
+}
+
+* {
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body {
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  overscroll-behavior:none;
+  touch-action:manipulation;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  background:#202124;
+  color:var(--text);
+}
+
+body {
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+/* ───────────────── Gallery ───────────────── */
+
+#gallery {
+  position:fixed;
+  inset:0;
+  z-index:1;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+
+  padding:
+    max(36px,env(safe-area-inset-top))
+    max(30px,env(safe-area-inset-right))
+    max(36px,env(safe-area-inset-bottom))
+    max(30px,env(safe-area-inset-left));
+
+  background:radial-gradient(
+    ellipse at 50% -10%,
+    #383a40 0%,
+    #292a2f 45%,
+    #1b1c1f 100%
+  );
+
+  color:var(--text);
+}
+
+.gallery-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:24px;
+  margin-bottom:36px;
+}
+
+.heading h1 {
+  font-size:clamp(30px,4vw,48px);
+  font-weight:650;
+  letter-spacing:-.045em;
+  margin:0;
+}
+
+.heading p {
+  color:var(--secondary);
+  font-size:14px;
+  margin:8px 0 0;
+}
+
+#device-info {
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:5px;
+  color:var(--secondary);
+  font-size:12px;
+  font-variant-numeric:tabular-nums;
+  text-align:right;
+  padding-top:5px;
+}
+
+#device-info .time {
+  color:var(--text);
+  font-size:15px;
+  font-weight:600;
+}
+
+.gallery-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));
+  gap:28px 22px;
+}
+
+.artwork {
+  appearance:none;
+  border:0;
+  padding:0;
+  margin:0;
+  min-width:0;
+  background:transparent;
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+  border-radius:0;
+  overflow:visible;
+  -webkit-appearance:none;
+}
+
+.artwork:focus-visible {
+  outline:3px solid #0a84ff;
+  outline-offset:5px;
+}
+
+.artwork .image-wrap {
+  width:100%;
+  aspect-ratio:4/3;
+  background:#303136;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 1px 2px #0003,0 6px 22px #0003;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+
+.artwork img {
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  pointer-events:none;
+}
+
+.artwork .title {
+  display:block;
+  margin-top:12px;
+  font-size:14px;
+  line-height:1.45;
+  font-weight:600;
+  letter-spacing:-.01em;
+  color:#f5f5f7;
+  overflow-wrap:anywhere;
+}
+
+.artwork .artist {
+  display:block;
+  margin-top:4px;
+  font-size:12px;
+  line-height:1.5;
+  color:#a1a1a6;
+  overflow:visible;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+@media(hover:hover) {
+  .artwork:hover .image-wrap {
+    transform:scale(1.015);
+    box-shadow:0 8px 28px #0006;
+  }
+}
+
+@media(max-width:600px) {
+  #gallery {
+    padding:
+      max(24px,env(safe-area-inset-top))
+      max(18px,env(safe-area-inset-right))
+      max(28px,env(safe-area-inset-bottom))
+      max(18px,env(safe-area-inset-left));
+  }
+
+  .gallery-header {
+    margin-bottom:26px;
+    gap:12px;
+  }
+
+  .heading h1 {
+    font-size:32px;
+  }
+
+  .heading p {
+    font-size:12px;
+  }
+
+  #device-info {
+    font-size:11px;
+  }
+
+  #device-info .time {
+    font-size:13px;
+  }
+
+  .gallery-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:24px 14px;
+  }
+
+  .artwork .title {
+    font-size:12px;
+  }
+
+  .artwork .artist {
+    font-size:11px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .artwork .image-wrap {
+    transition:none;
+  }
+}
+
+/* ───────────────── Viewer ───────────────── */
+
+#viewer {
+  position:fixed;
+  inset:0;
+  z-index:10;
+  display:none;
+  background:#000;
+  overflow:hidden;
+  touch-action:none;
+  overscroll-behavior:none;
+}
+
+#viewer.active {
+  display:block;
+}
+
+#painting {
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+#camera {
+  display:none;
+}
+
+#viewer,#viewer * {
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+</style>
+</head>
+
+<body>
+
+<main id="gallery">
+
+  <header class="gallery-header">
+    <div class="heading">
+      <h1>Impressionism</h1>
+      <p>December, 2026</p>
+    </div>
+
+    <div id="device-info">
+      <div class="time" id="clock">--:--</div>
+      <div id="date">Loading date…</div>
+      <div id="battery"></div>
+    </div>
+  </header>
+
+  <section class="gallery-grid" id="gallery-grid"></section>
+
+</main>
+
+<section id="viewer" aria-label="Artwork viewer">
+  <canvas id="painting"></canvas>
+  <video id="camera" autoplay playsinline muted></video>
+</section>
+
+<script>
+"use strict";
+
+// ───────────────── Artwork ─────────────────
+
+const artworks = [
+  {
+    artist:"Pierre-Auguste Renoir",
+    title:"Pont Neuf",
+    file:"Pierre-Auguste Renoir - Pont Neuf.jpg"
+  },
+  {
+    artist:"Camille Pissarro",
+    title:"Entrée du village de Voisins",
+    file:"Camille Pissarro - Entrée du village de Voisins.jpg"
+  },
+  {
+    artist:"Claude Monet",
+    title:"Impression, soleil levant",
+    file:"Claude Monet - Impression, soleil levant.jpg"
+  },
+  {
+    artist:"Claude Monet",
+    title:"Le Grand Canal",
+    file:"Claude Monet - Le Grand Canal.jpg"
+  },
+  {
+    artist:"Claude Monet",
+    title:"The Water Lily Pond",
+    file:"Claude Monet - The Water Lily Pond.png"
+  },
+  {
+    artist:"Claude Monet",
+    title:"Water Lilies",
+    file:"Claude Monet - Water Lilies.jpg"
+  },
+  {
+    artist:"Vincent van Gogh",
+    title:"Starry Night on the Rhone",
+    file:"Vincent van Gogh - Starry Night on the Rhone.jpg"
+  },
+  {
+    artist:"Vincent van Gogh",
+    title:"Starry Night",
+    file:"Vincent van Gogh - Starry Night.jpg"
+  }
+];
+
+
+// ───────────────── DOM elements ─────────────────
+
+const gallery = document.getElementById("gallery");
+const grid = document.getElementById("gallery-grid");
+const viewer = document.getElementById("viewer");
+const canvas = document.getElementById("painting");
+const video = document.getElementById("camera");
+
+
+// ───────────────── Gallery creation ─────────────────
+
+artworks.forEach((art,index) => {
+
+  const button = document.createElement("button");
+  button.className = "artwork";
+  button.type = "button";
+  button.dataset.artIndex = String(index);
+
+  button.setAttribute(
+    "aria-label",
+    `View ${art.title} by ${art.artist}`
+  );
+
+  const wrap = document.createElement("div");
+  wrap.className = "image-wrap";
+
+  const img = document.createElement("img");
+  img.src = "art/" + art.file;
+  img.alt = art.title;
+  img.loading = "lazy";
+  img.decoding = "async";
+  img.draggable = false;
+
+  const title = document.createElement("span");
+  title.className = "title";
+  title.textContent = art.title;
+
+  const artist = document.createElement("span");
+  artist.className = "artist";
+  artist.textContent = art.artist;
+
+  wrap.appendChild(img);
+  button.append(wrap,title,artist);
+
+  grid.appendChild(button);
+});
+
+
+// One delegated click listener for the entire gallery.
+// No individual event listeners are needed for every painting.
+
+grid.addEventListener("click",event => {
+
+  const button = event.target.closest("button.artwork");
+
+  if (!button || !grid.contains(button)) return;
+
+  const index = Number(button.dataset.artIndex);
+
+  openArtwork(index);
+});
+
+
+// ───────────────── Date / time / battery ─────────────────
+
+function updateClock() {
+
+  const now = new Date();
+
+  document.getElementById("clock").textContent =
+    now.toLocaleTimeString([],{
+      hour:"2-digit",
+      minute:"2-digit"
+    });
+
+  document.getElementById("date").textContent =
+    now.toLocaleDateString([],{
+      weekday:"short",
+      month:"short",
+      day:"numeric",
+      year:"numeric"
+    });
+}
+
+updateClock();
+
+// The clock only displays hours and minutes.
+// No need to update every second.
+setInterval(updateClock,60000);
+
+
+async function initBattery() {
+
+  if (!navigator.getBattery) return;
+
+  try {
+
+    const battery = await navigator.getBattery();
+
+    const el = document.getElementById("battery");
+
+    const update = () => {
+
+      el.textContent =
+        `Battery ${Math.round(battery.level*100)}%` +
+        `${battery.charging?" ⚡":""}`;
+
+    };
+
+    update();
+
+    battery.addEventListener("levelchange",update);
+    battery.addEventListener("chargingchange",update);
+
+  } catch (_) {}
+
+}
+
+initBattery();
+
+
+// ───────────────── Original ripple configuration ─────────────────
+
+const RIPPLE_DAMPING = 0.6;
+const SENSITIVITY = 35;
+const RIPPLE_STRENGTH = 10;
+const RIPPLE_DECAY_MS = 0;
+const IGNORE_MOTION_MS = 1500;
+
+// Original full-resolution motion detection.
+const MOTION_SAMPLE_STEP = 1;
+
+
+// ───────────────── Viewer state ─────────────────
+
+let w = 0;
+let h = 0;
+
+let ctx = null;
+
+let bufferCanvas = null;
+let bufferCtx = null;
+let lastData = null;
+
+let rippleMap1 = null;
+let rippleMap2 = null;
+
+let webcamReadyTime = 0;
+let started = false;
+let openingArtwork = false;
+
+let animationId = null;
+let activeImage = null;
+let cameraStream = null;
+
+let previousFrameTime = 0;
+
+// Tracks whether the ripple engine has actually been initialized.
+let rippleInitialized = false;
+
+// Prevents an old asynchronous opening operation from affecting
+// a newer selection or a viewer that has already been closed.
+let openRequestId = 0;
+
+
+// ───────────────── Deferred ripple initialization ─────────────────
+
+// IMPORTANT:
+//
+// This function is NOT called when the page loads.
+//
+// It only runs when the user selects a painting.
+//
+// This means the gallery does not allocate:
+// - A canvas drawing context
+// - A second full-size canvas
+// - Two full-resolution ripple arrays
+//
+// until the viewer is actually entered.
+
+function initializeRippleEngine() {
+
+  if (rippleInitialized) return;
+
+  ctx = canvas.getContext("2d",{
+    willReadFrequently:true
+  });
+
+  if (!ctx) {
+    throw new Error("Could not initialize painting canvas.");
+  }
+
+  resize();
+
+  rippleInitialized = true;
+}
+
+
+// ───────────────── Canvas sizing ─────────────────
+
+function resize() {
+
+  // Do nothing while the gallery is displayed.
+  if (!viewer.classList.contains("active")) return;
+
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+
+  canvas.style.width = "100%";
+  canvas.style.height = "100%";
+
+  initBuffers();
+
+  if (activeImage && !started) {
+    drawArtwork();
+  }
+}
+
+
+// Resizing only matters while the viewer is active.
+window.addEventListener("resize",() => {
+
+  if (!viewer.classList.contains("active")) return;
+
+  resize();
+
+});
+
+
+// ───────────────── Ripple buffers ─────────────────
+
+function initBuffers() {
+
+  bufferCanvas = document.createElement("canvas");
+
+  bufferCanvas.width = w;
+  bufferCanvas.height = h;
+
+  bufferCtx = bufferCanvas.getContext("2d",{
+    willReadFrequently:true
+  });
+
+  rippleMap1 = new Int16Array(w*h);
+  rippleMap2 = new Int16Array(w*h);
+
+  lastData = null;
+}
+
+
+// ───────────────── Artwork drawing ─────────────────
+
+function drawCover(targetCtx,source,targetW,targetH) {
+
+  const sw =
+    source.naturalWidth ||
+    source.videoWidth ||
+    source.width;
+
+  const sh =
+    source.naturalHeight ||
+    source.videoHeight ||
+    source.height;
+
+  if (!sw || !sh) return;
+
+  const scale = Math.max(
+    targetW/sw,
+    targetH/sh
+  );
+
+  const drawW = sw*scale;
+  const drawH = sh*scale;
+
+  targetCtx.drawImage(
+    source,
+    (targetW-drawW)/2,
+    (targetH-drawH)/2,
+    drawW,
+    drawH
+  );
+}
+
+
+function drawArtwork() {
+
+  if (
+    !ctx ||
+    !activeImage ||
+    !viewer.classList.contains("active")
+  ) return;
+
+  ctx.clearRect(0,0,w,h);
+
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0,0,w,h);
+
+  drawCover(ctx,activeImage,w,h);
+}
+
+
+// ───────────────── Opening artwork ─────────────────
+
+async function openArtwork(index) {
+
+  if (started || openingArtwork) return;
+
+  openingArtwork = true;
+
+  const requestId = ++openRequestId;
+
+  const art = artworks[index];
+
+  // Use the existing thumbnail URL where possible.
+  // The browser can reuse its cached image instead of downloading
+  // the same painting again.
+  const thumbnail = grid.querySelector(
+    `button[data-art-index="${index}"] img`
+  );
+
+  const image = new Image();
+
+  image.decoding = "async";
+
+  image.src =
+    thumbnail?.currentSrc ||
+    thumbnail?.src ||
+    ("art/" + art.file);
+
+  activeImage = image;
+
+  // Show the viewer immediately.
+  // Do not wait for the image to decode.
+  viewer.classList.add("active");
+  gallery.style.display = "none";
+
+  // Initialize the canvas and ripple buffers only now.
+  try {
+
+    initializeRippleEngine();
+
+  } catch(err) {
+
+    console.error("Could not initialize ripple engine:",err);
+
+    viewer.classList.remove("active");
+    gallery.style.display = "";
+    activeImage = null;
+    openingArtwork = false;
+
+    return;
+  }
+
+
+  // Request fullscreen immediately during the click interaction.
+  let fullscreenPromise = Promise.resolve();
+
+  if (
+    !document.fullscreenElement &&
+    viewer.requestFullscreen
+  ) {
+
+    try {
+
+      fullscreenPromise = viewer.requestFullscreen();
+
+    } catch(err) {
+
+      console.warn("Fullscreen unavailable:",err);
+
+    }
+  }
+
+
+  // Start the image decoding and camera request concurrently.
+  // Neither one blocks the initial viewer transition.
+
+  const imagePromise = image.decode();
+
+  let cameraPromise;
+
+  try {
+
+    cameraPromise = navigator.mediaDevices.getUserMedia({
+
+      video:{
+        facingMode:"user",
+        width:{ideal:1280},
+        height:{ideal:720}
+      },
+
+      audio:false
+
+    });
+
+  } catch(err) {
+
+    cameraPromise = Promise.reject(err);
+
+  }
+
+
+  // Avoid an unhandled rejection if the camera request fails
+  // before we reach the await below.
+  cameraPromise.catch(() => {});
+
+
+  try {
+
+    // Fullscreen and image loading can happen at the same time.
+    await Promise.all([
+      fullscreenPromise.catch(err => {
+        console.warn("Fullscreen unavailable:",err);
+      }),
+      imagePromise
+    ]);
+
+    // The viewer may have been closed while loading.
+    if (
+      requestId !== openRequestId ||
+      !viewer.classList.contains("active")
+    ) return;
+
+    drawArtwork();
+
+
+    // Now wait for the camera.
+    cameraStream = await cameraPromise;
+
+    // Check again in case the user exited while the camera
+    // permission request was still pending.
+    if (
+      requestId !== openRequestId ||
+      !viewer.classList.contains("active")
+    ) {
+
+      cameraStream.getTracks().forEach(track => track.stop());
+
+      cameraStream = null;
+
+      return;
+    }
+
+
+    video.srcObject = cameraStream;
+
+    await video.play();
+
+    webcamReadyTime =
+      performance.now() + IGNORE_MOTION_MS;
+
+    started = true;
+
+    previousFrameTime = 0;
+    lastData = null;
+
+    animationId = requestAnimationFrame(loop);
+
+  } catch(err) {
+
+    console.warn("Could not start artwork view:",err);
+
+    // If the camera is unavailable or permission is denied,
+    // leave the selected painting visible without the ripple effect.
+    if (
+      requestId === openRequestId &&
+      viewer.classList.contains("active")
+    ) {
+
+      started = false;
+
+      if (image.complete && image.naturalWidth) {
+        drawArtwork();
+      }
+
+      if (cameraStream) {
+
+        cameraStream.getTracks().forEach(track => track.stop());
+
+        cameraStream = null;
+
+      }
+    }
+
+  } finally {
+
+    if (requestId === openRequestId) {
+      openingArtwork = false;
+    }
+
+  }
+}
+
+
+// ───────────────── 5-second press-and-hold exit ─────────────────
+
+const HOLD_DURATION = 5000;
+
+let holdTimer = null;
+let holdPointerId = null;
+
+
+function cancelHold() {
+
+  if (holdTimer !== null) {
+    clearTimeout(holdTimer);
+  }
+
+  holdTimer = null;
+  holdPointerId = null;
+}
+
+
+function beginHold(e) {
+
+  if (
+    !viewer.classList.contains("active") ||
+    holdTimer !== null
+  ) return;
+
+  holdPointerId = e.pointerId;
+
+  holdTimer = setTimeout(() => {
+
+    holdTimer = null;
+    holdPointerId = null;
+
+    closeArtwork();
+
+  },HOLD_DURATION);
+
+}
+
+
+function endHold(e) {
+
+  if (holdPointerId !== e.pointerId) return;
+
+  cancelHold();
+
+}
+
+
+viewer.addEventListener("pointerdown",beginHold);
+viewer.addEventListener("pointerup",endHold);
+viewer.addEventListener("pointercancel",endHold);
+viewer.addEventListener("lostpointercapture",endHold);
+
+viewer.addEventListener("contextmenu",e => {
+  e.preventDefault();
+});
+
+viewer.addEventListener("dragstart",e => {
+  e.preventDefault();
+});
+
+viewer.addEventListener("click",e => {
+  e.preventDefault();
+});
+
+viewer.addEventListener("dblclick",e => {
+  e.preventDefault();
+});
+
+viewer.addEventListener("wheel",e => {
+  e.preventDefault();
+},{passive:false});
+
+
+window.addEventListener("keydown",e => {
+
+  if (viewer.classList.contains("active")) {
+
+    e.preventDefault();
+    e.stopPropagation();
+
+  }
+
+},true);
+
+
+// ───────────────── Closing artwork ─────────────────
+
+function closeArtwork() {
+
+  if (!viewer.classList.contains("active")) return;
+
+  cancelHold();
+
+  // Invalidate any pending asynchronous opening operation.
+  openRequestId++;
+
+  openingArtwork = false;
+  started = false;
+
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId);
+  }
+
+  animationId = null;
+
+  if (cameraStream) {
+
+    cameraStream.getTracks().forEach(track => track.stop());
+
+    cameraStream = null;
+
+  }
+
+  video.pause();
+  video.srcObject = null;
+
+  viewer.classList.remove("active");
+
+  gallery.style.display = "";
+
+  activeImage = null;
+
+  if (
+    document.fullscreenElement &&
+    document.exitFullscreen
+  ) {
+
+    document.exitFullscreen().catch(() => {});
+
+  }
+
+  if (ctx) {
+    ctx.clearRect(0,0,w,h);
+  }
+
+  // Keep the buffers allocated after first use.
+  // They are not doing any work while the gallery is displayed.
+}
+
+
+// ───────────────── Ripple calculations ─────────────────
+
+function addRipple(x,y,strength=60) {
+
+  if (
+    x<2 ||
+    x>=w-2 ||
+    y<2 ||
+    y>=h-2
+  ) return;
+
+  const idx = y*w+x;
+
+  rippleMap1[idx] += strength;
+
+  rippleMap1[idx-1] += strength*0.6;
+  rippleMap1[idx+1] += strength*0.6;
+
+  rippleMap1[idx-w] += strength*0.6;
+  rippleMap1[idx+w] += strength*0.6;
+
+}
+
+
+function updateRipples() {
+
+  let temp = rippleMap1;
+
+  rippleMap1 = rippleMap2;
+  rippleMap2 = temp;
+
+  for (let x=2;x<w-2;x++) {
+
+    for (let y=2;y<h-2;y++) {
+
+      const idx = y*w+x;
+
+      const val = (
+
+        rippleMap1[(y-1)*w+x] +
+        rippleMap1[(y+1)*w+x] +
+        rippleMap1[y*w+x-1] +
+        rippleMap1[y*w+x+1]
+
+      )/2-rippleMap2[idx];
+
+      rippleMap2[idx] = val*RIPPLE_DAMPING;
+
+    }
+
+  }
+
+}
+
+
+function applyDistortion() {
+
+  const src = ctx.getImageData(0,0,w,h).data;
+
+  const out = ctx.createImageData(w,h);
+
+  const dst = out.data;
+
+  for (let y=0;y<h;y++) {
+
+    for (let x=0;x<w;x++) {
+
+      const idx = (y*w+x)*4;
+
+      const height = rippleMap2[y*w+x]*0.08;
+
+      const ox = Math.round(
+        x+height*RIPPLE_STRENGTH
+      );
+
+      const oy = Math.round(
+        y+height*RIPPLE_STRENGTH*0.7
+      );
+
+      const sx = Math.max(
+        0,
+        Math.min(w-1,ox)
+      );
+
+      const sy = Math.max(
+        0,
+        Math.min(h-1,oy)
+      );
+
+      const sidx = (sy*w+sx)*4;
+
+      dst[idx] = src[sidx];
+      dst[idx+1] = src[sidx+1];
+      dst[idx+2] = src[sidx+2];
+      dst[idx+3] = 255;
+
+    }
+
+  }
+
+  ctx.putImageData(out,0,0);
+
+}
+
+
+// ───────────────── Main animation ─────────────────
+
+function loop(timeMs) {
+
+  if (!started) return;
+
+  animationId = requestAnimationFrame(loop);
+
+  if (!video.videoWidth || !video.videoHeight) return;
+
+
+  // Mirror the webcam frame.
+
+  bufferCtx.save();
+
+  bufferCtx.translate(w,0);
+  bufferCtx.scale(-1,1);
+
+  drawCover(bufferCtx,video,w,h);
+
+  bufferCtx.restore();
+
+
+  const frame = bufferCtx.getImageData(0,0,w,h);
+
+  const nowData = frame.data;
+
+
+  if (
+    !lastData ||
+    timeMs < webcamReadyTime
+  ) {
+
+    lastData = frame;
+
+    drawArtwork();
+
+    return;
+
+  }
+
+
+  const previous = lastData.data;
+
+  let motionFound = false;
+
+  const step = MOTION_SAMPLE_STEP;
+
+
+  // Original behavior: check every pixel.
+
+  for (let y=2;y<h-2;y+=step) {
+
+    for (let x=2;x<w-2;x+=step) {
+
+      const i = (y*w+x)*4;
+
+      const diff =
+
+        Math.abs(nowData[i]-previous[i]) +
+        Math.abs(nowData[i+1]-previous[i+1]) +
+        Math.abs(nowData[i+2]-previous[i+2]);
+
+
+      if (diff>SENSITIVITY*3) {
+
+        addRipple(x,y,80);
+
+        motionFound = true;
+
+      }
+
+    }
+
+  }
+
+
+  if (
+    !motionFound &&
+    timeMs-previousFrameTime>RIPPLE_DECAY_MS
+  ) {
+
+    for (let i=0;i<rippleMap1.length;i++) {
+
+      rippleMap1[i] *= 0.992;
+      rippleMap2[i] *= 0.992;
+
+    }
+
+  }
+
+
+  if (motionFound) {
+    previousFrameTime = timeMs;
+  }
+
+
+  lastData = frame;
+
+  updateRipples();
+
+  drawArtwork();
+
+  applyDistortion();
+
+}
+
+
+// ───────────────── Initial page state ─────────────────
+
+// Deliberately NO resize() call here.
+//
+// The gallery starts without initializing:
+// - The painting canvas context
+// - The buffer canvas
+// - The two ripple maps
+// - The animation loop
+//
+// All of those are deferred until openArtwork() is called.
+
+</script>
+
+</body>
+</html>
