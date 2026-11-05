@@ -7520,4 +7520,116 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-11-05",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-05",
+        time: "10:47 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Minor 7","correct":"Minor 7"}]
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-05",
+        time: "10:44 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-05",
+        time: "10:48 AM",
+        percentage: 73,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 7","correct":"Major 7"}]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-05",
+        time: "10:55 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-05",
+        time: "10:57 AM",
+        percentage: 87,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-05",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-05",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-05",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-05",
+        time: "10:53 AM",
+        percentage: 87,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-05",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-05",
+        time: "10:50 AM",
+        percentage: 73,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+    },
+    {
+        student: "William",
+        date: "2026-11-05",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-05",
+        time: "10:46 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"},{"item":"Dominant 7","correct":"Dominant 7"}]
+    },
 ];
