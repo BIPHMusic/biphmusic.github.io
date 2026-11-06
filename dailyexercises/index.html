@@ -1779,6 +1779,7 @@ function dailyCompleteExercise(type, resultData) {
   }
 
   state.results[type] = resultData;
+  dailyPersistSessionToWebCache();
 
   if (type === 'sightSinging') {
     state.waitingForAdvance = true;
@@ -1832,13 +1833,14 @@ function dailySightRecordingReady(blob, example) {
 
   state.results.sightSinging = {
     student: state.student,
-    date: new Date().toISOString().split('T')[0],
+    date: dailyLocalDateKey(),
     time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}),
     exercise: 'Sight Singing',
     example: example,
     recorded: true
   };
 
+  dailyPersistSessionToWebCache();
   state.waitingForAdvance = true;
 
   const button = document.getElementById('sightNextButton');
@@ -1851,20 +1853,180 @@ function dailySightRecordingReady(blob, example) {
   if (actions) actions.classList.remove('hidden');
 }
 
+function dailyLocalDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function dailyNormalizeTermsToReview(items) {
+  if (!Array.isArray(items)) return [];
+
+  return [...new Set(items.map(item => {
+    if (typeof item === 'string') return item.trim();
+    if (!item || typeof item !== 'object') return '';
+    return String(item.term ?? item.correct ?? item.item ?? item.name ?? '').trim();
+  }).filter(Boolean))];
+}
+
+function dailyExportExerciseResult(record) {
+  if (!record || typeof record !== 'object') return record ?? null;
+  const exported = JSON.parse(JSON.stringify(record));
+  exported.termsToReview = dailyNormalizeTermsToReview(exported.termsToReview);
+  return exported;
+}
+
 function dailyMakeExportData() {
   const s = window.dailyExerciseState;
-  const result = {
+  return {
     version: 1,
     student: s.student,
-    date: new Date().toISOString().split('T')[0],
+    date: dailyLocalDateKey(),
     time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}),
     exercises: {
-      vocab: s.results.vocab,
-      earTraining: s.results.earTraining,
-      sightSinging: s.results.sightSinging
+      vocab: dailyExportExerciseResult(s.results.vocab),
+      earTraining: dailyExportExerciseResult(s.results.earTraining),
+      sightSinging: dailyExportExerciseResult(s.results.sightSinging)
     }
   };
-  return result;
+}
+
+// Completed Daily Exercises sessions are kept in Cache Storage for the
+// remainder of the local calendar day. The next visit removes older entries.
+const DAILY_SESSION_CACHE_NAME = 'biph-daily-exercises-v1';
+let dailyCacheExpiryTimer = null;
+
+function dailyScheduleCacheExpiry() {
+  if (dailyCacheExpiryTimer) clearTimeout(dailyCacheExpiryTimer);
+  const now = new Date();
+  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+  dailyCacheExpiryTimer = setTimeout(async () => {
+    try {
+      await caches.delete(DAILY_SESSION_CACHE_NAME);
+    } catch (error) {
+      console.warn('Daily Exercises cache could not be cleared at midnight:', error);
+    }
+  }, Math.max(1000, nextMidnight.getTime() - now.getTime()));
+}
+
+function dailySessionCacheRequest(kind, date = dailyLocalDateKey(), student = window.dailyExerciseState.student) {
+  const safeStudent = encodeURIComponent(String(student || 'Student'));
+  const url = new URL(
+    `/__daily_exercises_cache__/${date}/${safeStudent}/${kind}`,
+    window.location.origin
+  );
+  return new Request(url.toString(), {method:'GET'});
+}
+
+async function dailyCleanupExpiredSessionCache() {
+  if (!('caches' in window)) return;
+  try {
+    const cache = await caches.open(DAILY_SESSION_CACHE_NAME);
+    const keys = await cache.keys();
+    const today = dailyLocalDateKey();
+    await Promise.all(keys.map(request => {
+      const parts = new URL(request.url).pathname.split('/').filter(Boolean);
+      return parts[1] !== today ? cache.delete(request) : Promise.resolve(false);
+    }));
+  } catch (error) {
+    console.warn('Daily Exercises cache cleanup was unavailable:', error);
+  }
+}
+
+async function dailyPersistSessionToWebCache() {
+  if (!('caches' in window)) return false;
+  const s = window.dailyExerciseState;
+  if (!s?.student) return false;
+
+  try {
+    const cache = await caches.open(DAILY_SESSION_CACHE_NAME);
+    const date = dailyLocalDateKey();
+    const session = {
+      version: 1,
+      date,
+      student: s.student,
+      order: Array.isArray(s.order) ? s.order : [],
+      index: s.index,
+      results: s.results || {},
+      sightExample: s.sightExample ?? null,
+      completed: Boolean(
+        s.results?.vocab &&
+        s.results?.earTraining &&
+        s.results?.sightSinging &&
+        s.sightRecording
+      )
+    };
+
+    await cache.put(
+      dailySessionCacheRequest('session.json', date, s.student),
+      new Response(JSON.stringify(session), {
+        headers: {'Content-Type':'application/json'}
+      })
+    );
+
+    if (s.sightRecording instanceof Blob) {
+      await cache.put(
+        dailySessionCacheRequest('recording.mp3', date, s.student),
+        new Response(s.sightRecording, {
+          headers: {'Content-Type': s.sightRecording.type || 'audio/mpeg'}
+        })
+      );
+    }
+
+    dailyScheduleCacheExpiry();
+    return true;
+  } catch (error) {
+    console.warn('Daily Exercises session could not be cached:', error);
+    return false;
+  }
+}
+
+async function dailyRestoreCompletedSession(student) {
+  if (!('caches' in window)) return false;
+  await dailyCleanupExpiredSessionCache();
+
+  try {
+    const cache = await caches.open(DAILY_SESSION_CACHE_NAME);
+    const date = dailyLocalDateKey();
+    const sessionResponse = await cache.match(dailySessionCacheRequest('session.json', date, student));
+    if (!sessionResponse) return false;
+
+    const session = await sessionResponse.json();
+    if (
+      !session ||
+      session.version !== 1 ||
+      session.date !== date ||
+      session.student !== student ||
+      !session.completed ||
+      !session.results?.vocab ||
+      !session.results?.earTraining ||
+      !session.results?.sightSinging
+    ) return false;
+
+    const recordingResponse = await cache.match(dailySessionCacheRequest('recording.mp3', date, student));
+    if (!recordingResponse) return false;
+    const recording = await recordingResponse.blob();
+    if (!recording.size) return false;
+
+    const s = window.dailyExerciseState;
+    s.student = student;
+    s.order = Array.isArray(session.order) && session.order.length
+      ? session.order
+      : ['vocab', 'earTraining', 'sightSinging'];
+    s.index = s.order.length;
+    s.results = session.results;
+    s.sightRecording = recording;
+    s.sightExample = session.sightExample ?? session.results.sightSinging.example ?? null;
+    s.sessionReady = true;
+    s.waitingForAdvance = false;
+    s.active = null;
+
+    return true;
+  } catch (error) {
+    console.warn('Daily Exercises session could not be restored:', error);
+    return false;
+  }
 }
 
 function dailyUnicodeBase64(str) {
@@ -1886,7 +2048,7 @@ function dailySafeName(name) {
 function dailyTextFile() {
   const state = window.dailyExerciseState;
   const name = dailySafeName(state.student);
-  const date = new Date().toISOString().split('T')[0];
+  const date = dailyLocalDateKey();
   const link = dailyScoreLink();
   return new File([link + '\n'], `${name} - Daily Exercises, ${date}.txt`, {type:'text/plain'});
 }
@@ -1894,7 +2056,7 @@ function dailyTextFile() {
 function dailyRecordingFile() {
   const state = window.dailyExerciseState;
   const name = dailySafeName(state.student);
-  const date = new Date().toISOString().split('T')[0];
+  const date = dailyLocalDateKey();
   return new File([state.sightRecording], `${date} Sight Singing - ${name}.mp3`, {type:'audio/mp3'});
 }
 
@@ -1924,24 +2086,42 @@ function dailyDownloadFile(file) {
 //   });
 // }
 
+function dailyIsIPad() {
+  return /iPad/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
 async function dailyShareBoth() {
+  const isIPad = dailyIsIPad();
   try {
     const txt = dailyTextFile();
     const mp3 = dailyRecordingFile();
-    if (navigator.canShare && navigator.canShare({files:[txt, mp3]})) {
+    const files = [txt, mp3];
+
+    if (navigator.share && (!navigator.canShare || navigator.canShare({files}))) {
       await navigator.share({
-        files:[txt, mp3],
+        files,
         title:'Daily Exercises',
         text:`Daily Exercises for ${window.dailyExerciseState.student}`
       });
       return;
     }
+
+    if (isIPad) {
+      alert('Sharing these files is not supported by this browser. Please try Safari or another browser with file sharing enabled.');
+      return;
+    }
+
     dailyDownloadFile(txt);
     dailyDownloadFile(mp3);
   } catch (err) {
     if (err.name !== 'AbortError') {
       console.error(err);
-      alert('Could not share the files. You can download them instead.');
+      if (isIPad) {
+        alert('Could not share the files. Please try again or use Safari.');
+      } else {
+        alert('Could not share the files. You can download them instead.');
+      }
     }
   }
 }
@@ -2076,8 +2256,10 @@ function dailyShowFinalScreen() {
       </div>
 
       <div class="daily-final-actions">
-        <button class="copy-button" id="dailyDownloadTxt">Download Scores (.txt)</button>
-        <button class="copy-button" id="dailyDownloadMp3">Download Recording (.mp3)</button>
+        ${dailyIsIPad() ? '' : `
+          <button class="copy-button" id="dailyDownloadTxt">Download Scores (.txt)</button>
+          <button class="copy-button" id="dailyDownloadMp3">Download Recording (.mp3)</button>
+        `}
         <button class="copy-button" id="dailyShareBoth">📤 Share / AirDrop Both</button>
       </div>
 
@@ -2095,16 +2277,19 @@ function dailyShowFinalScreen() {
   `;
 
   const audio = document.getElementById('dailyFinalAudio');
-  audio.src = URL.createObjectURL(s.sightRecording);
+  if (s.sightRecording) audio.src = URL.createObjectURL(s.sightRecording);
 
-  document.getElementById('dailyDownloadTxt').onclick = () => dailyDownloadFile(dailyTextFile());
-  document.getElementById('dailyDownloadMp3').onclick = () => dailyDownloadFile(dailyRecordingFile());
+  const downloadTxt = document.getElementById('dailyDownloadTxt');
+  const downloadMp3 = document.getElementById('dailyDownloadMp3');
+  if (downloadTxt) downloadTxt.onclick = () => dailyDownloadFile(dailyTextFile());
+  if (downloadMp3) downloadMp3.onclick = () => dailyDownloadFile(dailyRecordingFile());
   document.getElementById('dailyShareBoth').onclick = dailyShareBoth;
 
+  dailyPersistSessionToWebCache();
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-function dailyStartSession(displayName) {
+async function dailyStartSession(displayName) {
   const s = window.dailyExerciseState;
   s.student = displayName;
   s.sessionReady = false;
@@ -2117,6 +2302,16 @@ function dailyStartSession(displayName) {
 
   document.getElementById('main-content').style.display = 'block';
   if (typeof initMyMenu === 'function') initMyMenu();
+
+  const restored = await dailyRestoreCompletedSession(displayName);
+  if (restored) {
+    if (dailyAccessTimer) clearInterval(dailyAccessTimer);
+    const progress = document.getElementById('exercise-progress');
+    if (progress) progress.style.display = 'none';
+    dailyShowFinalScreen();
+    return;
+  }
+
   dailyStartAccessWindowWatcher();
 }
 
@@ -3590,26 +3785,15 @@ function dailyVocabPrepareResultData() {
         questionSet:
             dailyVocabQuestionBank[dailyVocabStudent],
 
-        termsToReview:
-            termsToReview
-                .map(term => ({
-                    term,
-                    definition:
-                        vocabularyTerms
-                            .find(
-                                v =>
-                                    v.Term ===
-                                    term
-                            )
-                            ?.Definition ||
-                        "Definition not found"
-                }))
-                .sort(
-                    (a, b) =>
-                        a.term.localeCompare(
-                            b.term
-                        )
+termsToReview:
+    termsToReview
+        .map(term => ({ term }))
+        .sort(
+            (a, b) =>
+                a.term.localeCompare(
+                    b.term
                 )
+        )
     };
 }
 
@@ -3954,8 +4138,8 @@ function dailyVocabPrepareResultData() {
                 }
             });
 
-            const termsToReview = [...new Set(missedAnswers)]
-                .map(correct => ({ item: correct, correct }));
+          const termsToReview = [...new Set(missedAnswers)]
+              .map(item => ({ item }));
 
             const correctCount = studentAnswers.filter((a, i) => 
                 a.toLowerCase() === allCorrect[i].toLowerCase()
