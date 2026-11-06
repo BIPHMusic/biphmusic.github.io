@@ -182,6 +182,48 @@ body {
   }
 }
 
+/* Webcam source selector */
+.camera-controls {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:18px;
+}
+.camera-controls label {
+  color:var(--secondary);
+  font-size:12px;
+  font-weight:600;
+}
+#camera-select {
+  max-width:min(360px,100%);
+  min-width:220px;
+  padding:9px 34px 9px 12px;
+  border:1px solid #55575f;
+  border-radius:9px;
+  background:#303136;
+  color:var(--text);
+  font:inherit;
+  font-size:13px;
+  color-scheme:dark;
+}
+#camera-status {
+  flex-basis:100%;
+  color:var(--secondary);
+  font-size:11px;
+  line-height:1.4;
+}
+@media(max-width:600px) {
+  .camera-controls {
+    gap:7px;
+    margin-top:14px;
+  }
+  #camera-select {
+    min-width:0;
+    width:100%;
+    max-width:100%;
+  }
+}
 @media(max-width:600px) {
   #gallery {
     padding:
@@ -275,6 +317,13 @@ body {
     <div class="heading">
       <h1>Impressionism</h1>
       <p>December, 2026</p>
+      <div class="camera-controls">
+        <label for="camera-select">Webcam source</label>
+        <select id="camera-select" aria-label="Select webcam source">
+          <option value="">Detecting cameras…</option>
+        </select>
+        <div id="camera-status" role="status" aria-live="polite">Choose a camera to grant access. USB webcams are supported.</div>
+      </div>
     </div>
 
     <div id="device-info">
@@ -349,9 +398,132 @@ const grid = document.getElementById("gallery-grid");
 const viewer = document.getElementById("viewer");
 const canvas = document.getElementById("painting");
 const video = document.getElementById("camera");
+const cameraSelect = document.getElementById("camera-select");
+const cameraStatus = document.getElementById("camera-status");
 
 
-// ───────────────── Gallery creation ─────────────────
+// ───────────────── Webcam source selection ─────────────────
+
+let selectedCameraId = "";
+let cameraPermissionGranted = false;
+
+function setCameraStatus(message) {
+  cameraStatus.textContent = message;
+}
+
+async function refreshCameraList(preferredDeviceId = selectedCameraId) {
+  if (!navigator.mediaDevices?.enumerateDevices) {
+    cameraSelect.innerHTML = '<option value="">Camera selection is not supported by this browser</option>';
+    cameraSelect.disabled = true;
+    setCameraStatus("Use a modern browser over HTTPS to access webcams.");
+    return;
+  }
+
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cameras = devices.filter(device => device.kind === "videoinput");
+    const previousValue = preferredDeviceId || cameraSelect.value;
+
+    cameraSelect.innerHTML = "";
+
+    if (!cameras.length) {
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "No cameras detected";
+      cameraSelect.appendChild(option);
+      selectedCameraId = "";
+      setCameraStatus("Connect a webcam, then refresh the page or reconnect the camera.");
+      return;
+    }
+
+    cameras.forEach((camera, index) => {
+      const option = document.createElement("option");
+      option.value = camera.deviceId;
+      option.textContent = camera.label || `Camera ${index + 1} (name available after permission)`;
+      cameraSelect.appendChild(option);
+    });
+
+    const matchingCamera = cameras.find(camera => camera.deviceId === previousValue);
+    selectedCameraId = matchingCamera ? matchingCamera.deviceId : cameras[0].deviceId;
+    cameraSelect.value = selectedCameraId;
+
+    if (cameraPermissionGranted || cameras.some(camera => camera.label)) {
+      setCameraStatus(`${cameras.length} camera${cameras.length === 1 ? "" : "s"} available. Selected camera is ready.`);
+    } else {
+      setCameraStatus("Select a camera to request browser permission. Camera names appear after permission is granted.");
+    }
+  } catch (error) {
+    console.warn("Could not enumerate cameras:", error);
+    setCameraStatus("Could not list cameras. Check browser permissions and try again.");
+  }
+}
+
+async function selectCamera(deviceId) {
+  if (!deviceId) return;
+
+  selectedCameraId = deviceId;
+  setCameraStatus("Requesting access to the selected camera…");
+
+  let permissionStream = null;
+
+  try {
+    // The browser will show its permission prompt if access has not
+    // already been granted. A specific deviceId selects the chosen USB
+    // webcam or built-in camera rather than relying on facingMode.
+    permissionStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        deviceId: { exact: deviceId },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    });
+
+    cameraPermissionGranted = true;
+    const activeTrack = permissionStream.getVideoTracks()[0];
+    const actualDeviceId = activeTrack?.getSettings?.().deviceId;
+
+    if (actualDeviceId) selectedCameraId = actualDeviceId;
+
+    await refreshCameraList(selectedCameraId);
+    cameraSelect.value = selectedCameraId;
+    setCameraStatus("Camera access granted. This source will be used in the artwork viewer.");
+  } catch (error) {
+    console.warn("Camera permission or selection failed:", error);
+    if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+      setCameraStatus("Camera permission was denied. Allow camera access in your browser’s site settings.");
+    } else if (error.name === "NotFoundError" || error.name === "OverconstrainedError") {
+      setCameraStatus("That camera is unavailable. Choose another source or reconnect the webcam.");
+      await refreshCameraList("");
+    } else {
+      setCameraStatus(`Could not access this camera: ${error.message || error.name}`);
+    }
+  } finally {
+    // This brief request is only to obtain permission and identify the
+    // selected source. The viewer opens its own stream when an artwork
+    // is selected, and closes it when the viewer exits.
+    if (permissionStream) {
+      permissionStream.getTracks().forEach(track => track.stop());
+    }
+  }
+}
+
+cameraSelect.addEventListener("change", () => {
+  selectCamera(cameraSelect.value);
+});
+
+// Device changes include USB webcams being connected or disconnected.
+if (navigator.mediaDevices?.addEventListener) {
+  navigator.mediaDevices.addEventListener("devicechange", () => {
+    refreshCameraList();
+  });
+}
+
+// List available cameras without requesting permission on page load.
+refreshCameraList();
+
+
+ // ───────────────── Gallery creation ─────────────────
 
 artworks.forEach((art,index) => {
 
@@ -726,11 +898,17 @@ async function openArtwork(index) {
 
     cameraPromise = navigator.mediaDevices.getUserMedia({
 
-      video:{
-        facingMode:"user",
-        width:{ideal:1280},
-        height:{ideal:720}
-      },
+      video: selectedCameraId
+        ? {
+            deviceId: { exact: selectedCameraId },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        : {
+            facingMode: "user",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
 
       audio:false
 
@@ -769,6 +947,9 @@ async function openArtwork(index) {
 
     // Now wait for the camera.
     cameraStream = await cameraPromise;
+
+    const activeCameraId = cameraStream.getVideoTracks()[0]?.getSettings?.().deviceId;
+    if (activeCameraId) selectedCameraId = activeCameraId;
 
     // Check again in case the user exited while the camera
     // permission request was still pending.
