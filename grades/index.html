@@ -5886,12 +5886,23 @@ function setupTeacherStudentSearch() {
                 </div>
 
                 <div class="cache-status-card">
-                    <h3>Cached records.js</h3>
+                <h3>Cached records.js</h3>
 
-                    <div class="cache-code" tabindex="-1">${escapeHTML(
-                        formatRecordsJS(cachedRecords)
-                    )}</div>
+                <div class="cache-code" tabindex="-1">${escapeHTML(
+                    formatRecordsJS(cachedRecords)
+                )}</div>
+
+                <div class="cache-actions" style="margin-top: 12px;">
+                    <button
+                        type="button"
+                        class="cache-action"
+                        id="cache-simplify-btn"
+                        tabindex="-1"
+                    >
+                        Simplify Records
+                    </button>
                 </div>
+            </div>
             `;
 
             container.innerHTML = html;
@@ -5953,6 +5964,13 @@ function setupTeacherStudentSearch() {
                 );
 
             document
+                .getElementById("cache-simplify-btn")
+                .addEventListener(
+                    "click",
+                    simplifyCachedRecords
+                );
+
+            document
                 .getElementById(
                     "cache-copy-btn"
                 )
@@ -5993,6 +6011,75 @@ function setupTeacherStudentSearch() {
                     }
                 );
         }
+
+function simplifyCachedRecords() {
+    let changedCount = 0;
+
+    cachedRecords.forEach(record => {
+        if (!Array.isArray(record.termsToReview)) {
+            return;
+        }
+
+        const simplified = [];
+        const seen = new Set();
+
+        record.termsToReview.forEach(entry => {
+            let term = "";
+
+            if (typeof entry === "string") {
+                term = entry.trim();
+            } else if (
+                entry &&
+                typeof entry === "object"
+            ) {
+                // Prefer the original item/term name.
+                // Fall back to other available fields.
+                const possibleNames = [
+                    entry.item,
+                    entry.term,
+                    entry.correct,
+                    entry.name
+                ];
+
+                term = String(
+                    possibleNames.find(value =>
+                        typeof value === "string" &&
+                        value.trim()
+                    ) || ""
+                ).trim();
+            }
+
+            if (!term) return;
+
+            const key = term.toLocaleLowerCase();
+
+            if (seen.has(key)) return;
+
+            seen.add(key);
+            simplified.push(term);
+        });
+
+        if (
+            JSON.stringify(record.termsToReview) !==
+            JSON.stringify(simplified)
+        ) {
+            record.termsToReview = simplified;
+            changedCount++;
+        }
+    });
+
+    if (changedCount > 0) {
+        saveCachedRecords();
+    }
+
+    renderCachePanel();
+
+    showToast(
+        changedCount > 0
+            ? `Simplified terms in ${changedCount} record${changedCount === 1 ? "" : "s"}`
+            : "Records are already simplified"
+    );
+}
 
         function exportCachedRecords() {
             const contents = formatRecordsJS(cachedRecords);
