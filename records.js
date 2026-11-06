@@ -1413,7 +1413,7 @@ const records = [
         time: "11:01 AM",
         percentage: 60,
         exercise: "Ear Training – All Intervals",
-        termsToReview: ["Tritone","Minor 6th","Major 6th","Tritone"]
+        termsToReview: ["Tritone","Minor 6th","Major 6th"]
     },
     {
         student: "Alex",
@@ -1813,7 +1813,7 @@ const records = [
         time: "10:49 am",
         percentage: 90,
         exercise: "Ear Training – All Intervals",
-        termsToReview: [{"item":"Q4","correct":"Major 7th"}]
+        termsToReview: ["Q4"]
     },
     {
         student: "Calvin",
@@ -1829,7 +1829,7 @@ const records = [
         time: "上午10:56",
         percentage: 80,
         exercise: "Ear Training – All Intervals",
-        termsToReview: [{"item":"Q1","correct":"Minor 6th"},{"item":"Q7","correct":"Perfect 5th"}]
+        termsToReview: ["Q1","Q7"]
     },
     {
         student: "Jocelyn",
@@ -1861,7 +1861,7 @@ const records = [
         time: "10:47 AM",
         percentage: 90,
         exercise: "Ear Training – All Intervals",
-        termsToReview: [{"item":"Q5","correct":"Minor 6th"}]
+        termsToReview: ["Q5"]
     },
     {
         student: "Teresa",
@@ -1877,7 +1877,7 @@ const records = [
         time: "上午10:49",
         percentage: 90,
         exercise: "Ear Training – All Intervals",
-        termsToReview: [{"item":"Q3","correct":"Major 3rd"}]
+        termsToReview: ["Q3"]
     },
     {
         student: "Thomas",
@@ -1901,7 +1901,7 @@ const records = [
         time: "10:48 AM",
         percentage: 80,
         exercise: "Ear Training – All Intervals",
-        termsToReview: [{"item":"Q7","correct":"Minor 3rd"},{"item":"Q10","correct":"Minor 7th"}]
+        termsToReview: ["Q7","Q10"]
     },
     {
         student: "Maggie",
@@ -1917,7 +1917,7 @@ const records = [
         time: "10:46 AM",
         percentage: 80,
         exercise: "Ear Training – All Intervals",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Major 6th","correct":"Major 6th"}]
+        termsToReview: ["Minor 6th","Major 6th"]
     },
     {
         student: "Teresa",
@@ -1933,7 +1933,7 @@ const records = [
         time: "上午10:51",
         percentage: 70,
         exercise: "Ear Training – All Intervals",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Perfect 5th","correct":"Perfect 5th"}]
+        termsToReview: ["Minor 7th","Perfect 5th"]
     },
     {
         student: "Alex",
@@ -1981,7 +1981,7 @@ const records = [
         time: "上午10:57",
         percentage: 80,
         exercise: "Ear Training – All Intervals",
-        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Major 6th","Minor 7th"]
     },
     {
         student: "Thomas",
@@ -1997,7 +1997,7 @@ const records = [
         time: "10:50 AM",
         percentage: 40,
         exercise: "Ear Training – All Intervals",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Minor 7th","Minor 3rd","Minor 6th","Perfect 4th","Major 7th"]
     },
     {
         student: "Maggie",
@@ -2149,7 +2149,7 @@ const records = [
         time: "10:50 AM",
         percentage: 70,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Minor 6th","correct":"Minor 6th"}]
+        termsToReview: ["Minor 7th","Major 7th","Minor 6th"]
     },
     {
         student: "William",
@@ -2165,7 +2165,7 @@ const records = [
         time: "10:59 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Major 2nd","correct":"Major 2nd"}]
+        termsToReview: ["Major 6th","Major 2nd"]
     },
     {
         student: "Thomas",
@@ -2181,7 +2181,7 @@ const records = [
         time: "10:48 AM",
         percentage: 70,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Perfect 8ve","correct":"Perfect 8ve"}]
+        termsToReview: ["Minor 6th","Perfect 8ve"]
     },
     {
         student: "Maggie",
@@ -2213,7 +2213,7 @@ const records = [
         time: "10:48 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 6th","correct":"Major 6th"}]
+        termsToReview: ["Major 3rd","Major 6th"]
     },
     {
         student: "Jocelyn",
@@ -2229,7 +2229,7 @@ const records = [
         time: "10:51 AM",
         percentage: 90,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Minor 7th"]
     },
     {
         student: "Alex",
@@ -2277,7 +2277,7 @@ const records = [
         time: "10:46 AM",
         percentage: 90,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"}]
+        termsToReview: ["Major 3rd"]
     },
     {
         student: "Thomas",
@@ -2293,7 +2293,7 @@ const records = [
         time: "10:47 AM",
         percentage: 50,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 8ve","correct":"Perfect 8ve"},{"item":"Tritone","correct":"Tritone"},{"item":"Minor 6th","correct":"Minor 6th"}]
+        termsToReview: ["Perfect 8ve","Tritone","Minor 6th"]
     },
     {
         student: "William",
@@ -2309,7 +2309,7 @@ const records = [
         time: "10:50 AM",
         percentage: 60,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 2nd","correct":"Major 2nd"},{"item":"Minor 6th","correct":"Minor 6th"}]
+        termsToReview: ["Perfect 4th","Major 3rd","Major 2nd","Minor 6th"]
     },
     {
         student: "Alex",
@@ -2693,7 +2693,7 @@ const records = [
         time: "上午10:49",
         percentage: 90,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 6th","correct":"Major 6th"}]
+        termsToReview: ["Major 6th"]
     },
     {
         student: "Thomas",
@@ -2709,7 +2709,7 @@ const records = [
         time: "10:49 AM",
         percentage: 60,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Major 6th","correct":"Major 6th"}]
+        termsToReview: ["Major 7th","Major 6th"]
     },
     {
         student: "William",
@@ -2725,7 +2725,7 @@ const records = [
         time: "10:58 AM",
         percentage: 70,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Perfect 4th","correct":"Perfect 4th"}]
+        termsToReview: ["Minor 6th","Minor 2nd","Perfect 4th"]
     },
     {
         student: "Teresa",
@@ -2733,7 +2733,7 @@ const records = [
         time: "上午10:49",
         percentage: 80,
         exercise: "Vocab",
-        termsToReview: [{"term":"Glissando","definition":"To quickly slide from a low note to a high note, or vice versa"},{"term":"Maestoso","definition":"To be played majestically, by accenting every note (bouncy)"}]
+        termsToReview: ["Glissando","Maestoso"]
     },
     {
         student: "Teresa",
@@ -2741,7 +2741,7 @@ const records = [
         time: "上午10:50",
         percentage: 90,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 6th","correct":"Major 6th"}]
+        termsToReview: ["Major 6th"]
     },
     {
         student: "Teresa",
@@ -2757,7 +2757,7 @@ const records = [
         time: "上午10:53",
         percentage: 90,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Minor 7th"]
     },
     {
         student: "Calvin",
@@ -2821,7 +2821,7 @@ const records = [
         time: "上午10:57",
         percentage: 90,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Major 7th"]
     },
     {
         student: "Jocelyn",
@@ -2885,7 +2885,7 @@ const records = [
         time: "10:49 AM",
         percentage: 90,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Major 7th"]
     },
     {
         student: "William",
@@ -2901,7 +2901,7 @@ const records = [
         time: "10:51 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Minor 6th","Major 7th"]
     },
     {
         student: "Alex",
@@ -3269,7 +3269,7 @@ const records = [
         time: "10:56 AM",
         percentage: 50,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Major 3rd","Major 7th","Minor 6th","Minor 7th"]
     },
     {
         student: "Alex",
@@ -3445,7 +3445,7 @@ const records = [
         time: "10:54 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Tritone","correct":"Tritone"},{"item":"Minor Triad","correct":"Minor Triad"}]
+        termsToReview: ["Minor 6th","Tritone","Minor Triad"]
     },
     {
         student: "Jocelyn",
@@ -3461,7 +3461,7 @@ const records = [
         time: "10:50 AM",
         percentage: 90,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Tritone"]
     },
     {
         student: "Jocelyn",
@@ -3525,7 +3525,7 @@ const records = [
         time: "10:45 AM",
         percentage: 90,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Minor 7th"]
     },
     {
         student: "Teresa",
@@ -3541,7 +3541,7 @@ const records = [
         time: "10:48 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Minor 7th"]
     },
     {
         student: "Thomas",
@@ -3557,7 +3557,7 @@ const records = [
         time: "10:51 AM",
         percentage: 70,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Perfect 8ve","correct":"Perfect 8ve"}]
+        termsToReview: ["Major 7th","Perfect 8ve"]
     },
     {
         student: "Thomas",
@@ -3573,7 +3573,7 @@ const records = [
         time: "10:49 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Minor Triad","correct":"Minor Triad"}]
+        termsToReview: ["Tritone","Minor Triad"]
     },
     {
         student: "Alex",
@@ -3605,7 +3605,7 @@ const records = [
         time: "10:49 AM",
         percentage: 70,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Tritone","Major 7th"]
     },
     {
         student: "Calvin",
@@ -3621,7 +3621,7 @@ const records = [
         time: "10:49 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Minor 6th","Tritone"]
     },
     {
         student: "Jocelyn",
@@ -3637,7 +3637,7 @@ const records = [
         time: "10:49 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Minor 6th","Tritone"]
     },
     {
         student: "Jocelyn",
@@ -3733,7 +3733,7 @@ const records = [
         time: "10:49 AM",
         percentage: 60,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Tritone","correct":"Tritone"},{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Perfect 4th","Tritone","Minor 2nd","Minor 7th"]
     },
     {
         student: "Calvin",
@@ -3949,7 +3949,7 @@ const records = [
         time: "10:53 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Tritone"]
     },
     {
         student: "Jocelyn",
@@ -3965,7 +3965,7 @@ const records = [
         time: "10:52 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Tritone"]
     },
     {
         student: "Maggie",
@@ -4013,7 +4013,7 @@ const records = [
         time: "10:55 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Major 7th"]
     },
     {
         student: "William",
@@ -4029,7 +4029,7 @@ const records = [
         time: "10:49 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Tritone"]
     },
     {
         student: "Alex",
@@ -4077,7 +4077,7 @@ const records = [
         time: "10:46 AM",
         percentage: 67,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Minor Triad","correct":"Minor Triad"}]
+        termsToReview: ["Minor 6th","Perfect 5th","Augmented Triad","Diminished Triad","Minor Triad"]
     },
     {
         student: "Calvin",
@@ -4093,7 +4093,7 @@ const records = [
         time: "上午10:55",
         percentage: 73,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Augmented Triad","correct":"Augmented Triad"}]
+        termsToReview: ["Minor 7th","Minor 6th","Major 7th","Augmented Triad"]
     },
     {
         student: "Jocelyn",
@@ -4125,7 +4125,7 @@ const records = [
         time: "10:48 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Tritone"]
     },
     {
         student: "Maggie",
@@ -4189,7 +4189,7 @@ const records = [
         time: "10:50 AM",
         percentage: 67,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 8ve","correct":"Perfect 8ve"},{"item":"Tritone","correct":"Tritone"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Augmented Triad","correct":"Augmented Triad"}]
+        termsToReview: ["Perfect 8ve","Tritone","Major 3rd","Augmented Triad"]
     },
     {
         student: "Thomas",
@@ -4205,7 +4205,7 @@ const records = [
         time: "10:49 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Tritone","correct":"Tritone"},{"item":"Diminished Triad","correct":"Diminished Triad"}]
+        termsToReview: ["Major 3rd","Tritone","Diminished Triad"]
     },
     {
         student: "William",
@@ -4221,7 +4221,7 @@ const records = [
         time: "10:55 AM",
         percentage: 67,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor Triad","correct":"Minor Triad"}]
+        termsToReview: ["Major 7th","Major 3rd","Minor 7th","Minor Triad"]
     },
     {
         student: "Thomas",
@@ -4325,7 +4325,7 @@ const records = [
         time: "10:48 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Tritone","correct":"Tritone"},{"item":"Augmented Triad","correct":"Augmented Triad"}]
+        termsToReview: ["Perfect 5th","Tritone","Augmented Triad"]
     },
     {
         student: "Jocelyn",
@@ -4357,7 +4357,7 @@ const records = [
         time: "10:50 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Tritone"]
     },
     {
         student: "Teresa",
@@ -4389,7 +4389,7 @@ const records = [
         time: "10:52 AM",
         percentage: 73,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Major 7th","Tritone"]
     },
     {
         student: "William",
@@ -4405,7 +4405,7 @@ const records = [
         time: "10:48 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Diminished Triad","correct":"Diminished Triad"}]
+        termsToReview: ["Major 3rd","Minor 3rd","Diminished Triad"]
     },
     {
         student: "William",
@@ -4437,7 +4437,7 @@ const records = [
         time: "10:48 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 6th","correct":"Major 6th"}]
+        termsToReview: ["Major 6th"]
     },
     {
         student: "Jocelyn",
@@ -4501,7 +4501,7 @@ const records = [
         time: "10:51 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Perfect 4th","Tritone"]
     },
     {
         student: "Thomas",
@@ -4517,7 +4517,7 @@ const records = [
         time: "10:49 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor Triad","correct":"Minor Triad"},{"item":"Augmented Triad","correct":"Augmented Triad"}]
+        termsToReview: ["Minor Triad","Augmented Triad"]
     },
     {
         student: "William",
@@ -4525,7 +4525,7 @@ const records = [
         time: "10:54 AM",
         percentage: 80,
         exercise: "Vocab",
-        termsToReview: [{"term":"Basso Continuo","definition":"The instrument(s) responsible for providing accompaniment in baroque music"},{"term":"Figured Bass","definition":"The practice of only writing the bass note and inversion symbols"}]
+        termsToReview: ["Basso Continuo","Figured Bass"]
     },
     {
         student: "William",
@@ -4533,7 +4533,7 @@ const records = [
         time: "10:52 AM",
         percentage: 73,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Tritone","correct":"Tritone"},{"item":"Diminished Triad","correct":"Diminished Triad"}]
+        termsToReview: ["Minor 3rd","Tritone","Diminished Triad"]
     },
     {
         student: "Alex",
@@ -5602,7 +5602,7 @@ const records = [
         time: "10:45 AM",
         percentage: 60,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Minor 7","correct":"Minor 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Major 3rd","Diminished Triad","Minor 7","Half-Diminished 7"]
     },
     {
         student: "Maggie",
@@ -5618,7 +5618,7 @@ const records = [
         time: "10:49 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Diminished 7","correct":"Diminished 7"}]
+        termsToReview: ["Diminished 7"]
     },
     {
         student: "Teresa",
@@ -5650,7 +5650,7 @@ const records = [
         time: "10:50 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Minor 7"]
     },
     {
         student: "Jocelyn",
@@ -5682,7 +5682,7 @@ const records = [
         time: "10:52 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Tritone","Major 7th"]
     },
     {
         student: "Alex",
@@ -5754,7 +5754,7 @@ const records = [
         time: "10:47 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Tritone"]
     },
     {
         student: "Thomas",
@@ -5778,7 +5778,7 @@ const records = [
         time: "10:43 AM",
         percentage: 80,
         exercise: "Vocab",
-        termsToReview: [{"term":"Counterpoint","definition":"The art of writing multiple melodies"},{"term":"Leitmotif","definition":"The practice of assigning themes and melodies to specific characters"}]
+        termsToReview: ["Counterpoint","Leitmotif"]
     },
     {
         student: "Calvin",
@@ -5786,7 +5786,7 @@ const records = [
         time: "10:48 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Tritone","correct":"Tritone"}]
+        termsToReview: ["Major 7th","Tritone"]
     },
     {
         student: "Jocelyn",
@@ -5802,7 +5802,7 @@ const records = [
         time: "10:53 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Minor 7th","Diminished 7","Half-Diminished 7"]
     },
     {
         student: "William",
@@ -5818,7 +5818,7 @@ const records = [
         time: "10:58 AM",
         percentage: 67,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Tritone","Minor 6th","Diminished Triad","Diminished 7","Half-Diminished 7"]
     },
     {
         student: "Calvin",
@@ -6082,7 +6082,7 @@ const records = [
         time: "10:49 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Augmented Triad","correct":"Augmented Triad"}]
+        termsToReview: ["Tritone","Augmented Triad"]
     },
     {
         student: "Maggie",
@@ -6098,7 +6098,7 @@ const records = [
         time: "10:52 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Diminished 7","correct":"Diminished 7"}]
+        termsToReview: ["Diminished 7"]
     },
     {
         student: "Teresa",
@@ -6114,7 +6114,7 @@ const records = [
         time: "11:02 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Diminished 7","Half-Diminished 7"]
     },
     {
         student: "William",
@@ -6130,7 +6130,7 @@ const records = [
         time: "10:47 AM",
         percentage: 53,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Minor 7","correct":"Minor 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"},{"item":"Dominant 7","correct":"Dominant 7"},{"item":"Diminished 7","correct":"Diminished 7"}]
+        termsToReview: ["Perfect 4th","Perfect 5th","Minor 7","Half-Diminished 7","Dominant 7","Diminished 7"]
     },
     {
         student: "Teresa",
@@ -6281,14 +6281,6 @@ const records = [
         date: "2026-10-23",
         time: "8:15 PM",
         percentage: 67,
-        exercise: "Sight Singing",
-        termsToReview: []
-    },
-    {
-        student: "Jocelyn",
-        date: "2026-10-21",
-        time: "8:55 PM",
-        percentage: 93,
         exercise: "Sight Singing",
         termsToReview: []
     },
@@ -6450,7 +6442,7 @@ const records = [
         time: "10:50 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Major 6th","correct":"Major 6th"}]
+        termsToReview: ["Minor 6th","Perfect 5th","Major 6th"]
     },
     {
         student: "Thomas",
@@ -6466,7 +6458,7 @@ const records = [
         time: "10:50 AM",
         percentage: 67,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"},{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Perfect 4th","Minor 2nd","Major 7th","Half-Diminished 7","Minor 7"]
     },
     {
         student: "Maggie",
@@ -6482,7 +6474,7 @@ const records = [
         time: "10:53 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Diminished 7","correct":"Diminished 7"}]
+        termsToReview: ["Major 7th","Diminished 7"]
     },
     {
         student: "William",
@@ -6498,7 +6490,7 @@ const records = [
         time: "10:54 AM",
         percentage: 74,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor 2nd","correct":"Minor 2nd"}]
+        termsToReview: ["Minor 6th","Minor 7th","Minor 2nd"]
     },
     {
         student: "Alex",
@@ -6514,7 +6506,7 @@ const records = [
         time: "10:55 AM",
         percentage: 100,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Major 7th"]
     },
     {
         student: "Teresa",
@@ -6530,7 +6522,7 @@ const records = [
         time: "10:55 AM",
         percentage: 100,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Dominant 7","correct":"Dominant 7"}]
+        termsToReview: ["Dominant 7"]
     },
     {
         student: "Jocelyn",
@@ -6538,7 +6530,7 @@ const records = [
         time: "10:53 AM",
         percentage: 80,
         exercise: "Vocab",
-        termsToReview: [{"term":"Perfect Authentic Cadence","definition":"An authentic cadence w/ both chords in root position, soprano ends on tonic"},{"term":"Plagal Cadence","definition":"A cadence from the subdominant (IV) to tonic (I)"}]
+        termsToReview: ["Perfect Authentic Cadence","Plagal Cadence"]
     },
     {
         student: "Jocelyn",
@@ -6546,7 +6538,7 @@ const records = [
         time: "10:56 AM",
         percentage: 94,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Perfect 8ve","correct":"Perfect 8ve"}]
+        termsToReview: ["Major 6th","Perfect 8ve"]
     },
     {
         student: "Alex",
@@ -6626,7 +6618,7 @@ const records = [
         time: "10:55 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Perfect 4th","Minor 7th","Minor 7"]
     },
     {
         student: "Thomas",
@@ -6642,7 +6634,7 @@ const records = [
         time: "10:57 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Major 2nd","correct":"Major 2nd"}]
+        termsToReview: ["Tritone","Major 2nd"]
     },
     {
         student: "Teresa",
@@ -6658,7 +6650,7 @@ const records = [
         time: "10:56 AM",
         percentage: 94,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Major 7th","Minor 7th"]
     },
     {
         student: "Maggie",
@@ -6674,7 +6666,7 @@ const records = [
         time: "10:52 AM",
         percentage: 100,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Major 7th"]
     },
     {
         student: "William",
@@ -6690,7 +6682,7 @@ const records = [
         time: "10:53 AM",
         percentage: 67,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Perfect 5th","Perfect 4th","Major 7th","Diminished Triad","Half-Diminished 7"]
     },
     {
         student: "Jocelyn",
@@ -6706,7 +6698,7 @@ const records = [
         time: "10:55 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 2nd","correct":"Major 2nd"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Major 2nd","Minor 6th","Minor 2nd","Minor 7"]
     },
     {
         student: "Alex",
@@ -6722,7 +6714,7 @@ const records = [
         time: "10:54 AM",
         percentage: 100,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 3rd","correct":"Minor 3rd"}]
+        termsToReview: ["Minor 3rd"]
     },
     {
         student: "Maggie",
@@ -6738,7 +6730,7 @@ const records = [
         time: "10:58 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Major 6th","Half-Diminished 7"]
     },
     {
         student: "Jocelyn",
@@ -6770,7 +6762,7 @@ const records = [
         time: "11:11 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Major 3rd","Minor 3rd","Minor 7"]
     },
     {
         student: "Calvin",
@@ -6786,7 +6778,7 @@ const records = [
         time: "10:59 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Tritone","correct":"Tritone"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Major 3rd","correct":"Major 3rd"}]
+        termsToReview: ["Tritone","Minor 3rd","Major 3rd"]
     },
     {
         student: "Teresa",
@@ -6802,7 +6794,7 @@ const records = [
         time: "11:00 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Diminished 7","correct":"Diminished 7"}]
+        termsToReview: ["Diminished 7"]
     },
     {
         student: "William",
@@ -6818,7 +6810,7 @@ const records = [
         time: "10:59 AM",
         percentage: 53,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 7th","correct":"Major 7th"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Perfect 8ve","correct":"Perfect 8ve"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Perfect 4th","Major 7th","Minor 3rd","Perfect 8ve","Minor 6th","Diminished Triad","Minor 7"]
     },
     {
         student: "Alex",
@@ -6850,7 +6842,7 @@ const records = [
         time: "10:51 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Minor 3rd","Minor 7"]
     },
     {
         student: "Thomas",
@@ -6866,7 +6858,7 @@ const records = [
         time: "10:52 AM",
         percentage: 67,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Major 6th","correct":"Major 6th"},{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Diminished 7","correct":"Diminished 7"}]
+        termsToReview: ["Minor 7th","Major 6th","Perfect 4th","Major 3rd","Diminished 7"]
     },
     {
         student: "Calvin",
@@ -6882,7 +6874,7 @@ const records = [
         time: "10:48 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 2nd","correct":"Major 2nd"}]
+        termsToReview: ["Major 3rd","Major 2nd"]
     },
     {
         student: "Teresa",
@@ -6898,7 +6890,7 @@ const records = [
         time: "10:50 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 7th","correct":"Major 7th"}]
+        termsToReview: ["Major 3rd","Major 7th"]
     },
     {
         student: "Maggie",
@@ -6914,7 +6906,7 @@ const records = [
         time: "10:48 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Diminished 7","correct":"Diminished 7"}]
+        termsToReview: ["Diminished 7"]
     },
     {
         student: "William",
@@ -6930,7 +6922,7 @@ const records = [
         time: "10:46 AM",
         percentage: 60,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Minor 7","correct":"Minor 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Minor 7th","Minor 6th","Diminished Triad","Minor 7","Half-Diminished 7"]
     },
     {
         student: "Calvin",
@@ -7061,7 +7053,7 @@ const records = [
         curvedPercentage: 100,
         curveApplied: true,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Diminished Triad","correct":"Diminished Triad"}]
+        termsToReview: ["Diminished Triad"]
     },
     {
         student: "Maggie",
@@ -7080,7 +7072,7 @@ const records = [
         curvedPercentage: 80,
         curveApplied: true,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"},{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Minor 3rd","Augmented Triad","Half-Diminished 7","Minor 7"]
     },
     {
         student: "William",
@@ -7099,7 +7091,7 @@ const records = [
         curvedPercentage: 67,
         curveApplied: true,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor Triad","correct":"Minor Triad"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Perfect 4th","Minor 3rd","Minor Triad","Diminished Triad","Half-Diminished 7"]
     },
     {
         student: "Thomas",
@@ -7118,7 +7110,7 @@ const records = [
         curvedPercentage: 87,
         curveApplied: true,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 2nd","correct":"Major 2nd"},{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Major 3rd","Major 2nd","Minor 7th"]
     },
     {
         student: "Calvin",
@@ -7137,7 +7129,7 @@ const records = [
         curvedPercentage: 80,
         curveApplied: true,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Minor 7th","Perfect 4th","Augmented Triad","Minor 7"]
     },
     {
         student: "Teresa",
@@ -7156,7 +7148,7 @@ const records = [
         curvedPercentage: 94,
         curveApplied: true,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Dominant 7","correct":"Dominant 7"}]
+        termsToReview: ["Minor 7th","Dominant 7"]
     },
     {
         student: "Jocelyn",
@@ -7175,7 +7167,7 @@ const records = [
         curvedPercentage: 80,
         curveApplied: true,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Minor Triad","correct":"Minor Triad"},{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Minor 3rd","Minor Triad","Diminished 7","Half-Diminished 7"]
     },
     {
         student: "William",
@@ -7191,7 +7183,7 @@ const records = [
         time: "10:54 AM",
         percentage: 67,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Major 6th","correct":"Major 6th"},{"item":"Minor 3rd","correct":"Minor 3rd"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Dominant 7","correct":"Dominant 7"}]
+        termsToReview: ["Perfect 4th","Major 6th","Minor 3rd","Augmented Triad","Dominant 7"]
     },
     {
         student: "Maggie",
@@ -7207,7 +7199,7 @@ const records = [
         time: "10:53 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Minor 7th","correct":"Minor 7th"}]
+        termsToReview: ["Minor 2nd","Minor 7th"]
     },
     {
         student: "Thomas",
@@ -7215,7 +7207,7 @@ const records = [
         time: "10:48 AM",
         percentage: 80,
         exercise: "Vocab",
-        termsToReview: [{"term":"Active / Tendency Tones","definition":"Voices that should resolve in certain ways (i.e. in a V7 chord, the 7th↘︎, 3rd ↗︎)"},{"term":"Glissando","definition":"To quickly slide from a low note to a high note, or vice versa"}]
+        termsToReview: ["Active / Tendency Tones","Glissando"]
     },
     {
         student: "Thomas",
@@ -7223,7 +7215,7 @@ const records = [
         time: "10:53 AM",
         percentage: 73,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 2nd","correct":"Major 2nd"},{"item":"Major 6th","correct":"Major 6th"},{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Major 2nd","Major 6th","Diminished Triad","Half-Diminished 7"]
     },
     {
         student: "Teresa",
@@ -7239,7 +7231,7 @@ const records = [
         time: "10:49 AM",
         percentage: 93,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 6th","correct":"Major 6th"}]
+        termsToReview: ["Major 6th"]
     },
     {
         student: "Alex",
@@ -7271,7 +7263,7 @@ const records = [
         time: "10:48 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Major 6th","correct":"Major 6th"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Minor 7th","Major 6th","Half-Diminished 7"]
     },
     {
         student: "Jocelyn",
@@ -7287,7 +7279,7 @@ const records = [
         time: "10:55 AM",
         percentage: 73,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Diminished 7","correct":"Diminished 7"}]
+        termsToReview: ["Major 3rd","Minor 6th","Augmented Triad","Diminished 7"]
     },
     {
         student: "Jocelyn",
@@ -7534,7 +7526,7 @@ const records = [
         time: "10:47 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Minor 2nd","correct":"Minor 2nd"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Minor 7","correct":"Minor 7"}]
+        termsToReview: ["Minor 2nd","Augmented Triad","Minor 7"]
     },
     {
         student: "Calvin",
@@ -7550,7 +7542,7 @@ const records = [
         time: "10:48 AM",
         percentage: 73,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Major 3rd","correct":"Major 3rd"},{"item":"Major 7","correct":"Major 7"}]
+        termsToReview: ["Perfect 5th","Minor 7th","Major 3rd","Major 7"]
     },
     {
         student: "Jocelyn",
@@ -7566,7 +7558,7 @@ const records = [
         time: "10:57 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Diminished Triad","Half-Diminished 7"]
     },
     {
         student: "Maggie",
@@ -7598,7 +7590,7 @@ const records = [
         time: "10:53 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Diminished 7","correct":"Diminished 7"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Diminished 7","Half-Diminished 7"]
     },
     {
         student: "Thomas",
@@ -7614,7 +7606,7 @@ const records = [
         time: "10:50 AM",
         percentage: 73,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Diminished Triad","correct":"Diminished Triad"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"}]
+        termsToReview: ["Diminished Triad","Augmented Triad","Half-Diminished 7"]
     },
     {
         student: "William",
@@ -7630,128 +7622,7 @@ const records = [
         time: "10:46 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 6th","correct":"Major 6th"},{"item":"Half-Diminished 7","correct":"Half-Diminished 7"},{"item":"Dominant 7","correct":"Dominant 7"}]
-    },
-    {
-        student: "Teresa",
-        date: "2026-10-30",
-        time: "8:47 PM",
-        percentage: 60,
-        originalPercentage: 50,
-        curvedPercentage: 60,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "William",
-        date: "2026-10-30",
-        time: "8:47 PM",
-        percentage: 100,
-        originalPercentage: 90,
-        curvedPercentage: 100,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Thomas",
-        date: "2026-10-30",
-        time: "8:48 PM",
-        percentage: 90,
-        originalPercentage: 80,
-        curvedPercentage: 90,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Maggie",
-        date: "2026-10-30",
-        time: "8:48 PM",
-        percentage: 90,
-        originalPercentage: 80,
-        curvedPercentage: 90,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Thomas",
-        date: "2026-11-03",
-        time: "8:48 PM",
-        percentage: 72,
-        originalPercentage: 43,
-        curvedPercentage: 72,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Jocelyn",
-        date: "2026-11-03",
-        time: "8:48 PM",
-        percentage: 72,
-        originalPercentage: 43,
-        curvedPercentage: 72,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Teresa",
-        date: "2026-11-03",
-        time: "8:49 PM",
-        percentage: 72,
-        originalPercentage: 43,
-        curvedPercentage: 72,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "William",
-        date: "2026-11-03",
-        time: "8:49 PM",
-        percentage: 100,
-        originalPercentage: 71,
-        curvedPercentage: 100,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Maggie",
-        date: "2026-11-03",
-        time: "8:49 PM",
-        percentage: 100,
-        originalPercentage: 71,
-        curvedPercentage: 100,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Alex",
-        date: "2026-11-03",
-        time: "8:49 PM",
-        percentage: 100,
-        originalPercentage: 71,
-        curvedPercentage: 100,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
-    },
-    {
-        student: "Calvin",
-        date: "2026-11-03",
-        time: "8:49 PM",
-        percentage: 86,
-        originalPercentage: 57,
-        curvedPercentage: 86,
-        curveApplied: true,
-        exercise: "MCQs",
-        termsToReview: []
+        termsToReview: ["Major 6th","Half-Diminished 7","Dominant 7"]
     },
     {
         student: "Thomas",
@@ -7823,7 +7694,7 @@ const records = [
         time: "10:49 AM",
         percentage: 87,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Minor Triad","correct":"Minor Triad"}]
+        termsToReview: ["Augmented Triad","Minor Triad"]
     },
     {
         student: "Calvin",
@@ -7839,7 +7710,7 @@ const records = [
         time: "10:49 AM",
         percentage: 67,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Perfect 5th","correct":"Perfect 5th"},{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Minor 6th","correct":"Minor 6th"},{"item":"Augmented Triad","correct":"Augmented Triad"},{"item":"Major Triad","correct":"Major Triad"}]
+        termsToReview: ["Perfect 5th","Perfect 4th","Minor 6th","Augmented Triad","Major Triad"]
     },
     {
         student: "Teresa",
@@ -7847,7 +7718,7 @@ const records = [
         time: "10:48 AM",
         percentage: 80,
         exercise: "Vocab",
-        termsToReview: [{"term":"Counterpoint","definition":"The art of writing multiple melodies"},{"term":"Doubling","definition":"Playing the same notes as another instrument (can be transposed up/down by octave)"}]
+        termsToReview: ["Counterpoint","Doubling"]
     },
     {
         student: "Teresa",
@@ -7855,7 +7726,7 @@ const records = [
         time: "10:49 AM",
         percentage: 80,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Perfect 4th","correct":"Perfect 4th"},{"item":"Diminished 7","correct":"Diminished 7"}]
+        termsToReview: ["Major 7th","Perfect 4th","Diminished 7"]
     },
     {
         student: "William",
@@ -7871,6 +7742,6 @@ const records = [
         time: "10:44 AM",
         percentage: 73,
         exercise: "Ear Training",
-        termsToReview: [{"item":"Major 7th","correct":"Major 7th"},{"item":"Minor 7th","correct":"Minor 7th"},{"item":"Augmented Triad","correct":"Augmented Triad"}]
+        termsToReview: ["Major 7th","Minor 7th","Augmented Triad"]
     },
 ];
