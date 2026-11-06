@@ -1060,15 +1060,30 @@
             }
             return dateText || timeText;
         }
+        
         function formatRecordDescription(record) {
             const exercise = normalizeExercise(record.exercise);
+
             const assessment =
                 exercise === "Major Assessment" && record.assessment
                     ? ` · ${record.assessment}`
                     : "";
+
             const timestamp = formatCacheTimestamp(record);
-            return `${record.student} · ${exercise}${assessment} · ${record.percentage}%${timestamp ? ` (${timestamp})` : ""}`;
+
+            const curveNote =
+                record.curveApplied &&
+                Number.isFinite(Number(record.curveAmount))
+                    ? ` Curved +${
+                        Number.isInteger(Number(record.curveAmount))
+                            ? Number(record.curveAmount)
+                            : Number(record.curveAmount).toFixed(1)
+                    }%`
+                    : "";
+
+            return `${record.student} · ${exercise}${assessment} · ${record.percentage}%${timestamp ? ` (${timestamp})` : ""}${curveNote}`;
         }
+
                 function formatRecordsJS(recordsSource) {
             const lines = [
                 "const records = ["
@@ -5659,29 +5674,46 @@ function setupTeacherStudentSearch() {
                     }, 1600);
                 });
         }
+        
         function renderCachePanel() {
             const container =
                 document.getElementById(
                     "cache-panel"
                 );
+
             if (!container) return;
+
+            // Automatically remove duplicate assignments when
+            // every entry has the same valid percentage.
+            if (
+                typeof window.resolveIdenticalScoreDuplicates === "function"
+            ) {
+                window.resolveIdenticalScoreDuplicates();
+            }
+
             const missingFromCache =
                 getRecordsMissingFromCache();
+
             const missingFromActual =
                 getRecordsMissingFromActual();
+
             const recordWord = count =>
                 count === 1
                     ? "record"
                     : "records";
+
             let statusClass =
                 "current";
+
             let statusText =
                 "The cache is completely up-to-date with records.js.";
+
             if (
                 missingFromCache.length > 0 &&
                 missingFromActual.length > 0
             ) {
                 statusClass = "mixed";
+
                 statusText =
                     `The cache and records.js differ in both directions. ` +
                     `${missingFromCache.length} ` +
@@ -5690,32 +5722,39 @@ function setupTeacherStudentSearch() {
                     `and ${missingFromActual.length} ` +
                     `${recordWord(missingFromActual.length)} ` +
                     `are in the cache but not in records.js.`;
+
             } else if (
                 missingFromCache.length > 0
             ) {
                 statusClass = "behind";
+
                 statusText =
                     `The cache is missing ${missingFromCache.length} ` +
                     `${recordWord(missingFromCache.length)} ` +
                     `${missingFromCache.length === 1 ? "that exists" : "that exist"} ` +
                     `in records.js.`;
+
             } else if (
                 missingFromActual.length > 0
             ) {
                 statusClass = "ahead";
+
                 statusText =
                     `The cache contains ${missingFromActual.length} additional ` +
                     `${recordWord(missingFromActual.length)} ` +
                     `${missingFromActual.length === 1 ? "that is" : "that are"} ` +
                     `not currently in records.js.`;
             }
+
             let html = `
                 <div class="cache-status-card">
                     <h3>Records Cache</h3>
                     <div id="cache-curve-tools"></div>
+
                     <div class="cache-status ${statusClass}">
                         ${escapeHTML(statusText)}
                     </div>
+
                     <p style="color: rgba(255,255,255,0.78);">
                         Actual records.js:
                         <strong style="color:#fff;">
@@ -5723,6 +5762,7 @@ function setupTeacherStudentSearch() {
                         </strong>
                         ${recordWord(actualRecords.length)}
                     </p>
+
                     <p style="color: rgba(255,255,255,0.78);">
                         Browser cache:
                         <strong style="color:#fff;">
@@ -5731,14 +5771,17 @@ function setupTeacherStudentSearch() {
                         ${recordWord(cachedRecords.length)}
                     </p>
             `;
+
             if (missingFromActual.length > 0) {
                 html += `
                     <div class="cache-new-entries">
                         <h3>New in Cache</h3>
+
                         <p>
                             These entries are in the browser's
                             cached version but not in records.js:
                         </p>
+
                         <ul
                             class="cache-list"
                             style="list-style: none; padding-left: 0;"
@@ -5775,6 +5818,7 @@ function setupTeacherStudentSearch() {
                                             flex: 0 0 auto;
                                         "
                                     >×</button>
+
                                     <span>
                                         ${escapeHTML(
                                             formatRecordDescription(record)
@@ -5786,14 +5830,17 @@ function setupTeacherStudentSearch() {
                     </div>
                 `;
             }
+
             if (missingFromCache.length > 0) {
                 html += `
                     <div class="cache-missing-entries">
                         <h3>Missing From Cache</h3>
+
                         <p>
                             These entries exist in records.js
                             but are not currently in the browser cache:
                         </p>
+
                         <ul class="cache-list">
                             ${missingFromCache.map(record => `
                                 <li>
@@ -5806,6 +5853,7 @@ function setupTeacherStudentSearch() {
                     </div>
                 `;
             }
+
             html += `
                     <div class="cache-actions">
                         <button
@@ -5816,6 +5864,7 @@ function setupTeacherStudentSearch() {
                         >
                             Export Records
                         </button>
+
                         <button
                             type="button"
                             class="cache-action"
@@ -5824,6 +5873,7 @@ function setupTeacherStudentSearch() {
                         >
                             Copy Records
                         </button>
+
                         <button
                             type="button"
                             class="cache-action danger"
@@ -5834,15 +5884,20 @@ function setupTeacherStudentSearch() {
                         </button>
                     </div>
                 </div>
+
                 <div class="cache-status-card">
                     <h3>Cached records.js</h3>
+
                     <div class="cache-code" tabindex="-1">${escapeHTML(
                         formatRecordsJS(cachedRecords)
                     )}</div>
                 </div>
             `;
+
             container.innerHTML = html;
+
             window.renderCacheCurveTools?.();
+
             // Delete individual cache entries
             container
                 .querySelectorAll(
@@ -5855,15 +5910,16 @@ function setupTeacherStudentSearch() {
                             const encodedIdentity =
                                 button.dataset
                                     .recordIdentity;
-                            if (
-                                !encodedIdentity
-                            ) {
+
+                            if (!encodedIdentity) {
                                 return;
                             }
+
                             const identity =
                                 decodeURIComponent(
                                     encodedIdentity
                                 );
+
                             const index =
                                 cachedRecords.findIndex(
                                     record =>
@@ -5871,18 +5927,22 @@ function setupTeacherStudentSearch() {
                                             record
                                         ) === identity
                                 );
+
                             if (index === -1) {
                                 return;
                             }
+
                             cachedRecords.splice(
                                 index,
-1
+                                1
                             );
+
                             saveCachedRecords();
                             renderCachePanel();
                         }
                     );
                 });
+
             document
                 .getElementById(
                     "cache-export-btn"
@@ -5891,6 +5951,7 @@ function setupTeacherStudentSearch() {
                     "click",
                     exportCachedRecords
                 );
+
             document
                 .getElementById(
                     "cache-copy-btn"
@@ -5903,11 +5964,13 @@ function setupTeacherStudentSearch() {
                                 cachedRecords
                             )
                         );
+
                         showToast(
                             "Cached records.js copied"
                         );
                     }
                 );
+
             document
                 .getElementById(
                     "cache-overwrite-btn"
@@ -5919,8 +5982,10 @@ function setupTeacherStudentSearch() {
                             window.confirm(
                                 "Overwrite the browser cache with the current records.js? Any cached entries that are not in records.js will be removed."
                             );
+
                         if (confirmed) {
                             overwriteCacheWithActualRecords();
+
                             showToast(
                                 "Cache overwritten with records.js"
                             );
@@ -5928,6 +5993,7 @@ function setupTeacherStudentSearch() {
                     }
                 );
         }
+
         function exportCachedRecords() {
             const contents = formatRecordsJS(cachedRecords);
             const blob = new Blob(
@@ -9539,6 +9605,56 @@ function setupTeacherStudentSearch() {
                 String(a.entries[0].record.student).localeCompare(String(b.entries[0].record.student)));
     }
 
+    function resolveIdenticalScoreDuplicates() {
+    const groups = getDuplicateGroups(cachedRecords);
+    if (!groups.length) return false;
+
+    const removeIndexes = [];
+
+    groups.forEach(group => {
+        const scores = group.entries.map(entry => validScore(entry.record));
+
+        // Only automatically resolve groups where every score
+        // is valid and numerically identical.
+        if (
+            scores.some(score => score === null) ||
+            !scores.every(score => score === scores[0])
+        ) {
+            return;
+        }
+
+        // Keep the most complete record, preserving additional
+        // information such as curve data and terms to review.
+        const ranked = group.entries.slice().sort((a, b) => {
+            const aRecord = a.record;
+            const bRecord = b.record;
+
+            const aScore =
+                Object.keys(aRecord).length +
+                (aRecord.curveApplied ? 10 : 0);
+
+            const bScore =
+                Object.keys(bRecord).length +
+                (bRecord.curveApplied ? 10 : 0);
+
+            return bScore - aScore;
+        });
+
+        ranked.slice(1).forEach(entry => {
+            removeIndexes.push(entry.index);
+        });
+    });
+
+    if (!removeIndexes.length) return false;
+
+    removeIndexes
+        .sort((a, b) => b - a)
+        .forEach(index => cachedRecords.splice(index, 1));
+
+    saveCachedRecords();
+    return true;
+}
+
     function recordChoiceLabel(entry, number) {
         const record = entry.record;
         const score = validScore(record);
@@ -9815,6 +9931,8 @@ function setupTeacherStudentSearch() {
         }
     }
     window.renderCacheCurveTools = render;
+    window.resolveIdenticalScoreDuplicates =
+    resolveIdenticalScoreDuplicates;
 })();
 </script>
 </body>
