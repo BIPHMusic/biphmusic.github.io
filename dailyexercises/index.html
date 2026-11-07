@@ -333,6 +333,41 @@
 .daily-navigation-actions .daily-navigation-leave:hover {
   background: rgba(244,67,54,.9);
 }
+
+/* ==================== SHARE SUCCESS CONFIRMATION ==================== */
+#daily-share-success-modal {
+  position: fixed; inset: 0; z-index: 30000; display: none;
+  align-items: center; justify-content: center; padding: 20px;
+  box-sizing: border-box; background: rgba(0,0,0,.72);
+}
+#daily-share-success-modal.visible { display: flex; }
+.daily-share-success-dialog {
+  position: relative; width: min(92vw, 480px); box-sizing: border-box;
+  padding: 34px 28px 26px; border: 1px solid rgba(255,255,255,.25);
+  border-radius: 12px; background: rgba(35,55,95,.99); color: #fff;
+  text-align: center; box-shadow: 0 20px 70px rgba(0,0,0,.45);
+}
+.daily-share-success-dialog p { margin: 0; font-size: 1.12rem; line-height: 1.5; }
+.daily-share-success-close {
+  position: absolute; top: 8px; right: 10px; width: 36px; height: 36px;
+  border: 0; border-radius: 50%; background: transparent; color: #fff;
+  font-size: 1.65rem; line-height: 1; cursor: pointer;
+}
+.daily-share-success-close:hover { background: rgba(255,255,255,.14); }
+.daily-share-success-actions {
+  display: flex; justify-content: center; gap: 12px; margin-top: 24px;
+}
+.daily-share-success-actions button {
+  min-width: 105px; padding: 10px 22px; border: 1px solid rgba(255,255,255,.3);
+  border-radius: 6px; background: rgba(255,255,255,.14); color: #fff;
+  font-size: 1rem; cursor: pointer;
+}
+.daily-share-success-actions button:hover { background: rgba(255,255,255,.25); }
+.daily-share-success-actions #dailyShareSuccessYes { background: rgba(46,125,82,.9); }
+.daily-share-success-actions #dailyShareSuccessYes:hover { background: rgba(46,145,92,1); }
+
+/* Keep the full shared menu above the countdown overlay. */
+#shared-menu {  z-index: 10002; pointer-events: auto; }
 </style>
 <style id="exercise-style"></style>
 </head>
@@ -347,6 +382,18 @@
     <div class="daily-navigation-actions">
       <button type="button" id="dailyNavigationStay">Stay</button>
       <button type="button" id="dailyNavigationLeave" class="daily-navigation-leave">Leave</button>
+    </div>
+  </div>
+</div>
+
+<div id="daily-share-success-modal" aria-hidden="true">
+  <div class="daily-share-success-dialog" role="dialog" aria-modal="true"
+       aria-labelledby="dailyShareSuccessMessage">
+    <button type="button" class="daily-share-success-close" id="dailyShareSuccessClose" aria-label="Close">&times;</button>
+    <p id="dailyShareSuccessMessage">Successfully received? Clear records and log out?</p>
+    <div class="daily-share-success-actions">
+      <button type="button" id="dailyShareSuccessYes">Yes</button>
+      <button type="button" id="dailyShareSuccessNo">No</button>
     </div>
   </div>
 </div>
@@ -1365,6 +1412,7 @@ document.addEventListener('keydown', e => {
   }
 });
 document.addEventListener('DOMContentLoaded', () => {
+  dailyInitializeShareSuccessModal();
   const stay = document.getElementById('dailyNavigationStay');
   const leave = document.getElementById('dailyNavigationLeave');
 
@@ -1414,12 +1462,19 @@ function dailyFormatCountdown(milliseconds) {
 }
 
 function dailyEnsureMenuAboveAccessBlocker() {
+  const menuContainer = document.getElementById('shared-menu');
   const hamburger = document.querySelector('#shared-menu .hamburger-menu');
 
+  if (menuContainer) {
+    // Raise the complete menu stacking context so the hamburger and dropdown
+    // remain clickable while the countdown overlay is displayed.
+    menuContainer.style.position = 'relative';
+    menuContainer.style.zIndex = '10002';
+    menuContainer.style.pointerEvents = 'auto';
+  }
   if (hamburger) {
-    // Keep the normal absolute positioning from menu.js.
-    // Only raise the menu above the access overlay.
-    hamburger.style.zIndex = '10001';
+    hamburger.style.zIndex = '10003';
+    hamburger.style.pointerEvents = 'auto';
   }
 }
 
@@ -2091,6 +2146,53 @@ function dailyIsIPad() {
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
+function dailyShowShareSuccessModal() {
+  const modal = document.getElementById('daily-share-success-modal');
+  if (!modal) return;
+  modal.classList.add('visible');
+  modal.setAttribute('aria-hidden', 'false');
+  document.getElementById('dailyShareSuccessNo')?.focus();
+}
+
+function dailyHideShareSuccessModal() {
+  const modal = document.getElementById('daily-share-success-modal');
+  if (!modal) return;
+  modal.classList.remove('visible');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+async function dailyClearRecordsAndLogOut() {
+  try {
+    if ('caches' in window) await caches.delete(DAILY_SESSION_CACHE_NAME);
+  } catch (error) {
+    console.warn('Could not clear Daily Exercises cache:', error);
+  }
+  if (dailyAccessTimer) { clearInterval(dailyAccessTimer); dailyAccessTimer = null; }
+  if (dailyCacheExpiryTimer) { clearTimeout(dailyCacheExpiryTimer); dailyCacheExpiryTimer = null; }
+
+  const state = window.dailyExerciseState;
+  if (state) {
+    state.student = ''; state.order = []; state.index = 0; state.results = {};
+    state.sightRecording = null; state.sightExample = null;
+    state.sessionReady = false; state.waitingForAdvance = false; state.active = null;
+  }
+  localStorage.removeItem('biph_student_name');
+  localStorage.removeItem('biph_name_timestamp');
+  window.location.reload();
+}
+
+function dailyInitializeShareSuccessModal() {
+  const modal = document.getElementById('daily-share-success-modal');
+  if (!modal || modal.dataset.initialized === 'true') return;
+  modal.dataset.initialized = 'true';
+  document.getElementById('dailyShareSuccessNo')?.addEventListener('click', dailyHideShareSuccessModal);
+  document.getElementById('dailyShareSuccessClose')?.addEventListener('click', dailyHideShareSuccessModal);
+  document.getElementById('dailyShareSuccessYes')?.addEventListener('click', dailyClearRecordsAndLogOut);
+  modal.addEventListener('click', event => {
+    if (event.target === modal) dailyHideShareSuccessModal();
+  });
+}
+
 async function dailyShareBoth() {
   const isIPad = dailyIsIPad();
   try {
@@ -2104,6 +2206,9 @@ async function dailyShareBoth() {
         title:'Daily Exercises',
         text:`Daily Exercises for ${window.dailyExerciseState.student}`
       });
+      // A resolved Web Share promise indicates the share flow completed.
+      // Cancellation rejects and will not display this confirmation.
+      dailyShowShareSuccessModal();
       return;
     }
 
