@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Impressionism — Interactive Exhibition</title>
+<title>Impressionism</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -760,16 +760,12 @@ body {
 /* =========================================================
    ARTIST INFORMATION AND ARTWORKS
 
-   The six works for each artist are listed in the same order
-   as supplied.
+   Each artist's six works are stored in piece-number order.
+   The artist order below is intentional: the schedule takes
+   one work from each artist per round.
 
-   The final schedule is interleaved automatically:
-
-   Round 1: Work 1 from each artist
-   Round 2: Work 2 from each artist
-   Round 3: Work 3 from each artist
-   ...
-   Round 6: Work 6 from each artist
+   The first three scheduled minutes are:
+   09:00 = piece13, 09:01 = piece25, 09:02 = piece1.
 
    This produces exactly 60 artworks.
 ========================================================= */
@@ -783,7 +779,7 @@ const artists = [
         works: [
 
             {
-                file: "Camille Pissarro - Entrée du village de Voisins.jpg",
+                file: "piece13.jpg",
                 title: "Entrée du village de Voisins",
                 year: "Date not specified",
                 description:
@@ -791,7 +787,7 @@ const artists = [
             },
 
             {
-                file: "Camille Pissarro - Hameau aux environs de Pontoise.jpg",
+                file: "piece14.jpg",
                 title: "Hameau aux environs de Pontoise",
                 year: "Date not specified",
                 description:
@@ -799,23 +795,7 @@ const artists = [
             },
 
             {
-                file: "Camille Pissarro - Pont Boieldieu in Rouen, Rainy Weather.jpg",
-                title: "Pont Boieldieu in Rouen, Rainy Weather",
-                year: "1896",
-                description:
-                    "Pissarro depicts the busy river crossing at Rouen under unsettled weather. The bridge, traffic, water, and distant architecture become part of a shifting urban atmosphere. His broken brushwork captures the way rain and changing light soften the details of a modern city."
-            },
-
-            {
-                file: "Camille Pissarro - Paysage à l'Hermitage, Pontoise.jpg",
-                title: "Paysage à l'Hermitage, Pontoise",
-                year: "Date not specified",
-                description:
-                    "The Hermitage district of Pontoise provided Pissarro with a recurring landscape. Here, the countryside is treated not as a grand panorama but as a familiar environment, where cultivated land, buildings, and vegetation form a connected pattern of everyday rural life."
-            },
-
-            {
-                file: "Camille Pissarro - Jalais Hill, Pontoise.jpg",
+                file: "piece15.jpg",
                 title: "Jalais Hill, Pontoise",
                 year: "1867",
                 description:
@@ -823,14 +803,30 @@ const artists = [
             },
 
             {
-                file: "Camille Pissarro - View from Louveciennes.jpg",
+                file: "piece16.jpg",
+                title: "Paysage à l'Hermitage, Pontoise",
+                year: "Date not specified",
+                description:
+                    "The Hermitage district of Pontoise provided Pissarro with a recurring landscape. Here, the countryside is treated not as a grand panorama but as a familiar environment, where cultivated land, buildings, and vegetation form a connected pattern of everyday rural life."
+            },
+
+            {
+                file: "piece17.jpg",
+                title: "Pont Boieldieu in Rouen, Rainy Weather",
+                year: "1896",
+                description:
+                    "Pissarro depicts the busy river crossing at Rouen under unsettled weather. The bridge, traffic, water, and distant architecture become part of a shifting urban atmosphere. His broken brushwork captures the way rain and changing light soften the details of a modern city."
+            },
+
+            {
+                file: "piece18.jpg",
                 title: "View from Louveciennes",
                 year: "Date not specified",
                 description:
                     "Louveciennes was one of the landscapes Pissarro explored during his years near Paris. The view invites attention to the relationship between the built environment and the surrounding countryside, with colour and brushwork giving the scene its particular outdoor light."
             }
 
-        ]
+    ]
     },
 
 
@@ -841,7 +837,7 @@ const artists = [
         works: [
 
             {
-                file: "Edgar Degas - Cotton Office New Orleans.jpg",
+                file: "piece25.jpg",
                 title: "Cotton Office in New Orleans",
                 year: "1873",
                 description:
@@ -849,7 +845,7 @@ const artists = [
             },
 
             {
-                file: "Edgar Degas - Millinery Shop.jpg",
+                file: "piece26.jpg",
                 title: "The Millinery Shop",
                 year: "Date not specified",
                 description:
@@ -857,7 +853,7 @@ const artists = [
             },
 
             {
-                file: "Edgar Degas - Orchestra Musicians.jpg",
+                file: "piece27.jpg",
                 title: "The Orchestra Musicians",
                 year: "1870s",
                 description:
@@ -865,7 +861,7 @@ const artists = [
             },
 
             {
-                file: "Edgar Degas - The Dancing Class.jpg",
+                file: "piece28.jpg",
                 title: "The Dancing Class",
                 year: "1870s",
                 description:
@@ -873,7 +869,7 @@ const artists = [
             },
 
             {
-                file: "Edgar Degas - Two Dancers Practicing at the Barre.jpg",
+                file: "piece29.jpg",
                 title: "Two Dancers Practicing at the Barre",
                 year: "Date not specified",
                 description:
@@ -881,14 +877,14 @@ const artists = [
             },
 
             {
-                file: "Edgar Degas - Woman Seated Vase of Flowers.jpg",
+                file: "piece30.jpg",
                 title: "Woman Seated with a Vase of Flowers",
                 year: "Date not specified",
                 description:
                     "Degas brings together a seated figure and a floral arrangement in an intimate interior. The relationship between the person, the flowers, and the surrounding space creates a quiet domestic moment, while the composition encourages the viewer to notice how the scene is framed."
             }
 
-        ]
+    ]
     },
 
 
@@ -899,7 +895,7 @@ const artists = [
         works: [
 
             {
-                file: "Alfred Sisley - Boulevard Heloise.jpg",
+                file: "piece1.jpg",
                 title: "Boulevard Heloise",
                 year: "Date not specified",
                 description:
@@ -907,7 +903,7 @@ const artists = [
             },
 
             {
-                file: "Alfred Sisley - Bridge at Serves.jpg",
+                file: "piece2.jpg",
                 title: "Bridge at Serves",
                 year: "Date not specified",
                 description:
@@ -915,7 +911,7 @@ const artists = [
             },
 
             {
-                file: "Alfred Sisley - Resting by a Stream at the Edge of the Wood.jpg",
+                file: "piece3.jpg",
                 title: "Resting by a Stream at the Edge of the Wood",
                 year: "Date not specified",
                 description:
@@ -923,7 +919,7 @@ const artists = [
             },
 
             {
-                file: "Alfred Sisley - Snow Effect in Louveciennes.jpg",
+                file: "piece4.jpg",
                 title: "Snow Effect in Louveciennes",
                 year: "Date not specified",
                 description:
@@ -931,7 +927,7 @@ const artists = [
             },
 
             {
-                file: "Alfred Sisley - The Road from Moret to Saint-Mammès.jpg",
+                file: "piece5.jpg",
                 title: "The Road from Moret to Saint-Mammès",
                 year: "Date not specified",
                 description:
@@ -939,14 +935,14 @@ const artists = [
             },
 
             {
-                file: "Alfred Sisley - The Seine at Point du Jour.jpg",
+                file: "piece6.jpg",
                 title: "The Seine at Point du Jour",
                 year: "Date not specified",
                 description:
                     "Sisley returns to the Seine, a subject that allowed him to explore reflections, open skies, and the changing appearance of water. The river gives the composition a broad sense of space, while the surrounding landscape anchors the view in a particular place."
             }
 
-        ]
+    ]
     },
 
 
@@ -957,7 +953,15 @@ const artists = [
         works: [
 
             {
-                file: "Claude Monet - Impression, Sunrise.jpg",
+                file: "piece19.jpg",
+                title: "Haystacks at Sunset, Frosty Weather",
+                year: "1890–1891",
+                description:
+                    "The haystacks become a subject through which Monet studies the changing effects of weather and time of day. In this winter atmosphere, the low sunlight and cool surroundings alter the appearance of a familiar rural object, demonstrating how colour changes with the conditions of viewing."
+            },
+
+            {
+                file: "piece20.jpg",
                 title: "Impression, Sunrise",
                 year: "1872",
                 description:
@@ -965,7 +969,7 @@ const artists = [
             },
 
             {
-                file: "Claude Monet - La Gare Saint-Lazare.jpg",
+                file: "piece21.jpg",
                 title: "La Gare Saint-Lazare",
                 year: "1877",
                 description:
@@ -973,23 +977,7 @@ const artists = [
             },
 
             {
-                file: "Claude Monet - Le Grand Canal.jpg",
-                title: "Le Grand Canal",
-                year: "1908",
-                description:
-                    "During his visit to Venice, Monet painted the Grand Canal from several viewpoints. Water, architecture, and reflections merge into shifting fields of colour. Rather than simply recording a famous landmark, he captures the city's changing light and the atmosphere of the lagoon."
-            },
-
-            {
-                file: "Claude Monet - The Water Lily Pond.jpg",
-                title: "The Water Lily Pond",
-                year: "1899",
-                description:
-                    "Monet's garden at Giverny became one of his most important subjects. The Japanese-style bridge, water lilies, and reflections allow him to explore the relationship between nature, colour, and the surface of the water. The garden becomes both a real place and a carefully observed world of light."
-            },
-
-            {
-                file: "Claude Monet - La Grenouillére.jpg",
+                file: "piece22.jpg",
                 title: "La Grenouillère",
                 year: "1869",
                 description:
@@ -997,14 +985,22 @@ const artists = [
             },
 
             {
-                file: "Claude Monet - Haystacks at Sunset, Frosty Weather.jpg",
-                title: "Haystacks at Sunset, Frosty Weather",
-                year: "1890–1891",
+                file: "piece23.jpg",
+                title: "Le Grand Canal",
+                year: "1908",
                 description:
-                    "The haystacks become a subject through which Monet studies the changing effects of weather and time of day. In this winter atmosphere, the low sunlight and cool surroundings alter the appearance of a familiar rural object, demonstrating how colour changes with the conditions of viewing."
+                    "During his visit to Venice, Monet painted the Grand Canal from several viewpoints. Water, architecture, and reflections merge into shifting fields of colour. Rather than simply recording a famous landmark, he captures the city's changing light and the atmosphere of the lagoon."
+            },
+
+            {
+                file: "piece24.jpg",
+                title: "The Water Lily Pond",
+                year: "1899",
+                description:
+                    "Monet's garden at Giverny became one of his most important subjects. The Japanese-style bridge, water lilies, and reflections allow him to explore the relationship between nature, colour, and the surface of the water. The garden becomes both a real place and a carefully observed world of light."
             }
 
-        ]
+    ]
     },
 
 
@@ -1015,7 +1011,7 @@ const artists = [
         works: [
 
             {
-                file: "Marie Bracquemond - Argenton en Landunvez.jpg",
+                file: "piece43.jpg",
                 title: "Argenton en Landunvez",
                 year: "Date not specified",
                 description:
@@ -1023,7 +1019,7 @@ const artists = [
             },
 
             {
-                file: "Marie Bracquemond - Bouquet of flowers in a glass bowl",
+                file: "piece44.jpg",
                 title: "Bouquet of Flowers in a Glass Bowl",
                 year: "Date not specified",
                 description:
@@ -1031,7 +1027,7 @@ const artists = [
             },
 
             {
-                file: "Marie Bracquemond - Effet de lumière sur le pont de Sèvres.jpg",
+                file: "piece45.jpg",
                 title: "Effet de lumière sur le pont de Sèvres",
                 year: "Date not specified",
                 description:
@@ -1039,7 +1035,7 @@ const artists = [
             },
 
             {
-                file: "Marie Bracquemond - Paysage d’hiver.jpg",
+                file: "piece46.jpg",
                 title: "Paysage d’hiver",
                 year: "Date not specified",
                 description:
@@ -1047,7 +1043,7 @@ const artists = [
             },
 
             {
-                file: "Marie Bracquemond - Study of Trees in the Light of the Rising Sun.jpg",
+                file: "piece47.jpg",
                 title: "Study of Trees in the Light of the Rising Sun",
                 year: "Date not specified",
                 description:
@@ -1055,14 +1051,14 @@ const artists = [
             },
 
             {
-                file: "Marie Bracquemond - View of Sèvres.jpg",
+                file: "piece48.jpg",
                 title: "View of Sèvres",
                 year: "Date not specified",
                 description:
                     "Bracquemond presents a view of Sèvres through the language of landscape painting. The setting offers an opportunity to observe the relationship between the built environment and nature, with the composition inviting the viewer to look beyond the most obvious details."
             }
 
-        ]
+    ]
     },
 
 
@@ -1073,7 +1069,7 @@ const artists = [
         works: [
 
             {
-                file: "Pierre-Auguste Renoir - Hills around the Bay of Moulin Huet.jpg",
+                file: "piece55.jpg",
                 title: "Hills around the Bay of Moulin Huet",
                 year: "1883",
                 description:
@@ -1081,7 +1077,7 @@ const artists = [
             },
 
             {
-                file: "Pierre-Auguste Renoir - Lakeside Landscape.jpg",
+                file: "piece56.jpg",
                 title: "Lakeside Landscape",
                 year: "Date not specified",
                 description:
@@ -1089,7 +1085,7 @@ const artists = [
             },
 
             {
-                file: "Pierre-Auguste Renoir - Pont Neuf.jpg",
+                file: "piece57.jpg",
                 title: "Pont Neuf",
                 year: "1872",
                 description:
@@ -1097,7 +1093,7 @@ const artists = [
             },
 
             {
-                file: "Pierre-Auguste Renoir - The Skiff.jpg",
+                file: "piece58.jpg",
                 title: "The Skiff",
                 year: "Date not specified",
                 description:
@@ -1105,7 +1101,7 @@ const artists = [
             },
 
             {
-                file: "Pierre-Auguste Renoir - Vue de Venise.jpg",
+                file: "piece59.jpg",
                 title: "Vue de Venise",
                 year: "1881",
                 description:
@@ -1113,14 +1109,14 @@ const artists = [
             },
 
             {
-                file: "Pierre-Auguste Renoir - Woman in a Garden.jpg",
+                file: "piece60.jpg",
                 title: "Woman in a Garden",
                 year: "Date not specified",
                 description:
                     "Renoir brings a human figure into a garden setting, combining portraiture with the surrounding natural world. The flowers and foliage are more than background decoration: they help create the colour, light, and intimate atmosphere of the scene."
             }
 
-        ]
+    ]
     },
 
 
@@ -1131,7 +1127,7 @@ const artists = [
         works: [
 
             {
-                file: "Berthe Morisot - English Seascape.jpg",
+                file: "piece7.jpg",
                 title: "English Seascape",
                 year: "Date not specified",
                 description:
@@ -1139,7 +1135,7 @@ const artists = [
             },
 
             {
-                file: "Berthe Morisot - Harbor in the Port of Fecamp.jpg",
+                file: "piece8.jpg",
                 title: "Harbor in the Port of Fécamp",
                 year: "Date not specified",
                 description:
@@ -1147,7 +1143,7 @@ const artists = [
             },
 
             {
-                file: "Berthe Morisot - Rosbras, Brittany.jpg",
+                file: "piece9.jpg",
                 title: "Rosbras, Brittany",
                 year: "Date not specified",
                 description:
@@ -1155,7 +1151,7 @@ const artists = [
             },
 
             {
-                file: "Berthe Morisot - The Port of Nice.jpg",
+                file: "piece10.jpg",
                 title: "The Port of Nice",
                 year: "Date not specified",
                 description:
@@ -1163,7 +1159,7 @@ const artists = [
             },
 
             {
-                file: "Berthe Morisot - The Seine below the Pont d'Lena.jpg",
+                file: "piece11.jpg",
                 title: "The Seine below the Pont d'Iéna",
                 year: "Date not specified",
                 description:
@@ -1171,14 +1167,14 @@ const artists = [
             },
 
             {
-                file: "Berthe Morisot - View of Tivoli after Corot.jpg",
+                file: "piece12.jpg",
                 title: "View of Tivoli after Corot",
                 year: "Date not specified",
                 description:
                     "This view of Tivoli acknowledges the influence of the landscape painter Camille Corot. The work connects Morisot's own observation of nature with an established tradition of landscape painting, while allowing her to explore the atmosphere and character of the Italian setting."
             }
 
-        ]
+    ]
     },
 
 
@@ -1189,7 +1185,7 @@ const artists = [
         works: [
 
             {
-                file: "Frederic Bazille - Beach at Sainte-Adresse.jpg",
+                file: "piece31.jpg",
                 title: "Beach at Sainte-Adresse",
                 year: "Date not specified",
                 description:
@@ -1197,7 +1193,7 @@ const artists = [
             },
 
             {
-                file: "Frederic Bazille - Flowers.jpg",
+                file: "piece32.jpg",
                 title: "Flowers",
                 year: "Date not specified",
                 description:
@@ -1205,7 +1201,7 @@ const artists = [
             },
 
             {
-                file: "Frederic Bazille - Landscape at Chailly.jpg",
+                file: "piece33.jpg",
                 title: "Landscape at Chailly",
                 year: "Date not specified",
                 description:
@@ -1213,7 +1209,7 @@ const artists = [
             },
 
             {
-                file: "Frederic Bazille - Landscape of Aigues-Mortes.jpg",
+                file: "piece34.jpg",
                 title: "Landscape of Aigues-Mortes",
                 year: "Date not specified",
                 description:
@@ -1221,7 +1217,7 @@ const artists = [
             },
 
             {
-                file: "Frederic Bazille - Landscape on the Shore of Lez.jpg",
+                file: "piece35.jpg",
                 title: "Landscape on the Shore of Lez",
                 year: "Date not specified",
                 description:
@@ -1229,14 +1225,14 @@ const artists = [
             },
 
             {
-                file: "Frederic Bazille - Port of the Queen at Aigues-Mortes.jpg",
+                file: "piece36.jpg",
                 title: "Port of the Queen at Aigues-Mortes",
                 year: "Date not specified",
                 description:
                     "Bazille depicts a place associated with the historic town of Aigues-Mortes. The setting combines landscape and human geography, encouraging the viewer to consider how the surrounding environment gives a location its distinctive identity."
             }
 
-        ]
+    ]
     },
 
 
@@ -1247,7 +1243,7 @@ const artists = [
         works: [
 
             {
-                file: "Mary Cassatt - Children in a Garden.jpg",
+                file: "piece49.jpg",
                 title: "Children in a Garden",
                 year: "Date not specified",
                 description:
@@ -1255,7 +1251,7 @@ const artists = [
             },
 
             {
-                file: "Mary Cassatt - Girl with a Banjo.jpg",
+                file: "piece50.jpg",
                 title: "Girl with a Banjo",
                 year: "Date not specified",
                 description:
@@ -1263,7 +1259,7 @@ const artists = [
             },
 
             {
-                file: "Mary Cassatt - Lydia Seated in the Garden with a Dog in Her Lap.jpg",
+                file: "piece51.jpg",
                 title: "Lydia Seated in the Garden with a Dog in Her Lap",
                 year: "Date not specified",
                 description:
@@ -1271,7 +1267,7 @@ const artists = [
             },
 
             {
-                file: "Mary Cassatt - Lydia Seated on a Terrace.jpg",
+                file: "piece52.jpg",
                 title: "Lydia Seated on a Terrace",
                 year: "Date not specified",
                 description:
@@ -1279,7 +1275,7 @@ const artists = [
             },
 
             {
-                file: "Mary Cassatt - Red poppies.jpg",
+                file: "piece53.jpg",
                 title: "Red Poppies",
                 year: "Date not specified",
                 description:
@@ -1287,14 +1283,14 @@ const artists = [
             },
 
             {
-                file: "Mary Cassatt - Summertime.jpg",
+                file: "piece54.jpg",
                 title: "Summertime",
                 year: "1894",
                 description:
                     "Cassatt presents a warm-weather scene centred on women and children outdoors. The subject reflects her interest in family life and the activities of women, while the garden setting brings together figures, nature, and the atmosphere of summer."
             }
 
-        ]
+    ]
     },
 
 
@@ -1305,7 +1301,7 @@ const artists = [
         works: [
 
             {
-                file: "Gustave Caillebotte - Norman Landscape.jpg",
+                file: "piece37.jpg",
                 title: "Norman Landscape",
                 year: "Date not specified",
                 description:
@@ -1313,7 +1309,7 @@ const artists = [
             },
 
             {
-                file: "Gustave Caillebotte - Richard Gallo and His Dog at Petit Gennevilliers.jpg",
+                file: "piece38.jpg",
                 title: "Richard Gallo and His Dog at Petit Gennevilliers",
                 year: "1884",
                 description:
@@ -1321,7 +1317,7 @@ const artists = [
             },
 
             {
-                file: "Gustave Caillebotte - Rue Halevy, Balcony View.jpg",
+                file: "piece39.jpg",
                 title: "Rue Halévy, Balcony View",
                 year: "Date not specified",
                 description:
@@ -1329,7 +1325,7 @@ const artists = [
             },
 
             {
-                file: "Gustave Caillebotte - The Canoe.jpg",
+                file: "piece40.jpg",
                 title: "The Canoe",
                 year: "Date not specified",
                 description:
@@ -1337,7 +1333,7 @@ const artists = [
             },
 
             {
-                file: "Gustave Caillebotte - The Harbour of Argentueil.jpg",
+                file: "piece41.jpg",
                 title: "The Harbour of Argenteuil",
                 year: "Date not specified",
                 description:
@@ -1345,14 +1341,14 @@ const artists = [
             },
 
             {
-                file: "Gustave Caillebotte - View of the Seine in the Direction of the Pont de Bezons.jpg",
+                file: "piece42.jpg",
                 title: "View of the Seine in the Direction of the Pont de Bezons",
                 year: "Date not specified",
                 description:
                     "Caillebotte follows the Seine toward the Pont de Bezons, using the river to organise a broad landscape view. The composition invites the eye along the waterway and into the distance, while the bridge connects the natural landscape with the expanding world of modern transport and industry."
             }
 
-        ]
+    ]
     }
 
 ];
@@ -1938,6 +1934,23 @@ function drawArtwork() {
 
 
 /* =========================================================
+   ARTWORK CONSOLE LOGGING
+========================================================= */
+
+function logCurrentArtwork(index, mode) {
+
+    const art = artworks[index];
+
+    if (!art) return;
+
+    console.info(
+        `[Impressionism] Now viewing ${art.file} — ${art.artist}: "${art.title}" (${mode})`
+    );
+
+}
+
+
+/* =========================================================
    LOAD AN ARTWORK
 ========================================================= */
 
@@ -1945,15 +1958,43 @@ async function loadArtwork(index) {
 
     const art = artworks[index];
 
+    if (!art) {
+        throw new Error(`No artwork exists at schedule index ${index}.`);
+    }
+
     const image = new Image();
 
     image.decoding = "async";
 
-    image.src = "art/" + art.file;
+    const imagePath = "art/" + art.file;
 
-    await image.decode();
+    image.src = imagePath;
+
+    try {
+
+        await image.decode();
+
+    } catch (error) {
+
+        console.error(
+            `[Impressionism] Image failed to decode: ${imagePath}`,
+            {
+                artwork: art.title,
+                artist: art.artist,
+                expectedFile: art.file,
+                imageWidth: image.naturalWidth,
+                imageHeight: image.naturalHeight,
+                error
+            }
+        );
+
+        throw error;
+
+    }
 
     activeImage = image;
+
+    logCurrentArtwork(index, "Main Display");
 
     if (mainDisplay.classList.contains("active")) {
         drawArtwork();
@@ -1970,6 +2011,8 @@ function updatePlacard(index) {
 
     const art = artworks[index];
 
+    logCurrentArtwork(index, "Placard");
+
     document.getElementById("placard-artist").textContent =
         art.artist;
 
@@ -1980,7 +2023,7 @@ function updatePlacard(index) {
         art.title;
 
     document.getElementById("placard-meta").textContent =
-        `${art.year} · ${art.medium}`;
+        art.medium;
 
     document.getElementById("placard-description").textContent =
         art.description;
