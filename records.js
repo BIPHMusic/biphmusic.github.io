@@ -7744,4 +7744,259 @@ const records = [
         exercise: "Ear Training",
         termsToReview: ["Major 7th","Minor 7th","Augmented Triad"]
     },
+    {
+        student: "Maggie",
+        date: "2026-11-04",
+        time: "2:37 PM",
+        percentage: 50,
+        originalPercentage: 33,
+        curvedPercentage: 50,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-04",
+        time: "2:37 PM",
+        percentage: 84,
+        originalPercentage: 67,
+        curvedPercentage: 84,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-04",
+        time: "2:38 PM",
+        percentage: 84,
+        originalPercentage: 67,
+        curvedPercentage: 84,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-04",
+        time: "2:38 PM",
+        percentage: 67,
+        originalPercentage: 50,
+        curvedPercentage: 67,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-04",
+        time: "2:38 PM",
+        percentage: 67,
+        originalPercentage: 50,
+        curvedPercentage: 67,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-04",
+        time: "2:38 PM",
+        percentage: 100,
+        originalPercentage: 83,
+        curvedPercentage: 100,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-05",
+        time: "2:38 PM",
+        percentage: 85,
+        originalPercentage: 71,
+        curvedPercentage: 85,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-05",
+        time: "2:38 PM",
+        percentage: 71,
+        originalPercentage: 57,
+        curvedPercentage: 71,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-05",
+        time: "2:38 PM",
+        percentage: 71,
+        originalPercentage: 57,
+        curvedPercentage: 71,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-05",
+        time: "2:39 PM",
+        percentage: 71,
+        originalPercentage: 57,
+        curvedPercentage: 71,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-05",
+        time: "2:39 PM",
+        percentage: 71,
+        originalPercentage: 57,
+        curvedPercentage: 71,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-05",
+        time: "2:39 PM",
+        percentage: 100,
+        originalPercentage: 86,
+        curvedPercentage: 100,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-05",
+        time: "2:39 PM",
+        percentage: 100,
+        originalPercentage: 86,
+        curvedPercentage: 100,
+        curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-06",
+        time: "2:39 PM",
+        percentage: 70,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-06",
+        time: "2:39 PM",
+        percentage: 70,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-06",
+        time: "2:39 PM",
+        percentage: 70,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-06",
+        time: "2:40 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-06",
+        time: "2:40 PM",
+        percentage: 50,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-06",
+        time: "2:41 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-06",
+        time: "2:41 PM",
+        percentage: 90,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-09",
+        time: "2:41 PM",
+        percentage: 33,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-09",
+        time: "2:41 PM",
+        percentage: 50,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-09",
+        time: "2:41 PM",
+        percentage: 50,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-09",
+        time: "2:41 PM",
+        percentage: 50,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-09",
+        time: "2:42 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-09",
+        time: "2:42 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-09",
+        time: "2:42 PM",
+        percentage: 83,
+        exercise: "MCQs",
+        termsToReview: []
+    },
 ];
