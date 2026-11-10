@@ -8244,4 +8244,12 @@ const records = [
         exercise: "Ear Training",
         termsToReview: ["Minor 7th","Minor 6th","Perfect 5th","Dominant 7","Diminished 7"]
     },
+    {
+        student: "Alex",
+        date: "2026-11-04",
+        time: "4:52 PM",
+        percentage: 83,
+        exercise: "MCQs",
+        termsToReview: []
+    },
 ];
