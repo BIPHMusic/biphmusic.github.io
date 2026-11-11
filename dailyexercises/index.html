@@ -1466,13 +1466,19 @@ function dailyEnsureMenuAboveAccessBlocker() {
   const hamburger = document.querySelector('#shared-menu .hamburger-menu');
 
   if (menuContainer) {
-    // Raise the complete menu stacking context so the hamburger and dropdown
-    // remain clickable while the countdown overlay is displayed.
-    menuContainer.style.position = 'relative';
+    menuContainer.style.position = 'fixed';
+    menuContainer.style.top = '0';
+    menuContainer.style.left = '0';
+    menuContainer.style.width = '0';
+    menuContainer.style.height = '0';
     menuContainer.style.zIndex = '10002';
     menuContainer.style.pointerEvents = 'auto';
   }
+
   if (hamburger) {
+    hamburger.style.position = 'fixed';
+    hamburger.style.top = '20px';
+    hamburger.style.left = '20px';
     hamburger.style.zIndex = '10003';
     hamburger.style.pointerEvents = 'auto';
   }
