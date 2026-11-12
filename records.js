@@ -8348,4 +8348,118 @@ const records = [
         exercise: "Vocab",
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-11-12",
+        time: "10:43 AM",
+        percentage: 80,
+        exercise: "Vocab",
+        termsToReview: ["Predominant","Subdominant"]
+    },
+    {
+        student: "Alex",
+        date: "2026-11-12",
+        time: "10:44 AM",
+        percentage: 80,
+        originalPercentage: 67,
+        curvedPercentage: 80,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: ["Minor 3rd","Diminished Triad","Half-Diminished 7"]
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-12",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-12",
+        time: "10:45 AM",
+        percentage: 93,
+        originalPercentage: 80,
+        curvedPercentage: 93,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: ["Major 6th","Augmented Triad","Diminished Triad"]
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-12",
+        time: "10:44 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-12",
+        time: "10:47 AM",
+        percentage: 100,
+        originalPercentage: 87,
+        curvedPercentage: 100,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: ["Perfect 4th","Perfect 8ve"]
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-12",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-12",
+        time: "10:48 AM",
+        percentage: 86,
+        originalPercentage: 73,
+        curvedPercentage: 86,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: ["Minor 3rd","Perfect 5th","Diminished Triad","Augmented Triad"]
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-12",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-12",
+        time: "10:51 AM",
+        percentage: 80,
+        originalPercentage: 67,
+        curvedPercentage: 80,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: ["Minor 3rd","Perfect 5th","Major 2nd","Diminished Triad","Diminished 7"]
+    },
+    {
+        student: "William",
+        date: "2026-11-12",
+        time: "10:41 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-12",
+        time: "10:45 AM",
+        percentage: 93,
+        originalPercentage: 80,
+        curvedPercentage: 93,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: ["Minor 6th","Diminished Triad","Dominant 7"]
+    },
 ];
