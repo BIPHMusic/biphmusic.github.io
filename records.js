@@ -8462,4 +8462,221 @@ const records = [
         exercise: "Ear Training",
         termsToReview: ["Minor 6th","Diminished Triad","Dominant 7"]
     },
+    {
+        student: "Jocelyn",
+        date: "2026-11-13",
+        time: "2:20 PM",
+        percentage: 85.3,
+        originalPercentage: 80,
+        curvedPercentage: 85.3,
+        curveApplied: true,
+        exercise: "Major Assessment",
+        assessment: "Unit 3 Progress Check",
+        criteria1: {"name":"MCQ","score":"22/24"},
+        criteria2: {"name":"FRQ-A","score":"22/24"},
+        criteria3: {"name":"FRQ-B","score":"5/9"},
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-13",
+        time: "2:21 PM",
+        percentage: 100,
+        originalPercentage: 94.7,
+        curvedPercentage: 100,
+        curveApplied: true,
+        exercise: "Major Assessment",
+        assessment: "Unit 3 Progress Check",
+        criteria1: {"name":"MCQ","score":"22/24"},
+        criteria2: {"name":"FRQ-A","score":"22/24"},
+        criteria3: {"name":"FRQ-B","score":"9/9"},
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-13",
+        time: "2:21 PM",
+        percentage: 92.6,
+        originalPercentage: 87.3,
+        curvedPercentage: 92.6,
+        curveApplied: true,
+        exercise: "Major Assessment",
+        assessment: "Unit 3 Progress Check",
+        criteria1: {"name":"MCQ","score":"19/24"},
+        criteria2: {"name":"FRQ-A","score":"20/24"},
+        criteria3: {"name":"FRQ-B","score":"9/9"},
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-13",
+        time: "2:21 PM",
+        percentage: 98.3,
+        originalPercentage: 93,
+        curvedPercentage: 98.3,
+        curveApplied: true,
+        exercise: "Major Assessment",
+        assessment: "Unit 3 Progress Check",
+        criteria1: {"name":"MCQ","score":"19/24"},
+        criteria2: {"name":"FRQ-A","score":"24/24"},
+        criteria3: {"name":"FRQ-B","score":"100"},
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-13",
+        time: "2:22 PM",
+        percentage: 78.3,
+        originalPercentage: 73,
+        curvedPercentage: 78.3,
+        curveApplied: true,
+        exercise: "Major Assessment",
+        assessment: "Unit 3 Progress Check",
+        criteria1: {"name":"MCQ","score":"21/24"},
+        criteria2: {"name":"FRQ-A","score":"10/24"},
+        criteria3: {"name":"FRQ-B","score":"8/9"},
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-13",
+        time: "2:22 PM",
+        percentage: 95.6,
+        originalPercentage: 90.3,
+        curvedPercentage: 95.6,
+        curveApplied: true,
+        exercise: "Major Assessment",
+        assessment: "Unit 3 Progress Check",
+        criteria1: {"name":"MCQ","score":"21/24"},
+        criteria2: {"name":"FRQ-A","score":"20/24"},
+        criteria3: {"name":"FRQ-B","score":"100"},
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-13",
+        time: "2:22 PM",
+        percentage: 88.6,
+        originalPercentage: 83.3,
+        curvedPercentage: 88.6,
+        curveApplied: true,
+        exercise: "Major Assessment",
+        assessment: "Unit 3 Progress Check",
+        criteria1: {"name":"MCQ","score":"19/24"},
+        criteria2: {"name":"FRQ-A","score":"17/24"},
+        criteria3: {"name":"FRQ-B","score":"100"},
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-16",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-16",
+        time: "10:48 AM",
+        percentage: 93,
+        exercise: "Ear Training",
+        termsToReview: ["Minor Triad"]
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-16",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-16",
+        time: "10:49 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: ["Major 3rd","Major 7th","Augmented Triad"]
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-16",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-16",
+        time: "10:49 AM",
+        percentage: 40,
+        exercise: "Ear Training",
+        termsToReview: ["Perfect 8ve","Minor 3rd","Perfect 5th","Diminished Triad","Minor 7","Half-Diminished 7","Diminished 7"]
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-16",
+        time: "10:49 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-16",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-16",
+        time: "10:46 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-16",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-16",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-16",
+        time: "10:46 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: ["Major 7th","Diminished Triad","Augmented Triad"]
+    },
+    {
+        student: "William",
+        date: "2026-11-16",
+        time: "2:27 PM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-16",
+        time: "2:27 PM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
 ];
