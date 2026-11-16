@@ -337,6 +337,52 @@
             }
         }
     
+/* Major Assessment criterion suggestions */
+.major-criterion-predictions {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+
+    max-height: 220px;
+    overflow-y: auto;
+
+    background: rgba(35, 59, 82, 0.88);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(190, 220, 245, 0.30);
+    border-radius: 9px;
+
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+
+    padding: 5px;
+    color: #f1f6ff;
+}
+
+.major-prediction-item {
+    padding: 10px 12px;
+    border-radius: 6px;
+
+    color: rgba(245, 249, 255, 0.94);
+    background: transparent;
+
+    font-size: 0.95rem;
+    cursor: pointer;
+
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.major-prediction-item:hover {
+    background: rgba(150, 195, 235, 0.22);
+    color: #ffffff;
+}
+
+.major-prediction-item:active {
+    background: rgba(150, 195, 235, 0.34);
+}
+
 </style>
 </head>
 <body>
@@ -7403,6 +7449,35 @@ function simplifyCachedRecords() {
                     }
                 }
             );
+
+            nameInput.addEventListener("blur", () => {
+                // Clicking outside the input dismisses its suggestions.
+                const dropdown = nameInput.parentElement?.querySelector(
+                    ".major-criterion-predictions"
+                );
+
+                if (dropdown) {
+                    dropdown.remove();
+                }
+            });
+
+            nameInput.addEventListener("keydown", event => {
+                if (event.key === "Escape") {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const dropdown = nameInput.parentElement?.querySelector(
+                        ".major-criterion-predictions"
+                    );
+
+                    if (dropdown) {
+                        dropdown.remove();
+                    }
+
+                    nameInput.blur();
+                }
+            });
+
             removeButton.addEventListener(
                 "click",
                 () => {
@@ -7455,59 +7530,53 @@ function simplifyCachedRecords() {
             preview.classList.remove("error");
             return result.percentage;
         }
-        function updateMajorCriterionPredictions(
-            input
-        ) {
-            const existing =
-                input.parentElement
-                    ?.querySelector(
-                        ".major-criterion-predictions"
-                    );
-            if (existing) {
-                existing.remove();
-            }
-            const query =
-                input.value
-                    .trim()
-                    .toLowerCase();
-            const matches =
-                getAllMajorCriteriaNames()
-                    .filter(name =>
-                        !query ||
-                        name
-                            .toLowerCase()
-                            .includes(query)
-                    );
-            if (!matches.length) {
-                return;
-            }
-            const dropdown =
-                document.createElement("div");
-            dropdown.className =
-                "major-criterion-predictions show";
-            matches.forEach(name => {
-                const item =
-                    document.createElement("div");
-                item.className =
-                    "major-prediction-item";
-                item.dataset.name = name;
-                item.textContent = name;
-                item.tabIndex = -1;
-                item.addEventListener(
-                    "mousedown",
-                    event => {
-                        event.preventDefault();
-                        input.value = name;
-                        dropdown.remove();
-                        updateMajorSubmitState();
-                    }
-                );
-                dropdown.appendChild(item);
-            });
-            input.parentElement.appendChild(
-                dropdown
-            );
-        }
+        
+function updateMajorCriterionPredictions(input) {
+    // Remove any existing dropdown for this input.
+    const existing = input.parentElement?.querySelector(
+        ".major-criterion-predictions"
+    );
+
+    if (existing) {
+        existing.remove();
+    }
+
+    const query = input.value.trim().toLowerCase();
+
+    const matches = getAllMajorCriteriaNames().filter(name =>
+        !query || name.toLowerCase().includes(query)
+    );
+
+    if (!matches.length || document.activeElement !== input) {
+        return;
+    }
+
+    const dropdown = document.createElement("div");
+    dropdown.className = "major-criterion-predictions show";
+
+    matches.forEach(name => {
+        const item = document.createElement("div");
+        item.className = "major-prediction-item";
+        item.dataset.name = name;
+        item.textContent = name;
+        item.tabIndex = -1;
+
+        item.addEventListener("mousedown", event => {
+            // Prevent the input from losing focus before selection.
+            event.preventDefault();
+
+            input.value = name;
+            dropdown.remove();
+
+            updateMajorSubmitState();
+        });
+
+        dropdown.appendChild(item);
+    });
+
+    input.parentElement.appendChild(dropdown);
+}
+
                 function renderMajorCriteria(
             criteria,
             locked = false
