@@ -1812,6 +1812,77 @@ function dailyShowCompletedExerciseFeedback(type, resultData) {
     </div>`;
 }
 
+
+async function dailySightHandleMicrophoneError(err) {
+  console.error('Microphone error:', err);
+
+  const status = document.getElementById('recordStatus');
+  const recordButton = document.getElementById('recordButton');
+
+  if (!status) return;
+
+  let permissionState = 'unknown';
+
+  // The Permissions API is not consistently supported by Safari.
+  // Treat it as helpful diagnostic information, not as the authority.
+  try {
+    if (navigator.permissions?.query) {
+      const permission = await navigator.permissions.query({
+        name: 'microphone'
+      });
+      permissionState = permission.state;
+    }
+  } catch (_) {
+    // Safari may reject this query even when getUserMedia is available.
+  }
+
+  if (!window.isSecureContext) {
+    status.innerHTML =
+      'Microphone access requires a secure connection. ' +
+      'Please make sure you are accessing this site using HTTPS.';
+  } else if (!navigator.mediaDevices?.getUserMedia) {
+    status.innerHTML =
+      'This browser does not currently support microphone access. ' +
+      'Please try Safari or another supported browser.';
+  } else if (
+    permissionState === 'denied' ||
+    err?.name === 'NotAllowedError' ||
+    err?.name === 'PermissionDeniedError'
+  ) {
+    status.innerHTML =
+      '<strong>Microphone access is blocked.</strong><br>' +
+      'Your browser or device is currently preventing this site ' +
+      'from using the microphone. No new permission prompt can ' +
+      'appear until that setting is changed.<br><br>' +
+      '<strong>On an iPad:</strong> Open the iPad Settings app and ' +
+      'check the microphone permission for your browser. Also check ' +
+      'Safari website settings for this site and set Microphone to Allow. ' +
+      'Then return here and try again.';
+  } else if (err?.name === 'NotFoundError') {
+    status.textContent =
+      'No microphone was found. Please check that your device has ' +
+      'a working microphone and try again.';
+  } else if (err?.name === 'NotReadableError') {
+    status.textContent =
+      'The microphone appears to be unavailable. Another app may ' +
+      'be using it. Close other apps using the microphone and try again.';
+  } else {
+    status.textContent =
+      'The microphone could not be started. Please check your ' +
+      'browser and device microphone settings, then try again.';
+  }
+
+  if (
+    recordButton &&
+    !dailySightTimeExpired &&
+    dailySightStartedAt &&
+    Date.now() - dailySightStartedAt < 120000
+  ) {
+    recordButton.disabled = false;
+  }
+}
+
+
 function dailyShowCompletedSightSinging() {
   document.getElementById('exercise-stage').innerHTML = `
     <div class="daily-completed-feedback daily-sight-completed-feedback">
@@ -4485,6 +4556,7 @@ function dailyInitSightSinging() {
   };
 }
 
+
 function dailyBeginSightSinging() {
   if (dailySightStartedAt || dailySightHasRecorded || dailySightTimeExpired) return;
 
@@ -4495,7 +4567,11 @@ function dailyBeginSightSinging() {
   document.getElementById('beginSightButton').disabled = true;
   document.getElementById('exerciseImage').classList.add('revealed');
 
-  // Show the visualizer immediately when the student presses Begin!
+  // Clear any previous microphone error.
+  const recordStatus = document.getElementById('recordStatus');
+  if (recordStatus) recordStatus.textContent = '';
+
+  // Show the visualizer immediately when the student presses Begin.
   const visualizer = document.getElementById('visualizer');
   if (visualizer) visualizer.style.display = 'block';
 
@@ -4536,8 +4612,10 @@ function dailyBeginSightSinging() {
   dailySightCountdownTimer =
     setInterval(dailySightUpdateCountdown, 250);
 
+  // This call remains directly within the Begin button's click flow.
   dailyToggleSightRecording();
 }
+
 
 
 function dailySightPlayOfficialTone() {
@@ -4781,14 +4859,12 @@ async function dailyToggleSightRecording() {
       dailySightIsRecording = true;
       recordButton.disabled = !dailySightOfficialStarted;
       document.getElementById('recordIcon').classList.add('recording');
-    } catch (err) {
-      console.error('Microphone error:', err);
-      if (!dailySightTimeExpired) {
-        document.getElementById('recordStatus').textContent =
-          'Microphone access is required. Allow microphone access, then press the record button to retry.';
-        if (recordButton && Date.now() - dailySightStartedAt < 120000) recordButton.disabled = false;
+      } catch (err) {
+        if (!dailySightTimeExpired) {
+          await dailySightHandleMicrophoneError(err);
+        }
       }
-    }
+
   } else {
     if (dailySightTimeExpired || !dailySightOfficialStarted) {
       // Students cannot stop the recording until the official 45-second phase.
