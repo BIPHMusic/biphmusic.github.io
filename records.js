@@ -8679,4 +8679,204 @@ const records = [
         exercise: "Vocab",
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-10-26",
+        time: "9:33 AM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-27",
+        time: "9:36 AM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-28",
+        time: "9:37 AM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-10-29",
+        time: "9:37 AM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-26",
+        time: "10:05 AM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-28",
+        time: "10:08 AM",
+        percentage: 89,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-10-29",
+        time: "10:10 AM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-26",
+        time: "10:13 AM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-27",
+        time: "10:17 AM",
+        percentage: 89,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-28",
+        time: "10:18 AM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-10-29",
+        time: "10:20 AM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-17",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-17",
+        time: "10:48 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: ["Major Triad","Augmented Triad","Dominant 7"]
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-17",
+        time: "10:43 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-17",
+        time: "10:47 AM",
+        percentage: 67,
+        exercise: "Ear Training",
+        termsToReview: ["Tritone","Dominant 7","Half-Diminished 7"]
+    },
+    {
+        student: "William",
+        date: "2026-11-17",
+        time: "10:45 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-17",
+        time: "10:44 AM",
+        percentage: 53,
+        exercise: "Ear Training",
+        termsToReview: ["Minor 3rd","Perfect 4th","Perfect 5th","Diminished Triad","Minor 7"]
+    },
+    {
+        student: "Alex",
+        date: "2026-11-17",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-17",
+        time: "10:48 AM",
+        percentage: 100,
+        exercise: "Ear Training",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-17",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-17",
+        time: "10:50 AM",
+        percentage: 87,
+        exercise: "Ear Training",
+        termsToReview: ["Diminished 7"]
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-17",
+        time: "10:47 AM",
+        percentage: 80,
+        exercise: "Vocab",
+        termsToReview: ["Sforzando","Tenuto"]
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-17",
+        time: "10:51 AM",
+        percentage: 67,
+        exercise: "Ear Training",
+        termsToReview: ["Minor 7th","Major 2nd","Minor 2nd","Diminished 7","Major 7"]
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-17",
+        time: "10:52 AM",
+        percentage: 100,
+        exercise: "Vocab",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-17",
+        time: "10:50 AM",
+        percentage: 80,
+        exercise: "Ear Training",
+        termsToReview: ["Perfect 5th","Diminished 7","Half-Diminished 7"]
+    },
 ];
