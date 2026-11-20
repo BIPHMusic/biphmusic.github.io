@@ -10367,4 +10367,68 @@ const records = [
         exercise: "MCQs",
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-11-19",
+        time: "6:55 AM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-20",
+        time: "10:54 AM",
+        percentage: 100,
+        exercise: "Vocab Quiz",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-20",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Vocab Quiz",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-20",
+        time: "10:53 AM",
+        percentage: 100,
+        exercise: "Vocab Quiz",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-20",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab Quiz",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-20",
+        time: "10:51 AM",
+        percentage: 100,
+        exercise: "Vocab Quiz",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-20",
+        time: "10:50 AM",
+        percentage: 100,
+        exercise: "Vocab Quiz",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-20",
+        time: "10:47 AM",
+        percentage: 100,
+        exercise: "Vocab Quiz",
+        termsToReview: []
+    },
 ];
