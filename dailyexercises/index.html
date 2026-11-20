@@ -9,6 +9,14 @@
 <link rel="icon" href="../icons/BGicon.png">
 <style>
 
+  img {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+    user-drag: none;
+}
+
 #exercise-stage {
   width: 100%;
   display: flex;
@@ -4465,8 +4473,8 @@ const DAILY_SIGHT_SCHOOL_DAYS = [
   '2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06',
   '2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13',
   '2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19',
-  '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-30',
-  '2026-12-01', '2026-12-02', '2026-12-03', '2026-12-04',
+  '2026-11-23', '2026-11-24', '2026-11-25', 
+  '2026-11-30', '2026-12-01', '2026-12-02', '2026-12-03', '2026-12-04',
   '2026-12-07', '2026-12-08', '2026-12-09', '2026-12-10', '2026-12-11',
   '2026-12-14', '2026-12-15', '2026-12-16', '2026-12-17', '2026-12-18',
   '2027-01-04', '2027-01-05', '2027-01-06', '2027-01-07', '2027-01-08',
@@ -4955,5 +4963,22 @@ document.addEventListener('click', e => {
 <script>
 window.addEventListener('load', () => initLogin());
 </script>
+
+<script>
+// Prevent right-click context menus on images
+document.addEventListener('contextmenu', function(e) {
+    if (e.target.closest('img')) {
+        e.preventDefault();
+    }
+});
+
+// Prevent dragging images
+document.addEventListener('dragstart', function(e) {
+    if (e.target.closest('img')) {
+        e.preventDefault();
+    }
+});
+</script>
+
 </body>
 </html>
