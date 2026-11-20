@@ -21,35 +21,40 @@
            body, h1, .Subtitle, .background, .overlay, .overlay2, .logo
         */
 
-        #unitSelector {
-            display: block;
-            margin: 0 auto 25px;
-            padding: 8px 12px;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 8px;
-            cursor: pointer;
-            width: auto;
-            min-width: 180px;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns=%27http\://www.w3.org/2000/svg%27 width=%2712%27 height=%278%27 viewBox=%270 0 12 8%27 fill=%27white%27><polygon points=%276,8 0,0 12,0%27/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 32px;
-        }
+#unitSelector {
+    display: block;
+    position: relative;
+    z-index: 1001;
 
-        #unitSelector:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
+    margin: 0 auto 25px;
+    padding: 8px 12px;
 
-        #unitSelector option {
-            cursor: pointer;
-        }
+    font-size: 16px;
+    color: white;
+
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+
+    cursor: pointer;
+    width: auto;
+    min-width: 180px;
+
+    /* Restore the browser's native dropdown appearance */
+    appearance: auto;
+    -webkit-appearance: menulist;
+
+    background-image: none;
+}
+
+#unitSelector:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+#unitSelector option {
+    cursor: pointer;
+}
 
         #glossary {
             display: grid;
@@ -436,7 +441,6 @@
         function populateUnitSelector() {
             const selector = document.getElementById('unitSelector');
 
-            // Preserve Cumulative and remove all existing unit options.
             selector.innerHTML = '<option value="Cumulative">Cumulative</option>';
 
             const units = getAvailableUnitArrays();
@@ -448,7 +452,6 @@
                 selector.appendChild(option);
             });
 
-            // Cumulative is always selected on page load.
             selector.value = 'Cumulative';
         }
 
@@ -550,26 +553,34 @@
 
         function filterTerms() {
             const selected = document.getElementById('unitSelector').value;
-            let termList;
+
+            let termList = [];
 
             if (selected === 'Cumulative') {
-                termList = cumulative;
+
+                // Combine all available unit arrays.
+                termList = getAvailableUnitArrays()
+                    .flatMap(unit => unit.terms);
+
             } else {
+
                 const match = selected.match(/^Unit(\d+)$/);
                 const unitNumber = match ? Number(match[1]) : 0;
+
                 termList = getUnitTerms(unitNumber);
             }
 
-            if (!Array.isArray(termList)) {
-                termList = [];
-            }
+            // Remove duplicates.
+            termList = [...new Set(termList)];
 
-            const glossary = document.getElementById('glossary');
-            glossary.innerHTML = '';
-
+            // Match terms against the glossary.
             const filtered = theglossary.filter(term =>
                 termList.includes(term.Term)
             );
+
+            const glossary = document.getElementById('glossary');
+
+            glossary.innerHTML = '';
 
             filtered.forEach(term => {
                 glossary.appendChild(createTermCard(term));
