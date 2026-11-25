@@ -10554,17 +10554,6 @@ const records = [
         termsToReview: ["Augmented Triad","Dominant 7","Half-Diminished 7"]
     },
     {
-        student: "Jocelyn",
-        date: "2026-11-23",
-        time: "11:01 AM",
-        percentage: 80,
-        originalPercentage: 73,
-        curvedPercentage: 80,
-        curveApplied: true,        
-        exercise: "Ear Training",
-        termsToReview: ["Augmented Triad","Diminished 7","Minor 7"]
-    },
-    {
         student: "William",
         date: "2026-11-20",
         time: "8:54 PM",
@@ -10682,6 +10671,81 @@ const records = [
         originalPercentage: 80,
         curvedPercentage: 100,
         curveApplied: true,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-23",
+        time: "11:01 AM",
+        percentage: 80,
+        originalPercentage: 73,
+        curvedPercentage: 80,
+        curveApplied: true,
+        exercise: "Ear Training",
+        termsToReview: ["Augmented Triad","Diminished 7","Minor 7"]
+    },
+    {
+        student: "Alex",
+        date: "2026-11-23",
+        time: "2:30 PM",
+        percentage: 40,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-23",
+        time: "2:30 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-24",
+        time: "2:30 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Alex",
+        date: "2026-11-24",
+        time: "2:30 PM",
+        percentage: 60,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-24",
+        time: "2:31 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-24",
+        time: "2:31 PM",
+        percentage: 100,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-24",
+        time: "2:31 PM",
+        percentage: 80,
+        exercise: "MCQs",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-24",
+        time: "2:31 PM",
+        percentage: 80,
         exercise: "MCQs",
         termsToReview: []
     },
