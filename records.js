@@ -10854,4 +10854,60 @@ const records = [
         criteria3: {"name":"FRQ-B","score":"9/9"},
         termsToReview: []
     },
+    {
+        student: "Alex",
+        date: "2026-11-23",
+        time: "7:44 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Calvin",
+        date: "2026-11-23",
+        time: "7:50 PM",
+        percentage: 44,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Jocelyn",
+        date: "2026-11-23",
+        time: "8:03 PM",
+        percentage: 89,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Maggie",
+        date: "2026-11-23",
+        time: "8:28 PM",
+        percentage: 100,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Teresa",
+        date: "2026-11-23",
+        time: "8:33 PM",
+        percentage: 50,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "Thomas",
+        date: "2026-11-23",
+        time: "8:38 PM",
+        percentage: 50,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
+    {
+        student: "William",
+        date: "2026-11-23",
+        time: "8:43 PM",
+        percentage: 94,
+        exercise: "Sight Singing",
+        termsToReview: []
+    },
 ];
